@@ -60,6 +60,21 @@ def _parse_int(value: str) -> int:
     return int(value) if value.isdigit() else 0
 
 
+def _extract_district(row: dict[str, str]) -> str:
+    candidates = [
+        "Nr okręgu",
+        "Numer okręgu",
+        "Okręg",
+        "Okreg",
+        "Numer",
+    ]
+    for key in candidates:
+        value = (row.get(key) or "").strip()
+        if value:
+            return value
+    return "unknown"
+
+
 def _detect_year_from_path(path: Path) -> int | None:
     match = ELECTION_PATH_RE.search(str(path))
     if not match:
@@ -364,7 +379,7 @@ def _import_dataset(csv_path: Path, year: int) -> None:
                 committee_to_id[committee] = cur.fetchone()[0]
 
             for row in rows:
-                district = row.get("Nr okręgu", "").strip() or "unknown"
+                district = _extract_district(row)
                 for committee in committees:
                     candidate_id = committee_to_id.get(committee)
                     if not candidate_id:
