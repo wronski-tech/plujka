@@ -14,9 +14,13 @@ question = st.text_input("Pytanie", placeholder="Ile głosów ma KO?")
 
 if st.button("Zapytaj") and question.strip():
     with st.spinner("Wysyłam zapytanie do API..."):
-        response = requests.post(f"{API_URL}/ask", json={"question": question}, timeout=60)
-        response.raise_for_status()
-        data = response.json()
+        try:
+            response = requests.post(f"{API_URL}/ask", json={"question": question}, timeout=60)
+            response.raise_for_status()
+            data = response.json()
+        except requests.RequestException as error:
+            st.error(f"API jest chwilowo niedostępne lub zwróciło błąd: {error}")
+            st.stop()
 
     st.subheader("Wykryta intencja")
     st.code(data["intent"])

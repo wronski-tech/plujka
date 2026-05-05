@@ -34,7 +34,7 @@ SQL_TEMPLATES = {
         SELECT year, district, committee_name, candidate_name, candidate_votes, list_position
         FROM elected_candidates
         WHERE (%(year)s::int IS NULL OR year = %(year)s::int)
-          AND (%(candidate_pattern)s IS NULL OR committee_name ILIKE %(candidate_pattern)s)
+          AND (%(candidate_pattern)s::text IS NULL OR committee_name ILIKE %(candidate_pattern)s::text)
         ORDER BY year DESC, CAST(district AS INT), candidate_votes DESC;
     """,
     "trend_by_district_for_candidate": """

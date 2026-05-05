@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import threading
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
@@ -12,16 +14,26 @@ class AskRequest(BaseModel):
     question: str
 
 
+def _run_seed_background() -> None:
+    try:
+        seed.seed_if_empty()
+    except Exception:
+        # Logged by uvicorn if unhandled; keep thread alive for ops
+        import logging
+
+        logging.exception("Background seed failed")
+
+
 @app.on_event("startup")
 def startup() -> None:
     db.init_database()
-    seed.seed_if_empty()
     opensearch_store.ensure_index()
+    threading.Thread(target=_run_seed_background, name="seed", daemon=True).start()
 
 
 @app.get("/health")
-def health() -> dict[str, str]:
-    return {"status": "ok"}
+def health() -> dict[str, str | bool]:
+    return {"status": "ok", "data_ready": seed.seed_complete.is_set()}
 
 
 @app.post("/ask")

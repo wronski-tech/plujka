@@ -3,6 +3,7 @@ from __future__ import annotations
 import csv
 import json
 import re
+import threading
 from pathlib import Path
 
 from api.services import db
@@ -378,9 +379,15 @@ def _import_dataset(csv_path: Path, year: int) -> None:
                     )
 
 
+seed_complete = threading.Event()
+
+
 def seed_if_empty() -> None:
-    profile_all_csv_sources()
-    for year, csv_path in _dataset_candidates():
-        if csv_path.exists():
-            _import_dataset(csv_path, year)
-    _seed_elected_candidates_2019()
+    try:
+        profile_all_csv_sources()
+        for year, csv_path in _dataset_candidates():
+            if csv_path.exists():
+                _import_dataset(csv_path, year)
+        _seed_elected_candidates_2019()
+    finally:
+        seed_complete.set()
