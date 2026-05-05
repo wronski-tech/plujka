@@ -1,0 +1,52 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Jerzy Mieczysław CHRÓŚCIKOWSKI";"Marcin DYBOWSKI";"Józef Jan KUROPATWA";"Liczba obwodów"
+"060201";"gmina miejska";"m. Biłgoraj";"biłgorajski";"lubelskie";19499;20910;6917;12582;17;91;1;1;0;0;0;0;1;12582;1;0;12582;322;107;215;0;12260;6342;1498;4420;14
+"060202";"gmina wiejska";"gm. Aleksandrów";"biłgorajski";"lubelskie";2350;2585;888;1462;1;20;0;0;0;0;0;0;0;1462;0;0;1462;26;2;24;0;1436;1049;125;262;4
+"060203";"gmina wiejska";"gm. Biłgoraj";"biłgorajski";"lubelskie";9737;10423;3727;6010;9;17;0;0;0;0;0;0;0;6010;0;0;6010;161;25;136;0;5849;4001;495;1353;15
+"060204";"gmina wiejska";"gm. Biszcza";"biłgorajski";"lubelskie";2864;3089;1178;1686;5;5;0;0;0;0;0;0;0;1686;0;0;1686;21;4;17;0;1665;1178;131;356;4
+"060205";"gmina miejsko-wiejska";"gm. Frampol";"biłgorajski";"lubelskie";4638;5018;1923;2715;0;15;0;0;0;0;0;0;0;2715;0;0;2715;44;9;35;0;2671;1830;301;540;9
+"060206";"gmina wiejska";"gm. Goraj";"biłgorajski";"lubelskie";3117;3416;1266;1851;6;14;0;0;0;0;0;0;0;1851;0;0;1851;49;13;36;0;1802;1342;174;286;5
+"060207";"gmina miejsko-wiejska";"gm. Józefów";"biłgorajski";"lubelskie";5231;5684;2399;2832;9;33;0;0;0;0;0;0;0;2832;0;0;2832;58;22;36;0;2774;1675;282;817;8
+"060208";"gmina wiejska";"gm. Księżpol";"biłgorajski";"lubelskie";5000;5481;1976;3024;4;6;0;0;0;0;0;0;0;3024;0;0;3024;76;15;61;0;2948;2126;254;568;5
+"060209";"gmina wiejska";"gm. Łukowa";"biłgorajski";"lubelskie";3188;3430;1283;1905;0;24;0;0;0;0;0;0;0;1904;0;0;1904;18;10;8;0;1886;1450;117;319;3
+"060210";"gmina wiejska";"gm. Obsza";"biłgorajski";"lubelskie";3164;3470;1317;1847;2;16;0;0;0;0;0;0;0;1847;0;0;1847;51;9;42;0;1796;1378;113;305;4
+"060211";"gmina wiejska";"gm. Potok Górny";"biłgorajski";"lubelskie";4137;4506;1605;2532;17;16;0;0;0;0;0;0;0;2532;0;0;2532;49;11;38;0;2483;1946;182;355;4
+"060212";"gmina miejsko-wiejska";"gm. Tarnogród";"biłgorajski";"lubelskie";4962;5336;1821;3141;5;12;0;0;0;0;0;0;0;3139;0;1;3138;74;17;57;0;3064;2082;274;708;9
+"060213";"gmina wiejska";"gm. Tereszpol";"biłgorajski";"lubelskie";2839;3169;1159;1680;5;7;0;0;0;0;0;0;0;1680;0;0;1680;34;10;24;0;1646;1086;154;406;4
+"060214";"gmina wiejska";"gm. Turobin";"biłgorajski";"lubelskie";4719;5150;1623;3096;18;12;0;0;0;0;0;0;0;3096;0;0;3096;63;27;36;0;3033;2353;206;474;10
+"060401";"gmina miejska";"m. Hrubieszów";"hrubieszowski";"lubelskie";13838;14780;5958;7881;12;75;1;1;0;0;0;0;1;7883;1;0;7883;286;101;185;0;7597;3786;1437;2374;15
+"060402";"gmina wiejska";"gm. Dołhobyczów";"hrubieszowski";"lubelskie";4160;4457;2240;1920;7;17;0;0;0;0;0;0;0;1920;0;0;1920;28;5;23;0;1892;1079;133;680;8
+"060403";"gmina wiejska";"gm. Horodło";"hrubieszowski";"lubelskie";3894;4221;2004;1890;0;11;0;0;0;0;0;0;0;1890;0;0;1890;38;9;29;0;1852;1127;210;515;5
+"060404";"gmina wiejska";"gm. Hrubieszów";"hrubieszowski";"lubelskie";7558;8179;3696;3862;9;32;0;0;0;0;0;0;0;3862;0;0;3862;92;20;72;0;3770;2414;435;921;12
+"060405";"gmina wiejska";"gm. Mircze";"hrubieszowski";"lubelskie";5553;6032;2771;2782;3;23;0;0;0;0;0;0;0;2780;0;0;2780;71;23;48;0;2709;1420;191;1098;11
+"060406";"gmina wiejska";"gm. Trzeszczany";"hrubieszowski";"lubelskie";3173;3453;1521;1652;23;8;0;0;0;0;0;0;0;1652;0;0;1652;28;6;22;0;1624;1126;162;336;3
+"060407";"gmina wiejska";"gm. Uchanie";"hrubieszowski";"lubelskie";3493;3790;1561;1932;4;9;0;0;0;0;0;0;0;1931;0;0;1931;56;7;49;0;1875;1297;177;401;5
+"060408";"gmina wiejska";"gm. Werbkowice";"hrubieszowski";"lubelskie";7168;7716;3338;3829;6;32;0;0;0;0;0;0;0;3828;0;0;3828;89;15;74;0;3739;2538;390;811;10
+"061801";"gmina miejska";"m. Tomaszów Lubelski";"tomaszowski";"lubelskie";14610;15536;5474;9135;28;74;1;1;0;0;0;0;1;9135;1;0;9135;224;52;172;0;8911;4808;1016;3087;12
+"061802";"gmina wiejska";"gm. Bełżec";"tomaszowski";"lubelskie";2441;2644;1077;1363;3;4;0;0;0;0;0;0;0;1362;0;0;1362;39;3;36;0;1323;828;120;375;4
+"061803";"gmina wiejska";"gm. Jarczów";"tomaszowski";"lubelskie";2610;2915;1153;1457;0;6;1;1;1;0;0;0;0;1457;0;0;1457;31;6;25;0;1426;1051;108;267;4
+"061804";"gmina wiejska";"gm. Krynice";"tomaszowski";"lubelskie";2470;2715;993;1477;5;15;0;0;0;0;0;0;0;1477;0;0;1477;41;8;33;0;1436;1026;109;301;5
+"061805";"gmina miejsko-wiejska";"gm. Lubycza Królewska";"tomaszowski";"lubelskie";4724;5111;2566;2158;2;34;0;0;0;0;0;0;0;2158;0;0;2158;45;8;37;0;2113;1255;227;631;7
+"061806";"gmina miejsko-wiejska";"gm. Łaszczów";"tomaszowski";"lubelskie";4620;4974;2119;2501;13;13;0;0;0;0;0;0;0;2500;0;0;2500;44;3;41;0;2456;1620;173;663;11
+"061807";"gmina wiejska";"gm. Rachanie";"tomaszowski";"lubelskie";3989;4442;1732;2257;6;25;0;0;0;0;0;0;0;2257;0;0;2257;32;5;27;0;2225;1547;236;442;9
+"061808";"gmina wiejska";"gm. Susiec";"tomaszowski";"lubelskie";5660;6151;2382;3278;4;47;0;0;0;0;0;0;0;3278;0;0;3278;80;10;70;0;3198;2175;250;773;7
+"061809";"gmina wiejska";"gm. Tarnawatka";"tomaszowski";"lubelskie";2910;3138;1285;1625;7;9;0;0;0;0;0;0;0;1625;0;0;1625;27;8;19;0;1598;1234;125;239;5
+"061810";"gmina wiejska";"gm. Telatyn";"tomaszowski";"lubelskie";3008;3276;1376;1632;4;16;0;0;0;0;0;0;0;1632;0;0;1632;39;11;28;0;1593;1048;109;436;5
+"061811";"gmina wiejska";"gm. Tomaszów Lubelski";"tomaszowski";"lubelskie";8361;9147;3482;4879;4;14;0;0;0;0;0;0;0;4879;0;0;4879;105;10;95;0;4774;3259;424;1091;13
+"061812";"gmina miejsko-wiejska";"gm. Tyszowce";"tomaszowski";"lubelskie";4432;4694;2112;2320;15;17;0;0;0;0;0;0;0;2320;0;0;2320;57;14;43;0;2263;1566;183;514;9
+"061813";"gmina wiejska";"gm. Ulhówek";"tomaszowski";"lubelskie";3620;3991;1892;1728;2;4;0;0;0;0;0;0;0;1728;0;0;1728;41;3;38;0;1687;1159;111;417;9
+"062001";"gmina wiejska";"gm. Adamów";"zamojski";"lubelskie";3630;3998;1477;2153;7;11;0;0;0;0;0;0;0;2153;0;0;2153;50;8;42;0;2103;1549;172;382;5
+"062002";"gmina wiejska";"gm. Grabowiec";"zamojski";"lubelskie";3137;3457;1522;1615;13;17;1;1;0;0;0;0;1;1616;1;0;1616;27;2;25;0;1589;1172;145;272;4
+"062003";"gmina wiejska";"gm. Komarów-Osada";"zamojski";"lubelskie";3853;4131;1542;2311;10;12;0;0;0;0;0;0;0;2311;0;0;2311;59;14;45;0;2252;1454;145;653;8
+"062004";"gmina miejsko-wiejska";"gm. Krasnobród";"zamojski";"lubelskie";5541;5783;2084;3457;3;63;0;0;0;0;0;0;0;3457;0;0;3457;82;20;62;0;3375;2537;267;571;12
+"062005";"gmina wiejska";"gm. Łabunie";"zamojski";"lubelskie";4621;5024;1750;2871;15;14;0;0;0;0;0;0;0;2871;0;0;2871;39;7;32;0;2832;2155;231;446;7
+"062006";"gmina wiejska";"gm. Miączyn";"zamojski";"lubelskie";4306;4711;2032;2274;10;20;0;0;0;0;0;0;0;2274;0;0;2274;59;13;46;0;2215;1519;182;514;8
+"062007";"gmina wiejska";"gm. Nielisz";"zamojski";"lubelskie";4250;4676;1922;2328;7;15;0;0;0;0;0;0;0;2328;0;0;2328;32;6;26;0;2296;1620;179;497;7
+"062008";"gmina wiejska";"gm. Radecznica";"zamojski";"lubelskie";4531;4852;2042;2489;6;10;1;1;0;0;0;0;1;2489;1;0;2489;46;13;33;0;2443;1820;211;412;7
+"062009";"gmina wiejska";"gm. Sitno";"zamojski";"lubelskie";4955;5329;2089;2866;4;13;0;0;0;0;0;0;0;2866;0;0;2866;60;9;51;0;2806;2070;291;445;6
+"062010";"gmina wiejska";"gm. Skierbieszów";"zamojski";"lubelskie";3853;4213;1643;2210;15;18;0;0;0;0;0;0;0;2210;0;0;2210;48;10;38;0;2162;1640;193;329;6
+"062011";"gmina wiejska";"gm. Stary Zamość";"zamojski";"lubelskie";3930;4261;1544;2386;17;20;0;0;0;0;0;0;0;2386;0;0;2386;65;13;52;0;2321;1661;200;460;6
+"062012";"gmina wiejska";"gm. Sułów";"zamojski";"lubelskie";3440;3747;1571;1869;3;18;0;0;0;0;0;0;0;1869;0;0;1869;27;5;22;0;1842;1325;140;377;5
+"062013";"gmina miejsko-wiejska";"gm. Szczebrzeszyn";"zamojski";"lubelskie";8487;9197;3833;4654;4;97;0;0;0;0;0;0;0;4653;0;0;4653;100;33;67;0;4553;3083;461;1009;12
+"062014";"gmina wiejska";"gm. Zamość";"zamojski";"lubelskie";17110;18404;6580;10530;10;53;1;1;0;0;0;0;1;10527;1;0;10527;272;63;209;0;10255;6307;1229;2719;21
+"062015";"gmina miejsko-wiejska";"gm. Zwierzyniec";"zamojski";"lubelskie";5181;5481;2413;2767;2;39;0;0;0;0;0;0;0;2768;0;0;2768;63;9;54;0;2705;1561;302;842;5
+"066401";"gmina miejska";"m. Zamość";"Zamość";"lubelskie";46868;50726;17953;28915;33;343;2;1;0;0;0;0;1;28913;1;2;28911;702;180;522;0;28209;14319;4408;9482;35

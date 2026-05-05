@@ -1,0 +1,43 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Maciej Józef KOŹBIAŁ";"Andrzej Michał PAJĄK";"Liczba obwodów"
+"120301";"gmina miejsko-wiejska";"gm. Alwernia";"chrzanowski";"małopolskie";9210;10123;2948;6257;3;46;0;0;0;0;0;0;0;6252;0;0;6252;203;54;149;0;6049;2693;3356;8
+"120302";"gmina wiejska";"gm. Babice";"chrzanowski";"małopolskie";6717;7331;1985;4731;0;14;0;0;0;0;0;0;0;4729;0;0;4729;188;45;143;0;4541;1901;2640;9
+"120303";"gmina miejsko-wiejska";"gm. Chrzanów";"chrzanowski";"małopolskie";33715;36537;10874;22841;24;92;3;3;1;0;0;0;2;22839;2;1;22838;759;202;557;0;22079;12492;9587;31
+"120304";"gmina miejsko-wiejska";"gm. Libiąż";"chrzanowski";"małopolskie";16129;17574;4866;11263;21;28;0;0;0;0;0;0;0;11262;0;0;11262;398;130;268;0;10864;5014;5850;15
+"120305";"gmina miejsko-wiejska";"gm. Trzebinia";"chrzanowski";"małopolskie";24635;26847;7901;16734;13;52;0;0;0;0;0;0;0;16732;0;0;16732;605;153;452;0;16127;8585;7542;26
+"120901";"gmina miejsko-wiejska";"gm. Dobczyce";"myślenicki";"małopolskie";10650;11725;3162;7489;4;51;0;0;0;0;0;0;0;7488;0;0;7488;247;74;173;0;7241;2680;4561;9
+"120902";"gmina wiejska";"gm. Lubień";"myślenicki";"małopolskie";7000;7667;2181;4819;6;37;0;0;0;0;0;0;0;4818;0;0;4818;139;34;105;0;4679;981;3698;5
+"120903";"gmina miejsko-wiejska";"gm. Myślenice";"myślenicki";"małopolskie";30983;34151;8378;22605;8;116;11;11;0;0;0;0;11;22615;11;1;22614;743;198;545;0;21871;8322;13549;27
+"120904";"gmina wiejska";"gm. Pcim";"myślenicki";"małopolskie";7837;8585;2277;5560;7;12;0;0;0;0;0;0;0;5560;0;0;5560;188;34;154;0;5372;1290;4082;8
+"120905";"gmina wiejska";"gm. Raciechowice";"myślenicki";"małopolskie";4620;5066;1798;2822;10;10;0;0;0;0;0;0;0;2822;0;0;2822;76;19;57;0;2746;802;1944;5
+"120906";"gmina wiejska";"gm. Siepraw";"myślenicki";"małopolskie";6218;6924;1796;4422;3;19;0;0;0;0;0;0;0;4422;0;1;4421;130;47;83;0;4291;1440;2851;5
+"120907";"gmina miejsko-wiejska";"gm. Sułkowice";"myślenicki";"małopolskie";10406;11476;3506;6900;1;44;0;0;0;0;0;0;0;6900;0;3;6897;227;54;173;0;6670;2243;4427;9
+"120908";"gmina wiejska";"gm. Tokarnia";"myślenicki";"małopolskie";6074;6669;1729;4345;7;18;0;0;0;0;0;0;0;4345;0;0;4345;100;16;84;0;4245;782;3463;6
+"120909";"gmina wiejska";"gm. Wiśniowa";"myślenicki";"małopolskie";5141;5679;1453;3688;5;10;2;2;0;0;0;0;2;3689;2;0;3689;107;27;80;0;3582;720;2862;7
+"121301";"gmina miejska";"m. Oświęcim";"oświęcimski";"małopolskie";27731;29967;8319;19412;61;91;1;1;0;0;0;0;1;19412;1;1;19411;670;166;504;0;18741;10520;8221;25
+"121302";"gmina miejsko-wiejska";"gm. Brzeszcze";"oświęcimski";"małopolskie";15398;16723;4400;10998;12;27;3;3;0;0;0;0;3;11000;3;0;11000;312;83;229;0;10688;4824;5864;12
+"121303";"gmina miejsko-wiejska";"gm. Chełmek";"oświęcimski";"małopolskie";9362;10149;2924;6438;11;12;0;0;0;0;0;0;0;6437;0;0;6437;205;40;165;0;6232;3013;3219;9
+"121304";"gmina miejsko-wiejska";"gm. Kęty";"oświęcimski";"małopolskie";24254;26364;7131;17123;29;64;0;0;0;0;0;0;0;17122;0;6;17116;514;113;401;0;16602;7488;9114;21
+"121305";"gmina wiejska";"gm. Osiek";"oświęcimski";"małopolskie";5957;6461;1945;4012;8;17;0;0;0;0;0;0;0;4012;0;0;4012;102;19;83;0;3910;1401;2509;4
+"121306";"gmina wiejska";"gm. Oświęcim";"oświęcimski";"małopolskie";13495;14736;3380;10115;3;39;0;0;0;0;0;0;0;10113;0;0;10113;281;85;196;0;9832;4550;5282;16
+"121307";"gmina wiejska";"gm. Polanka Wielka";"oświęcimski";"małopolskie";3099;3401;833;2267;1;5;0;0;0;0;0;0;0;2267;0;0;2267;93;16;77;0;2174;868;1306;3
+"121308";"gmina wiejska";"gm. Przeciszów";"oświęcimski";"małopolskie";4900;5396;1530;3370;4;12;0;0;0;0;0;0;0;3370;0;0;3370;106;12;94;0;3264;1437;1827;3
+"121309";"gmina miejsko-wiejska";"gm. Zator";"oświęcimski";"małopolskie";6827;7439;2186;4642;3;49;0;0;0;0;0;0;0;4638;0;0;4638;135;45;90;0;4503;1897;2606;11
+"121501";"gmina miejska";"m. Jordanów";"suski";"małopolskie";3840;4153;1290;2550;7;16;0;0;0;0;0;0;0;2550;0;0;2550;85;37;48;0;2465;934;1531;4
+"121502";"gmina miejska";"m. Sucha Beskidzka";"suski";"małopolskie";6884;7505;2187;4697;8;52;0;0;0;0;0;0;0;4696;0;1;4695;156;52;104;0;4539;2193;2346;7
+"121503";"gmina wiejska";"gm. Budzów";"suski";"małopolskie";6150;6737;2382;3768;4;9;0;0;0;0;0;0;0;3768;0;0;3768;135;34;101;0;3633;869;2764;6
+"121504";"gmina wiejska";"gm. Bystra-Sidzina";"suski";"małopolskie";4853;5334;1989;2864;5;30;0;0;0;0;0;0;0;2864;0;0;2864;106;19;87;0;2758;657;2101;4
+"121505";"gmina wiejska";"gm. Jordanów";"suski";"małopolskie";7849;8611;2861;4988;5;30;0;0;0;0;0;0;0;4985;0;0;4985;125;24;101;0;4860;1019;3841;7
+"121506";"gmina miejsko-wiejska";"gm. Maków Podhalański";"suski";"małopolskie";11716;12645;3955;7761;6;61;0;0;0;0;0;0;0;7761;0;0;7761;251;63;188;0;7510;2405;5105;12
+"121507";"gmina wiejska";"gm. Stryszawa";"suski";"małopolskie";8726;9495;2851;5875;10;56;0;0;0;0;0;0;0;5872;0;0;5872;185;43;142;0;5687;1720;3967;8
+"121508";"gmina wiejska";"gm. Zawoja";"suski";"małopolskie";6546;7436;2269;4277;8;180;0;0;0;0;0;0;0;4277;0;0;4277;138;45;93;0;4139;1180;2959;8
+"121509";"gmina wiejska";"gm. Zembrzyce";"suski";"małopolskie";4097;4482;1340;2757;3;20;0;0;0;0;0;0;0;2757;0;0;2757;105;21;84;0;2652;954;1698;5
+"121801";"gmina miejsko-wiejska";"gm. Andrychów";"wadowicki";"małopolskie";31149;33905;9483;21665;25;78;4;4;0;0;0;0;4;21668;4;0;21668;732;141;591;0;20936;8867;12069;24
+"121802";"gmina wiejska";"gm. Brzeźnica";"wadowicki";"małopolskie";7386;8171;2433;4953;4;34;0;0;0;0;0;0;0;4952;0;0;4952;119;29;90;0;4833;1990;2843;7
+"121803";"gmina miejsko-wiejska";"gm. Kalwaria Zebrzydowska";"wadowicki";"małopolskie";14395;15917;4877;9518;13;129;0;0;0;0;0;0;0;9519;0;0;9519;239;42;197;0;9280;4061;5219;16
+"121804";"gmina wiejska";"gm. Lanckorona";"wadowicki";"małopolskie";4391;4873;1581;2809;1;22;1;1;0;0;0;0;1;2809;1;0;2809;97;24;73;0;2712;1005;1707;4
+"121805";"gmina wiejska";"gm. Mucharz";"wadowicki";"małopolskie";2927;3243;898;2029;0;27;0;0;0;0;0;0;0;2029;0;0;2029;52;9;43;0;1977;812;1165;5
+"121806";"gmina wiejska";"gm. Spytkowice";"wadowicki";"małopolskie";7402;8092;2532;4870;9;8;0;0;0;0;0;0;0;4870;0;0;4870;167;41;126;0;4703;1597;3106;6
+"121807";"gmina wiejska";"gm. Stryszów";"wadowicki";"małopolskie";4960;5470;1738;3222;6;14;1;1;0;0;0;0;1;3223;1;0;3223;86;21;65;0;3137;1408;1729;5
+"121808";"gmina wiejska";"gm. Tomice";"wadowicki";"małopolskie";5621;6193;1900;3721;3;13;0;0;0;0;0;0;0;3721;0;0;3721;92;20;72;0;3629;1664;1965;4
+"121809";"gmina miejsko-wiejska";"gm. Wadowice";"wadowicki";"małopolskie";27582;30119;8865;18716;36;130;0;0;0;0;0;0;0;18715;0;0;18715;597;154;443;0;18118;9050;9068;27
+"121810";"gmina wiejska";"gm. Wieprz";"wadowicki";"małopolskie";8674;9517;2648;6027;5;8;0;0;0;0;0;0;0;6024;0;0;6024;160;31;129;0;5864;2069;3795;8

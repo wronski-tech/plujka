@@ -1,0 +1,30 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Jan Filip LIBICKI";"Jerzy Stanisław WIERZCHOWIECKI";"Liczba obwodów"
+"300501";"gmina wiejska";"gm. Granowo";"grodziski";"wielkopolskie";3516;3865;1267;2249;2;11;0;0;0;0;0;0;0;2249;0;0;2249;91;20;71;0;2158;1056;1102;4
+"300502";"gmina miejsko-wiejska";"gm. Grodzisk Wielkopolski";"grodziski";"wielkopolskie";13849;15102;4682;9165;4;44;1;1;0;0;0;0;1;9164;1;0;9164;277;86;191;0;8887;5292;3595;10
+"300503";"gmina wiejska";"gm. Kamieniec";"grodziski";"wielkopolskie";4625;5092;1762;2863;2;13;0;0;0;0;0;0;0;2863;0;0;2863;74;11;63;0;2789;1488;1301;5
+"300504";"gmina miejsko-wiejska";"gm. Rakoniewice";"grodziski";"wielkopolskie";9129;9941;3460;5669;2;12;0;0;0;0;0;0;0;5667;0;0;5667;191;49;142;0;5476;3094;2382;6
+"300505";"gmina miejsko-wiejska";"gm. Wielichowo";"grodziski";"wielkopolskie";4901;5315;1786;3115;2;5;0;0;0;0;0;0;0;3115;0;0;3115;118;39;79;0;2997;1548;1449;5
+"301401";"gmina wiejska";"gm. Chrzypsko Wielkie";"międzychodzki";"wielkopolskie";2387;2685;1009;1378;0;18;0;0;0;0;0;0;0;1378;0;0;1378;51;2;49;0;1327;792;535;3
+"301402";"gmina wiejska";"gm. Kwilcz";"międzychodzki";"wielkopolskie";4505;4951;1779;2726;4;5;0;0;0;0;0;0;0;2725;0;0;2725;78;21;57;0;2647;1639;1008;3
+"301403";"gmina miejsko-wiejska";"gm. Międzychód";"międzychodzki";"wielkopolskie";13170;14194;4703;8467;9;54;0;0;0;0;0;0;0;8467;0;0;8467;238;88;150;0;8229;5655;2574;12
+"301404";"gmina miejsko-wiejska";"gm. Sieraków";"międzychodzki";"wielkopolskie";6192;6818;2446;3746;8;34;0;0;0;0;0;0;0;3746;0;0;3746;119;23;96;0;3627;2363;1264;4
+"301501";"gmina wiejska";"gm. Kuślin";"nowotomyski";"wielkopolskie";3855;4256;1484;2371;2;7;1;1;0;0;0;0;1;2372;1;1;2371;60;13;47;0;2311;1289;1022;3
+"301502";"gmina miejsko-wiejska";"gm. Lwówek";"nowotomyski";"wielkopolskie";6411;7068;2548;3863;7;14;0;0;0;0;0;0;0;3863;0;0;3863;104;25;79;0;3759;2232;1527;6
+"301503";"gmina wiejska";"gm. Miedzichowo";"nowotomyski";"wielkopolskie";2661;2959;967;1694;1;18;0;0;0;0;0;0;0;1694;0;0;1694;48;13;35;0;1646;965;681;2
+"301504";"gmina miejsko-wiejska";"gm. Nowy Tomyśl";"nowotomyski";"wielkopolskie";18612;20335;5598;13014;11;46;1;1;0;0;0;0;1;13014;1;0;13014;404;112;292;0;12610;8614;3996;17
+"301505";"gmina miejsko-wiejska";"gm. Opalenica";"nowotomyski";"wielkopolskie";11422;12483;3642;7780;3;30;0;0;0;0;0;0;0;7777;0;0;7777;245;47;198;0;7532;4635;2897;10
+"301506";"gmina miejsko-wiejska";"gm. Zbąszyń";"nowotomyski";"wielkopolskie";9697;10579;3032;6665;6;29;0;0;0;0;0;0;0;6665;0;0;6665;263;66;197;0;6402;4190;2212;11
+"301601";"gmina miejsko-wiejska";"gm. Oborniki";"obornicki";"wielkopolskie";23498;25794;7310;16187;21;57;1;1;0;0;0;0;1;16180;1;0;16180;440;103;337;0;15740;10673;5067;24
+"301602";"gmina miejsko-wiejska";"gm. Rogoźno";"obornicki";"wielkopolskie";12432;13601;4750;7682;5;29;1;1;0;0;0;0;1;7680;1;0;7680;218;43;175;0;7462;4651;2811;15
+"301603";"gmina wiejska";"gm. Ryczywół";"obornicki";"wielkopolskie";5090;5556;2081;3009;0;13;0;0;0;0;0;0;0;3009;0;0;3009;101;16;85;0;2908;1744;1164;7
+"302401";"gmina miejska";"m. Obrzycko";"szamotulski";"wielkopolskie";1712;1855;603;1109;3;4;2;2;0;0;0;0;2;1111;2;0;1111;57;14;43;0;1054;653;401;1
+"302402";"gmina wiejska";"gm. Duszniki";"szamotulski";"wielkopolskie";6351;7069;2004;4346;3;25;0;0;0;0;0;0;0;4344;0;2;4342;162;40;122;0;4180;2460;1720;5
+"302403";"gmina wiejska";"gm. Kaźmierz";"szamotulski";"wielkopolskie";5867;6577;1752;4115;6;39;0;0;0;0;0;0;0;4115;0;1;4114;136;32;104;0;3978;2712;1266;6
+"302404";"gmina wiejska";"gm. Obrzycko";"szamotulski";"wielkopolskie";3163;3461;1361;1802;3;2;0;0;0;0;0;0;0;1802;0;0;1802;45;7;38;0;1757;1030;727;2
+"302405";"gmina miejsko-wiejska";"gm. Ostroróg";"szamotulski";"wielkopolskie";3497;3837;1322;2175;4;6;0;0;0;0;0;0;0;2174;0;0;2174;49;11;38;0;2125;1307;818;2
+"302406";"gmina miejsko-wiejska";"gm. Pniewy";"szamotulski";"wielkopolskie";8753;9615;2896;5857;16;24;0;0;0;0;0;0;0;5855;0;0;5855;180;54;126;0;5675;3456;2219;7
+"302407";"gmina miejsko-wiejska";"gm. Szamotuły";"szamotulski";"wielkopolskie";21053;23187;6607;14447;23;61;0;0;0;0;0;0;0;14444;0;0;14444;482;145;337;0;13962;9281;4681;17
+"302408";"gmina miejsko-wiejska";"gm. Wronki";"szamotulski";"wielkopolskie";14781;15946;4910;9871;7;44;0;0;0;0;0;0;0;9868;0;0;9868;306;76;230;0;9562;6554;3008;15
+"302901";"gmina wiejska";"gm. Przemęt";"wolsztyński";"wielkopolskie";10014;11023;3963;6051;3;54;1;1;0;0;0;0;1;6052;1;0;6052;167;37;130;0;5885;3034;2851;9
+"302902";"gmina wiejska";"gm. Siedlec";"wolsztyński";"wielkopolskie";8757;9643;3175;5582;3;46;0;0;0;0;0;0;0;5581;0;0;5581;186;51;135;0;5395;3158;2237;9
+"302903";"gmina miejsko-wiejska";"gm. Wolsztyn";"wolsztyński";"wielkopolskie";21366;23334;6260;15113;9;94;0;0;0;0;0;0;0;15111;0;0;15111;551;138;413;0;14560;9477;5083;23

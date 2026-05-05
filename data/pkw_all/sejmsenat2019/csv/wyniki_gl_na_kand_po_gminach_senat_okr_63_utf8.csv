@@ -1,0 +1,39 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Waldemar BONKOWSKI";"Dariusz DRELICH";"Stanisław Józef LAMCZYK";"Liczba obwodów"
+"220101";"gmina wiejska";"gm. Borzytuchom";"bytowski";"pomorskie";2299;2473;989;1310;0;3;0;0;0;0;0;0;0;1310;0;0;1310;44;12;32;0;1266;217;503;546;3
+"220102";"gmina miejsko-wiejska";"gm. Bytów";"bytowski";"pomorskie";17880;18847;6690;11190;5;55;1;1;0;1;0;0;0;11186;0;0;11186;217;63;154;0;10969;1366;4168;5435;20
+"220103";"gmina wiejska";"gm. Czarna Dąbrówka";"bytowski";"pomorskie";4247;4490;1919;2328;1;24;0;0;0;0;0;0;0;2327;0;0;2327;39;10;29;0;2288;273;1201;814;5
+"220104";"gmina wiejska";"gm. Kołczygłowy";"bytowski";"pomorskie";3161;3351;1572;1589;0;10;0;0;0;0;0;0;0;1589;0;0;1589;37;8;29;0;1552;249;672;631;4
+"220105";"gmina wiejska";"gm. Lipnica";"bytowski";"pomorskie";3909;4150;1540;2369;1;33;0;0;0;0;0;0;0;2369;0;0;2369;32;8;24;0;2337;278;1380;679;5
+"220106";"gmina miejsko-wiejska";"gm. Miastko";"bytowski";"pomorskie";14187;15021;6807;7380;7;42;4;4;0;0;0;0;4;7383;4;0;7383;180;48;132;0;7203;1204;2528;3471;16
+"220107";"gmina wiejska";"gm. Parchowo";"bytowski";"pomorskie";2644;2827;853;1791;1;20;0;0;0;0;0;0;0;1791;0;0;1791;38;15;23;0;1753;208;939;606;4
+"220108";"gmina wiejska";"gm. Studzienice";"bytowski";"pomorskie";2628;2845;955;1673;1;15;0;0;0;0;0;0;0;1673;0;0;1673;32;13;19;0;1641;221;727;693;3
+"220109";"gmina wiejska";"gm. Trzebielino";"bytowski";"pomorskie";2658;2850;1321;1337;3;13;0;0;0;0;0;0;0;1337;0;0;1337;35;5;30;0;1302;169;543;590;3
+"220110";"gmina wiejska";"gm. Tuchomie";"bytowski";"pomorskie";3099;3263;1494;1605;0;4;0;0;0;0;0;0;0;1605;0;0;1605;31;8;23;0;1574;216;706;652;4
+"220201";"gmina miejska";"m. Chojnice";"chojnicki";"pomorskie";28700;30125;10365;18335;17;126;1;1;0;0;0;0;1;18333;1;0;18333;389;131;258;0;17944;2011;6473;9460;24
+"220202";"gmina miejsko-wiejska";"gm. Brusy";"chojnicki";"pomorskie";10045;10768;3402;6643;8;36;10;10;7;0;0;0;3;6646;3;0;6646;98;29;69;0;6548;701;3283;2564;13
+"220203";"gmina wiejska";"gm. Chojnice";"chojnicki";"pomorskie";13353;14251;5291;8062;4;112;0;0;0;0;0;0;0;8060;0;0;8060;174;43;131;0;7886;987;3298;3601;14
+"220204";"gmina miejsko-wiejska";"gm. Czersk";"chojnicki";"pomorskie";15237;16313;6292;8945;12;39;0;0;0;0;0;0;0;8945;0;0;8945;146;39;107;0;8799;1168;4536;3095;17
+"220205";"gmina wiejska";"gm. Konarzyny";"chojnicki";"pomorskie";1649;1753;725;924;3;5;0;0;0;0;0;0;0;924;0;0;924;17;4;13;0;907;127;407;373;1
+"220301";"gmina miejska";"m. Człuchów";"człuchowski";"pomorskie";10197;10706;3827;6370;8;49;0;0;0;0;0;0;0;6370;0;1;6369;133;47;86;0;6236;763;1889;3584;9
+"220302";"gmina miejsko-wiejska";"gm. Czarne";"człuchowski";"pomorskie";7571;7970;3637;3934;1;18;0;0;0;0;0;0;0;3934;0;0;3934;113;35;78;0;3821;693;1312;1816;10
+"220303";"gmina wiejska";"gm. Człuchów";"człuchowski";"pomorskie";7830;8274;3913;3917;0;26;0;0;0;0;0;0;0;3917;0;0;3917;73;20;53;0;3844;641;1571;1632;7
+"220304";"gmina miejsko-wiejska";"gm. Debrzno";"człuchowski";"pomorskie";6673;6952;3313;3360;3;23;0;0;0;0;0;0;0;3360;0;0;3360;94;21;73;0;3266;586;1168;1512;11
+"220305";"gmina wiejska";"gm. Koczała";"człuchowski";"pomorskie";2540;2635;1271;1269;1;9;0;0;0;0;0;0;0;1268;0;0;1268;25;6;19;0;1243;195;438;610;5
+"220306";"gmina wiejska";"gm. Przechlewo";"człuchowski";"pomorskie";4790;4951;2233;2557;1;23;0;0;0;0;0;0;0;2557;0;0;2557;68;20;48;0;2489;428;933;1128;9
+"220307";"gmina wiejska";"gm. Rzeczenica";"człuchowski";"pomorskie";2758;2870;1393;1365;2;19;0;0;0;0;0;0;0;1365;0;0;1365;30;4;26;0;1335;194;592;549;6
+"220501";"gmina wiejska";"gm. Chmielno";"kartuski";"pomorskie";5255;5804;1627;3628;1;87;0;0;0;0;0;0;0;3628;0;0;3628;54;24;30;0;3574;335;1657;1582;4
+"220502";"gmina miejsko-wiejska";"gm. Kartuzy";"kartuski";"pomorskie";22993;24580;6878;16114;13;121;1;1;0;0;0;0;1;16113;1;0;16113;228;98;130;0;15885;1272;6148;8465;20
+"220503";"gmina wiejska";"gm. Przodkowo";"kartuski";"pomorskie";6190;6806;1790;4402;2;9;0;0;0;0;0;0;0;4401;0;0;4401;72;30;42;0;4329;538;1961;1830;5
+"220504";"gmina wiejska";"gm. Sierakowice";"kartuski";"pomorskie";12700;13764;3343;9357;9;69;0;0;0;0;0;0;0;9356;0;0;9356;139;43;96;0;9217;804;5237;3176;11
+"220505";"gmina wiejska";"gm. Somonino";"kartuski";"pomorskie";7199;7906;2588;4611;6;58;3;3;0;0;0;0;3;4614;3;0;4614;82;26;56;0;4532;318;1823;2391;5
+"220506";"gmina wiejska";"gm. Stężyca";"kartuski";"pomorskie";7131;7679;2305;4826;2;218;0;0;0;0;0;0;0;4826;0;0;4826;84;20;64;0;4742;479;2342;1921;7
+"220507";"gmina wiejska";"gm. Sulęczyno";"kartuski";"pomorskie";3805;4134;1267;2538;2;50;0;0;0;0;0;0;0;2538;0;0;2538;51;13;38;0;2487;231;1303;953;4
+"220508";"gmina miejsko-wiejska";"gm. Żukowo";"kartuski";"pomorskie";26553;28856;6722;19830;2;193;7;7;0;0;0;0;7;19821;7;2;19819;291;100;191;0;19528;2106;6433;10989;19
+"220601";"gmina miejska";"m. Kościerzyna";"kościerski";"pomorskie";16572;17852;5361;11210;4;64;8;8;0;0;0;0;8;11218;8;0;11218;246;88;158;0;10972;1160;3523;6289;12
+"220602";"gmina wiejska";"gm. Dziemiany";"kościerski";"pomorskie";3113;3392;957;2156;1;34;0;0;0;0;0;0;0;2156;0;0;2156;43;15;28;0;2113;288;1110;715;3
+"220603";"gmina wiejska";"gm. Karsin";"kościerski";"pomorskie";4426;4841;1594;2832;0;20;0;0;0;0;0;0;0;2832;0;0;2832;56;20;36;0;2776;350;1285;1141;4
+"220604";"gmina wiejska";"gm. Kościerzyna";"kościerski";"pomorskie";11009;11789;3614;7395;1;73;0;0;0;0;0;0;0;7395;0;1;7394;135;37;98;0;7259;859;3186;3214;12
+"220605";"gmina wiejska";"gm. Liniewo";"kościerski";"pomorskie";3282;3533;1279;2003;3;19;0;0;0;0;0;0;0;2002;0;0;2002;48;9;39;0;1954;462;771;721;4
+"220606";"gmina wiejska";"gm. Lipusz";"kościerski";"pomorskie";2610;2822;786;1824;2;13;1;1;0;0;0;0;1;1824;1;0;1824;49;17;32;0;1775;241;931;603;3
+"220607";"gmina wiejska";"gm. Nowa Karczma";"kościerski";"pomorskie";4820;5198;1853;2967;1;29;0;0;0;0;0;0;0;2967;0;0;2967;108;17;91;0;2859;379;1269;1211;5
+"220608";"gmina wiejska";"gm. Stara Kiszewa";"kościerski";"pomorskie";4843;5262;1857;2986;9;46;0;0;0;0;0;0;0;2986;0;0;2986;50;13;37;0;2936;464;1310;1162;5

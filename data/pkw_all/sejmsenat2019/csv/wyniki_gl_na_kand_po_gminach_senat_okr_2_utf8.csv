@@ -1,0 +1,27 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Kazimierz Sławomir KLIMEK";"Krzysztof Stanisław MRÓZ";"Jerzy Jan POKÓJ";"Liczba obwodów"
+"020501";"gmina miejska";"m. Jawor";"jaworski";"dolnośląskie";16985;18180;6464;10524;15;43;2;2;0;0;0;0;2;10519;2;8;10511;274;81;193;0;10237;2023;4918;3296;14
+"020502";"gmina miejsko-wiejska";"gm. Bolków";"jaworski";"dolnośląskie";7503;8204;3403;4100;7;32;0;0;0;0;0;0;0;4098;0;0;4098;146;36;110;0;3952;977;1826;1149;13
+"020503";"gmina wiejska";"gm. Męcinka";"jaworski";"dolnośląskie";3600;3942;1430;2170;1;7;0;0;0;0;0;0;0;2170;0;0;2170;59;19;40;0;2111;343;1265;503;4
+"020504";"gmina wiejska";"gm. Mściwojów";"jaworski";"dolnośląskie";2971;3204;1218;1753;5;3;0;0;0;0;0;0;0;1752;0;0;1752;45;13;32;0;1707;318;914;475;3
+"020505";"gmina wiejska";"gm. Paszowice";"jaworski";"dolnośląskie";2900;3190;1207;1693;2;12;0;0;0;0;0;0;0;1693;0;0;1693;44;21;23;0;1649;307;890;452;2
+"020506";"gmina wiejska";"gm. Wądroże Wielkie";"jaworski";"dolnośląskie";2895;3204;1183;1712;9;8;0;0;0;0;0;0;0;1712;0;0;1712;42;14;28;0;1670;320;873;477;3
+"020601";"gmina miejska";"m. Karpacz";"karkonoski";"dolnośląskie";4024;5048;620;3404;5;1118;0;0;0;0;0;0;0;3404;0;10;3394;54;15;39;0;3340;724;810;1806;6
+"020602";"gmina miejska";"m. Kowary";"karkonoski";"dolnośląskie";7875;8374;3330;4543;12;55;1;1;0;0;0;0;1;4544;1;0;4544;102;36;66;0;4442;1100;1510;1832;9
+"020603";"gmina miejska";"m. Piechowice";"karkonoski";"dolnośląskie";4515;5011;1571;2944;7;84;0;0;0;0;0;0;0;2944;0;0;2944;59;25;34;0;2885;647;1015;1223;4
+"020604";"gmina miejska";"m. Szklarska Poręba";"karkonoski";"dolnośląskie";4903;5921;1070;3833;12;894;0;0;0;0;0;0;0;3833;0;0;3833;90;24;66;0;3743;817;1158;1768;8
+"020605";"gmina wiejska";"gm. Janowice Wielkie";"karkonoski";"dolnośląskie";3057;3393;1143;1914;2;45;0;0;0;0;0;0;0;1914;0;0;1914;47;15;32;0;1867;375;689;803;5
+"020606";"gmina wiejska";"gm. Jeżów Sudecki";"karkonoski";"dolnośląskie";5208;5752;1770;3433;5;23;0;0;0;0;0;0;0;3433;0;0;3433;71;17;54;0;3362;769;1080;1513;4
+"020607";"gmina wiejska";"gm. Mysłakowice";"karkonoski";"dolnośląskie";7352;7943;2788;4564;6;61;0;0;0;0;0;0;0;4563;0;0;4563;111;33;78;0;4452;917;1698;1837;7
+"020608";"gmina wiejska";"gm. Podgórzyn";"karkonoski";"dolnośląskie";5965;6504;2203;3761;6;74;0;0;0;0;0;0;0;3762;0;0;3762;90;28;62;0;3672;787;1205;1680;7
+"020609";"gmina wiejska";"gm. Stara Kamienica";"karkonoski";"dolnośląskie";4037;4158;1876;2161;5;27;0;0;0;0;0;0;0;2161;0;0;2161;48;21;27;0;2113;481;832;800;4
+"020701";"gmina miejska";"m. Kamienna Góra";"kamiennogórski";"dolnośląskie";14319;15141;5976;8343;13;48;0;0;0;0;0;0;0;8340;0;0;8340;251;48;203;0;8089;1626;3416;3047;10
+"020702";"gmina wiejska";"gm. Kamienna Góra";"kamiennogórski";"dolnośląskie";6477;6899;2579;3898;2;51;1;1;0;0;0;0;1;3899;1;0;3899;102;27;75;0;3797;646;1689;1462;8
+"020703";"gmina miejsko-wiejska";"gm. Lubawka";"kamiennogórski";"dolnośląskie";7998;8728;3108;4890;8;58;0;0;0;0;0;0;0;4889;0;0;4889;113;35;78;0;4776;1056;1974;1746;7
+"020704";"gmina wiejska";"gm. Marciszów";"kamiennogórski";"dolnośląskie";3214;3580;1383;1831;0;18;0;0;0;0;0;0;0;1831;0;0;1831;38;7;31;0;1793;377;855;561;7
+"022601";"gmina miejska";"m. Wojcieszów";"złotoryjski";"dolnośląskie";2700;2905;1262;1438;2;3;0;0;0;0;0;0;0;1438;0;0;1438;34;9;25;0;1404;344;583;477;3
+"022602";"gmina miejska";"m. Złotoryja";"złotoryjski";"dolnośląskie";11498;12255;4295;7203;7;30;1;0;0;0;0;0;0;7201;0;1;7200;144;40;104;0;7056;1723;2909;2424;11
+"022603";"gmina wiejska";"gm. Pielgrzymka";"złotoryjski";"dolnośląskie";3398;3594;1593;1805;0;2;0;0;0;0;0;0;0;1805;0;0;1805;67;9;58;0;1738;322;927;489;7
+"022604";"gmina miejsko-wiejska";"gm. Świerzawa";"złotoryjski";"dolnośląskie";5500;6022;2449;3051;10;55;0;0;0;0;0;0;0;3051;0;0;3051;65;12;53;0;2986;595;1397;994;9
+"022605";"gmina wiejska";"gm. Zagrodno";"złotoryjski";"dolnośląskie";3898;4223;1705;2193;2;5;0;0;0;0;0;0;0;2193;0;0;2193;48;13;35;0;2145;345;1359;441;6
+"022606";"gmina wiejska";"gm. Złotoryja";"złotoryjski";"dolnośląskie";5100;5455;2134;2966;2;6;0;0;0;0;0;0;0;2966;0;0;2966;89;6;83;0;2877;584;1476;817;7
+"026101";"gmina miejska";"m. Jelenia Góra";"Jelenia Góra";"dolnośląskie";58103;61948;19132;38967;44;549;15;14;6;0;0;0;8;38968;8;1;38967;964;277;687;0;38003;8635;12670;16698;46

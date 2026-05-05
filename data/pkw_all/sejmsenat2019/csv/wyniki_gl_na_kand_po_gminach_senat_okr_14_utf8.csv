@@ -1,0 +1,49 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Stanisław GOGACZ";"Arkadiusz KASZNIA";"Wojciech MATEŃKA";"Marcin WALASEK";"Liczba obwodów"
+"060801";"gmina miejska";"m. Lubartów";"lubartowski";"lubelskie";16054;17181;5063;10991;19;58;0;0;0;0;0;0;0;10988;0;0;10988;263;75;188;0;10725;5464;3771;797;693;12
+"060802";"gmina wiejska";"gm. Abramów";"lubartowski";"lubelskie";3032;3331;1069;1963;5;11;0;0;0;0;0;0;0;1963;0;0;1963;46;8;38;0;1917;1477;202;127;111;7
+"060803";"gmina wiejska";"gm. Firlej";"lubartowski";"lubelskie";4305;4734;1801;2504;4;24;0;0;0;0;0;0;0;2504;0;0;2504;53;11;42;0;2451;1561;489;178;223;8
+"060804";"gmina wiejska";"gm. Jeziorzany";"lubartowski";"lubelskie";2046;2235;880;1166;3;9;0;0;0;0;0;0;0;1166;0;0;1166;37;12;25;0;1129;822;174;64;69;3
+"060805";"gmina wiejska";"gm. Kamionka";"lubartowski";"lubelskie";4706;5139;1962;2744;7;12;0;0;0;0;0;0;0;2743;0;0;2743;58;14;44;0;2685;1695;649;167;174;9
+"060806";"gmina miejsko-wiejska";"gm. Kock";"lubartowski";"lubelskie";4790;5147;2017;2773;2;18;0;0;0;0;0;0;0;2771;0;0;2771;85;19;66;0;2686;1915;462;173;136;8
+"060807";"gmina wiejska";"gm. Lubartów";"lubartowski";"lubelskie";8207;9005;2714;5493;0;25;0;0;0;0;0;0;0;5493;0;2;5491;116;34;82;0;5375;3336;1262;371;406;12
+"060808";"gmina wiejska";"gm. Michów";"lubartowski";"lubelskie";4516;4907;1884;2632;12;16;0;0;0;0;0;0;0;2630;0;0;2630;39;19;20;0;2591;1807;463;174;147;6
+"060809";"gmina wiejska";"gm. Niedźwiada";"lubartowski";"lubelskie";4587;4973;1756;2831;7;6;0;0;0;0;0;0;0;2831;0;0;2831;63;14;49;0;2768;2048;385;166;169;6
+"060810";"gmina miejsko-wiejska";"gm. Ostrów Lubelski";"lubartowski";"lubelskie";3869;4258;1435;2434;14;11;0;0;0;0;0;0;0;2434;0;0;2434;45;9;36;0;2389;1666;457;128;138;5
+"060811";"gmina wiejska";"gm. Ostrówek";"lubartowski";"lubelskie";2836;3105;1112;1724;3;8;0;0;0;0;0;0;0;1724;0;0;1724;43;10;33;0;1681;1197;290;101;93;6
+"060812";"gmina wiejska";"gm. Serniki";"lubartowski";"lubelskie";3635;3938;1283;2352;4;5;0;0;0;0;0;0;0;2351;0;0;2351;51;10;41;0;2300;1715;328;133;124;5
+"060813";"gmina wiejska";"gm. Uścimów";"lubartowski";"lubelskie";2324;2536;940;1384;8;8;0;0;0;0;0;0;0;1384;0;0;1384;19;7;12;0;1365;961;251;79;74;4
+"061101";"gmina miejska";"m. Łuków";"łukowski";"lubelskie";21222;22955;6479;14742;13;98;1;1;0;0;0;0;1;14742;1;0;14742;245;76;169;0;14497;7864;4405;1633;595;22
+"061102";"gmina miejska";"m. Stoczek Łukowski";"łukowski";"lubelskie";1927;2057;652;1275;3;8;0;0;0;0;0;0;0;1275;0;0;1275;22;5;17;0;1253;752;349;97;55;2
+"061103";"gmina wiejska";"gm. Adamów";"łukowski";"lubelskie";4055;4440;1508;2547;2;16;0;0;0;0;0;0;0;2547;0;0;2547;66;25;41;0;2481;1637;556;159;129;7
+"061104";"gmina wiejska";"gm. Krzywda";"łukowski";"lubelskie";7389;8021;3089;4300;7;16;0;0;0;0;0;0;0;4299;0;0;4299;92;29;63;0;4207;2953;692;379;183;8
+"061105";"gmina wiejska";"gm. Łuków";"łukowski";"lubelskie";12374;13582;4270;8105;5;25;0;0;0;0;0;0;0;8103;0;0;8103;126;48;78;0;7977;5690;1265;700;322;15
+"061106";"gmina wiejska";"gm. Serokomla";"łukowski";"lubelskie";2954;3210;1274;1680;5;6;0;0;0;0;0;0;0;1680;0;0;1680;32;8;24;0;1648;1185;255;128;80;5
+"061107";"gmina wiejska";"gm. Stanin";"łukowski";"lubelskie";6894;7504;2469;4425;1;17;0;0;0;0;0;0;0;4425;0;1;4424;140;31;109;0;4284;3047;710;375;152;9
+"061108";"gmina wiejska";"gm. Stoczek Łukowski";"łukowski";"lubelskie";5776;6316;2133;3643;2;19;0;0;0;0;0;0;0;3642;0;0;3642;80;16;64;0;3562;2715;455;259;133;10
+"061109";"gmina wiejska";"gm. Trzebieszów";"łukowski";"lubelskie";5337;5831;1579;3758;3;14;0;0;0;0;0;0;0;3758;0;0;3758;52;8;44;0;3706;3092;346;175;93;7
+"061110";"gmina wiejska";"gm. Wojcieszków";"łukowski";"lubelskie";4938;5402;2011;2927;8;7;0;0;0;0;0;0;0;2926;0;0;2926;70;17;53;0;2856;2122;414;224;96;8
+"061111";"gmina wiejska";"gm. Wola Mysłowska";"łukowski";"lubelskie";3618;3908;1416;2202;4;10;0;0;0;0;0;0;0;2202;0;0;2202;44;10;34;0;2158;1594;289;177;98;4
+"061201";"gmina wiejska";"gm. Chodel";"opolski";"lubelskie";4783;5263;2060;2723;6;13;0;0;0;0;0;0;0;2723;0;0;2723;66;22;44;0;2657;1947;404;141;165;5
+"061202";"gmina miejsko-wiejska";"gm. Józefów nad Wisłą";"opolski";"lubelskie";4866;5356;2247;2619;0;17;0;0;0;0;0;0;0;2619;0;0;2619;38;11;27;0;2581;1743;529;168;141;6
+"061203";"gmina wiejska";"gm. Karczmiska";"opolski";"lubelskie";4216;4576;1887;2329;7;30;0;0;0;0;0;0;0;2329;0;0;2329;51;12;39;0;2278;1401;554;162;161;6
+"061204";"gmina wiejska";"gm. Łaziska";"opolski";"lubelskie";3625;3953;1669;1956;0;13;0;0;0;0;0;0;0;1956;0;0;1956;50;12;38;0;1906;1293;377;112;124;6
+"061205";"gmina miejsko-wiejska";"gm. Opole Lubelskie";"opolski";"lubelskie";13275;14316;5833;7442;10;29;1;1;0;0;0;0;1;7441;1;0;7441;157;37;120;0;7284;4357;1999;514;414;18
+"061206";"gmina miejsko-wiejska";"gm. Poniatowa";"opolski";"lubelskie";10569;11332;4209;6360;13;34;0;0;0;0;0;0;0;6360;0;0;6360;127;50;77;0;6233;3765;1720;391;357;13
+"061207";"gmina wiejska";"gm. Wilków";"opolski";"lubelskie";3360;3659;1373;1987;0;7;0;0;0;0;0;0;0;1987;0;0;1987;41;5;36;0;1946;1389;309;129;119;8
+"061401";"gmina miejska";"m. Puławy";"puławski";"lubelskie";35460;37709;11821;23631;46;131;6;6;0;0;1;0;5;23644;5;0;23644;510;136;374;0;23134;11042;9315;1458;1319;24
+"061402";"gmina wiejska";"gm. Baranów";"puławski";"lubelskie";3029;3240;1249;1780;17;8;0;0;0;0;0;0;0;1780;0;0;1780;49;9;40;0;1731;1187;308;109;127;7
+"061403";"gmina wiejska";"gm. Janowiec";"puławski";"lubelskie";2800;3055;995;1805;5;16;0;0;0;0;0;0;0;1804;0;0;1804;28;6;22;0;1776;1033;495;94;154;3
+"061404";"gmina miejsko-wiejska";"gm. Kazimierz Dolny";"puławski";"lubelskie";5084;5711;1733;3351;5;303;0;0;0;0;0;0;0;3350;0;0;3350;72;28;44;0;3278;1805;1094;182;197;5
+"061405";"gmina wiejska";"gm. Końskowola";"puławski";"lubelskie";6562;7167;2218;4344;6;10;0;0;0;0;0;0;0;4344;0;0;4344;65;15;50;0;4279;2608;1057;294;320;10
+"061406";"gmina wiejska";"gm. Kurów";"puławski";"lubelskie";5660;6109;2134;3526;5;12;0;0;0;0;0;0;0;3525;0;0;3525;86;22;64;0;3439;2279;784;210;166;7
+"061407";"gmina wiejska";"gm. Markuszów";"puławski";"lubelskie";2161;2400;726;1435;10;3;0;0;0;0;0;0;0;1435;0;0;1435;26;9;17;0;1409;956;299;74;80;4
+"061408";"gmina miejsko-wiejska";"gm. Nałęczów";"puławski";"lubelskie";8101;8269;2736;5364;10;475;2;2;0;0;0;0;2;5363;2;0;5363;96;25;71;0;5267;3002;1570;394;301;16
+"061409";"gmina wiejska";"gm. Puławy";"puławski";"lubelskie";8934;9680;3266;5671;5;36;0;0;0;0;0;0;0;5668;0;0;5668;127;29;98;0;5541;3362;1462;324;393;9
+"061410";"gmina wiejska";"gm. Wąwolnica";"puławski";"lubelskie";3428;3797;1323;2105;5;22;1;1;0;0;0;0;1;2106;1;0;2106;49;9;40;0;2057;1455;342;147;113;5
+"061411";"gmina wiejska";"gm. Żyrzyn";"puławski";"lubelskie";4811;5212;1653;3158;5;11;0;0;0;0;0;0;0;3158;0;0;3158;72;28;44;0;3086;2073;532;209;272;9
+"061601";"gmina miejska";"m. Dęblin";"rycki";"lubelskie";11719;12668;4065;7654;26;92;1;1;0;0;0;0;1;7655;1;0;7655;132;36;96;0;7523;3890;2555;548;530;18
+"061602";"gmina wiejska";"gm. Kłoczew";"rycki";"lubelskie";5205;5617;1833;3372;10;12;0;0;0;0;0;0;0;3372;0;0;3372;61;32;29;0;3311;2603;340;163;205;8
+"061603";"gmina wiejska";"gm. Nowodwór";"rycki";"lubelskie";3020;3261;1070;1950;7;6;0;0;0;0;0;0;0;1950;0;0;1950;50;8;42;0;1900;1414;214;92;180;7
+"061604";"gmina miejsko-wiejska";"gm. Ryki";"rycki";"lubelskie";15335;16395;5571;9763;17;41;1;1;0;0;0;0;1;9765;1;0;9765;243;89;154;0;9522;5743;2269;590;920;21
+"061605";"gmina wiejska";"gm. Stężyca";"rycki";"lubelskie";3911;4269;1460;2451;0;8;1;1;0;0;0;0;1;2452;1;0;2452;62;24;38;0;2390;1630;490;132;138;7
+"061606";"gmina wiejska";"gm. Ułęż";"rycki";"lubelskie";2438;2658;926;1512;1;11;0;0;0;0;0;0;0;1512;0;0;1512;40;11;29;0;1472;948;294;86;144;7

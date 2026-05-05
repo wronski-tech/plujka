@@ -1,0 +1,34 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Henryk Władysław CAREWICZ";"Janusz GROMEK";"Grażyna Anna SZTARK";"Liczba obwodów"
+"320101";"gmina miejska";"m. Białogard";"białogardzki";"zachodniopomorskie";16688;18070;6379;10309;20;44;1;1;0;0;0;0;1;10307;1;1;10306;286;72;214;0;10020;3218;3692;3110;18
+"320102";"gmina wiejska";"gm. Białogard";"białogardzki";"zachodniopomorskie";5340;5873;2755;2586;1;8;0;0;0;0;0;0;0;2585;0;0;2585;52;11;41;0;2533;951;779;803;5
+"320103";"gmina miejsko-wiejska";"gm. Karlino";"białogardzki";"zachodniopomorskie";6301;6884;3272;3028;3;22;0;0;0;0;0;0;0;3029;0;0;3029;87;20;67;0;2942;1109;834;999;6
+"320104";"gmina miejsko-wiejska";"gm. Tychowo";"białogardzki";"zachodniopomorskie";5176;5617;2614;2562;3;16;0;0;0;0;0;0;0;2562;0;0;2562;59;22;37;0;2503;878;718;907;6
+"320201";"gmina wiejska";"gm. Bierzwnik";"choszczeński";"zachodniopomorskie";3451;3752;1663;1788;1;13;0;0;0;0;0;0;0;1788;0;0;1788;58;8;50;0;1730;809;647;274;3
+"320202";"gmina miejsko-wiejska";"gm. Choszczno";"choszczeński";"zachodniopomorskie";15409;16739;6583;8826;14;65;1;1;0;0;0;0;1;8827;1;0;8827;184;37;147;0;8643;3240;4020;1383;17
+"320203";"gmina miejsko-wiejska";"gm. Drawno";"choszczeński";"zachodniopomorskie";3808;4115;1886;1922;1;17;0;0;0;0;0;0;0;1921;0;0;1921;66;11;55;0;1855;761;742;352;6
+"320204";"gmina wiejska";"gm. Krzęcin";"choszczeński";"zachodniopomorskie";2760;2864;1566;1194;0;1;0;0;0;0;0;0;0;1193;0;0;1193;31;4;27;0;1162;496;385;281;2
+"320205";"gmina miejsko-wiejska";"gm. Pełczyce";"choszczeński";"zachodniopomorskie";5520;6070;2906;2614;6;9;0;0;0;0;0;0;0;2614;0;0;2614;60;15;45;0;2554;1229;906;419;4
+"320206";"gmina miejsko-wiejska";"gm. Recz";"choszczeński";"zachodniopomorskie";3880;4219;2048;1832;4;9;0;0;0;0;0;0;0;1832;0;0;1832;41;9;32;0;1791;843;647;301;4
+"320301";"gmina miejsko-wiejska";"gm. Czaplinek";"drawski";"zachodniopomorskie";8462;9325;3853;4609;7;34;0;0;0;0;0;0;0;4609;0;0;4609;128;33;95;0;4481;1621;1646;1214;8
+"320302";"gmina miejsko-wiejska";"gm. Drawsko Pomorskie";"drawski";"zachodniopomorskie";12526;13635;5462;7064;8;99;4;4;0;0;0;0;4;7068;4;0;7068;163;33;130;0;6905;2331;3306;1268;16
+"320303";"gmina miejsko-wiejska";"gm. Kalisz Pomorski";"drawski";"zachodniopomorskie";5060;5521;2543;2517;2;14;0;0;0;0;0;0;0;2517;0;0;2517;61;14;47;0;2456;896;1060;500;6
+"320305";"gmina wiejska";"gm. Wierzchowo";"drawski";"zachodniopomorskie";3601;3877;1756;1845;0;5;0;0;0;0;0;0;0;1844;0;0;1844;54;7;47;0;1790;731;673;386;5
+"320306";"gmina miejsko-wiejska";"gm. Złocieniec";"drawski";"zachodniopomorskie";11821;12765;5153;6768;12;53;0;0;0;0;0;0;0;6767;0;0;6767;166;31;135;0;6601;2607;2627;1367;16
+"320801";"gmina miejska";"m. Kołobrzeg";"kołobrzeski";"zachodniopomorskie";33883;38055;8758;25125;26;3296;1;1;1;0;0;0;0;25116;0;2;25114;431;105;326;0;24683;8024;13237;3422;24
+"320802";"gmina wiejska";"gm. Dygowo";"kołobrzeski";"zachodniopomorskie";3945;4302;1827;2118;2;12;0;0;0;0;0;0;0;2118;0;0;2118;67;22;45;0;2051;824;801;426;6
+"320803";"gmina miejsko-wiejska";"gm. Gościno";"kołobrzeski";"zachodniopomorskie";3754;4043;1742;2012;0;3;0;0;0;0;0;0;0;2012;0;0;2012;45;7;38;0;1967;781;892;294;6
+"320804";"gmina wiejska";"gm. Kołobrzeg";"kołobrzeski";"zachodniopomorskie";8002;8767;2693;5308;3;317;1;1;0;0;0;0;1;5310;1;0;5310;85;24;61;0;5225;1776;2643;806;9
+"320805";"gmina wiejska";"gm. Rymań";"kołobrzeski";"zachodniopomorskie";2880;3139;1352;1528;2;18;0;0;0;0;0;0;0;1528;0;0;1528;50;10;40;0;1478;590;619;269;4
+"320806";"gmina wiejska";"gm. Siemyśl";"kołobrzeski";"zachodniopomorskie";2680;2892;1183;1497;0;6;0;0;0;0;0;0;0;1497;0;0;1497;34;6;28;0;1463;542;591;330;2
+"320807";"gmina wiejska";"gm. Ustronie Morskie";"kołobrzeski";"zachodniopomorskie";2750;3526;639;2111;2;466;0;0;0;0;0;0;0;2111;0;0;2111;39;11;28;0;2072;759;1003;310;2
+"321601";"gmina miejska";"m. Świdwin";"świdwiński";"zachodniopomorskie";10847;11726;4436;6411;5;45;0;0;0;0;0;0;0;6411;0;0;6411;153;53;100;0;6258;2108;2786;1364;8
+"321602";"gmina wiejska";"gm. Brzeżno";"świdwiński";"zachodniopomorskie";1950;2136;965;985;1;14;0;0;0;0;0;0;0;985;0;0;985;27;7;20;0;958;379;346;233;2
+"321603";"gmina miejsko-wiejska";"gm. Połczyn-Zdrój";"świdwiński";"zachodniopomorskie";11391;12383;4942;6449;7;438;0;0;0;0;0;0;0;6446;0;0;6446;145;35;110;0;6301;2565;2542;1194;10
+"321604";"gmina wiejska";"gm. Rąbino";"świdwiński";"zachodniopomorskie";2620;2844;1359;1261;1;2;0;0;0;0;0;0;0;1261;0;0;1261;31;5;26;0;1230;571;337;322;4
+"321605";"gmina wiejska";"gm. Sławoborze";"świdwiński";"zachodniopomorskie";2921;3177;1539;1382;2;12;0;0;0;0;0;0;0;1382;0;0;1382;43;5;38;0;1339;472;517;350;5
+"321606";"gmina wiejska";"gm. Świdwin";"świdwiński";"zachodniopomorskie";4250;4632;2163;2086;3;10;0;0;0;0;0;0;0;2087;0;0;2087;51;8;43;0;2036;912;620;504;8
+"321701";"gmina miejska";"m. Wałcz";"wałecki";"zachodniopomorskie";17863;18932;6297;11567;12;67;2;2;0;1;0;0;1;11564;1;0;11564;251;79;172;0;11313;3442;5642;2229;13
+"321702";"gmina miejsko-wiejska";"gm. Człopa";"wałecki";"zachodniopomorskie";3610;3940;1815;1795;3;10;0;0;0;0;0;0;0;1795;0;0;1795;38;6;32;0;1757;746;599;412;4
+"321703";"gmina miejsko-wiejska";"gm. Mirosławiec";"wałecki";"zachodniopomorskie";3752;4137;1626;2126;0;31;0;0;0;0;0;0;0;2126;0;0;2126;50;12;38;0;2076;692;971;413;5
+"321704";"gmina miejsko-wiejska";"gm. Tuczno";"wałecki";"zachodniopomorskie";3490;3831;1709;1781;3;25;0;0;0;0;0;0;0;1781;0;0;1781;36;9;27;0;1745;726;616;403;6
+"321705";"gmina wiejska";"gm. Wałcz";"wałecki";"zachodniopomorskie";8859;9627;4104;4755;1;23;0;0;0;0;0;0;0;4755;0;0;4755;90;17;73;0;4665;1721;1904;1040;9

@@ -1,0 +1,28 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Włodzimierz BERNACKI";"Mirosław Adam CHODUR";"Wojciech KOZAK";"Artur Stanisław KOZIOŁ";"Liczba obwodów"
+"120101";"gmina miejska";"m. Bochnia";"bocheński";"małopolskie";21109;22856;6201;14908;27;99;0;0;0;0;0;0;0;14906;0;2;14904;283;73;210;0;14621;6917;1545;1996;4163;17
+"120102";"gmina wiejska";"gm. Bochnia";"bocheński";"małopolskie";14157;15507;4524;9633;3;41;0;0;0;0;0;0;0;9632;0;0;9632;213;48;165;0;9419;5822;786;1323;1488;16
+"120103";"gmina wiejska";"gm. Drwinia";"bocheński";"małopolskie";4825;5242;1506;3319;5;13;0;0;0;0;0;0;0;3319;0;0;3319;48;15;33;0;3271;2412;189;371;299;6
+"120104";"gmina wiejska";"gm. Lipnica Murowana";"bocheński";"małopolskie";3972;4332;1323;2649;5;19;1;1;0;0;0;0;1;2650;1;0;2650;61;9;52;0;2589;1848;192;318;231;5
+"120105";"gmina wiejska";"gm. Łapanów";"bocheński";"małopolskie";5756;6355;1860;3896;6;24;0;0;0;0;0;0;0;3895;0;0;3895;94;17;77;0;3801;2454;270;605;472;5
+"120106";"gmina miejsko-wiejska";"gm. Nowy Wiśnicz";"bocheński";"małopolskie";10058;11044;2837;7220;6;54;0;0;0;0;0;0;0;7220;0;0;7220;125;19;106;0;7095;3825;1857;610;803;9
+"120107";"gmina wiejska";"gm. Rzezawa";"bocheński";"małopolskie";8003;8776;2639;5364;5;27;0;0;0;0;0;0;0;5363;0;0;5363;96;22;74;0;5267;3655;362;583;667;9
+"120108";"gmina wiejska";"gm. Trzciana";"bocheński";"małopolskie";3893;4318;1040;2853;1;17;0;0;0;0;0;0;0;2853;0;0;2853;41;6;35;0;2812;2012;197;387;216;5
+"120109";"gmina wiejska";"gm. Żegocina";"bocheński";"małopolskie";3763;4117;903;2860;3;23;0;0;0;0;0;0;0;2860;0;0;2860;42;4;38;0;2818;2200;174;251;193;4
+"120201";"gmina wiejska";"gm. Borzęcin";"brzeski";"małopolskie";6088;6744;2412;3676;4;16;0;0;0;0;0;0;0;3675;0;0;3675;107;16;91;0;3568;2352;226;514;476;7
+"120202";"gmina miejsko-wiejska";"gm. Brzesko";"brzeski";"małopolskie";26371;28488;9103;17267;7;62;2;2;0;0;0;0;2;17262;2;1;17261;374;73;301;0;16887;9471;1012;2766;3638;22
+"120203";"gmina miejsko-wiejska";"gm. Czchów";"brzeski";"małopolskie";6915;7467;2368;4547;7;56;0;0;0;0;0;0;0;4547;0;1;4546;92;17;75;0;4454;2983;271;640;560;8
+"120204";"gmina wiejska";"gm. Dębno";"brzeski";"małopolskie";10534;11383;3616;6918;13;28;0;0;0;0;0;0;0;6917;0;0;6917;148;24;124;0;6769;4306;379;1056;1028;12
+"120205";"gmina wiejska";"gm. Gnojnik";"brzeski";"małopolskie";5546;6092;1884;3662;5;29;0;0;0;0;0;0;0;3662;0;0;3662;78;10;68;0;3584;2622;208;418;336;6
+"120206";"gmina wiejska";"gm. Iwkowa";"brzeski";"małopolskie";4489;4971;1325;3161;5;28;0;0;0;0;0;0;0;3162;0;0;3162;79;11;68;0;3083;2328;126;405;224;4
+"120207";"gmina wiejska";"gm. Szczurowa";"brzeski";"małopolskie";6991;7631;3072;3918;5;14;0;0;0;0;0;0;0;3918;0;0;3918;123;13;110;0;3795;2466;243;659;427;11
+"121401";"gmina wiejska";"gm. Koniusza";"proszowicki";"małopolskie";6369;7006;2476;3893;4;10;0;0;0;0;0;0;0;3893;0;0;3893;67;8;59;0;3826;2412;175;769;470;10
+"121402";"gmina miejsko-wiejska";"gm. Koszyce";"proszowicki";"małopolskie";4143;4531;1949;2194;1;11;0;0;0;0;0;0;0;2194;0;0;2194;52;23;29;0;2142;1369;81;423;269;3
+"121403";"gmina miejsko-wiejska";"gm. Nowe Brzesko";"proszowicki";"małopolskie";4216;4635;1557;2660;2;13;0;0;0;0;0;0;0;2659;0;0;2659;48;6;42;0;2611;1724;99;461;327;5
+"121404";"gmina wiejska";"gm. Pałecznica";"proszowicki";"małopolskie";2597;2850;984;1613;0;6;0;0;0;0;0;0;0;1613;0;0;1613;42;3;39;0;1571;793;67;646;65;5
+"121405";"gmina miejsko-wiejska";"gm. Proszowice";"proszowicki";"małopolskie";12160;13165;4685;7475;15;24;0;0;0;0;0;0;0;7475;0;0;7475;140;43;97;0;7335;4129;357;1752;1097;14
+"121406";"gmina wiejska";"gm. Radziemice";"proszowicki";"małopolskie";2489;2729;1014;1475;0;4;0;0;0;0;0;0;0;1475;0;0;1475;37;8;29;0;1438;898;53;366;121;4
+"121901";"gmina wiejska";"gm. Biskupice";"wielicki";"małopolskie";7151;7947;2095;5055;3;22;0;0;0;0;0;0;0;5056;0;0;5056;68;15;53;0;4988;2697;243;832;1216;10
+"121902";"gmina wiejska";"gm. Gdów";"wielicki";"małopolskie";12770;14058;4011;8759;14;37;1;1;0;0;0;0;1;8758;1;0;8758;168;43;125;0;8590;4828;446;1765;1551;12
+"121903";"gmina wiejska";"gm. Kłaj";"wielicki";"małopolskie";7606;8387;2285;5321;3;38;0;0;0;0;0;0;0;5320;0;0;5320;101;28;73;0;5219;2527;289;1005;1398;10
+"121904";"gmina miejsko-wiejska";"gm. Niepołomice";"wielicki";"małopolskie";19623;21744;5093;14530;8;71;0;0;0;0;0;0;0;14528;0;0;14528;229;76;153;0;14299;6800;881;2029;4589;13
+"121905";"gmina miejsko-wiejska";"gm. Wieliczka";"wielicki";"małopolskie";40922;45781;10728;30194;23;259;0;0;0;0;0;0;0;30193;0;6;30187;456;146;310;0;29731;11798;1382;3620;12931;37

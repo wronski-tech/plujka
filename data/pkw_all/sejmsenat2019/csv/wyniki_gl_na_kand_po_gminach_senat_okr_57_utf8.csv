@@ -1,0 +1,28 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Daria Urszula BALON";"Ryszard Wiesław SKOTNICZNY";"Alicja Maria ZAJĄC";"Liczba obwodów"
+"180201";"gmina miejsko-wiejska";"gm. Brzozów";"brzozowski";"podkarpackie";19506;20974;8084;11422;23;58;2;2;0;0;0;0;2;11423;2;0;11423;228;43;185;0;11195;2040;1102;8053;17
+"180202";"gmina wiejska";"gm. Domaradz";"brzozowski";"podkarpackie";4460;4839;1711;2749;2;11;0;0;0;0;0;0;0;2749;0;0;2749;60;13;47;0;2689;259;223;2207;6
+"180203";"gmina wiejska";"gm. Dydnia";"brzozowski";"podkarpackie";5940;6450;2560;3380;0;14;0;0;0;0;0;0;0;3380;0;0;3380;83;10;73;0;3297;439;347;2511;12
+"180204";"gmina wiejska";"gm. Haczów";"brzozowski";"podkarpackie";6700;7291;2541;4159;21;18;0;0;0;0;0;0;0;4159;0;7;4152;68;15;53;0;4084;688;435;2961;8
+"180205";"gmina wiejska";"gm. Jasienica Rosielna";"brzozowski";"podkarpackie";5570;6069;1575;3995;30;52;0;0;0;0;0;0;0;3995;0;0;3995;63;11;52;0;3932;362;358;3212;5
+"180206";"gmina wiejska";"gm. Nozdrzec";"brzozowski";"podkarpackie";6027;6559;2522;3505;1;31;0;0;0;0;0;0;0;3504;0;0;3504;70;16;54;0;3434;562;363;2509;11
+"180501";"gmina miejska";"m. Jasło";"jasielski";"podkarpackie";26514;28266;10007;16507;31;103;0;0;0;0;0;0;0;16505;0;0;16505;316;114;202;0;16189;4992;2646;8551;29
+"180502";"gmina wiejska";"gm. Brzyska";"jasielski";"podkarpackie";4810;5213;1774;3036;2;14;0;0;0;0;0;0;0;3034;0;0;3034;75;14;61;0;2959;288;214;2457;7
+"180503";"gmina wiejska";"gm. Dębowiec";"jasielski";"podkarpackie";6390;6935;2474;3916;4;23;0;0;0;0;0;0;0;3916;0;0;3916;64;10;54;0;3852;499;379;2974;10
+"180504";"gmina wiejska";"gm. Jasło";"jasielski";"podkarpackie";12422;13359;4596;7826;7;13;0;0;0;0;0;0;0;7826;0;0;7826;144;31;113;0;7682;1340;844;5498;22
+"180505";"gmina miejsko-wiejska";"gm. Kołaczyce";"jasielski";"podkarpackie";6570;7107;2589;3980;6;17;0;0;0;0;0;0;0;3980;0;0;3980;87;26;61;0;3893;455;323;3115;8
+"180506";"gmina wiejska";"gm. Krempna";"jasielski";"podkarpackie";1430;1553;712;718;0;21;0;0;0;0;0;0;0;718;0;0;718;28;5;23;0;690;131;92;467;5
+"180507";"gmina wiejska";"gm. Nowy Żmigród";"jasielski";"podkarpackie";6830;7369;2536;4294;12;20;0;0;0;0;0;0;0;4294;0;0;4294;101;16;85;0;4193;550;378;3265;12
+"180508";"gmina wiejska";"gm. Osiek Jasielski";"jasielski";"podkarpackie";3909;4226;1673;2236;4;17;0;0;0;0;0;0;0;2236;0;0;2236;35;8;27;0;2201;245;175;1781;6
+"180509";"gmina wiejska";"gm. Skołyszyn";"jasielski";"podkarpackie";9230;10015;3483;5747;2;10;0;0;0;0;0;0;0;5747;0;0;5747;89;29;60;0;5658;1042;587;4029;12
+"180511";"gmina wiejska";"gm. Tarnowiec";"jasielski";"podkarpackie";6900;7511;2758;4142;9;26;0;0;0;0;0;0;0;4141;0;0;4141;78;21;57;0;4063;689;440;2934;10
+"180701";"gmina wiejska";"gm. Chorkówka";"krośnieński";"podkarpackie";9810;10704;3785;6023;7;31;0;0;0;0;0;0;0;6020;0;0;6020;135;25;110;0;5885;1288;504;4093;14
+"180702";"gmina miejsko-wiejska";"gm. Dukla";"krośnieński";"podkarpackie";10690;11671;4401;6289;6;73;0;0;0;0;0;0;0;6287;0;0;6287;132;35;97;0;6155;1378;571;4206;15
+"180703";"gmina miejsko-wiejska";"gm. Iwonicz-Zdrój";"krośnieński";"podkarpackie";8541;8852;2837;5704;8;676;1;1;0;0;0;0;1;5703;1;0;5703;106;48;58;0;5597;1326;442;3829;8
+"180704";"gmina miejsko-wiejska";"gm. Jedlicze";"krośnieński";"podkarpackie";11220;12248;4474;6746;9;30;0;0;0;0;0;0;0;6743;0;0;6743;148;29;119;0;6595;1833;652;4110;15
+"180705";"gmina wiejska";"gm. Korczyna";"krośnieński";"podkarpackie";8260;8989;3016;5244;10;56;0;0;0;0;0;0;0;5244;0;0;5244;106;32;74;0;5138;1205;813;3120;10
+"180706";"gmina wiejska";"gm. Krościenko Wyżne";"krośnieński";"podkarpackie";4070;4378;1356;2714;4;16;0;0;0;0;0;0;0;2713;0;0;2713;37;7;30;0;2676;657;299;1720;4
+"180707";"gmina wiejska";"gm. Miejsce Piastowe";"krośnieński";"podkarpackie";10150;10973;3569;6578;14;32;3;3;0;0;0;0;3;6579;3;0;6579;159;33;126;0;6420;1756;673;3991;9
+"180708";"gmina miejsko-wiejska";"gm. Rymanów";"krośnieński";"podkarpackie";12320;13439;4347;7973;20;324;0;0;0;0;0;0;0;7973;0;0;7973;152;24;128;0;7821;1863;694;5264;17
+"180709";"gmina wiejska";"gm. Wojaszówka";"krośnieński";"podkarpackie";6869;7417;3032;3836;3;27;0;0;0;0;0;0;0;3837;0;0;3837;80;12;68;0;3757;963;327;2467;11
+"180710";"gmina wiejska";"gm. Jaśliska";"krośnieński";"podkarpackie";1900;2063;838;1062;10;26;0;0;0;0;0;0;0;1062;0;0;1062;17;0;17;0;1045;224;94;727;4
+"186101";"gmina miejska";"m. Krosno";"Krosno";"podkarpackie";34549;36985;12076;22473;44;230;2;2;0;0;0;0;2;22474;2;2;22472;427;121;306;0;22045;9159;2637;10249;28

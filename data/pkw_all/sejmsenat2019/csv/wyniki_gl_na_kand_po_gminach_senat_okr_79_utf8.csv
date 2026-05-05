@@ -1,0 +1,28 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Jerzy Witold JACHNIK";"Tadeusz Wiktor KOPEĆ";"Hubert Zbigniew MAŚLANKA";"Liczba obwodów"
+"240301";"gmina miejska";"m. Cieszyn";"cieszyński";"śląskie";26964;26944;9667;17289;15;171;2;2;0;0;0;0;2;17290;2;1;17289;343;92;251;0;16946;2050;5935;8961;25
+"240302";"gmina miejska";"m. Ustroń";"cieszyński";"śląskie";14210;15019;4475;9735;21;1041;2;2;0;0;0;0;2;9736;2;0;9736;180;53;127;0;9556;938;3313;5305;13
+"240303";"gmina miejska";"m. Wisła";"cieszyński";"śląskie";8316;9325;2967;5349;11;383;0;0;0;0;0;0;0;5348;0;0;5348;117;18;99;0;5231;480;1096;3655;8
+"240304";"gmina wiejska";"gm. Brenna";"cieszyński";"śląskie";8171;8851;2740;5431;4;127;0;0;0;0;0;0;0;5429;0;2;5427;106;30;76;0;5321;632;2678;2011;8
+"240305";"gmina wiejska";"gm. Chybie";"cieszyński";"śląskie";6917;7500;2248;4669;6;5;0;0;0;0;0;0;0;4666;0;0;4666;74;18;56;0;4592;517;2562;1513;5
+"240306";"gmina wiejska";"gm. Dębowiec";"cieszyński";"śląskie";4197;4469;1460;2737;2;8;0;0;0;0;0;0;0;2737;0;0;2737;66;19;47;0;2671;369;1149;1153;5
+"240307";"gmina wiejska";"gm. Goleszów";"cieszyński";"śląskie";9814;10427;3433;6381;4;35;0;0;0;0;0;0;0;6381;0;0;6381;139;44;95;0;6242;762;1849;3631;12
+"240308";"gmina wiejska";"gm. Hażlach";"cieszyński";"śląskie";7715;8217;2712;5003;6;7;0;0;0;0;0;0;0;5002;0;0;5002;90;27;63;0;4912;668;2236;2008;7
+"240309";"gmina wiejska";"gm. Istebna";"cieszyński";"śląskie";8762;9296;2995;5767;8;120;0;0;0;0;0;0;0;5764;0;0;5764;103;23;80;0;5661;395;3992;1274;6
+"240310";"gmina miejsko-wiejska";"gm. Skoczów";"cieszyński";"śląskie";18995;20539;6492;12503;22;47;1;1;0;0;0;0;1;12501;1;0;12501;224;72;152;0;12277;1553;5441;5283;19
+"240311";"gmina miejsko-wiejska";"gm. Strumień";"cieszyński";"śląskie";10633;10185;4187;6447;5;33;0;0;0;0;0;0;0;6446;0;0;6446;114;36;78;0;6332;721;3305;2306;8
+"240312";"gmina wiejska";"gm. Zebrzydowice";"cieszyński";"śląskie";10458;10127;3971;6487;6;26;0;0;0;0;0;0;0;6487;0;0;6487;87;33;54;0;6400;755;3311;2334;8
+"241701";"gmina miejska";"m. Żywiec";"żywiecki";"śląskie";23345;24533;7540;15805;16;87;2;2;0;0;0;0;2;15805;2;6;15799;283;92;191;0;15516;1490;6555;7471;20
+"241702";"gmina wiejska";"gm. Czernichów";"żywiecki";"śląskie";4865;5262;1425;3440;7;56;0;0;0;0;0;0;0;3438;0;0;3438;55;13;42;0;3383;283;2065;1035;5
+"241703";"gmina wiejska";"gm. Gilowice";"żywiecki";"śląskie";4427;4893;1289;3138;2;39;0;0;0;0;0;0;0;3138;0;0;3138;65;18;47;0;3073;303;1789;981;3
+"241704";"gmina wiejska";"gm. Jeleśnia";"żywiecki";"śląskie";10120;10920;3551;6569;23;145;0;0;0;0;0;0;0;6569;0;0;6569;137;48;89;0;6432;524;4028;1880;11
+"241705";"gmina wiejska";"gm. Koszarawa";"żywiecki";"śląskie";1910;2018;693;1217;5;26;0;0;0;0;0;0;0;1216;0;0;1216;24;11;13;0;1192;92;793;307;4
+"241706";"gmina wiejska";"gm. Lipowa";"żywiecki";"śląskie";7833;8360;2785;5048;2;26;0;0;0;0;0;0;0;5046;0;0;5046;102;22;80;0;4944;556;2528;1860;7
+"241707";"gmina wiejska";"gm. Łękawica";"żywiecki";"śląskie";3356;3576;1097;2259;7;14;0;0;0;0;0;0;0;2259;0;0;2259;34;9;25;0;2225;216;1314;695;4
+"241708";"gmina wiejska";"gm. Łodygowice";"żywiecki";"śląskie";10451;11373;2968;7483;7;39;0;0;0;0;0;0;0;7481;0;0;7481;178;55;123;0;7303;766;3917;2620;7
+"241709";"gmina wiejska";"gm. Milówka";"żywiecki";"śląskie";7502;7990;2769;4733;0;122;0;0;0;0;0;0;0;4730;0;1;4729;90;17;73;0;4639;370;3098;1171;7
+"241710";"gmina wiejska";"gm. Radziechowy-Wieprz";"żywiecki";"śląskie";9557;10259;3370;6187;12;33;0;0;0;0;0;0;0;6186;0;0;6186;98;30;68;0;6088;548;4014;1526;8
+"241711";"gmina wiejska";"gm. Rajcza";"żywiecki";"śląskie";6895;7036;2889;4006;5;80;0;0;0;0;0;0;0;4007;0;2;4005;70;20;50;0;3935;335;2494;1106;9
+"241712";"gmina wiejska";"gm. Ślemień";"żywiecki";"śląskie";2647;2898;746;1900;4;37;0;0;0;0;0;0;0;1901;0;0;1901;46;7;39;0;1855;157;1235;463;3
+"241713";"gmina wiejska";"gm. Świnna";"żywiecki";"śląskie";6107;6451;2036;4071;1;66;0;0;0;0;0;0;0;4071;0;0;4071;60;11;49;0;4011;340;2165;1506;6
+"241714";"gmina wiejska";"gm. Ujsoły";"żywiecki";"śląskie";3456;3682;1344;2112;6;60;0;0;0;0;0;0;0;2112;0;0;2112;48;11;37;0;2064;169;1283;612;5
+"241715";"gmina wiejska";"gm. Węgierska Górka";"żywiecki";"śląskie";10926;11762;3585;7341;14;85;0;0;0;0;0;0;0;7340;0;0;7340;149;40;109;0;7191;561;4510;2120;8

@@ -1,0 +1,579 @@
+﻿"Nr komisji";"Siedziba komisji";"TERYT Gminy";"Gmina";"Powiat";"Województwo";"Liczba komisji";"Liczba uwzględnionych komisji";"RADO Michał Marcin - KW BEZPARTYJNI SAMORZĄDOWCY";"UJAZDOWSKI Kazimierz Michał - KKW TRZECIA DROGA PSL-PL2050 SZYMONA HOŁOWNI";"OBREMSKI Jarosław Wojciech - KW PRAWO I SPRAWIEDLIWOŚĆ"
+1;"SPZOZ Ośrodek Rehabilitacji Dzieci Niepełnosprawnych, ul. Osiedle Kazimierza Wielkiego 25, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;140;364;303
+2;"Ośrodek Pomocy Społecznej, ul. Poznańska 23, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;148;620;359
+3;"Szkoła Podstawowa Nr 3, ul. Podwale 20, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;171;486;424
+4;"Szkoła Podstawowa Nr 1, ul. Szkolna 2, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;86;361;209
+5;"Szkoła Podstawowa Nr 3, ul. Poznańska 2, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;90;271;183
+6;"Zespół Żłobek i Klub Dziecięcy, ul. Piastów 34, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;95;261;244
+7;"Szkoła Podstawowa Nr 1, ul. Marii Konopnickiej 2, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;394;763;181
+8;"Filia biblioteczna, Czernina ul. Rynek 8, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;108;235;254
+9;"Świetlica Wiejska, Kłoda Górowska 45, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;45;136;200
+10;"Świetlica Wiejska, Stara Góra 33A, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;119;336;323
+11;"Zespół Szkoła Podstawowa i Przedszkole, Witoszyce 10, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;79;234;236
+12;"Przedszkole Publiczne, Glinka 6, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;80;172;166
+13;"Świetlica Wiejska, Ślubów 22A, 56-200 Góra";20401;"gm. Góra";"górowski";"dolnośląskie";1;1;42;79;74
+1;"Dom Kultury, Luboszyce 15, 56-209 Jemielno";20402;"gm. Jemielno";"górowski";"dolnośląskie";1;1;68;148;184
+2;"Urząd Gminy Jemielno, Jemielno 81, 56-209 Jemielno";20402;"gm. Jemielno";"górowski";"dolnośląskie";1;1;90;135;218
+3;"Świetlica Wiejska, Psary 44, 56-209 Jemielno";20402;"gm. Jemielno";"górowski";"dolnośląskie";1;1;47;109;197
+4;"Świetlica Wiejska, Kietlów 1, 56-209 Jemielno";20402;"gm. Jemielno";"górowski";"dolnośląskie";1;1;26;28;105
+1;"Zespół Szkół w Sicinach, Siciny 78, 56-215 Niechlów";20403;"gm. Niechlów";"górowski";"dolnośląskie";1;1;120;201;327
+2;"Gminny Ośrodek Kultury, ul. Dworcowa 9, 56-215 Niechlów";20403;"gm. Niechlów";"górowski";"dolnośląskie";1;1;126;168;314
+3;"Świetlica wiejska, Lipowiec 16, 56-215 Niechlów";20403;"gm. Niechlów";"górowski";"dolnośląskie";1;1;53;124;328
+4;"Świetlica wiejska w Naratowie, Naratów 21, 56-215 Niechlów";20403;"gm. Niechlów";"górowski";"dolnośląskie";1;1;74;134;191
+1;"Szkoła Podstawowa, Czarnoborsko 10, 56-210 Wąsosz";20404;"gm. Wąsosz";"górowski";"dolnośląskie";1;1;88;222;311
+2;"Ośrodek Pomocy Społecznej, ul. Krzywa 11, 56-210 Wąsosz";20404;"gm. Wąsosz";"górowski";"dolnośląskie";1;1;209;669;468
+3;"Zespół Placówek Kultury, ul. Zacisze 10D, 56-210 Wąsosz";20404;"gm. Wąsosz";"górowski";"dolnośląskie";1;1;41;88;77
+4;"Szkoła Podstawowa, Pobiel 75, 56-210 Wąsosz";20404;"gm. Wąsosz";"górowski";"dolnośląskie";1;1;48;82;108
+5;"Świetlica wiejska, Kamień Górowski 8A, 56-210 Wąsosz";20404;"gm. Wąsosz";"górowski";"dolnośląskie";1;1;68;135;222
+6;"Świetlica Wiejska, Cieszkowice 41, 56-210 Wąsosz";20404;"gm. Wąsosz";"górowski";"dolnośląskie";1;1;30;62;59
+7;"Świetlica Wiejska, Czeladź Wielka 48, 56-210 Wąsosz";20404;"gm. Wąsosz";"górowski";"dolnośląskie";1;1;28;70;133
+8;"Świetlica Wiejska, Lubiel 37, 56-210 Wąsosz";20404;"gm. Wąsosz";"górowski";"dolnośląskie";1;1;39;64;133
+1;"Szkoła Podstawowa w Cieszkowie, ul. Grunwaldzka 3, 56-330 Cieszków";21301;"gm. Cieszków";"milicki";"dolnośląskie";1;1;237;642;627
+2;"Świetlica wiejska w Trzebicku, Trzebicko 33, 56-330 Cieszków";21301;"gm. Cieszków";"milicki";"dolnośląskie";1;1;55;101;165
+3;"Szkoła Podstawowa w Pakosławsku, Pakosławsko 58, 56-330 Cieszków";21301;"gm. Cieszków";"milicki";"dolnośląskie";1;1;83;265;246
+1;"Centrum Edukacyjno-Turystyczno-Sportowe w Krośnicach, ul. Sanatoryjna 19, 56-320 Krośnice";21302;"gm. Krośnice";"milicki";"dolnośląskie";1;1;205;524;449
+2;"Szkoła Podstawowa im. Piastów Śląskich w Bukowicach, ul. Wrocławska 43, 56-321 Bukowice";21302;"gm. Krośnice";"milicki";"dolnośląskie";1;1;250;621;704
+3;"Szkoła Podstawowa im. Edmunda Bojanowskiego w Kuźnicy Czeszyckiej, Kuźnica Czeszycka 1, 56-320 Kuźnica Czeszycka";21302;"gm. Krośnice";"milicki";"dolnośląskie";1;1;103;234;256
+4;"Świetlica środowiskowa i wiejska w Wierzchowicach, ul. Kościelna 15, 56-320 Wierzchowice";21302;"gm. Krośnice";"milicki";"dolnośląskie";1;1;107;265;295
+5;"Dom Pomocy Społecznej, ul. Kwiatowa 9, 56-320 Krośnice";21302;"gm. Krośnice";"milicki";"dolnośląskie";1;1;9;12;23
+1;"Świetlica Środowiskowa, ul. Aleja Lipowa 1, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;185;536;410
+2;"Szkoła Podstawowa Nr 1 w Miliczu, ul. Armii Krajowej 7, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;266;982;567
+3;"Zespół Szkół w Miliczu, ul. Trzebnicka 4, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;84;357;194
+4;"Szkoła Podstawowa Nr 2 w Miliczu, ul. Mikołaja Kopernika 18, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;198;799;472
+5;"Nadleśnictwo Państwowe w Miliczu, ul. Trzebnicka 18, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;104;469;305
+6;"Świetlica Wiejska, Bartniki 29, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;37;78;125
+7;"Szkoła Podstawowa w Czatkowicach, Czatkowice ul. Szosowa 2, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;60;143;112
+8;"Świetlica Wiejska w Gądkowicach, Gądkowice 45a, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;79;133;189
+9;"Świetlica Wiejska w Ostrowąsach, Ostrowąsy 31, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;51;76;123
+10;"Świetlica Wiejska w Potaszni, Potasznia 12, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;50;132;181
+11;"Szkoła Podstawowa w Nowym Zamku, Nowe Grodzisko 9, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;41;90;105
+12;"Świetlica Wiejska we Wszewilkach, Wszewilki 51, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;75;210;129
+13;"Szkoła Podstawowa w Dunkowej, Dunkowa 1, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;41;58;101
+14;"Szkoła Podstawowa w Sułowie, Sułów ul. Szkolna 6, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;155;410;409
+15;"Świetlica Wiejska w Sławoszowicach, Sławoszowice ul. 3 Maja 12a, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;101;302;195
+16;"Świetlica Wiejska w Piękocinie, Piękocin 38, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;26;46;101
+17;"Świetlica Wiejska w Olszy, Olsza 3a, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;29;88;120
+18;"Świetlica Wiejska, Kaszowo 34, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;41;89;87
+19;"Szkoła Podstawowa im. Wandy Rutkiewicz, Wziąchowo Wielkie 47, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;24;64;93
+20;"Świetlica Wiejska w Gogołowicach, Gogołowice 26, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;15;62;72
+21;"Świetlica Wiejska, Stawiec 23B, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;32;82;77
+22;"Świetlica Wiejska, Piotrkosice 49, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;15;50;67
+23;"Świetlica Wiejska, Słączno 2a, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;24;77;100
+24;"Świetlica Wiejska, Miłosławice 19c, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;24;51;65
+25;"Świetlica Wiejska, Świętoszyn 17a, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;40;85;101
+26;"Świetlica Wiejska w Miłochowicach, Miłochowice 16, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;40;107;85
+27;"Świetlica Wiejska, Pracze 11, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;46;117;90
+28;"Milickie Centrum Medyczne sp. z o. o., ul. Grzybowa 1, 56-300 Milicz";21303;"gm. Milicz";"milicki";"dolnośląskie";1;1;14;38;33
+1;"Zespół Szkół Zawodowych im. Marii Skłodowskiej-Curie w Oleśnicy, ul. Wojska Polskiego 67/69, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;152;523;277
+2;"Szkoła Podstawowa nr 2 im. Jana Kilińskiego w Oleśnicy, ul. św. Jadwigi 1a, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;117;328;248
+3;"Szkoła Podstawowa nr 2 im. Jana Kilińskiego w Oleśnicy, ul. św. Jadwigi 1a, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;123;405;239
+4;"Urząd Miasta Oleśnicy, rynek Rynek 1, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;125;504;350
+5;"Szkoła Podstawowa nr 7 im. Jana Pawła II w Oleśnicy, ul. 11 Listopada 10, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;154;397;304
+6;"Miejski Ośrodek Kultury i Sztuki, ul. Jana Kochanowskiego 4, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;138;397;309
+7;"Szkoła Podstawowa nr 4 im. Romana Podoskiego w Oleśnicy, ul. Ignacego Paderewskiego 2, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;138;401;256
+8;"Szkoła Podstawowa nr 1 im. Książąt Oleśnickich w Oleśnicy, ul. Armii Krajowej 47, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;127;484;263
+9;"Szkoła Podstawowa nr 4 im. Romana Podoskiego w Oleśnicy, ul. Ignacego Paderewskiego 2, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;105;382;287
+10;"Szkoła Podstawowa nr 3 im. Podróżników i Odkrywców Polskich w Oleśnicy, ul. Jana Kochanowskiego 8, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;157;392;291
+11;"Zespół Szkolno-Przedszkolny Nr 1 w Oleśnicy, ul. gen. Franciszka Kleeberga 4, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;134;474;358
+12;"Zespół Szkolno-Przedszkolny Nr 1 w Oleśnicy, ul. gen. Franciszka Kleeberga 4, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;136;529;247
+13;"Spółdzielczy Dom Kultury KORELAT w Oleśnicy, ul. Jana Kochanowskiego 5, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;152;546;331
+14;"Hala Sportowa OKR Atol w Oleśnicy, ul. Jana Kochanowskiego 2, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;190;676;337
+15;"Cech Rzemiosł Różnych oraz Małej i Średniej Przedsiębiorczości w Oleśnicy, ul. Wrocławska 41 - 43, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;166;620;351
+16;"Oleśnicka Biblioteka Publiczna, ul. Mikołaja Reja 10, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;189;629;335
+17;"Szkoła Podstawowa nr 8 im. Noblistów Polskich w Oleśnicy, ul. Wiejska 35, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;124;531;236
+18;"Szkoła Podstawowa nr 7 im. Jana Pawła II w Oleśnicy (wejście od ul. Chopina), ul. Juliusza Słowackiego 4, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;121;396;314
+19;"Zespół Szkół Zawodowych im. Marii Skłodowskiej-Curie w Oleśnicy, ul. Wojska Polskiego 67/69, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;168;649;262
+20;"Przedszkole nr 6 w Oleśnicy, ul. Kazimierza Wielkiego 7, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;184;607;262
+21;"Szkoła Podstawowa nr 3 im. Podróżników i Odkrywców Polskich w Oleśnicy, ul. Jana Kochanowskiego 8, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;189;812;353
+22;"Powiatowy Zespół Szpitali-Szpital w Oleśnicy, ul. Armii Krajowej 1, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;14;23;14
+23;"Zakład Karny nr 1 we Wrocławiu Oddział Zewnętrzny w Oleśnicy, ul. Wały Jagiellońskie 1, 56-400 Oleśnica";21401;"m. Oleśnica";"oleśnicki";"dolnośląskie";1;1;18;73;20
+1;"Centrum Usług Wspólnych w Bierutowie, ul. Kolejowa 7, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;191;689;522
+2;"Zespół Szkół Ponadpodstawowych w Bierutowie, ul. Plac Kościelny 2, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;155;424;393
+3;"Szkoła Podstawowa w Wabienicach, Wabienice 92, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;31;79;99
+4;"Szkoła Podstawowa w Zbytowej, Zbytowa 59a, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;84;128;199
+5;"Budynek po szkole w Posadowicach, Posadowice 7, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;45;66;92
+6;"Budynek po szkole w Solnikach Wielkich, Solniki Wielkie 22, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;53;91;102
+7;"Budynek po szkole w Paczkowie, Paczków 24, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;26;31;57
+8;"Świetlica OSP, Gorzesław 25, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;42;63;82
+9;"Świetlica Wiejska, Jemielna 16, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;14;45;29
+10;"Świetlica Wiejska, Karwiniec 22d, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;36;112;85
+11;"Świetlica Wiejska, Kruszowice 34, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;12;55;36
+12;"Szkoła Podstawowa w Wabienicach, Wabienice 92, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;35;92;82
+13;"Świetlica Wiejska, Solniki Małe 7a, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;23;97;124
+14;"Świetlica Wiejska, Zawidowice 39a, 56-420 Bierutów";21402;"gm. Bierutów";"oleśnicki";"dolnośląskie";1;1;22;46;81
+1;"Szkoła Podstawowa im. Ireny Sendlerowej, ul. Parkowa 5, 56-410 Dobroszyce";21403;"gm. Dobroszyce";"oleśnicki";"dolnośląskie";1;1;283;873;600
+2;"Szkoła Podstawowa im. Ireny Sendlerowej, ul. Parkowa 5, 56-410 Dobroszyce";21403;"gm. Dobroszyce";"oleśnicki";"dolnośląskie";1;1;253;640;541
+3;"Szkoła Podstawowa im. Orła Białego, Dobrzeń 9A, 56-410 Dobroszyce";21403;"gm. Dobroszyce";"oleśnicki";"dolnośląskie";1;1;139;339;320
+1;"Zespół Szkół w Dziadowej Kłodzie, ul. Słoneczna 5, 56-504 Dziadowa Kłoda";21404;"gm. Dziadowa Kłoda";"oleśnicki";"dolnośląskie";1;1;172;483;263
+2;"Szkoła Podstawowa w Miłowicach, Miłowice 27, 56-504 Dziadowa Kłoda";21404;"gm. Dziadowa Kłoda";"oleśnicki";"dolnośląskie";1;1;122;333;307
+3;"Świetlica wiejska w Dalborowicach, Dalborowice ul. Namysłowska 19, 56-504 Dziadowa Kłoda";21404;"gm. Dziadowa Kłoda";"oleśnicki";"dolnośląskie";1;1;82;259;215
+1;"Miejsko-Gminny Ośrodek Kultury w Międzyborzu, ul. Wrocławska 8, 56-513 Międzybórz";21405;"gm. Międzybórz";"oleśnicki";"dolnośląskie";1;1;107;271;210
+2;"Miejsko-Gminny Ośrodek Kultury w Międzyborzu, ul. Wrocławska 8, 56-513 Międzybórz";21405;"gm. Międzybórz";"oleśnicki";"dolnośląskie";1;1;104;345;187
+3;"Szkoła Podstawowa im. Jerzego Badury w Międzyborzu, ul. Wrocławska 6 - 6a, 56-513 Międzybórz";21405;"gm. Międzybórz";"oleśnicki";"dolnośląskie";1;1;63;143;142
+4;"Świetlica wiejska w Bukowinie Sycowskiej, Bukowina Sycowska 20A, 56-513 Międzybórz";21405;"gm. Międzybórz";"oleśnicki";"dolnośląskie";1;1;98;254;209
+5;"Świetlica Wiejska, Klonów 27, 56-513 Międzybórz";21405;"gm. Międzybórz";"oleśnicki";"dolnośląskie";1;1;29;73;77
+6;"Świetlica Wiejska, Kraszów 35A, 56-513 Międzybórz";21405;"gm. Międzybórz";"oleśnicki";"dolnośląskie";1;1;45;72;86
+1;"Świetlica Wiejska w Bystrem, Bystre ul. Wrocławska 14, 56-400 Oleśnica";21406;"gm. Oleśnica";"oleśnicki";"dolnośląskie";1;1;107;287;188
+2;"Szkoła Podstawowa w Ligocie Małej im. UNICEF, Ligota Mała 15, 56-400 Oleśnica";21406;"gm. Oleśnica";"oleśnicki";"dolnośląskie";1;1;179;450;357
+3;"Szkoła Podstawowa w Ligocie Polskiej, Ligota Polska 3, 56-400 Oleśnica";21406;"gm. Oleśnica";"oleśnicki";"dolnośląskie";1;1;231;527;426
+4;"Świetlica Wiejska w Boguszycach, Boguszyce 118a, 56-400 Oleśnica";21406;"gm. Oleśnica";"oleśnicki";"dolnośląskie";1;1;97;328;266
+5;"Szkoła Podstawowa we Wszechświętem, Wszechświęte 16b, 56-400 Oleśnica";21406;"gm. Oleśnica";"oleśnicki";"dolnośląskie";1;1;87;298;245
+6;"Szkoła Podstawowa w Smolnej im. Kawalerów Orderu Uśmiechu, Smolna 70, 56-400 Oleśnica";21406;"gm. Oleśnica";"oleśnicki";"dolnośląskie";1;1;215;486;369
+7;"Szkoła Podstawowa w Sokołowicach im. Orła Białego, Sokołowice 24, 56-400 Oleśnica";21406;"gm. Oleśnica";"oleśnicki";"dolnośląskie";1;1;231;799;434
+8;"Świetlica Wiejska w Smardzowie, Smardzów ul. Wrocławska 12, 56-400 Oleśnica";21406;"gm. Oleśnica";"oleśnicki";"dolnośląskie";1;1;161;425;331
+9;"Świetlica Wiejska w Nieciszowie, Nieciszów 5A, 56-400 Oleśnica";21406;"gm. Oleśnica";"oleśnicki";"dolnośląskie";1;1;77;315;126
+10;"Powiatowy Dom Pomocy Społecznej w Ostrowinie, Ostrowina 21, 56-400 Oleśnica";21406;"gm. Oleśnica";"oleśnicki";"dolnośląskie";1;1;7;6;22
+1;"Publiczne Przedszkole nr 1, ul. Kaliska 8, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;217;829;382
+2;"Szkoła Podstawowa nr 2, ul. Adama Mickiewicza 5, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;159;602;382
+3;"Biblioteka Publiczna w Sycowie, ul. Kościelna 3A, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;184;793;330
+4;"Sala Ślubów Urzędu Stanu Cywilnego w Sycowie, pl. Wolności 7/3, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;173;674;355
+5;"Szkoła Podstawowa w Stradomi Wierzchniej, Stradomia Wierzchnia 64, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;71;279;201
+6;"Szkoła Podstawowa w Drołtowicach, Drołtowice 12, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;37;110;73
+7;"Szkoła Podstawowa w Działoszy, Działosza 62, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;134;285;206
+8;"Publiczne Przedszkole nr 2 w Sycowie, ul. Komorowska 2, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;96;410;187
+9;"Świetlica wiejska, Ślizów 80d, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;40;160;98
+10;"Świetlica wiejska w Wiosce, Wioska 19a, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;97;438;175
+11;"Świetlica wiejska w Szczodrowie, Szczodrów 38, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;44;165;128
+12;"Świetlica wiejska w Biskupicach, Biskupice 32, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;35;95;61
+13;"Świetlica wiejska w Zawadzie, Zawada 12a, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;54;95;84
+14;"Powiatowy Zespół Szpitali-Szpital w Sycowie, ul. Oleśnicka 25, 56-500 Syców";21407;"gm. Syców";"oleśnicki";"dolnośląskie";1;1;2;13;15
+1;"Szkoła Podstawowa nr 2 im. Jana Pawła II, ul. Stefana Batorego 5, 56-416 Twardogóra";21408;"gm. Twardogóra";"oleśnicki";"dolnośląskie";1;1;244;693;544
+2;"Szkoła Podstawowa nr 2 im. Jana Pawła II, ul. św. Jadwigi 7, 56-416 Twardogóra";21408;"gm. Twardogóra";"oleśnicki";"dolnośląskie";1;1;202;669;425
+3;"Zakład Gospodarki Mieszkaniowej, ul. 1 Maja 2, 56-416 Twardogóra";21408;"gm. Twardogóra";"oleśnicki";"dolnośląskie";1;1;251;774;539
+4;"Szkoła Podstawowa nr 2 im. Jana Pawła II, ul. Stefana Batorego 5, 56-416 Twardogóra";21408;"gm. Twardogóra";"oleśnicki";"dolnośląskie";1;1;105;315;294
+5;"Szkoła Podstawowa, Goszcz ul. Szkolna 1, 56-416 Twardogóra";21408;"gm. Twardogóra";"oleśnicki";"dolnośląskie";1;1;228;463;485
+6;"Szkoła Podstawowa, Grabowno Wielkie 139a, 56-416 Twardogóra";21408;"gm. Twardogóra";"oleśnicki";"dolnośląskie";1;1;92;193;162
+1;"Przedszkole Miejskie Nr 4, ul. 1 Maja 33, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;215;361;251
+2;"Szkoła Podstawowa Nr 5, ul. Kamienna 8, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;212;417;278
+3;"Oławskie Centrum Rozwoju Społecznego, ul. 3 Maja 18i/u, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;258;477;266
+4;"Klub ""Parnas"", ul. 1 Maja 13, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;132;243;212
+5;"Stowarzyszenie Pomocy Dzieciom ""Tęcza"" Centrum Terapeutyczno-Rehabilitacyjne, ul. 3 Maja 18k/u, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;143;255;176
+6;"Świetlica Środowiskowa, ul. Młyńska 12b, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;250;533;434
+7;"Żłobek Miejski, ul. Bolesława Chrobrego 106a, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;159;345;320
+8;"Szkoła Podstawowa Nr 6, ul. Sportowa 6, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;326;595;424
+9;"Liceum Ogólnokształcące Nr I, pl. Zamkowy 10, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;237;464;330
+10;"Ośrodek Kultury, ul. 11 Listopada 27, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;239;448;389
+11;"Centrum Kształcenia Zawodowego i Ustawicznego, ul. ks. Franciszka Kutrowskiego 31, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;196;508;271
+12;"Centrum Kształcenia Zawodowego i Ustawicznego, ul. ks. Franciszka Kutrowskiego 31, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;210;442;274
+13;"Szkoła Podstawowa Nr 4, ul. Władysława Broniewskiego 6, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;399;777;370
+14;"Szkoła Podstawowa Nr 4, ul. Władysława Broniewskiego 6, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;457;1053;367
+15;"Zespół Szkolno-Przedszkolny Nr 1, ul. Jarosława Iwaszkiewicza 11, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;378;747;383
+16;"Zespół Szkolno-Przedszkolny Nr 1, ul. Jarosława Iwaszkiewicza 11, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;198;393;309
+17;"Zespół Szkolno-Przedszkolny Nr 1, ul. Jarosława Iwaszkiewicza 11b, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;223;443;321
+18;"Zespół Opieki Zdrowotnej w Oławie, ul. Krzysztofa Kamila Baczyńskiego 1, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;4;14;7
+19;"Dom Pomocy Społecznej w Oławie, ul. Lwowska 6, 55-200 Oława";21501;"m. Oława";"oławski";"dolnośląskie";1;1;7;10;22
+1;"Centrum Kultury i Czytelnictwa Gminy Domaniów, Domaniów 16, 55-216 Domaniów";21502;"gm. Domaniów";"oławski";"dolnośląskie";1;1;64;78;100
+2;"Centrum Kultury i Czytelnictwa Gminy Domaniów, Domaniów 16, 55-216 Domaniów";21502;"gm. Domaniów";"oławski";"dolnośląskie";1;1;66;161;163
+3;"Świetlica Wiejska w Goszczynie, Goszczyna 34B, 55-216 Domaniów";21502;"gm. Domaniów";"oławski";"dolnośląskie";1;1;58;89;109
+4;"Świetlica Wiejska w Piskorzowie, Piskorzów 33A, 55-216 Domaniów";21502;"gm. Domaniów";"oławski";"dolnośląskie";1;1;37;61;59
+5;"Sala Sportowa w Wierzbnie, Wierzbno 83A, 55-216 Domaniów";21502;"gm. Domaniów";"oławski";"dolnośląskie";1;1;71;124;138
+6;"Sala Sportowa w Wierzbnie, Wierzbno 83A, 55-216 Domaniów";21502;"gm. Domaniów";"oławski";"dolnośląskie";1;1;79;125;174
+7;"Świetlica Wiejska w Kończycach, Kończyce 26, 55-216 Domaniów";21502;"gm. Domaniów";"oławski";"dolnośląskie";1;1;52;87;110
+8;"Świetlica Wiejska w Piskorzówku, Piskorzówek 17A, 55-216 Domaniów";21502;"gm. Domaniów";"oławski";"dolnośląskie";1;1;42;71;79
+9;"Świetlica Wiejska w Polwicy, Polwica 22H, 55-216 Domaniów";21502;"gm. Domaniów";"oławski";"dolnośląskie";1;1;44;51;105
+10;"Świetlica Wiejska w Skrzypniku, Skrzypnik 65, 55-216 Domaniów";21502;"gm. Domaniów";"oławski";"dolnośląskie";1;1;62;89;83
+11;"Świetlica Wiejska w Swojkowie, Swojków 11, 55-216 Domaniów";21502;"gm. Domaniów";"oławski";"dolnośląskie";1;1;42;58;88
+1;"Publiczna Szkoła Podstawowa, Wójcice ul. Główna 87, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;179;88;203
+2;"Świetlica wiejska, Miłocice ul. Główna 26, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;77;117;127
+3;"Publiczna Szkoła Podstawowa, Minkowice Oławskie ul. Kościelna 20, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;176;267;363
+4;"Schronisko Młodzieżowe, Chwałowice ul. Szkolna 4, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;259;550;388
+5;"Publiczna Szkoła Podstawowa, Miłoszyce ul. Główna 24, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;380;888;491
+6;"Zespół Szkół, ul. Techników 26, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;129;193;169
+7;"Publiczna Szkoła Podstawowa nr 3, ul. Bolesława Prusa 2, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;148;261;179
+8;"Publiczna Szkoła Podstawowa nr 2 (aula), ul. Aleja Młodych 1, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;275;697;561
+9;"Publiczna Szkoła Podstawowa nr 2 (stołówka), ul. Aleja Młodych 1, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;357;782;486
+10;"Urząd Miasta i Gminy, ul. Wincentego Witosa 24, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;190;508;396
+11;"Hala Sportowa, ul. Partyzantów 10, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;261;471;434
+12;"Środowiskowy Klub ""Kuźnia"", ul. Aleja Wolności 34A, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;239;443;491
+13;"Filia Publicznej Szkoły Podstawowej nr 3, ul. Ludwika Hirszfelda 92, 55-220 Jelcz-Laskowice";21503;"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";1;1;105;206;256
+1;"Świetlica Wiejska, Bystrzyca ul. Tadeusza Kościuszki 2, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;758;382;321
+2;"Szkoła Podstawowa, Marcinkowice ul. Szkolna 1, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;330;640;360
+3;"Świetlica Wiejska, Sobocisko 70, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;127;94;169
+4;"Szkoła Podstawowa, Drzemlikowice 14, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;175;122;219
+5;"Świetlica Wiejska, Osiek 124 A, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;193;231;275
+6;"Szkoła Podstawowa, Ścinawa Polska 26, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;148;136;177
+7;"Świetlica Wiejska, Godzikowice ul. Sportowa 18, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;146;201;132
+8;"Świetlica Wiejska, Gaj Oławski 11B, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;209;247;217
+9;"Świetlica Wiejska, Stanowice ul. Słonecznikowa 5, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;189;408;213
+10;"Świetlica Wiejska, Janików ul. Stefana Batorego 22A, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;151;116;136
+11;"Świetlica Wiejska, Gać 8A, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;129;135;125
+12;"Świetlica Wiejska, Owczary 22A, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;137;153;213
+13;"Budynek po byłym gimnazjum, Siedlce 12, 55-200 Oława";21504;"gm. Oława";"oławski";"dolnośląskie";1;1;206;221;276
+1;"Zespół Szkół Publicznych w Borowie, ul. Wrocławska 24, 57-160 Borów";21701;"gm. Borów";"strzeliński";"dolnośląskie";1;1;192;542;549
+2;"Publiczna Szkoła Podstawowa w Borku Strzelińskim, Borek Strzeliński ul. Szkolna 3, 57-160 Borów";21701;"gm. Borów";"strzeliński";"dolnośląskie";1;1;107;319;408
+3;"Publiczna Szkoła Podstawowa w Zielenicach, Zielenice 26, 57-160 Borów";21701;"gm. Borów";"strzeliński";"dolnośląskie";1;1;66;166;350
+4;"Świetlica Wiejska, Ludów Śląski 35, 57-160 Ludów Śląski";21701;"gm. Borów";"strzeliński";"dolnośląskie";1;1;42;100;111
+1;"Świetlica Wiejska w Karczynie, Karczyn 19, 57-150 Prusy";21702;"gm. Kondratowice";"strzeliński";"dolnośląskie";1;1;52;119;228
+2;"Gminny Ośrodek Kultury w Kondratowicach, Kondratowice ul. Długa 23, 57-150 Prusy";21702;"gm. Kondratowice";"strzeliński";"dolnośląskie";1;1;42;153;175
+3;"Sala Gimnastyczna Szkoły w Księginicach Wielkich, Księginice Wielkie 32, 57-150 Prusy";21702;"gm. Kondratowice";"strzeliński";"dolnośląskie";1;1;42;98;101
+4;"Świetlica Wiejska w Górce Sobockiej, Górka Sobocka 10, 57-150 Prusy";21702;"gm. Kondratowice";"strzeliński";"dolnośląskie";1;1;36;85;117
+5;"Świetlica Wiejska w Kowalskich, Kowalskie 28, 57-150 Prusy";21702;"gm. Kondratowice";"strzeliński";"dolnośląskie";1;1;51;125;151
+6;"Świetlica Wiejska w Prusach, ul. Kościelna 4, 57-150 Prusy";21702;"gm. Kondratowice";"strzeliński";"dolnośląskie";1;1;27;64;93
+7;"Świetlica Wiejska w Stachowie, Stachów 17, 57-150 Prusy";21702;"gm. Kondratowice";"strzeliński";"dolnośląskie";1;1;42;126;164
+1;"Urząd Gminy w Przewornie, ul. Kolejowa 4A, 57-130 Przeworno";21703;"gm. Przeworno";"strzeliński";"dolnośląskie";1;1;98;248;289
+2;"Świetlica wiejska w Jegłowej, Jegłowa ul. Janusza Korczaka 6A, 57-130 Przeworno";21703;"gm. Przeworno";"strzeliński";"dolnośląskie";1;1;66;170;172
+3;"Świetlica wiejska w Krzywinie, Krzywina 19, 57-130 Przeworno";21703;"gm. Przeworno";"strzeliński";"dolnośląskie";1;1;55;118;125
+4;"Świetlica wiejska w Romanowie, Romanów 25, 57-130 Przeworno";21703;"gm. Przeworno";"strzeliński";"dolnośląskie";1;1;28;46;57
+5;"Świetlica wiejska w Sarbach, Sarby 55a, 57-130 Przeworno";21703;"gm. Przeworno";"strzeliński";"dolnośląskie";1;1;50;104;243
+6;"Świetlica wiejska w Karnkowie, Karnków 13a, 57-130 Przeworno";21703;"gm. Przeworno";"strzeliński";"dolnośląskie";1;1;28;46;71
+7;"Świetlica Wiejska w Cierpicach, Cierpice 50, 57-130 Przeworno";21703;"gm. Przeworno";"strzeliński";"dolnośląskie";1;1;27;45;100
+8;"Świetlica Wiejska w Rożnowie, Rożnów 18a, 57-130 Przeworno";21703;"gm. Przeworno";"strzeliński";"dolnośląskie";1;1;13;38;93
+9;"Świetlica Wiejska w Strużynie, Strużyna 13, 57-130 Przeworno";21703;"gm. Przeworno";"strzeliński";"dolnośląskie";1;1;25;24;60
+1;"Publiczna Szkoła Podstawowa nr 3, pl. 1 Maja 10, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;132;471;390
+2;"Przedszkole Miejskie ""Kolorowa Kraina"", ul. Przedszkolna 1A, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;147;549;333
+3;"Strzelińskie Centrum Sportowo-Edukacyjne Sp. z o. o., ul. Generała Leopolda Okulickiego 10, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;177;544;346
+4;"Centrum Kształcenia Zawodowego i Ustawicznego, ul. Stanisława Staszica 5, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;164;511;286
+5;"Hala Sportowa Strzelińskiego Centrum Sportowo-Edukacyjnego Sp. z o. o., ul. Staromiejska 64, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;107;474;230
+6;"Strzeliński Ośrodek Kultury, ul. Adama Mickiewicza 2, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;113;432;309
+7;"Zespół Szkół Ogólnokształcących, ul. Jana Pawła II 23, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;156;430;367
+8;"Centrum Kształcenia Zawodowego i Ustawicznego, Ludów Polski 16, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;43;178;136
+9;"Świetlica Wiejska, Szczawin ul. Aleja Lipowa 59, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;84;193;146
+10;"Świetlica Wiejska, Karszów 54A, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;97;213;235
+11;"Publiczna Szkoła Podstawowa, Biały Kościół ul. Kamienna 18, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;130;310;309
+12;"Świetlica Wiejska, Kazanów 19, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;66;111;188
+13;"Remiza Ochotniczej Straży Pożarnej, Brożec 73B, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;64;135;186
+14;"Świetlica Wiejska, Karszówek 37, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;34;82;103
+15;"Publiczna Szkoła Podstawowa, Kuropatnik ul. Szkolna 1, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;88;167;192
+16;"Świetlica Wiejska, Gęsiniec ul. Świerkowa 5A, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;100;318;147
+17;"Świetlica Wiejska, Biedrzychów 10B, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;40;76;116
+18;"Świetlica Wiejska, Gościęcice 92B, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;71;147;130
+19;"Świetlica Wiejska, Pęcz 28, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;34;69;66
+20;"Świetlica Wiejska, Pławna ul. Kasztanowa 45, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;71;178;123
+21;"Uniwersytecki Szpital Kliniczny we Wrocławiu lokalizacja Strzelin, budynek A, sala konferencyjna, ul. Wrocławska 46, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;4;17;28
+22;"Zakład Karny w Strzelinie, ul. Ząbkowicka 68, 57-100 Strzelin";21704;"gm. Strzelin";"strzeliński";"dolnośląskie";1;1;125;350;63
+1;"Sala Obrad w Urzędzie Miasta i Gminy Wiązów, pl. Wolności 37, 57-120 Wiązów";21705;"gm. Wiązów";"strzeliński";"dolnośląskie";1;1;177;481;509
+2;"Świetlica wiejska w Starym Wiązowie, Stary Wiązów 75a, 57-120 Wiązów";21705;"gm. Wiązów";"strzeliński";"dolnośląskie";1;1;80;184;290
+3;"Świetlica wiejska w Częstocicach, Częstocice 29a, 57-120 Wiązów";21705;"gm. Wiązów";"strzeliński";"dolnośląskie";1;1;91;109;246
+4;"Świetlica wiejska w Jutrzynie, Jutrzyna 102, 57-120 Wiązów";21705;"gm. Wiązów";"strzeliński";"dolnośląskie";1;1;65;161;179
+5;"Świetlica wiejska w Jędrzychowicach, Jędrzychowice 12b, 57-120 Wiązów";21705;"gm. Wiązów";"strzeliński";"dolnośląskie";1;1;66;105;210
+6;"Świetlica Wiejska w Łojowicach, Łojowice 1a, 57-120 Wiązów";21705;"gm. Wiązów";"strzeliński";"dolnośląskie";1;1;30;50;127
+7;"Świetlica Wiejska w Wyszonowicach, Wyszonowice 10, 57-120 Wiązów";21705;"gm. Wiązów";"strzeliński";"dolnośląskie";1;1;38;81;94
+8;"Świetlica Wiejska w Witowicach, Witowice 3, 57-120 Wiązów";21705;"gm. Wiązów";"strzeliński";"dolnośląskie";1;1;46;79;98
+9;"Dom Opieki ""Leśny Dworek"", Jędrzychowice 25, 57-120 Wiązów";21705;"gm. Wiązów";"strzeliński";"dolnośląskie";1;1;1;3;12
+1;"Gminny Ośrodek Kultury w Kostomłotach, ul. Rynek 25, 55-311 Kostomłoty";21801;"gm. Kostomłoty";"średzki";"dolnośląskie";1;1;182;741;388
+2;"Szkoła Podstawowa im. Jana Brzechwy w Mieczkowie, Mieczków 14, 55-311 Kostomłoty";21801;"gm. Kostomłoty";"średzki";"dolnośląskie";1;1;15;45;87
+3;"Zespół Szkolno-Przedszkolny ""Nasza Szkoła"" w Piotrowicach, Piotrowice ul. Główna 65, 55-311 Kostomłoty";21801;"gm. Kostomłoty";"średzki";"dolnośląskie";1;1;107;269;306
+4;"Szkoła Podstawowa im. Jana Bosko w Karczycach, Karczyce 12, 55-311 Kostomłoty";21801;"gm. Kostomłoty";"średzki";"dolnośląskie";1;1;126;292;353
+5;"Dzienny Dom Seniora, Osiek ul. Lipowa 6, 55-311 Kostomłoty";21801;"gm. Kostomłoty";"średzki";"dolnośląskie";1;1;58;105;194
+6;"Świetlica Wiejska, Zabłoto 40, 55-311 Kostomłoty";21801;"gm. Kostomłoty";"średzki";"dolnośląskie";1;1;54;124;144
+1;"Szkoła Podstawowa, ul. Szkolna 6, 55-320 Malczyce";21802;"gm. Malczyce";"średzki";"dolnośląskie";1;1;135;360;310
+2;"Urząd Gminy Malczyce, ul. Traugutta 15, 55-320 Malczyce";21802;"gm. Malczyce";"średzki";"dolnośląskie";1;1;109;361;343
+3;"Świetlica wiejska, Wilczków ul. Strzegomska 19, 55-320 Malczyce";21802;"gm. Malczyce";"średzki";"dolnośląskie";1;1;46;133;112
+4;"Świetlica wiejska, Dębice ul. Szkolna 8B, 55-320 Malczyce";21802;"gm. Malczyce";"średzki";"dolnośląskie";1;1;53;113;117
+5;"Świetlica Wiejska, Chomiąża ul. Średzka 40, 55-320 Malczyce";21802;"gm. Malczyce";"średzki";"dolnośląskie";1;1;40;86;105
+6;"Świetlica Wiejska, Kwietno ul. Przelotowa 9, 55-320 Malczyce";21802;"gm. Malczyce";"średzki";"dolnośląskie";1;1;41;59;97
+7;"Świetlica Wiejska, Mazurowice ul. Kolejowa 19A, 55-320 Malczyce";21802;"gm. Malczyce";"średzki";"dolnośląskie";1;1;35;77;71
+8;"Świetlica Wiejska, Rusko ul. Główna 26D, 55-320 Malczyce";21802;"gm. Malczyce";"średzki";"dolnośląskie";1;1;38;94;102
+1;"Zespół Szkolno-Przedszkolny Sala Sportowa, ul. Szkolna 2, 55-330 Miękinia";21803;"gm. Miękinia";"średzki";"dolnośląskie";1;1;196;650;330
+2;"Świetlica Wiejska, Mrozów ul. Wyzwolenia 24, 55-330 Miękinia";21803;"gm. Miękinia";"średzki";"dolnośląskie";1;1;137;488;270
+3;"Szkoła Podstawowa, Pisarzowice ul. Szkolna 3A, 55-330 Miękinia";21803;"gm. Miękinia";"średzki";"dolnośląskie";1;1;235;832;409
+4;"Zespół Szkolno-Przedszkolny Sala Sportowa, Lutynia ul. Polna 1B, 55-330 Miękinia";21803;"gm. Miękinia";"średzki";"dolnośląskie";1;1;293;951;434
+5;"Świetlica Wiejska, Białków 19, 55-330 Miękinia";21803;"gm. Miękinia";"średzki";"dolnośląskie";1;1;71;189;166
+6;"Świetlica Wiejska w Wilkszynie, Wilkszyn ul. Sportowa 2, 55-330 Miękinia";21803;"gm. Miękinia";"średzki";"dolnośląskie";1;1;291;1032;397
+7;"Samorządowy Ośrodek Kultury, ul. Kościuszki 43, 55-330 Miękinia";21803;"gm. Miękinia";"średzki";"dolnośląskie";1;1;90;191;136
+8;"Świetlica Wiejska w Gałowie, Gałów ul. Słoneczna 2, 55-330 Miękinia";21803;"gm. Miękinia";"średzki";"dolnośląskie";1;1;141;433;257
+9;"Świetlica Wiejska w Brzezince Średzkiej, Brzezinka Średzka ul. Szkolna 1, 55-330 Miękinia";21803;"gm. Miękinia";"średzki";"dolnośląskie";1;1;78;262;183
+10;"Świetlica Wiejska w Krępicach, Krępice ul. Wrocławska 3, 55-330 Miękinia";21803;"gm. Miękinia";"średzki";"dolnośląskie";1;1;142;390;212
+11;"Świetlica Wiejska w Księginicach, Księginice ul. Sportowa 2, 55-330 Miękinia";21803;"gm. Miękinia";"średzki";"dolnośląskie";1;1;76;230;201
+12;"Świetlica Wiejska we Wróblowicach, Wróblowice ul. Długa 17a, 55-330 Miękinia";21803;"gm. Miękinia";"średzki";"dolnośląskie";1;1;198;460;221
+1;"Średzki Inkubator Przedsiębiorczości, ul. Spółdzielcza 1, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;159;458;250
+2;"Dworzec Średzki, ul. Legnicka 29, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;96;380;238
+3;"Hala Sportowa OSiR, ul. 1 Maja 4, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;142;412;241
+4;"Szkoła Podstawowa nr 3 (budynek SP nr 1) w Środzie Śląskiej, ul. Kościuszki 62, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;108;386;231
+5;"Urząd Stanu Cywilnego w Środzie Śląskiej, pl. Plac Wolności 3, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;84;261;177
+6;"Szkoła Podstawowa Nr 3 w Środzie Śląskiej, ul. Górna 2, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;103;405;175
+7;"Żłobek Publiczny w Środzie Śląskiej, ul. Zaciszna 1, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;107;541;219
+8;"Świetlica Wiejska w Chwalimierzu, Chwalimierz 50, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;31;62;66
+9;"Świetlica wiejska w Komornikach, Komorniki ul. Okrężna 6, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;28;73;52
+10;"Lokalne Centrum Aktywności Wiejskiej w Szczepanowie, Szczepanów ul. Średzka 19A, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;177;445;394
+11;"Świetlica wiejska w Brodnie (przy OSP), Brodno 44, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;30;62;108
+12;"Szkoła Podstawowa w Ciechowie, Ciechów ul. Średzka 1, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;123;374;308
+13;"Filia Biblioteki Publicznej w Cesarzowicach, Cesarzowice 60, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;50;105;129
+14;"Świetlica wiejska w Bukówku, Bukówek 19, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;22;88;61
+15;"Świetlica wiejska w Krynicznie, Kryniczno 34, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;56;82;116
+16;"Rakoszyckie Centrum Czytelnictwa i Kultury Lokalnej, Rakoszyce ul. Ogrodowa 1A, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;59;170;164
+17;"Świetlica Wiejska w Jastrzębcach, Jastrzębce 57, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;39;116;75
+18;"Świetlica Wiejska w Ogrodnicy, Ogrodnica 31, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;16;57;62
+19;"Świetlica Wiejska w Proszkowie, Proszków 52, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;36;87;101
+20;"Świetlica Wiejska w Juszczynie, Juszczyn 35, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;36;93;79
+21;"Świetlica Wiejska w Przedmościu, Przedmoście 47, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;29;86;92
+22;"Świetlica Wiejska w Świętem, Święte 62, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;34;118;103
+23;"Świetlica Wiejska w Rzeczycy, Rzeczyca ul. Odrzańska 11A, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;17;28;80
+24;"Świetlica Wiejska w Kulinie, Kulin 55, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;28;68;97
+25;"Świetlica Wiejska we Wrocisławicach, Wrocisławice 30A, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;21;86;87
+26;"Świetlica Wiejska w Jugowcu, Jugowiec 25, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;22;44;71
+27;"Świetlica wiejska w Kobylnikach, Kobylniki 3A, 55-300 Środa Śląska";21804;"gm. Środa Śląska";"średzki";"dolnośląskie";1;1;50;77;56
+1;"Szkoła Podstawowa w Udaninie im. Adama Mickiewicza, ul. Główna 19, 55-340 Udanin";21805;"gm. Udanin";"średzki";"dolnośląskie";1;1;115;300;434
+2;"Świetlica wiejska w Ujeździe Górnym, Ujazd Górny ul. Sportowa 32, 55-340 Udanin";21805;"gm. Udanin";"średzki";"dolnośląskie";1;1;104;259;318
+3;"Świetlica wiejska w Konarach, Konary ul. Główna 3, 55-340 Udanin";21805;"gm. Udanin";"średzki";"dolnośląskie";1;1;52;162;351
+4;"Świetlica wiejska w Pichorowicach, Pichorowice 31, 55-340 Udanin";21805;"gm. Udanin";"średzki";"dolnośląskie";1;1;79;182;313
+1;"Szkoła Podstawowa Nr 1, ul. Kazimierza Kownackiego 3, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;101;390;271
+2;"Szkoła Podstawowa Nr 2 w Obornikach Śląskich, ul. kard. Stefana Wyszyńskiego 24, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;119;518;295
+3;"Szkoła Podstawowa Nr 3, ul. Trzebnicka 33, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;148;524;257
+4;"Szkoła Podstawowa Nr 3, ul. Trzebnicka 33, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;134;679;254
+5;"Liceum Ogólnokształcące, ul. Wrocławska 18, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;144;468;250
+6;"Powiatowy Zespół Szkół, ul. Parkowa 8, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;112;541;265
+7;"Świetlica Wiejska, Wilczyn ul. Parkowa 1, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;105;286;198
+8;"Remiza OSP, Rościsławice ul. Żmigrodzka 2, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;125;312;236
+9;"Szkoła Podstawowa, Uraz ul. Wołowska 55, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;99;270;389
+10;"Świetlica Wiejska, Lubnów ul. Pęgowska 3, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;114;344;257
+11;"Szkoła Podstawowa, Osolin ul. marsz. Józefa Piłsudskiego 5, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;89;254;227
+12;"Świetlica Wiejska, Pęgów ul. Poprzeczna 18, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;158;420;229
+13;"Szkoła Podstawowa, Pęgów ul. Główna 101, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;97;333;160
+14;"Świetlica Wiejska, Bagno ul. Ziołowa 64, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;41;102;123
+15;"Świetlica Wiejska, Kotowice ul. Koralowa 1, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;32;74;70
+16;"Świetlica Wiejska, Kuraszków ul. Lipowa 69, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;45;100;105
+17;"Oddział Przedszkolny przy Szkole Postawowej nr 2, Siemianice ul. Poznańska 43, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;82;272;149
+18;"Świetlica Wiejska, Osola ul. Główna 6, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;38;128;100
+19;"Świetlica Wiejska, Paniowice ul. Główna 48, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;46;121;93
+20;"Świetlica Wiejska, Zajączków 5A, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;35;89;88
+21;"Dom Pomocy Społecznej w Obornikach Śląskich, Filia w Rościsławicach, Rościsławice ul. Polna 43, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;9;13;21
+22;"Dom Pomocy Społecznej w Obornikach Śląskich, ul. kard. Stefana Wyszyńskiego 33, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;3;2;17
+23;"Dolnośląskie Centrum Onkologii, Pulmonologii i Hematologii-Szpital Leśne, ul. Ksawerego Dunikowskiego 2 - 8, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;5;3;7
+24;"Dolnośląskie Centrum Onkologii, Pulmonologii i Hematologii-Placówka Zamiejscowa w Obornikach Śląskich Zakład Opiekuńczo-Pielęgnacyjny, ul. Trzebnicka 3, 55-120 Oborniki Śląskie";22001;"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";1;1;0;5;2
+1;"Gminny Ośrodek Kultury i Sportu w Prusicach, ul. Jana Pawła II 7, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;216;473;400
+2;"Szkoła Podstawowa w Skokowej, Skokowa ul. Wrocławska 9, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;179;411;409
+3;"Szkoła Podstawowa w Piotrkowicach, Piotrkowice 19, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;81;88;229
+4;"Świetlica Wiejska w Krościnie Małej, Krościna Mała 16E, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;43;78;118
+5;"Świetlica Wiejska we Wszemirowie, Wszemirów 67, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;47;77;115
+6;"Świetlica Wiejska w Górowej, Górowo 23A, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;26;55;113
+7;"Świetlica Wiejska w Kaszycach Wielkich, Kaszyce Wielkie 13A, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;43;75;105
+8;"Świetlica Wiejska w Krościnie Wielkiej, Krościna Wielka 34B, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;70;137;201
+9;"Świetlica Wiejska w Pawłowie Trzebnickim, Pawłów Trzebnicki 32A, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;37;97;89
+10;"Świetlica Wiejska w Pietrowicach Małych, Pietrowice Małe 49A, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;57;110;93
+11;"Szkoła Podstawowa w Strupinie, Strupina rynek Rynek 15, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;42;93;132
+12;"Świetlica Wiejska w Świerzowie, Świerzów 1A, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;56;126;74
+13;"Świetlica Wiejska w Wilkowej, Wilkowa 27, 55-110 Prusice";22002;"gm. Prusice";"trzebnicki";"dolnośląskie";1;1;37;82;88
+1;"Gminne Centrum Kultury i Sztuki w Trzebnicy, ul. Prusicka 12, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;48;123;124
+2;"Świetlica Wiejska, Księginice ul. Cicha 9, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;173;476;210
+3;"Świetlica Wiejska, Marcinowo 37, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;53;140;138
+4;"Gminne Centrum Kultury i Sztuki w Trzebnicy, ul. Prusicka 12, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;29;102;97
+5;"Świetlica Wiejska, Taczów Wielki 5, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;54;175;149
+6;"Świetlica Wiejska, Skarszyn 17A, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;42;146;122
+7;"Świetlica Wiejska, Cerekwica ul. Trzebnicka 11, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;49;73;80
+8;"Świetlica Wiejska, Jaźwiny 15, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;31;74;69
+9;"Szkoła Podstawowa w Kuźniczysku, Kuźniczysko ul. Kuźnicza 1, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;63;153;154
+10;"Świetlica Wiejska, Biedaszków Wielki 31, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;28;72;70
+11;"Szkoła Podstawowa w Ujeźdźcu Wielkim, Ujeździec Wielki 46, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;42;102;112
+12;"Szkoła Podstawowa Nr 3 w Trzebnicy, ul. Marii Konopnickiej 14, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;173;590;331
+13;"Rynek-Ratusz, rynek Rynek 25, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;168;658;410
+14;"Szkoła Podstawowa Nr 1 w Trzebnicy, ul. Świętej Jadwigi 10, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;157;486;306
+15;"Gminne Centrum Kultury i Sztuki w Trzebnicy, ul. Prusicka 12, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;90;359;196
+16;"Szkoła Podstawowa nr 2, ul. 3 Maja 5, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;204;654;442
+17;"Szkoła Podstawowa nr 2, ul. 3 Maja 5, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;248;887;420
+18;"Powiatowy Zespół Szkół nr 2 w Trzebnicy, ul. Stefana Żeromskiego 25, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;161;561;342
+19;"Świetlica Wiejska, Brzyków 75, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;42;69;57
+20;"Świetlica Wiejska, Raszów 21, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;25;81;49
+21;"Szkoła Podstawowa, Boleścin 23, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;30;62;70
+22;"Świetlica Wiejska, Głuchów Górny 73, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;29;81;121
+23;"Szkoła Podstawowa, Masłów 228, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;24;76;78
+24;"Świetlica Wiejska, Ligota 29, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;36;88;59
+25;"Świetlica Wiejska, Skoroszów 13, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;23;64;106
+26;"Świetlica Wiejska, Brzezie 20A, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;36;45;103
+27;"Świetlica Wiejska, Komorowo 29B, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;28;76;32
+28;"Świetlica Wiejska, Komorówko 34A, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;55;90;130
+29;"Świetlica Wiejska, Koniowo 39A, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;40;60;87
+30;"Świetlica Wiejska, Szczytkowice 81, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;75;164;93
+31;"Świetlica Wiejska, Ujeździec Mały 44A, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;34;51;93
+32;"Szpital im. Św. Jadwigi Śląskiej w Trzebnicy, ul. Prusicka 53-55, 55-100 Trzebnica";22003;"gm. Trzebnica";"trzebnicki";"dolnośląskie";1;1;7;27;41
+1;"Ośrodek Kultury Sportu i Rekreacji w Wiszni Małej, ul. Szkolna 1, 55-114 Wisznia Mała";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;141;353;251
+2;"Szkoła Podstawowa w Psarach, Psary ul. Główna 40, 51-180 Wrocław";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;126;387;255
+3;"Świetlica Wiejska w Strzeszowie, Strzeszów ul. Osiedlowa 13, 55-114 Wisznia Mała";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;78;256;224
+4;"Świetlica Wiejska w Krynicznie, Kryniczno ul. Parkowa 6, 55-114 Wisznia Mała";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;85;220;132
+5;"Zespół Szkolno-Przedszkolny w Szewcach, Szewce ul. Strzeszowska 7, 55-114 Wisznia Mała";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;152;370;303
+6;"Świetlica Wiejska w Ligocie Pięknej, Ligota Piękna ul. Główna 19, 55-114 Wisznia Mała";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;139;454;223
+7;"Świetlica Wiejska w Pierwoszowie, Pierwoszów ul. Wierzbowa 2, 55-114 Wisznia Mała";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;19;127;61
+8;"Świetlica Wiejska w Piotrkowiczkach, Piotrkowiczki ul. Spacerowa 62, 55-114 Wisznia Mała";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;68;152;139
+9;"Świetlica Wiejska w Krzyżanowicach, Krzyżanowice ul. Parkowa 18, 51-180 Wrocław";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;52;272;126
+10;"Świetlica Wiejska w Szymanowie, Szymanów ul. Lipowa 1, 51-180 Wrocław";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;121;391;229
+11;"Świetlica Wiejska w Ozorowicach, Ozorowice ul. Spacerowa 8, 55-114 Wisznia Mała";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;58;107;105
+12;"Świetlica Wiejska w Malinie, Malin ul. Główna 91, 55-114 Wisznia Mała";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;73;260;151
+13;"Świetlica Wiejska w Rogożu, Rogoż ul. Parkowa 82, 55-114 Wisznia Mała";22004;"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";1;1;50;170;82
+1;"Sala senioralna w Zawoni, ul. Trzebnicka 11, 55-106 Zawonia";22005;"gm. Zawonia";"trzebnicki";"dolnośląskie";1;1;221;578;401
+2;"Hala sportowo-widowiskowa przy Zespole Szkolno-Przedszkolnym w Zawoni, Tarnowiec 9, 55-106 Zawonia";22005;"gm. Zawonia";"trzebnicki";"dolnośląskie";1;1;144;288;286
+3;"Sala nr 4 w Szkole Podstawowej w Czeszowie, Czeszów ul. Marii Konopnickiej 18, 55-106 Zawonia";22005;"gm. Zawonia";"trzebnicki";"dolnośląskie";1;1;130;322;317
+4;"Świetlica Wiejska, Złotów 34, 55-106 Zawonia";22005;"gm. Zawonia";"trzebnicki";"dolnośląskie";1;1;46;80;100
+5;"Świetlica Wiejska, Niedary ul. Przyjazna 20, 55-106 Zawonia";22005;"gm. Zawonia";"trzebnicki";"dolnośląskie";1;1;45;72;85
+1;"Publiczne Przedszkole ""Zielona Dolina"", ul. Czereśniowa 9, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;278;628;365
+2;"Zespół Placówek Kultury, ul. Wrocławska 12, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;218;503;391
+3;"Szkoła Podstawowa im. Bolesława Chrobrego, ul. Henryka Sienkiewicza 6, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;249;482;311
+4;"Szkoła Podstawowa im. Janusza Korczaka, Barkowo 75, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;49;75;136
+5;"Szkoła Podstawowa im. Polskich Olimpijczyków, Korzeńsko ul. Kolejowa 14, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;110;229;190
+6;"Świetlica Wiejska, Radziądz ul. Żmigrodzka 16, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;79;153;110
+7;"Świetlica Wiejska, Borzęcin 16 A, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;64;85;127
+8;"Szkoła Podstawowa im. Ks. Jana Twardowskiego, Powidzko 49, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;56;109;110
+9;"Świetlica Wiejska, Żmigródek ul. Spacerowa 9, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;53;168;148
+10;"Świetlica Wiejska, Bychowo 26, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;82;118;139
+11;"Świetlica Wiejska, Łapczyce 40, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;38;40;60
+12;"Świetlica Wiejska, Borek 19A, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;33;57;51
+13;"Świetlica Wiejska, Dębno 10, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;33;96;65
+14;"Świetlica Wiejska, Garbce 52A, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;57;102;91
+15;"Świetlica Wiejska, Niezgoda 45, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;53;77;113
+16;"Świetlica Wiejska, Kliszkowice 38H, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;40;39;67
+17;"Świetlica Wiejska, Kanclerzowice 29A, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;90;134;177
+18;"Świetlica Wiejska, Kaszyce Milickie 38, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;34;56;94
+19;"Szpital im. Św. Jadwigi Śląskiej w Trzebnicy-Szpital Rehabilitacyjny w Żmigrodzie, ul. Willowa 4, 55-140 Żmigród";22006;"gm. Żmigród";"trzebnicki";"dolnośląskie";1;1;4;12;13
+1;"Dolnobrzeski Ośrodek Kultury, ul. Kolejowa 29, 56-120 Brzeg Dolny";22201;"gm. Brzeg Dolny";"wołowski";"dolnośląskie";1;1;238;870;412
+2;"Szkoła Podstawowa Nr 5, ul. Zwycięstwa 10, 56-120 Brzeg Dolny";22201;"gm. Brzeg Dolny";"wołowski";"dolnośląskie";1;1;96;405;333
+3;"Siedziba Polskiego Związku Emerytów, Rencistów i Inwalidów, ul. Zwycięstwa 5, 56-120 Brzeg Dolny";22201;"gm. Brzeg Dolny";"wołowski";"dolnośląskie";1;1;202;622;328
+4;"Biblioteka Miejska, ul. Młodzieżowa 2, 56-120 Brzeg Dolny";22201;"gm. Brzeg Dolny";"wołowski";"dolnośląskie";1;1;157;470;321
+5;"Szkoła Podstawowa Nr 6, ul. Wilcza 4, 56-120 Brzeg Dolny";22201;"gm. Brzeg Dolny";"wołowski";"dolnośląskie";1;1;114;442;240
+6;"Świetlica w Godzięcinie, Godzięcin 46A, 56-120 Brzeg Dolny";22201;"gm. Brzeg Dolny";"wołowski";"dolnośląskie";1;1;66;86;157
+7;"Świetlica w Jodłowicach, Jodłowice 12, 56-120 Brzeg Dolny";22201;"gm. Brzeg Dolny";"wołowski";"dolnośląskie";1;1;50;168;131
+8;"Szkoła Podstawowa w Pogalewie Wielkim, Pogalewo Wielkie 12H, 56-120 Brzeg Dolny";22201;"gm. Brzeg Dolny";"wołowski";"dolnośląskie";1;1;136;227;266
+9;"Świetlica w Radeczu, Radecz 37, 56-120 Brzeg Dolny";22201;"gm. Brzeg Dolny";"wołowski";"dolnośląskie";1;1;93;224;143
+10;"Przedszkole Samorządowe Nr 3, ul. Przedszkolna 1, 56-120 Brzeg Dolny";22201;"gm. Brzeg Dolny";"wołowski";"dolnośląskie";1;1;175;658;429
+11;"Przedszkole Samorządowe Nr 1, ul. Zwycięstwa 3, 56-120 Brzeg Dolny";22201;"gm. Brzeg Dolny";"wołowski";"dolnośląskie";1;1;70;286;122
+12;"Powiatowe Centrum Medyczne Sp. z o. o.-Szpital w Brzegu Dolnym, ul. Aleje Jerozolimskie 26, 56-120 Brzeg Dolny";22201;"gm. Brzeg Dolny";"wołowski";"dolnośląskie";1;1;0;2;5
+1;"Gminny Ośrodek Kultury, ul. marsz. Józefa Piłsudskiego 42, 56-160 Wińsko";22202;"gm. Wińsko";"wołowski";"dolnośląskie";1;1;191;411;605
+2;"Szkoła Podstawowa w Wińsku, ul. Na Piaski 12, 56-160 Wińsko";22202;"gm. Wińsko";"wołowski";"dolnośląskie";1;1;124;251;503
+3;"Szkoła Podstawowa im. Jana Adama de Garnier, Głębowice 10, 56-160 Wińsko";22202;"gm. Wińsko";"wołowski";"dolnośląskie";1;1;68;151;219
+4;"Szkoła Podstawowa im. Świętego Mikołaja z Miry, Krzelów 125, 56-160 Wińsko";22202;"gm. Wińsko";"wołowski";"dolnośląskie";1;1;89;164;287
+5;"Szkoła Podstawowa im. Jana Markiewicza, Orzeszków 9, 56-160 Wińsko";22202;"gm. Wińsko";"wołowski";"dolnośląskie";1;1;43;85;129
+6;"Świetlica wiejska w Przyborowie, Przyborów 16, 56-160 Wińsko";22202;"gm. Wińsko";"wołowski";"dolnośląskie";1;1;49;89;275
+7;"Świetlica wiejska w Małowicach, Małowice 52/5, 56-160 Wińsko";22202;"gm. Wińsko";"wołowski";"dolnośląskie";1;1;36;53;87
+8;"Świetlica wiejska w Piskorzynie, Piskorzyna 29, 56-160 Wińsko";22202;"gm. Wińsko";"wołowski";"dolnośląskie";1;1;25;37;94
+1;"Szkoła Podstawowa Nr 1 w Wołowie, ul. Trzebnicka 14, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;334;803;551
+2;"Urząd Miejski w Wołowie, rynek Rynek 34, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;123;344;329
+3;"Wołowski Ośrodek Kultury, ul. Generała Władysława Sikorskiego 6, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;251;757;552
+4;"Szkoła Podstawowa Nr 2 w Wołowie, ul. Komuny Paryskiej 18, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;171;515;392
+5;"Centrum Kształcenia Zawodowego i Ustawicznego w Wołowie, ul. Tadeusza Kościuszki 27, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;172;523;364
+6;"Ośrodek Sportu i Rekreacji w Wołowie, ul. Panieńska 4, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;145;425;283
+7;"Szkoła Podstawowa w Krzydlinie Wielkiej, Krzydlina Wielka 27A, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;50;109;150
+8;"Zespół Szkół Publicznych w Lubiążu, Lubiąż ul. Wojska Polskiego 3A, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;198;518;515
+9;"Świetlica Wiejska w Mojęcicach, Mojęcice ul. Szkolna 1A, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;100;247;263
+10;"Świetlica Wiejska w Gródku, Gródek 25A, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;76;119;228
+11;"Szkoła Podstawowa w Warzęgowie, Warzęgowo 15, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;51;59;211
+12;"Szkoła Podstawowa w Starym Wołowie, Stary Wołów 56, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;118;164;299
+13;"Świetlica Wiejska w Dębnie, Dębno 1, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;54;122;181
+14;"Świetlica Wiejska w Krzydlinie Małej, Krzydlina Mała 19, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;36;97;95
+15;"Świetlica Wiejska w Pełczynie, Pełczyn 43A, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;48;89;175
+16;"Zakład Karny w Wołowie, ul. Więzienna 6, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;120;506;73
+17;"Powiatowe Centrum Medyczne w Wołowie Sp. z o. o., ul. Inwalidów Wojennych 26, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;0;5;16
+18;"Wojewódzki Szpital dla Nerwowo i Psychicznie Chorych w Lubiążu, Lubiąż ul. Adama Mickiewicza 1, 56-100 Wołów";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;18;10;59
+19;"Dom Pomocy Społecznej ""Nasz Dom"" w Mojęcicach, ul. Wołowska 4, 56-100 Mojęcice";22203;"gm. Wołów";"wołowski";"dolnośląskie";1;1;5;3;11
+1;"Świetlica Zespołu Szkolno-Przedszkolnego w Czernicy, ul. św. Brata Alberta Adama Chmielowskiego 5, 55-003 Czernica";22301;"gm. Czernica";"wrocławski";"dolnośląskie";1;1;379;1183;602
+2;"Szkoła Podstawowa im. Bolesława Krzywoustego w Kamieńcu Wrocławskim, ul. Kolejowa 8, 55-002 Kamieniec Wrocławski";22301;"gm. Czernica";"wrocławski";"dolnośląskie";1;1;356;1354;516
+3;"Świetlica wiejska Nadolice Wielkie, Nadolice Wielkie ul. Wrocławska 56, 55-003 Czernica";22301;"gm. Czernica";"wrocławski";"dolnośląskie";1;1;259;1020;339
+4;"Szkoła Podstawowa im. Piastów Śląskich w Chrząstawie Wielkiej, Chrząstawa Wielka ul. Wrocławska 19, 55-003 Czernica";22301;"gm. Czernica";"wrocławski";"dolnośląskie";1;1;356;1187;542
+5;"Szkoła Podstawowa im. Janusza Korczaka w Ratowicach, Ratowice ul. Wrocławska 36, 55-003 Czernica";22301;"gm. Czernica";"wrocławski";"dolnośląskie";1;1;155;289;249
+6;"Świetlica wiejska Gajków, Gajków ul. Przedszkolna 3, 55-002 Kamieniec Wrocławski";22301;"gm. Czernica";"wrocławski";"dolnośląskie";1;1;150;546;245
+7;"Zespół Szkolno-Przedszkolny w Dobrzykowicach, Dobrzykowice ul. Sukcesu 2, 55-002 Kamieniec Wrocławski";22301;"gm. Czernica";"wrocławski";"dolnośląskie";1;1;295;1421;378
+8;"Świetlica Wiejska w Nadolicach Małych, Nadolice Małe ul. Zielona 17, 55-003 Czernica";22301;"gm. Czernica";"wrocławski";"dolnośląskie";1;1;241;702;233
+1;"Zespół Szkolno-Przedszkolny w Długołęce, Długołęka ul. Szkolna 40, 55-095 Mirków";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;410;1416;661
+2;"Szkoła Podstawowa w Borowej, Borowa ul. Parkowa 2/4, 55-093 Kiełczów";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;95;262;187
+3;"Szkoła Podstawowa w Brzeziej Łące, Brzezia Łąka ul. Szkolna 10, 55-093 Kiełczów";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;200;626;327
+4;"Szkoła Podstawowa w Kiełczowie, ul. Szkolna 3, 55-093 Kiełczów";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;398;1250;341
+5;"Świetlica Wiejska w Januszkowicach, Januszkowice ul. Klonowa 1, 55-095 Mirków";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;99;177;309
+6;"Szkoła Podstawowa w Łozinie, Łozina ul. Milicka 15, 55-095 Mirków";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;124;333;281
+7;"Świetlica Wiejska w Pasikurowicach, Pasikurowice ul. Wrocławska 30, 55-095 Mirków";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;136;418;300
+8;"Szkoła Podstawowa w Szczodrem, Szczodre ul. Trzebnicka 42, 55-095 Mirków";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;291;1002;484
+9;"Budynek byłej Szkoły Podstawowej, Węgrów 31, 55-095 Mirków";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;101;223;285
+10;"Zespół Szkolno-Przedszkolny w Mirkowie, ul. Juliusza Słowackiego 17, 55-095 Mirków";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;326;1126;448
+11;"Szkoła Podstawowa w Siedlcu, Siedlec ul. Wrocławska 22, 55-095 Mirków";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;135;389;338
+12;"Szkoła Podstawowa w Wilczycach, Wilczyce ul. Wrocławska 15, 51-361 Wrocław";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;375;1534;481
+13;"Świetlica Wiejska w Piecowicach, Piecowice ul. Stawowa 20, 55-093 Kiełczów";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;91;210;119
+14;"Szkoła Podstawowa w Kiełczowie, ul. Szkolna 3, 55-093 Kiełczów";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;235;800;272
+15;"Świetlica Wiejska w Bykowie, Byków ul. Ogrodowa 2, 55-095 Mirków";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;163;466;297
+16;"Świetlica Wiejska w Kątnej, Kątna ul. Sportowa 1, 55-093 Kiełczów";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;41;96;95
+17;"Świetlica Wiejska w Pruszowicach, Pruszowice ul. Parkowa 11, 51-217 Wrocław";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;76;263;113
+18;"Gminny Żłobek w Kiełczowie, ul. Wrocławska 113, 55-093 Kiełczów";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;186;710;173
+19;"Budynek Kompleksu Sportowego-Rekreacyjnego, ul. Leśna 3a, 55-093 Kiełczów";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;254;961;280
+20;"Świetlica Wiejska w Bielawie, Bielawa ul. Główna 16, 55-093 Mirków";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;70;121;131
+21;"Świetlica Wiejska w Dobroszowie Oleśnickim, Dobroszów Oleśnicki ul. Portugalska 2, 55-095 Mirków";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;57;86;36
+22;"Świetlica Wiejska w Godzieszowej, Godzieszowa 21, 55-095 Mirków";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;42;78;122
+23;"Świetlica Wiejska w Oleśniczce, Oleśniczka 29G, 55-093 Kiełczów";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;50;102;62
+24;"Świetlica Wiejska w Rakowie, Raków 25, 55-093 Kiełczów";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;19;99;67
+25;"Świetlica Wiejska w Stępinie, Stępin 26a, 55-093 Kiełczów";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;51;105;109
+26;"Świetlica Wiejska w Śliwicach, Śliwice ul. Topolowa 8, 55-093 Kiełczów";22302;"gm. Długołęka";"wrocławski";"dolnośląskie";1;1;57;212;103
+1;"Świetlica Wiejska w Jordanowie Śląskim, ul. Wrocławska 55, 55-065 Jordanów Śląski";22303;"gm. Jordanów Śląski";"wrocławski";"dolnośląskie";1;1;229;536;564
+2;"Świetlica Wiejska w Janówku, Janówek 3a, 55-065 Jordanów Śląski";22303;"gm. Jordanów Śląski";"wrocławski";"dolnośląskie";1;1;66;147;222
+3;"Świetlica Wiejska w Wilczkowicach, Wilczkowice 32a, 55-065 Wilczkowice";22303;"gm. Jordanów Śląski";"wrocławski";"dolnośląskie";1;1;44;84;61
+1;"Szkoła Podstawowa Nr 1 w Kątach Wrocławskich, ul. 1 Maja 59, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;210;743;421
+2;"Szkoła Podstawowa nr 2 w Kątach Wrocławskich, ul. Brzozowa 6, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;287;797;429
+3;"Gminny Ośrodek Kultury i Sportu w Kątach Wrocławskich, ul. Zwycięstwa 23, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;149;503;402
+4;"Zespół Szkolno-Przedszkolny w Smolcu, Smolec ul. Kościelna 2, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;208;1172;212
+5;"Świetlica Wiejska w Smolcu, Smolec ul. Główna 47, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;187;833;305
+6;"Świetlica Wiejska w Mokronosie Dolnym, Mokronos Dolny ul. Stawowa 48, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;126;592;170
+7;"Zespół Szkolno-Przedszkolny w Smolcu Szkoła Podstawowa w Jaszkotlu, Jaszkotle 27, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;55;160;114
+8;"Zespół Szkolno-Przedszkolny w Sadkowie, Sadków ul. Szkolna 9, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;143;487;322
+9;"Świetlica Wiejska w Skałce, Skałka ul. Szkolna 2A, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;203;593;235
+10;"Szkoła Podstawowa nr 2 w Kątach Wrocławskich, ul. Brzozowa 6, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;118;306;341
+11;"Szkoła Podstawowa w Gniechowicach, Gniechowice ul. Szkolna 4, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;142;392;445
+12;"Świetlica Wiejska w Zachowicach, Zachowice ul. Słoneczna 17a, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;96;255;290
+13;"Zespół Szkolno-Przedszkolny w Smolcu, Smolec ul. Kościelna 2, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;318;941;182
+14;"Świetlica Wiejska w Bogdaszowicach, Bogdaszowice ul. Główna 13, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;65;213;152
+15;"Świetlica Wiejska w Kilianowie, Kilianów 7C, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;29;63;78
+16;"Szkoła Podstawowa w Małkowicach, Małkowice ul. Szkolna 3, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;43;124;109
+17;"Świetlica Wiejska w Nowej Wsi Wrocławskiej, Nowa Wieś Wrocławska ul. Relaksowa 14, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;35;77;87
+18;"Świetlica Wiejska w Pełcznicy, Pełcznica 1A, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;69;122;177
+19;"Świetlica Wiejska w Pietrzykowicach, Pietrzykowice ul. Główna 7A, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;86;326;130
+20;"Świetlica Wiejska w Zabrodziu, Zabrodzie 10, 52-327 Wrocław";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;30;73;49
+21;"Dom Opieki Św. Józefa Caritas Archidiecezji Wrocławskiej w Małkowicach, Małkowice ul. Klasztorna 1, 55-080 Kąty Wrocławskie";22304;"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";1;1;2;5;8
+1;"Szkoła Podstawowa im. UNICEF, Bielany Wrocławskie ul. Akacjowa 1, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;234;1107;298
+2;"Świetlica Wiejska, Tyniec Mały ul. Świdnicka 6, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;188;845;291
+3;"Świetlica Wiejska w Krzyżowicach, Krzyżowice ul. Główna 18 a, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;69;202;94
+4;"Szkoła Podstawowa im. Polskich Odkrywców i Podróżników, ul. Parkowa 7, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;236;786;466
+5;"Zespół Szkolno-Przedszkolny, Pustków Żurawski ul. Kolejowa 46, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;96;227;228
+6;"Świetlica Wiejska, Wierzbice ul. Tarnopolska 15, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;77;214;149
+7;"Świetlica Wiejska, Rolantowice 4a, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;53;168;122
+8;"Świetlica Wiejska, Tyniec nad Ślęzą ul. Sportowa 1, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;39;87;155
+9;"Świetlica Wiejska, Domasław ul. Wrocławska 35, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;145;466;241
+10;"Zespół Szkolno-Przedszkolny, Wysoka ul. Chabrowa 99, 52-200 Wrocław";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;214;829;218
+11;"Zespół Szkolno-Przedszkolny, Wysoka ul. Chabrowa 99, 52-200 Wrocław";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;214;1003;155
+12;"Szkoła Podstawowa im. UNICEF, Bielany Wrocławskie ul. Akacjowa 1, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;91;664;143
+13;"Świetlica Wiejska w Ślęzie, Ślęza ul. Główna 23A, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;126;427;101
+14;"Świetlica Wiejska w Królikowicach, Królikowice ul. Boczna 2a, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;57;178;93
+15;"Świetlica Wiejska w Księginicach, Księginice ul. Oławska 2, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;38;113;41
+16;"Świetlica Wiejska w Kuklicach, Kuklice ul. Kasztanowa 13, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;14;57;58
+17;"Świetlica Wiejska w Magnicach, Magnice ul. Kwiatowa 14, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;35;81;65
+18;"Świetlica Wiejska w Pełczycach, Pełczyce ul. Długa 3, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;31;163;68
+19;"Świetlica Wiejska w Pustkowie Wilczkowskim, Pustków Wilczkowski ul. Domianowicka 2a, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;43;137;105
+20;"Świetlica Wiejska w Solnej, Solna ul. Krucza 12B, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;25;56;77
+21;"Świetlica Wiejska w Szczepankowicach, Szczepankowice ul. Wrocławska 7A, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;43;51;78
+22;"Świetlica Wiejska w Żernikach Małych, Żerniki Małe ul. Sportowa 14, 55-040 Kobierzyce";22305;"gm. Kobierzyce";"wrocławski";"dolnośląskie";1;1;65;201;74
+1;"Gminny Ośrodek Kultury, ul. Spółdzielcza 6, 55-081 Mietków";22306;"gm. Mietków";"wrocławski";"dolnośląskie";1;1;100;222;195
+2;"Świetlica wiejska w Maniowie, Maniów ul. Główna 2C, 55-081 Mietków";22306;"gm. Mietków";"wrocławski";"dolnośląskie";1;1;97;203;220
+3;"Świetlica wiejska w Domanicach, Domanice 12A, 55-081 Mietków";22306;"gm. Mietków";"wrocławski";"dolnośląskie";1;1;57;166;107
+4;"Świetlica Wiejska w Milinie, Milin ul. Chłopska 9, 55-081 Mietków";22306;"gm. Mietków";"wrocławski";"dolnośląskie";1;1;70;158;105
+5;"Świetlica Wiejska w Wawrzeńczycach, Wawrzeńczyce ul. Kątecka 32, 55-081 Mietków";22306;"gm. Mietków";"wrocławski";"dolnośląskie";1;1;57;193;169
+6;"Dom Pomocy Społecznej ""Przystań Seniora"" w Borzygniewie, Borzygniew ul. Sportowa 2, 55-081 Mietków";22306;"gm. Mietków";"wrocławski";"dolnośląskie";1;1;9;10;12
+1;"Zespół Szkolno-Przedszkolny im. Janusza Korczaka, ul. Świdnicka 20, 20A, 55-050 Sobótka";22307;"gm. Sobótka";"wrocławski";"dolnośląskie";1;1;270;809;560
+2;"Zespół Szkolno-Przedszkolny im. Janusza Korczaka, ul. Świdnicka 20, 20A, 55-050 Sobótka";22307;"gm. Sobótka";"wrocławski";"dolnośląskie";1;1;168;565;337
+3;"Szkoła Podstawowa Nr 2 w Sobótce, ul. Marii Skłodowskiej-Curie 19, 55-050 Sobótka";22307;"gm. Sobótka";"wrocławski";"dolnośląskie";1;1;202;670;429
+4;"Zespół Szkolno-Przedszkolny w Świątnikach, Świątniki ul. Parkowa 6, 55-050 Sobótka";22307;"gm. Sobótka";"wrocławski";"dolnośląskie";1;1;129;303;370
+5;"Zespół Szkolno-Przedszkolny im. Marii Konopnickiej w Rogowie Sobóckim, Rogów Sobócki ul. Szkolna 7, 55-050 Sobótka";22307;"gm. Sobótka";"wrocławski";"dolnośląskie";1;1;161;434;373
+6;"Niepubliczna Szkoła Podstawowa w Rękowie, Ręków ul. Nasławicka 21, 55-050 Sobótka";22307;"gm. Sobótka";"wrocławski";"dolnośląskie";1;1;66;154;163
+7;"Świetlica Wiejska, Mirosławice ul. Wrocławska 12, 55-050 Sobótka";22307;"gm. Sobótka";"wrocławski";"dolnośląskie";1;1;59;211;187
+8;"Świetlica Wiejska, Sulistrowice ul. Bolesława Chrobrego 2A, 55-050 Sobótka";22307;"gm. Sobótka";"wrocławski";"dolnośląskie";1;1;104;263;241
+1;"Centrum Kultury Klub Tęcza, ul. Główna 82, 55-010 Święta Katarzyna";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;125;491;239
+2;"Przedszkole Publiczne ""Układanka"", ul. Generała Dąbrowskiego 3, 55-010 Święta Katarzyna";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;0;2;23
+3;"Centrum Kultury Klub Tęcza, ul. Główna 82, 55-010 Święta Katarzyna";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;186;537;300
+4;"Świetlica w Sulimowie, Sulimów ul. Kochanowskiego 38, 55-010 Święta Katarzyna";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;26;120;100
+5;"Świetlica w Groblicach, Groblice ul. Kotowicka 5, 55-010 Święta Katarzyna";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;134;421;153
+6;"Szkoła Podstawowa w Kotowicach, Kotowice ul. Podwalna 1, 55-010 Święta Katarzyna";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;83;254;171
+7;"Przedszkole w Siechnicach, ul. Osiedlowa 23a, 55-011 Siechnice";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;323;856;292
+8;"Przedszkole w Siechnicach, ul. Osiedlowa 23a, 55-011 Siechnice";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;161;460;223
+9;"Szkoła Podstawowa Nr 2, ul. Księżnej Anny z Przemyślidów 6, 55-011 Siechnice";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;325;765;314
+10;"Centrum Kultury Klub Relaks, ul. Fabryczna 15, 55-011 Siechnice";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;107;266;168
+11;"Urząd Miejski w Siechnicach, ul. Jana Pawła II 12, 55-011 Siechnice";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;281;893;299
+12;"Centrum Kultury Klub Słońce, Radwanice ul. Kolejowa 8, 55-010 Święta Katarzyna";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;79;368;203
+13;"Szkoła Podstawowa, Radwanice ul. Szkolna 14a, 55-010 Święta Katarzyna";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;311;987;353
+14;"Punkt Informacji Turystycznej, Mokry Dwór ul. Stefana Batorego 6a, 50-458 Wrocław";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;45;120;76
+15;"Świetlica w Iwinach, Iwiny ul. Miodowa 12, 52-116 Wrocław";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;167;846;241
+16;"Centrum Kultury Klub Kuźnia, Żerniki Wrocławskie ul. Parkowa 2, 55-010 Święta Katarzyna";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;124;539;197
+17;"Szkoła Podstawowa, Żerniki Wrocławskie ul. Kolejowa 7a, 55-010 Święta Katarzyna";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;214;797;350
+18;"Świetlica w Ozorzycach, Ozorzyce ul. Krasińskiego 1d, 55-010 Święta Katarzyna";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;42;114;79
+19;"Świetlica w Zacharzycach, Zacharzyce ul. Kościuszki 15d, 52-116 Wrocław";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;42;135;43
+20;"Świetlica w Zębicach, Zębice ul. Prusa 13b, 55-010 Święta Katarzyna";22308;"gm. Siechnice";"wrocławski";"dolnośląskie";1;1;67;226;96
+1;"Gminne Centrum Kultury w Żórawinie, al. Niepodległości 6, 55-020 Żórawina";22309;"gm. Żórawina";"wrocławski";"dolnośląskie";1;1;243;931;497
+2;"Szkoła Podstawowa w Węgrach, Węgry ul. Szkolna 3, 55-020 Żórawina";22309;"gm. Żórawina";"wrocławski";"dolnośląskie";1;1;80;150;164
+3;"Świetlica w Starym Śleszowie, Stary Śleszów ul. Oławska 16, 55-020 Żórawina";22309;"gm. Żórawina";"wrocławski";"dolnośląskie";1;1;94;249;238
+4;"Świetlica w Turowie, Turów ul. Wrocławska 6, 55-020 Żórawina";22309;"gm. Żórawina";"wrocławski";"dolnośląskie";1;1;86;254;172
+5;"Szkoła Podstawowa w Wilczkowie, Wilczków ul. Mikołaja Kopernika 29, 55-020 Żórawina";22309;"gm. Żórawina";"wrocławski";"dolnośląskie";1;1;49;136;85
+6;"Szkoła Podstawowa w Rzeplinie, Rzeplin al. Lipowa 46, 55-020 Żórawina";22309;"gm. Żórawina";"wrocławski";"dolnośląskie";1;1;207;661;219
+7;"Świetlica w Karwianach, Karwiany ul. Majowa 3a, 52-200 Wrocław";22309;"gm. Żórawina";"wrocławski";"dolnośląskie";1;1;228;873;214
+8;"Świetlica w Galowicach, Galowice ul. Dębowa 12, 55-020 Żórawina";22309;"gm. Żórawina";"wrocławski";"dolnośląskie";1;1;37;180;42
+9;"Świetlica w Jaksonowie, Jaksonów ul. Słoneczna 12, 55-020 Żórawina";22309;"gm. Żórawina";"wrocławski";"dolnośląskie";1;1;66;195;202
+10;"Świetlica w Krajkowie, Krajków ul. Nowa 19, 55-020 Żórawina";22309;"gm. Żórawina";"wrocławski";"dolnośląskie";1;1;54;131;147
+11;"Świetlica w Wojkowicach, Wojkowice ul. Leśna 3, 55-020 Żórawina";22309;"gm. Żórawina";"wrocławski";"dolnośląskie";1;1;68;251;118

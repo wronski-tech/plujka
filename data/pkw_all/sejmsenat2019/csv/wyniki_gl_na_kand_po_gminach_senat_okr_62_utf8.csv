@@ -1,0 +1,27 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Dorota Irvina ARCISZEWSKA-MIELEWCZYK";"Kazimierz Mariusz KLEINA";"Liczba obwodów"
+"220801";"gmina miejska";"m. Lębork";"lęborski";"pomorskie";24488;25975;8612;15874;17;98;3;3;0;0;0;0;3;15871;3;0;15871;564;194;370;0;15307;5501;9806;23
+"220802";"gmina miejska";"m. Łeba";"lęborski";"pomorskie";2805;3181;760;2045;2;249;0;0;0;0;0;0;0;2044;0;0;2044;70;27;43;0;1974;681;1293;3
+"220803";"gmina wiejska";"gm. Cewice";"lęborski";"pomorskie";4952;5321;1954;2998;0;12;0;0;0;0;0;0;0;2999;0;0;2999;98;23;75;0;2901;1413;1488;4
+"220804";"gmina wiejska";"gm. Nowa Wieś Lęborska";"lęborski";"pomorskie";9492;10136;3771;5721;5;27;0;0;0;0;0;0;0;5721;0;0;5721;176;51;125;0;5545;2434;3111;13
+"220805";"gmina wiejska";"gm. Wicko";"lęborski";"pomorskie";4156;4476;1983;2173;1;12;0;0;0;0;0;0;0;2173;0;0;2173;69;22;47;0;2104;809;1295;3
+"221201";"gmina miejska";"m. Ustka";"słupski";"pomorskie";11350;12773;3504;7846;13;748;1;1;0;0;0;0;1;7846;1;0;7846;241;57;184;0;7605;2865;4740;9
+"221202";"gmina wiejska";"gm. Damnica";"słupski";"pomorskie";4309;4579;2138;2171;7;5;0;0;0;0;0;0;0;2170;0;0;2170;63;11;52;0;2107;1015;1092;3
+"221203";"gmina wiejska";"gm. Dębnica Kaszubska";"słupski";"pomorskie";6746;7278;3303;3443;3;18;0;0;0;0;0;0;0;3443;0;0;3443;113;25;88;0;3330;1473;1857;7
+"221204";"gmina wiejska";"gm. Główczyce";"słupski";"pomorskie";6605;6827;3639;2966;3;6;0;0;0;0;0;0;0;2966;0;0;2966;89;10;79;0;2877;1323;1554;15
+"221205";"gmina miejsko-wiejska";"gm. Kępice";"słupski";"pomorskie";6747;6846;3545;3202;0;8;0;0;0;0;0;0;0;3202;0;0;3202;124;27;97;0;3078;1232;1846;15
+"221206";"gmina wiejska";"gm. Kobylnica";"słupski";"pomorskie";8628;9209;3464;5164;15;35;1;1;0;0;0;0;1;5165;1;0;5165;147;42;105;0;5018;1877;3141;7
+"221207";"gmina wiejska";"gm. Potęgowo";"słupski";"pomorskie";4900;5199;2632;2268;1;14;0;0;0;0;0;0;0;2268;0;0;2268;82;13;69;0;2186;988;1198;5
+"221208";"gmina wiejska";"gm. Słupsk";"słupski";"pomorskie";11986;12856;4566;7420;8;24;1;1;0;0;0;0;1;7420;1;0;7420;212;37;175;0;7208;2709;4499;10
+"221209";"gmina wiejska";"gm. Smołdzino";"słupski";"pomorskie";2501;2591;1156;1345;0;17;1;1;0;0;0;0;1;1345;1;0;1345;66;23;43;0;1279;612;667;3
+"221210";"gmina wiejska";"gm. Ustka";"słupski";"pomorskie";6140;6348;2709;3431;4;84;0;0;0;0;0;0;0;3430;0;0;3430;103;25;78;0;3327;1467;1860;14
+"221501";"gmina miejska";"m. Reda";"wejherowski";"pomorskie";16975;18795;4076;12899;7;120;0;0;0;0;0;0;0;12897;0;2;12895;378;138;240;0;12517;4216;8301;9
+"221502";"gmina miejska";"m. Rumia";"wejherowski";"pomorskie";33644;36541;7888;25755;15;173;5;5;0;0;0;0;5;25755;5;0;25755;830;299;531;0;24925;8682;16243;21
+"221503";"gmina miejska";"m. Wejherowo";"wejherowski";"pomorskie";33438;35763;10772;22666;30;109;8;8;1;0;0;0;7;22665;7;1;22664;665;209;456;0;21999;8497;13502;21
+"221504";"gmina wiejska";"gm. Choczewo";"wejherowski";"pomorskie";4180;4434;1962;2218;2;66;0;0;0;0;0;0;0;2218;0;0;2218;67;15;52;0;2151;912;1239;7
+"221505";"gmina wiejska";"gm. Gniewino";"wejherowski";"pomorskie";5049;5419;2283;2766;4;27;0;0;0;0;0;0;0;2766;0;0;2766;88;19;69;0;2678;1236;1442;6
+"221506";"gmina wiejska";"gm. Linia";"wejherowski";"pomorskie";4358;4680;1511;2847;0;24;0;0;0;0;0;0;0;2847;0;0;2847;82;20;62;0;2765;1769;996;4
+"221507";"gmina wiejska";"gm. Luzino";"wejherowski";"pomorskie";10555;11528;3546;7009;7;20;0;0;0;0;0;0;0;7003;0;0;7003;243;60;183;0;6760;3705;3055;7
+"221508";"gmina wiejska";"gm. Łęczyce";"wejherowski";"pomorskie";8151;8753;3287;4864;2;10;0;0;0;0;0;0;0;4863;0;0;4863;140;37;103;0;4723;2452;2271;9
+"221509";"gmina wiejska";"gm. Szemud";"wejherowski";"pomorskie";11914;13042;3342;8572;2;59;0;0;0;0;0;0;0;8571;0;1;8570;246;55;191;0;8324;3803;4521;7
+"221510";"gmina wiejska";"gm. Wejherowo";"wejherowski";"pomorskie";17122;18433;5393;11728;5;38;0;0;0;0;0;0;0;11727;0;0;11727;354;122;232;0;11373;5001;6372;14
+"226301";"gmina miejska";"m. Słupsk";"Słupsk";"pomorskie";65431;68457;22786;42645;43;325;9;8;4;0;0;0;4;42640;4;8;42632;1426;509;917;0;41206;15404;25802;47

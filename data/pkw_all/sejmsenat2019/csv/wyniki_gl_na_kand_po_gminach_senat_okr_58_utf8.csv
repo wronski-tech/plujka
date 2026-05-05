@@ -1,0 +1,56 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Mieczysław Józef GOLBA";"Bartosz ROMOWICZ";"Liczba obwodów"
+"180103";"gmina wiejska";"gm. Czarna";"bieszczadzki";"podkarpackie";1780;2016;787;993;1;96;0;0;0;0;0;0;0;993;0;0;993;27;7;20;0;966;532;434;4
+"180105";"gmina wiejska";"gm. Lutowiska";"bieszczadzki";"podkarpackie";1829;2234;523;1306;1;395;0;0;0;0;0;0;0;1306;0;0;1306;37;15;22;0;1269;501;768;4
+"180108";"gmina miejsko-wiejska";"gm. Ustrzyki Dolne";"bieszczadzki";"podkarpackie";12917;14193;5617;7300;6;240;3;3;2;0;0;0;1;7300;1;0;7300;231;92;139;0;7069;3199;3870;22
+"180401";"gmina miejska";"m. Jarosław";"jarosławski";"podkarpackie";28102;30010;10518;17584;48;130;1;1;0;0;0;0;1;17580;1;0;17580;497;162;335;0;17083;10068;7015;23
+"180402";"gmina miejska";"m. Radymno";"jarosławski";"podkarpackie";4010;4364;1534;2476;6;9;0;0;0;0;0;0;0;2475;0;0;2475;77;30;47;0;2398;1641;757;3
+"180403";"gmina wiejska";"gm. Chłopice";"jarosławski";"podkarpackie";4130;4505;1583;2547;9;7;0;0;0;0;0;0;0;2547;0;0;2547;65;14;51;0;2482;1998;484;6
+"180404";"gmina wiejska";"gm. Jarosław";"jarosławski";"podkarpackie";9530;10400;3721;5809;7;22;0;0;0;0;0;0;0;5809;0;0;5809;122;40;82;0;5687;4212;1475;11
+"180405";"gmina wiejska";"gm. Laszki";"jarosławski";"podkarpackie";5057;5431;2071;2986;5;5;0;0;0;0;0;0;0;2986;0;0;2986;94;21;73;0;2892;2256;636;12
+"180406";"gmina wiejska";"gm. Pawłosiów";"jarosławski";"podkarpackie";6327;6777;2280;4047;3;14;0;0;0;0;0;0;0;4047;0;0;4047;86;22;64;0;3961;2881;1080;10
+"180407";"gmina miejsko-wiejska";"gm. Pruchnik";"jarosławski";"podkarpackie";7100;7780;2440;4660;15;19;0;0;0;0;0;0;0;4660;0;0;4660;108;31;77;0;4552;3854;698;11
+"180408";"gmina wiejska";"gm. Radymno";"jarosławski";"podkarpackie";8300;8964;3416;4884;8;16;0;0;0;0;0;0;0;4883;0;1;4882;97;18;79;0;4785;3824;961;14
+"180409";"gmina wiejska";"gm. Rokietnica";"jarosławski";"podkarpackie";3260;3568;1398;1862;10;4;0;0;0;0;0;0;0;1862;0;0;1862;45;8;37;0;1817;1487;330;5
+"180410";"gmina wiejska";"gm. Roźwienica";"jarosławski";"podkarpackie";4589;4976;1796;2793;7;11;1;1;0;0;0;0;1;2793;1;0;2793;57;20;37;0;2736;2193;543;8
+"180411";"gmina wiejska";"gm. Wiązownica";"jarosławski";"podkarpackie";8480;9228;2708;5772;14;67;0;0;0;0;0;0;0;5772;0;0;5772;209;50;159;0;5563;3942;1621;11
+"180901";"gmina miejska";"m. Lubaczów";"lubaczowski";"podkarpackie";9110;9899;3599;5511;12;39;0;0;0;0;0;0;0;5511;0;0;5511;176;45;131;0;5335;3065;2270;7
+"180902";"gmina miejsko-wiejska";"gm. Cieszanów";"lubaczowski";"podkarpackie";5410;5856;2385;3025;7;14;0;0;0;0;0;0;0;3025;0;0;3025;78;12;66;0;2947;1978;969;8
+"180903";"gmina wiejska";"gm. Horyniec-Zdrój";"lubaczowski";"podkarpackie";3630;4089;1554;2076;2;227;0;0;0;0;0;0;0;2076;0;2;2074;78;22;56;0;1996;1329;667;7
+"180904";"gmina wiejska";"gm. Lubaczów";"lubaczowski";"podkarpackie";6836;7316;2891;3945;4;18;0;0;0;0;0;0;0;3944;0;0;3944;102;29;73;0;3842;2974;868;8
+"180905";"gmina miejsko-wiejska";"gm. Narol";"lubaczowski";"podkarpackie";5974;6457;2777;3197;2;17;0;0;0;0;0;0;0;3197;0;0;3197;77;8;69;0;3120;2216;904;9
+"180906";"gmina miejsko-wiejska";"gm. Oleszyce";"lubaczowski";"podkarpackie";4759;5150;1965;2794;5;20;0;0;0;0;0;0;0;2793;0;0;2793;88;19;69;0;2705;1883;822;8
+"180907";"gmina wiejska";"gm. Stary Dzików";"lubaczowski";"podkarpackie";3230;3475;1394;1836;4;12;0;0;0;0;0;0;0;1835;0;0;1835;43;3;40;0;1792;1418;374;6
+"180908";"gmina wiejska";"gm. Wielkie Oczy";"lubaczowski";"podkarpackie";2790;3025;1109;1681;4;10;0;0;0;0;0;0;0;1681;0;0;1681;48;6;42;0;1633;1294;339;7
+"181301";"gmina wiejska";"gm. Bircza";"przemyski";"podkarpackie";4910;5304;2232;2678;11;25;0;0;0;0;0;0;0;2678;0;0;2678;52;7;45;0;2626;1978;648;9
+"181302";"gmina wiejska";"gm. Dubiecko";"przemyski";"podkarpackie";6890;7503;3100;3790;4;34;0;0;0;0;0;0;0;3790;0;0;3790;112;20;92;0;3678;2613;1065;10
+"181303";"gmina wiejska";"gm. Fredropol";"przemyski";"podkarpackie";4118;4481;1899;2218;3;62;0;0;0;0;0;0;0;2218;0;0;2218;57;7;50;0;2161;1489;672;13
+"181304";"gmina wiejska";"gm. Krasiczyn";"przemyski";"podkarpackie";3780;4105;1545;2235;7;58;0;0;0;0;0;0;0;2235;0;0;2235;80;12;68;0;2155;1383;772;5
+"181305";"gmina wiejska";"gm. Krzywcza";"przemyski";"podkarpackie";3620;3886;1563;2057;3;10;0;0;0;0;0;0;0;2057;0;0;2057;59;8;51;0;1998;1615;383;9
+"181306";"gmina wiejska";"gm. Medyka";"przemyski";"podkarpackie";4918;5316;2073;2845;4;29;0;0;0;0;0;0;0;2845;0;0;2845;85;19;66;0;2760;1933;827;9
+"181307";"gmina wiejska";"gm. Orły";"przemyski";"podkarpackie";6450;6931;2561;3889;3;7;0;0;0;0;0;0;0;3888;0;0;3888;106;11;95;0;3782;2695;1087;12
+"181308";"gmina wiejska";"gm. Przemyśl";"przemyski";"podkarpackie";7740;8288;3057;4683;1;13;0;0;0;0;0;0;0;4683;0;0;4683;118;27;91;0;4565;2916;1649;12
+"181309";"gmina wiejska";"gm. Stubno";"przemyski";"podkarpackie";2910;3143;1487;1423;5;3;0;0;0;0;0;0;0;1423;0;0;1423;34;2;32;0;1389;953;436;5
+"181310";"gmina wiejska";"gm. Żurawica";"przemyski";"podkarpackie";9770;10505;3914;5856;11;42;0;0;0;0;0;0;0;5854;0;1;5853;196;57;139;0;5657;3901;1756;12
+"181401";"gmina miejska";"m. Przeworsk";"przeworski";"podkarpackie";11476;12312;4050;7426;12;71;2;2;0;0;0;0;2;7428;2;0;7428;187;56;131;0;7241;4592;2649;14
+"181402";"gmina wiejska";"gm. Adamówka";"przeworski";"podkarpackie";3048;3386;1306;1742;23;9;0;0;0;0;0;0;0;1742;0;0;1742;54;8;46;0;1688;1240;448;4
+"181403";"gmina wiejska";"gm. Gać";"przeworski";"podkarpackie";3370;3692;1260;2110;7;2;0;0;0;0;0;0;0;2109;0;0;2109;54;12;42;0;2055;1532;523;5
+"181404";"gmina wiejska";"gm. Jawornik Polski";"przeworski";"podkarpackie";3440;3756;1412;2028;12;12;0;0;0;0;0;0;0;2028;0;0;2028;75;10;65;0;1953;1349;604;4
+"181405";"gmina miejsko-wiejska";"gm. Kańczuga";"przeworski";"podkarpackie";9180;9978;4085;5095;12;9;0;0;0;0;0;0;0;5095;0;0;5095;131;32;99;0;4964;3223;1741;9
+"181406";"gmina wiejska";"gm. Przeworsk";"przeworski";"podkarpackie";10770;11816;3643;7127;10;13;0;0;0;0;0;0;0;7127;0;0;7127;146;29;117;0;6981;5656;1325;11
+"181407";"gmina miejsko-wiejska";"gm. Sieniawa";"przeworski";"podkarpackie";5330;5769;2159;3171;15;22;0;0;0;0;0;0;0;3171;0;0;3171;98;25;73;0;3073;2062;1011;9
+"181408";"gmina wiejska";"gm. Tryńcza";"przeworski";"podkarpackie";6120;6659;2199;3921;7;26;0;0;0;0;0;0;0;3920;0;0;3920;58;12;46;0;3862;3275;587;7
+"181409";"gmina wiejska";"gm. Zarzecze";"przeworski";"podkarpackie";5280;5736;2023;3257;1;12;1;1;0;0;0;0;1;3258;1;0;3258;90;19;71;0;3168;2292;876;9
+"181701";"gmina miejska";"m. Sanok";"sanocki";"podkarpackie";27631;29577;10574;17057;35;265;6;6;0;0;0;0;6;17058;6;1;17057;513;154;359;0;16544;8591;7953;23
+"181702";"gmina wiejska";"gm. Besko";"sanocki";"podkarpackie";3210;3451;1430;1780;1;12;0;0;0;0;0;0;0;1779;0;0;1779;60;11;49;0;1719;1214;505;4
+"181703";"gmina wiejska";"gm. Bukowsko";"sanocki";"podkarpackie";3920;4259;1598;2322;2;23;0;0;0;0;0;0;0;2322;0;0;2322;85;13;72;0;2237;1540;697;3
+"181704";"gmina wiejska";"gm. Komańcza";"sanocki";"podkarpackie";3837;4302;1918;1919;4;165;0;0;0;0;0;0;0;1918;0;0;1918;78;24;54;0;1840;780;1060;6
+"181705";"gmina wiejska";"gm. Sanok";"sanocki";"podkarpackie";13050;14117;5210;7840;4;91;0;0;0;0;0;0;0;7838;0;0;7838;200;49;151;0;7638;5462;2176;20
+"181706";"gmina wiejska";"gm. Tyrawa Wołoska";"sanocki";"podkarpackie";1470;1592;657;813;1;11;0;0;0;0;0;0;0;811;0;0;811;32;6;26;0;779;517;262;1
+"181707";"gmina miejsko-wiejska";"gm. Zagórz";"sanocki";"podkarpackie";9639;10480;3961;5678;13;59;1;1;0;0;0;0;1;5677;1;0;5677;127;32;95;0;5550;3777;1773;8
+"181708";"gmina wiejska";"gm. Zarszyn";"sanocki";"podkarpackie";6770;7318;2881;3889;6;13;0;0;0;0;0;0;0;3889;0;0;3889;88;21;67;0;3801;2409;1392;7
+"182101";"gmina wiejska";"gm. Baligród";"leski";"podkarpackie";2450;2812;959;1491;3;128;0;0;0;0;0;0;0;1491;0;0;1491;48;9;39;0;1443;896;547;3
+"182102";"gmina wiejska";"gm. Cisna";"leski";"podkarpackie";2530;2815;358;2172;0;1069;0;0;0;0;0;0;0;2172;0;0;2172;56;29;27;0;2116;566;1550;2
+"182103";"gmina miejsko-wiejska";"gm. Lesko";"leski";"podkarpackie";8595;9331;3663;4932;12;133;0;0;0;0;0;0;0;4932;0;0;4932;135;32;103;0;4797;2695;2102;12
+"182104";"gmina wiejska";"gm. Olszanica";"leski";"podkarpackie";4120;4391;1886;2234;6;34;0;0;0;0;0;0;0;2234;0;0;2234;58;19;39;0;2176;1311;865;5
+"182105";"gmina wiejska";"gm. Solina";"leski";"podkarpackie";4920;5434;1279;3641;6;910;0;0;0;0;0;0;0;3641;0;0;3641;94;28;66;0;3547;2095;1452;8
+"186201";"gmina miejska";"m. Przemyśl";"Przemyśl";"podkarpackie";45067;48029;18163;26904;52;199;8;8;0;0;0;0;8;26904;8;0;26904;900;293;607;0;26004;13299;12705;39

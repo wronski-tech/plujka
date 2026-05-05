@@ -1,0 +1,36 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Margareta BUDNER";"Maciej Dariusz SYTEK";"Liczba obwodów"
+"300901";"gmina miejska";"m. Koło";"kolski";"wielkopolskie";15915;17099;5651;10264;10;39;0;0;0;0;0;0;0;10258;0;0;10258;342;99;243;0;9916;4801;5115;15
+"300902";"gmina wiejska";"gm. Babiak";"kolski";"wielkopolskie";5799;6327;2383;3416;0;24;0;0;0;0;0;0;0;3415;0;0;3415;129;29;100;0;3286;2293;993;5
+"300903";"gmina wiejska";"gm. Chodów";"kolski";"wielkopolskie";2374;2578;1079;1295;0;8;0;0;0;0;0;0;0;1295;0;0;1295;58;9;49;0;1237;889;348;4
+"300904";"gmina miejsko-wiejska";"gm. Dąbie";"kolski";"wielkopolskie";4703;5121;1878;2825;1;19;0;0;0;0;0;0;0;2824;0;0;2824;87;17;70;0;2737;2003;734;5
+"300905";"gmina wiejska";"gm. Grzegorzew";"kolski";"wielkopolskie";4141;4516;1634;2507;5;6;0;0;0;0;0;0;0;2505;0;0;2505;88;21;67;0;2417;1652;765;5
+"300906";"gmina miejsko-wiejska";"gm. Kłodawa";"kolski";"wielkopolskie";9418;10214;3978;5440;4;14;0;0;0;0;0;0;0;5438;0;0;5438;188;52;136;0;5250;3315;1935;11
+"300907";"gmina wiejska";"gm. Koło";"kolski";"wielkopolskie";5599;5971;2079;3520;2;11;0;0;0;0;0;0;0;3520;0;0;3520;93;17;76;0;3427;2137;1290;4
+"300908";"gmina wiejska";"gm. Kościelec";"kolski";"wielkopolskie";4883;5344;1821;3062;2;14;0;0;0;0;0;0;0;3062;0;0;3062;84;30;54;0;2978;2030;948;4
+"300909";"gmina wiejska";"gm. Olszówka";"kolski";"wielkopolskie";3328;3641;1406;1922;0;0;0;0;0;0;0;0;0;1922;0;0;1922;88;11;77;0;1834;1393;441;3
+"300910";"gmina wiejska";"gm. Osiek Mały";"kolski";"wielkopolskie";4394;4782;1789;2605;0;6;0;0;0;0;0;0;0;2605;0;0;2605;97;29;68;0;2508;1787;721;3
+"300911";"gmina miejsko-wiejska";"gm. Przedecz";"kolski";"wielkopolskie";3055;3283;1409;1646;2;12;0;0;0;0;0;0;0;1646;0;0;1646;65;0;65;0;1581;1039;542;3
+"301001";"gmina miejsko-wiejska";"gm. Golina";"koniński";"wielkopolskie";8823;9603;3298;5525;10;24;0;0;0;0;0;0;0;5525;0;0;5525;167;53;114;0;5358;3182;2176;7
+"301002";"gmina wiejska";"gm. Grodziec";"koniński";"wielkopolskie";3774;4096;1692;2082;4;11;0;0;0;0;0;0;0;2082;0;0;2082;94;18;76;0;1988;1308;680;4
+"301003";"gmina wiejska";"gm. Kazimierz Biskupi";"koniński";"wielkopolskie";8291;9024;2996;5304;4;18;0;0;0;0;0;0;0;5295;0;2;5293;179;44;135;0;5114;2943;2171;6
+"301004";"gmina miejsko-wiejska";"gm. Kleczew";"koniński";"wielkopolskie";7272;7889;2792;4480;12;31;1;1;0;0;0;0;1;4481;1;0;4481;152;39;113;0;4329;2937;1392;7
+"301005";"gmina wiejska";"gm. Kramsk";"koniński";"wielkopolskie";8082;8906;3067;5015;6;11;0;0;0;0;0;0;0;5015;0;0;5015;139;41;98;0;4876;3154;1722;9
+"301006";"gmina wiejska";"gm. Krzymów";"koniński";"wielkopolskie";5712;6268;2132;3580;3;15;0;0;0;0;0;0;0;3580;0;0;3580;103;40;63;0;3477;2362;1115;5
+"301007";"gmina miejsko-wiejska";"gm. Rychwał";"koniński";"wielkopolskie";6065;6565;2417;3648;2;28;0;0;0;0;0;0;0;3648;0;0;3648;132;39;93;0;3516;2412;1104;7
+"301008";"gmina wiejska";"gm. Rzgów";"koniński";"wielkopolskie";5239;5606;2067;3172;1;2;0;0;0;0;0;0;0;3172;0;0;3172;105;35;70;0;3067;1858;1209;4
+"301009";"gmina wiejska";"gm. Skulsk";"koniński";"wielkopolskie";4489;4899;2134;2355;4;8;0;0;0;0;0;0;0;2355;0;0;2355;86;25;61;0;2269;1497;772;9
+"301010";"gmina miejsko-wiejska";"gm. Sompolno";"koniński";"wielkopolskie";7599;8292;3164;4435;6;9;1;1;0;0;0;0;1;4434;1;0;4434;179;39;140;0;4255;2938;1317;7
+"301011";"gmina wiejska";"gm. Stare Miasto";"koniński";"wielkopolskie";8639;9388;2833;5805;5;29;0;0;0;0;0;0;0;5804;0;0;5804;174;34;140;0;5630;3052;2578;8
+"301012";"gmina miejsko-wiejska";"gm. Ślesin";"koniński";"wielkopolskie";10273;11249;4032;6241;15;76;0;0;0;0;0;0;0;6239;0;0;6239;213;96;117;0;6026;3666;2360;10
+"301013";"gmina wiejska";"gm. Wierzbinek";"koniński";"wielkopolskie";5200;5646;2374;2826;0;5;0;0;0;0;0;0;0;2826;0;0;2826;74;9;65;0;2752;2153;599;7
+"301014";"gmina wiejska";"gm. Wilczyn";"koniński";"wielkopolskie";4443;4795;1914;2529;4;17;0;0;0;0;0;0;0;2529;0;0;2529;58;10;48;0;2471;1728;743;6
+"302701";"gmina miejska";"m. Turek";"turecki";"wielkopolskie";19906;21649;6676;13270;10;52;5;5;0;0;0;0;5;13263;5;0;13263;413;130;283;0;12850;6271;6579;14
+"302702";"gmina wiejska";"gm. Brudzew";"turecki";"wielkopolskie";4333;4757;1595;2738;5;13;0;0;0;0;0;0;0;2738;0;0;2738;83;15;68;0;2655;1941;714;6
+"302703";"gmina miejsko-wiejska";"gm. Dobra";"turecki";"wielkopolskie";4408;4821;1734;2674;2;12;0;0;0;0;0;0;0;2674;0;0;2674;85;14;71;0;2589;1816;773;6
+"302704";"gmina wiejska";"gm. Kawęczyn";"turecki";"wielkopolskie";3865;4223;1496;2369;3;6;0;0;0;0;0;0;0;2369;0;0;2369;101;15;86;0;2268;1639;629;4
+"302705";"gmina wiejska";"gm. Malanów";"turecki";"wielkopolskie";4725;5188;2077;2648;1;8;0;0;0;0;0;0;0;2647;0;0;2647;100;30;70;0;2547;1762;785;4
+"302706";"gmina wiejska";"gm. Przykona";"turecki";"wielkopolskie";3265;3614;1201;2064;2;16;0;0;0;0;0;0;0;2064;0;1;2063;57;17;40;0;2006;1451;555;3
+"302707";"gmina miejsko-wiejska";"gm. Tuliszków";"turecki";"wielkopolskie";7528;8233;2973;4555;8;12;0;0;0;0;0;0;0;4552;0;0;4552;145;48;97;0;4407;2981;1426;6
+"302708";"gmina wiejska";"gm. Turek";"turecki";"wielkopolskie";6870;7524;2397;4473;4;12;0;0;0;0;0;0;0;4473;0;1;4472;123;29;94;0;4349;2672;1677;8
+"302709";"gmina wiejska";"gm. Władysławów";"turecki";"wielkopolskie";5782;6331;1895;3887;5;5;0;0;0;0;0;0;0;3886;0;0;3886;116;29;87;0;3770;2810;960;7
+"306201";"gmina miejska";"m. Konin";"Konin";"wielkopolskie";54086;58244;17277;36808;17;183;13;13;1;0;0;0;12;36817;12;1;36816;1220;371;849;0;35596;16245;19351;47

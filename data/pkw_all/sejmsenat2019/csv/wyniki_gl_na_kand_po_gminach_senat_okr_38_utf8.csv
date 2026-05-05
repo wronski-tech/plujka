@@ -1,0 +1,42 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Marek Eryk MARTYNOWSKI";"Waldemar PAWLAK";"Liczba obwodów"
+"140401";"gmina miejska";"m. Gostynin";"gostyniński";"mazowieckie";13651;14733;4893;8758;15;40;2;2;0;0;0;0;2;8757;2;0;8757;280;85;195;0;8477;4066;4411;16
+"140402";"gmina wiejska";"gm. Gostynin";"gostyniński";"mazowieckie";9068;9900;3835;5233;4;29;0;0;0;0;0;0;0;5232;0;0;5232;183;58;125;0;5049;3018;2031;13
+"140403";"gmina wiejska";"gm. Pacyna";"gostyniński";"mazowieckie";2667;2932;1069;1598;3;9;0;0;0;0;0;0;0;1598;0;0;1598;53;13;40;0;1545;935;610;5
+"140404";"gmina miejsko-wiejska";"gm. Sanniki";"gostyniński";"mazowieckie";4456;4949;1626;2830;13;6;0;0;0;0;0;0;0;2830;0;0;2830;67;11;56;0;2763;1782;981;11
+"140405";"gmina wiejska";"gm. Szczawin Kośc.";"gostyniński";"mazowieckie";3640;4052;1596;2044;2;3;0;0;0;0;0;0;0;2044;0;0;2044;68;11;57;0;1976;1215;761;4
+"141901";"gmina wiejska";"gm. Bielsk";"płocki";"mazowieckie";6388;7062;2481;3907;4;12;0;0;0;0;0;0;0;3907;0;0;3907;95;32;63;0;3812;2376;1436;7
+"141902";"gmina wiejska";"gm. Bodzanów";"płocki";"mazowieckie";5954;6560;2402;3552;6;12;0;0;0;0;0;0;0;3552;0;0;3552;94;30;64;0;3458;2078;1380;9
+"141903";"gmina wiejska";"gm. Brudzeń Duży";"płocki";"mazowieckie";5910;6543;2384;3526;0;13;0;0;0;0;0;0;0;3525;0;0;3525;115;31;84;0;3410;2290;1120;10
+"141904";"gmina wiejska";"gm. Bulkowo";"płocki";"mazowieckie";4090;4510;1679;2411;3;4;0;0;0;0;0;0;0;2411;0;0;2411;76;27;49;0;2335;1619;716;6
+"141905";"gmina miejsko-wiejska";"gm. Drobin";"płocki";"mazowieckie";5622;6192;2654;2968;21;9;0;0;0;0;0;0;0;2968;0;3;2965;92;22;70;0;2873;1800;1073;6
+"141906";"gmina miejsko-wiejska";"gm. Gąbin";"płocki";"mazowieckie";8005;8824;2925;5079;3;31;0;0;0;0;0;0;0;5074;0;0;5074;167;43;124;0;4907;2955;1952;11
+"141907";"gmina wiejska";"gm. Łąck";"płocki";"mazowieckie";3940;4311;1411;2529;3;10;0;0;0;0;0;0;0;2529;0;0;2529;101;15;86;0;2428;1355;1073;6
+"141908";"gmina wiejska";"gm. Mała Wieś";"płocki";"mazowieckie";4405;4847;1942;2463;5;4;0;0;0;0;0;0;0;2462;0;0;2462;83;19;64;0;2379;1544;835;6
+"141909";"gmina wiejska";"gm. Nowy Duninów";"płocki";"mazowieckie";2861;3179;1114;1747;3;23;0;0;0;0;0;0;0;1747;0;0;1747;60;8;52;0;1687;1014;673;5
+"141910";"gmina wiejska";"gm. Radzanowo";"płocki";"mazowieckie";5935;6527;2250;3685;3;16;0;0;0;0;0;0;0;3685;0;1;3684;99;25;74;0;3585;1900;1685;6
+"141911";"gmina wiejska";"gm. Słubice";"płocki";"mazowieckie";3239;3581;1212;2027;3;6;0;0;0;0;0;0;0;2027;0;0;2027;63;11;52;0;1964;1344;620;6
+"141912";"gmina wiejska";"gm. Słupno";"płocki";"mazowieckie";5618;6215;1419;4199;8;21;0;0;0;0;0;0;0;4199;0;0;4199;134;39;95;0;4065;1715;2350;10
+"141913";"gmina wiejska";"gm. Stara Biała";"płocki";"mazowieckie";8243;9114;2621;5622;11;31;0;0;0;0;0;0;0;5622;0;0;5622;190;61;129;0;5432;3085;2347;7
+"141914";"gmina wiejska";"gm. Staroźreby";"płocki";"mazowieckie";5272;5812;2332;2940;2;5;0;0;0;0;0;0;0;2939;0;0;2939;91;21;70;0;2848;1948;900;8
+"141915";"gmina miejsko-wiejska";"gm. Wyszogród";"płocki";"mazowieckie";4099;4509;1698;2401;9;7;1;1;0;0;0;0;1;2402;1;0;2402;100;28;72;0;2302;1332;970;7
+"142701";"gmina miejska";"m. Sierpc";"sierpecki";"mazowieckie";13027;14123;4853;8174;17;37;0;0;0;0;0;0;0;8173;0;0;8173;225;72;153;0;7948;3979;3969;16
+"142702";"gmina wiejska";"gm. Gozdowo";"sierpecki";"mazowieckie";4286;4722;2002;2284;4;0;0;0;0;0;0;0;0;2284;0;0;2284;57;13;44;0;2227;1401;826;8
+"142703";"gmina wiejska";"gm. Mochowo";"sierpecki";"mazowieckie";4380;4835;1964;2416;7;8;0;0;0;0;0;0;0;2415;0;0;2415;94;15;79;0;2321;1440;881;6
+"142704";"gmina wiejska";"gm. Rościszewo";"sierpecki";"mazowieckie";3010;3321;1201;1809;8;6;0;0;0;0;0;0;0;1809;0;0;1809;64;13;51;0;1745;1220;525;5
+"142705";"gmina wiejska";"gm. Sierpc";"sierpecki";"mazowieckie";4910;5437;2253;2657;5;13;0;0;0;0;0;0;0;2657;0;0;2657;77;10;67;0;2580;1549;1031;6
+"142706";"gmina wiejska";"gm. Szczutowo";"sierpecki";"mazowieckie";3135;3492;1438;1697;6;13;0;0;0;0;0;0;0;1697;0;0;1697;49;6;43;0;1648;1066;582;6
+"142707";"gmina wiejska";"gm. Zawidz";"sierpecki";"mazowieckie";4800;5273;2045;2755;8;13;0;0;0;0;0;0;0;2755;0;0;2755;61;25;36;0;2694;1709;985;5
+"142801";"gmina miejska";"m. Sochaczew";"sochaczewski";"mazowieckie";25371;27588;7764;17614;23;75;2;2;0;0;0;0;2;17615;2;0;17615;591;235;356;0;17024;7637;9387;24
+"142802";"gmina wiejska";"gm. Brochów";"sochaczewski";"mazowieckie";3201;3558;1193;2008;2;14;0;0;0;0;0;0;0;2008;0;0;2008;69;11;58;0;1939;1189;750;4
+"142803";"gmina wiejska";"gm. Iłów";"sochaczewski";"mazowieckie";4455;4920;1534;2921;4;9;0;0;0;0;0;0;0;2920;0;0;2920;73;19;54;0;2847;1838;1009;6
+"142804";"gmina wiejska";"gm. Młodzieszyn";"sochaczewski";"mazowieckie";4005;4440;1542;2463;1;9;0;0;0;0;0;0;0;2463;0;0;2463;72;19;53;0;2391;1557;834;6
+"142805";"gmina wiejska";"gm. Nowa Sucha";"sochaczewski";"mazowieckie";4687;5208;1459;3228;1;8;0;0;0;0;0;0;0;3228;0;0;3228;113;25;88;0;3115;1809;1306;5
+"142806";"gmina wiejska";"gm. Rybno";"sochaczewski";"mazowieckie";2449;2737;843;1606;1;2;0;0;0;0;0;0;0;1606;0;0;1606;52;12;40;0;1554;963;591;4
+"142807";"gmina wiejska";"gm. Sochaczew";"sochaczewski";"mazowieckie";7542;8193;2363;5179;5;24;0;0;0;0;0;0;0;5178;0;0;5178;194;47;147;0;4984;2641;2343;8
+"142808";"gmina wiejska";"gm. Teresin";"sochaczewski";"mazowieckie";8167;9022;2407;5759;14;54;0;0;0;0;0;0;0;5759;0;0;5759;194;43;151;0;5565;2988;2577;8
+"143801";"gmina miejska";"m. Żyrardów";"żyrardowski";"mazowieckie";27336;29949;7773;19563;22;104;2;2;0;0;0;0;2;19557;2;0;19557;568;196;372;0;18989;8071;10918;24
+"143802";"gmina miejsko-wiejska";"gm. Mszczonów";"żyrardowski";"mazowieckie";8170;8945;2803;5367;4;34;0;0;0;0;0;0;0;5366;0;0;5366;177;69;108;0;5189;2963;2226;14
+"143803";"gmina wiejska";"gm. Puszcza Mariańska";"żyrardowski";"mazowieckie";6167;6845;2224;3943;0;29;0;0;0;0;0;0;0;3943;0;0;3943;128;37;91;0;3815;2214;1601;9
+"143804";"gmina wiejska";"gm. Radziejowice";"żyrardowski";"mazowieckie";4103;4528;1092;3011;7;49;0;0;0;0;0;0;0;3011;0;0;3011;89;23;66;0;2922;1375;1547;6
+"143805";"gmina wiejska";"gm. Wiskitki";"żyrardowski";"mazowieckie";7108;7890;2522;4586;7;16;0;0;0;0;0;0;0;4584;0;0;4584;126;31;95;0;4458;2711;1747;9
+"146201";"gmina miejska";"m. Płock";"Płock";"mazowieckie";85133;92579;25707;59425;54;357;7;5;0;0;0;0;5;59386;5;0;59386;1695;649;1046;0;57691;26109;31582;70

@@ -1,0 +1,33 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Paweł Antoni ARNDT";"Robert Kazimierz GAWEŁ";"Michał Aleksander JURGA";"Mirosław PIASECKI";"Liczba obwodów"
+"300301";"gmina miejska";"m. Gniezno";"gnieźnieński";"wielkopolskie";48617;52789;14603;34009;38;147;6;5;0;0;0;0;5;33999;5;4;33995;437;158;279;0;33558;17853;11587;2547;1571;39
+"300302";"gmina miejsko-wiejska";"gm. Czerniejewo";"gnieźnieński";"wielkopolskie";5818;6205;2231;3591;3;10;0;0;0;0;0;0;0;3591;0;0;3591;62;9;53;0;3529;1413;1538;334;244;5
+"300303";"gmina wiejska";"gm. Gniezno";"gnieźnieński";"wielkopolskie";8277;9091;2441;5835;5;21;0;0;0;0;0;0;0;5836;0;0;5836;53;24;29;0;5783;2800;2155;521;307;5
+"300304";"gmina wiejska";"gm. Kiszkowo";"gnieźnieński";"wielkopolskie";3842;4226;1488;2354;1;22;0;0;0;0;0;0;0;2354;0;0;2354;58;16;42;0;2296;929;1028;224;115;4
+"300305";"gmina miejsko-wiejska";"gm. Kłecko";"gnieźnieński";"wielkopolskie";5318;5801;1861;3457;6;6;0;0;0;0;0;0;0;3457;0;0;3457;88;13;75;0;3369;1199;1686;298;186;6
+"300306";"gmina wiejska";"gm. Łubowo";"gnieźnieński";"wielkopolskie";4515;4983;1385;3129;2;8;0;0;0;0;0;0;0;3130;0;0;3130;49;8;41;0;3081;1411;1218;251;201;4
+"300307";"gmina wiejska";"gm. Mieleszyn";"gnieźnieński";"wielkopolskie";2790;3037;1196;1594;1;2;0;0;0;0;0;0;0;1593;0;0;1593;31;2;29;0;1562;576;794;113;79;4
+"300308";"gmina wiejska";"gm. Niechanowo";"gnieźnieński";"wielkopolskie";4153;4571;1359;2793;0;3;0;0;0;0;0;0;0;2791;0;0;2791;53;9;44;0;2738;1032;1319;252;135;3
+"300309";"gmina miejsko-wiejska";"gm. Trzemeszno";"gnieźnieński";"wielkopolskie";9963;10884;4246;5717;4;9;0;0;0;0;0;0;0;5715;0;0;5715;84;25;59;0;5631;2133;2505;635;358;12
+"300310";"gmina miejsko-wiejska";"gm. Witkowo";"gnieźnieński";"wielkopolskie";9605;10571;3211;6394;5;37;0;0;0;0;0;0;0;6393;0;0;6393;105;21;84;0;6288;2552;2834;496;406;10
+"302301";"gmina miejska";"m. Słupca";"słupecki";"wielkopolskie";9989;10776;3276;6713;5;29;1;1;0;0;0;0;1;6714;1;0;6714;120;34;86;0;6594;2919;2690;631;354;8
+"302302";"gmina wiejska";"gm. Lądek";"słupecki";"wielkopolskie";4245;4615;1753;2492;4;10;0;0;0;0;0;0;0;2492;0;0;2492;31;4;27;0;2461;746;1354;202;159;3
+"302303";"gmina wiejska";"gm. Orchowo";"słupecki";"wielkopolskie";2792;3020;1219;1573;1;6;0;0;0;0;0;0;0;1573;0;0;1573;29;10;19;0;1544;514;767;183;80;5
+"302304";"gmina wiejska";"gm. Ostrowite";"słupecki";"wielkopolskie";3864;4200;1850;2014;3;13;2;2;1;0;0;0;1;2015;1;0;2015;46;10;36;0;1969;460;1239;142;128;4
+"302305";"gmina wiejska";"gm. Powidz";"słupecki";"wielkopolskie";1687;1890;461;1226;0;36;0;0;0;0;0;0;0;1226;0;0;1226;19;7;12;0;1207;450;579;121;57;2
+"302306";"gmina wiejska";"gm. Słupca";"słupecki";"wielkopolskie";6942;7594;2742;4200;4;8;0;0;0;0;0;0;0;4200;0;0;4200;76;22;54;0;4124;1110;2370;397;247;6
+"302307";"gmina wiejska";"gm. Strzałkowo";"słupecki";"wielkopolskie";7332;7922;2706;4626;1;13;0;0;0;0;0;0;0;4626;0;0;4626;78;12;66;0;4548;1463;2214;497;374;7
+"302308";"gmina miejsko-wiejska";"gm. Zagórów";"słupecki";"wielkopolskie";6559;7132;2941;3618;7;4;0;0;0;0;0;0;0;3618;0;0;3618;84;26;58;0;3534;1035;1952;319;228;6
+"302501";"gmina wiejska";"gm. Dominowo";"średzki";"wielkopolskie";2166;2368;794;1372;0;6;0;0;0;0;0;0;0;1372;0;0;1372;26;4;22;0;1346;384;616;222;124;3
+"302502";"gmina wiejska";"gm. Krzykosy";"średzki";"wielkopolskie";4947;5423;1827;3120;1;6;0;0;0;0;0;0;0;3120;0;0;3120;57;15;42;0;3063;977;1436;428;222;4
+"302503";"gmina wiejska";"gm. Nowe Miasto nad Wartą";"średzki";"wielkopolskie";6448;7044;2517;3931;1;19;0;0;0;0;0;0;0;3931;0;0;3931;79;19;60;0;3852;1321;1776;485;270;5
+"302504";"gmina miejsko-wiejska";"gm. Środa Wielkopolska";"średzki";"wielkopolskie";22579;24832;6843;15736;8;60;0;0;0;0;0;0;0;15731;0;3;15728;309;111;198;0;15419;6474;5365;2599;981;23
+"302505";"gmina wiejska";"gm. Zaniemyśl";"średzki";"wielkopolskie";4820;5302;1501;3319;3;20;0;0;0;0;0;0;0;3316;0;0;3316;43;10;33;0;3273;1423;1113;498;239;4
+"302601";"gmina wiejska";"gm. Brodnica";"śremski";"wielkopolskie";3443;3792;1384;2059;1;6;0;0;0;0;0;0;0;2059;0;0;2059;47;12;35;0;2012;816;712;249;235;4
+"302602";"gmina miejsko-wiejska";"gm. Dolsk";"śremski";"wielkopolskie";4181;4547;1715;2465;0;12;0;0;0;0;0;0;0;2466;0;0;2466;51;11;40;0;2415;686;1081;339;309;5
+"302603";"gmina miejsko-wiejska";"gm. Książ Wielkopolski";"śremski";"wielkopolskie";5916;6611;2466;3450;4;5;0;0;0;0;0;0;0;3450;0;0;3450;50;10;40;0;3400;1006;1608;359;427;4
+"302604";"gmina miejsko-wiejska";"gm. Śrem";"śremski";"wielkopolskie";29253;32023;9103;20100;21;88;0;0;0;0;0;0;0;20098;0;0;20098;336;106;230;0;19762;8128;6789;2118;2727;23
+"303001";"gmina wiejska";"gm. Kołaczkowo";"wrzesiński";"wielkopolskie";4225;4635;1712;2513;0;3;0;0;0;0;0;0;0;2513;0;0;2513;40;5;35;0;2473;702;1347;265;159;5
+"303002";"gmina miejsko-wiejska";"gm. Miłosław";"wrzesiński";"wielkopolskie";7340;8016;2615;4723;9;21;0;0;0;0;0;0;0;4725;0;7;4718;90;34;56;0;4628;1666;2124;556;282;7
+"303003";"gmina miejsko-wiejska";"gm. Nekla";"wrzesiński";"wielkopolskie";5265;5819;1642;3623;3;16;0;0;0;0;0;0;0;3623;0;0;3623;49;8;41;0;3574;1542;1384;409;239;4
+"303004";"gmina miejsko-wiejska";"gm. Pyzdry";"wrzesiński";"wielkopolskie";5088;5536;2091;2997;4;13;0;0;0;0;0;0;0;2997;0;0;2997;59;9;50;0;2938;858;1647;284;149;6
+"303005";"gmina miejsko-wiejska";"gm. Września";"wrzesiński";"wielkopolskie";32528;35692;9807;22721;8;83;4;4;0;0;0;0;4;22720;4;0;22720;325;82;243;0;22395;10319;8586;2235;1255;30

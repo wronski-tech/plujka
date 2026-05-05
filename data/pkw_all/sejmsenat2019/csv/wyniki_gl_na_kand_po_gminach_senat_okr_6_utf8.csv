@@ -1,0 +1,48 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Jarosław Wojciech OBREMSKI";"Dariusz Paweł STASIAK";"Bogdan Andrzej ZDROJEWSKI";"Liczba obwodów"
+"020401";"gmina miejsko-wiejska";"gm. Góra";"górowski";"dolnośląskie";13994;15265;6123;7869;3;28;1;1;0;0;0;0;1;7869;1;0;7869;157;38;119;0;7712;3450;1165;3097;11
+"020402";"gmina wiejska";"gm. Jemielno";"górowski";"dolnośląskie";2199;2405;1051;1148;5;7;0;0;0;0;0;0;0;1148;0;0;1148;26;5;21;0;1122;663;206;253;3
+"020403";"gmina wiejska";"gm. Niechlów";"górowski";"dolnośląskie";3399;3771;1575;1824;1;2;0;0;0;0;0;0;0;1824;0;0;1824;26;4;22;0;1798;1076;233;489;4
+"020404";"gmina miejsko-wiejska";"gm. Wąsosz";"górowski";"dolnośląskie";5298;5735;2443;2855;9;13;0;0;0;0;0;0;0;2855;0;0;2855;66;15;51;0;2789;1391;406;992;5
+"021301";"gmina wiejska";"gm. Cieszków";"milicki";"dolnośląskie";3499;3707;1394;2103;2;8;0;0;0;0;0;0;0;2102;0;0;2102;42;11;31;0;2060;1087;311;662;3
+"021302";"gmina wiejska";"gm. Krośnice";"milicki";"dolnośląskie";5771;6327;2369;3402;3;17;0;0;0;0;0;0;0;3402;0;0;3402;67;18;49;0;3335;1663;592;1080;5
+"021303";"gmina miejsko-wiejska";"gm. Milicz";"milicki";"dolnośląskie";17294;18986;6627;10667;11;60;0;0;0;0;0;0;0;10662;0;0;10662;191;68;123;0;10471;4491;1728;4252;19
+"021401";"gmina miejska";"m. Oleśnica";"oleśnicki";"dolnośląskie";26466;28770;8388;18077;27;83;0;0;0;0;0;0;0;18072;0;0;18072;283;66;217;0;17789;6575;2268;8946;23
+"021402";"gmina miejsko-wiejska";"gm. Bierutów";"oleśnicki";"dolnośląskie";7300;7841;3213;4087;3;14;1;1;0;0;0;0;1;4086;1;0;4086;74;9;65;0;4012;1926;527;1559;7
+"021403";"gmina wiejska";"gm. Dobroszyce";"oleśnicki";"dolnośląskie";4695;5253;1651;3044;0;17;0;0;0;0;0;0;0;3044;0;0;3044;35;8;27;0;3009;1383;383;1243;3
+"021404";"gmina wiejska";"gm. Dziadowa Kłoda";"oleśnicki";"dolnośląskie";3302;3551;1506;1796;0;7;0;0;0;0;0;0;0;1796;0;0;1796;40;25;15;0;1756;783;279;694;3
+"021405";"gmina miejsko-wiejska";"gm. Międzybórz";"oleśnicki";"dolnośląskie";3599;3999;1569;2029;2;14;0;0;0;0;0;0;0;2030;0;0;2030;29;7;22;0;2001;804;350;847;4
+"021406";"gmina wiejska";"gm. Oleśnica";"oleśnicki";"dolnośląskie";9470;10504;3614;5855;3;15;0;0;0;0;0;0;0;5856;0;0;5856;103;33;70;0;5753;2574;762;2417;9
+"021407";"gmina miejsko-wiejska";"gm. Syców";"oleśnicki";"dolnośląskie";12092;13015;4597;7495;7;48;2;2;0;0;0;0;2;7497;2;0;7497;157;32;125;0;7340;2715;1253;3372;12
+"021408";"gmina miejsko-wiejska";"gm. Twardogóra";"oleśnicki";"dolnośląskie";9386;10221;3612;5774;4;29;0;0;0;0;0;0;0;5770;0;0;5770;117;27;90;0;5653;2510;785;2358;6
+"021501";"gmina miejska";"m. Oława";"oławski";"dolnośląskie";23352;25236;6916;16436;13;76;0;0;0;0;0;0;0;16435;0;1;16434;243;52;191;0;16191;5946;2110;8135;19
+"021502";"gmina wiejska";"gm. Domaniów";"oławski";"dolnośląskie";3698;4152;1372;2326;4;9;0;0;0;0;0;0;0;2326;0;0;2326;44;6;38;0;2282;1164;324;794;6
+"021503";"gmina miejsko-wiejska";"gm. Jelcz-Laskowice";"oławski";"dolnośląskie";16194;17797;5083;11111;5;38;1;1;0;0;0;0;1;11112;1;0;11112;174;28;146;0;10938;4984;1269;4685;13
+"021504";"gmina wiejska";"gm. Oława";"oławski";"dolnośląskie";10801;11833;3456;7345;8;43;0;0;0;0;0;0;0;7344;0;0;7344;115;23;92;0;7229;3430;949;2850;13
+"021701";"gmina wiejska";"gm. Borów";"strzeliński";"dolnośląskie";3800;4295;1276;2524;1;13;0;0;0;0;0;0;0;2524;0;0;2524;33;12;21;0;2491;1411;285;795;3
+"021702";"gmina wiejska";"gm. Kondratowice";"strzeliński";"dolnośląskie";3100;3495;1263;1837;9;5;0;0;0;0;0;0;0;1837;0;0;1837;31;5;26;0;1806;1007;186;613;7
+"021703";"gmina wiejska";"gm. Przeworno";"strzeliński";"dolnośląskie";3500;3904;1462;2037;3;10;0;0;0;0;0;0;0;2038;0;0;2038;50;9;41;0;1988;1103;223;662;6
+"021704";"gmina miejsko-wiejska";"gm. Strzelin";"strzeliński";"dolnośląskie";16812;18045;6200;10612;8;66;0;0;0;0;0;0;0;10612;0;0;10612;143;27;116;0;10469;4358;1130;4981;18
+"021705";"gmina miejsko-wiejska";"gm. Wiązów";"strzeliński";"dolnośląskie";5199;5748;2086;3113;5;11;0;0;0;0;0;0;0;3112;0;0;3112;62;6;56;0;3050;1806;329;915;5
+"021801";"gmina wiejska";"gm. Kostomłoty";"średzki";"dolnośląskie";5001;5647;1929;3072;2;12;0;0;0;0;0;0;0;3070;0;0;3070;56;8;48;0;3014;1616;392;1006;4
+"021802";"gmina wiejska";"gm. Malczyce";"średzki";"dolnośląskie";4198;4631;1728;2470;2;4;0;0;0;0;0;0;0;2470;0;0;2470;44;9;35;0;2426;1215;250;961;4
+"021803";"gmina wiejska";"gm. Miękinia";"średzki";"dolnośląskie";11400;12564;3371;8028;1;40;0;0;0;0;0;0;0;8028;0;0;8028;106;28;78;0;7922;2899;1041;3982;8
+"021804";"gmina miejsko-wiejska";"gm. Środa Śląska";"średzki";"dolnośląskie";13965;15434;5088;8877;4;21;0;0;0;0;0;0;0;8876;0;0;8876;131;32;99;0;8745;3812;1040;3893;16
+"021805";"gmina wiejska";"gm. Udanin";"średzki";"dolnośląskie";3801;4200;1531;2270;2;4;0;0;0;0;0;0;0;2269;0;0;2269;29;9;20;0;2240;1335;286;619;4
+"022001";"gmina miejsko-wiejska";"gm. Oborniki Śląskie";"trzebnicki";"dolnośląskie";14571;15924;4145;10418;15;73;2;2;0;0;0;0;2;10427;2;0;10427;160;34;126;0;10267;3979;988;5300;17
+"022002";"gmina miejsko-wiejska";"gm. Prusice";"trzebnicki";"dolnośląskie";6798;7484;2750;4047;2;15;0;0;0;0;0;0;0;4046;0;0;4046;84;22;62;0;3962;2101;415;1446;5
+"022003";"gmina miejsko-wiejska";"gm. Trzebnica";"trzebnicki";"dolnośląskie";16952;18642;5410;11542;11;78;2;2;0;0;0;0;2;11544;2;1;11543;198;48;150;0;11345;4794;1416;5135;19
+"022004";"gmina wiejska";"gm. Wisznia Mała";"trzebnicki";"dolnośląskie";7395;8166;1936;5459;3;35;0;0;0;0;0;0;0;5456;0;1;5455;67;11;56;0;5388;2224;593;2571;6
+"022005";"gmina wiejska";"gm. Zawonia";"trzebnicki";"dolnośląskie";4299;4673;1804;2495;9;14;1;1;0;0;0;0;1;2494;1;0;2494;40;11;29;0;2454;1132;332;990;3
+"022006";"gmina miejsko-wiejska";"gm. Żmigród";"trzebnicki";"dolnośląskie";10537;11556;4431;6106;5;20;0;0;0;0;0;0;0;6106;0;0;6106;124;14;110;0;5982;2530;772;2680;10
+"022201";"gmina miejsko-wiejska";"gm. Brzeg Dolny";"wołowski";"dolnośląskie";11609;12708;4181;7428;8;32;0;0;0;0;0;0;0;7427;0;1;7426;120;36;84;0;7306;2774;854;3678;11
+"022202";"gmina wiejska";"gm. Wińsko";"wołowski";"dolnośląskie";6095;6752;2627;3468;8;14;0;0;0;0;0;0;0;3465;0;0;3465;64;14;50;0;3401;2111;388;902;6
+"022203";"gmina miejsko-wiejska";"gm. Wołów";"wołowski";"dolnośląskie";17452;18796;7132;10320;10;55;0;0;0;0;0;0;0;10318;0;0;10318;200;35;165;0;10118;4544;1221;4353;16
+"022301";"gmina wiejska";"gm. Czernica";"wrocławski";"dolnośląskie";10897;12096;2008;8885;5;78;1;1;0;0;0;0;1;8888;1;1;8887;114;36;78;0;8773;2921;977;4875;7
+"022302";"gmina wiejska";"gm. Długołęka";"wrocławski";"dolnośląskie";22296;25356;4166;18125;13;147;1;1;0;0;0;0;1;18117;1;1;18116;266;86;180;0;17850;6445;2224;9181;17
+"022303";"gmina wiejska";"gm. Jordanów Śląski";"wrocławski";"dolnośląskie";2299;2530;780;1519;1;12;0;0;0;0;0;0;0;1519;0;1;1518;15;3;12;0;1503;800;184;519;2
+"022304";"gmina miejsko-wiejska";"gm. Kąty Wrocławskie";"wrocławski";"dolnośląskie";16736;18404;4409;12323;6;101;1;1;0;0;0;0;1;12323;1;3;12320;188;80;108;0;12132;4510;1533;6089;12
+"022305";"gmina wiejska";"gm. Kobierzyce";"wrocławski";"dolnośląskie";14198;15369;3520;10676;2;127;0;0;0;0;0;0;0;10676;0;0;10676;149;49;100;0;10527;3247;1270;6010;13
+"022306";"gmina wiejska";"gm. Mietków";"wrocławski";"dolnośląskie";2873;3112;1026;1847;1;7;0;0;0;0;0;0;0;1847;0;0;1847;22;5;17;0;1825;837;260;728;4
+"022307";"gmina miejsko-wiejska";"gm. Sobótka";"wrocławski";"dolnośląskie";9200;10212;3217;5982;5;44;0;0;0;0;0;0;0;5982;0;0;5982;99;41;58;0;5883;2499;710;2674;6
+"022308";"gmina miejsko-wiejska";"gm. Siechnice";"wrocławski";"dolnośląskie";15144;16829;3066;12078;2;103;0;0;0;0;0;0;0;12078;0;0;12078;167;52;115;0;11911;3969;1566;6376;17
+"022309";"gmina wiejska";"gm. Żórawina";"wrocławski";"dolnośląskie";7803;8552;2265;5538;6;28;0;0;0;0;0;0;0;5538;0;0;5538;85;20;65;0;5453;2042;696;2715;7

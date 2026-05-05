@@ -1,0 +1,32 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Stanisław KARCZEWSKI";"Leszek Janusz PRZYBYTNIAK";"Liczba obwodów"
+"140101";"gmina miejsko-wiejska";"gm. Białobrzegi";"białobrzeski";"mazowieckie";7548;8176;2253;5295;3;30;0;0;0;0;0;0;0;5293;0;1;5292;133;34;99;0;5159;3000;2159;6
+"140102";"gmina wiejska";"gm. Promna";"białobrzeski";"mazowieckie";4092;4466;1495;2597;4;19;0;0;0;0;0;0;0;2597;0;0;2597;66;17;49;0;2531;1642;889;4
+"140103";"gmina wiejska";"gm. Radzanów";"białobrzeski";"mazowieckie";2745;3018;887;1858;2;5;0;0;0;0;0;0;0;1858;0;0;1858;52;12;40;0;1806;1354;452;2
+"140104";"gmina wiejska";"gm. Stara Błotnica";"białobrzeski";"mazowieckie";3827;4221;1294;2533;3;4;0;0;0;0;0;0;0;2533;0;0;2533;40;10;30;0;2493;2030;463;3
+"140105";"gmina wiejska";"gm. Stromiec";"białobrzeski";"mazowieckie";4116;4441;1720;2395;2;21;1;1;0;0;0;0;1;2397;1;0;2397;70;18;52;0;2327;1790;537;6
+"140106";"gmina miejsko-wiejska";"gm. Wyśmierzyce";"białobrzeski";"mazowieckie";2116;2354;726;1390;3;10;0;0;0;0;0;0;0;1390;0;0;1390;34;5;29;0;1356;1038;318;3
+"140601";"gmina wiejska";"gm. Belsk Duży";"grójecki";"mazowieckie";4745;5233;1571;3173;2;10;0;0;0;0;0;0;0;3174;0;0;3174;60;26;34;0;3114;1658;1456;8
+"140602";"gmina wiejska";"gm. Błędów";"grójecki";"mazowieckie";5508;6050;2026;3482;3;7;0;0;0;0;0;0;0;3482;0;0;3482;94;46;48;0;3388;2073;1315;5
+"140603";"gmina wiejska";"gm. Chynów";"grójecki";"mazowieckie";7080;7836;2320;4760;11;30;0;0;0;0;0;0;0;4759;0;0;4759;101;18;83;0;4658;2574;2084;8
+"140604";"gmina wiejska";"gm. Goszczyn";"grójecki";"mazowieckie";2131;2340;659;1472;1;2;0;0;0;0;0;0;0;1472;0;0;1472;16;2;14;0;1456;968;488;3
+"140605";"gmina miejsko-wiejska";"gm. Grójec";"grójecki";"mazowieckie";18086;19765;5330;12753;12;97;0;0;0;0;0;0;0;12753;0;5;12748;331;126;205;0;12417;5299;7118;16
+"140606";"gmina wiejska";"gm. Jasieniec";"grójecki";"mazowieckie";3891;4248;1304;2586;2;7;0;0;0;0;0;0;0;2585;0;0;2585;76;15;61;0;2509;1367;1142;3
+"140607";"gmina miejsko-wiejska";"gm. Mogielnica";"grójecki";"mazowieckie";6571;7278;2387;4184;10;23;0;0;0;0;0;0;0;4181;0;0;4181;80;28;52;0;4101;2756;1345;9
+"140608";"gmina miejsko-wiejska";"gm. Nowe Miasto nad Pilicą";"grójecki";"mazowieckie";6134;6454;2051;4082;13;49;0;0;0;0;0;0;0;4080;0;4;4076;59;30;29;0;4017;2708;1309;8
+"140609";"gmina wiejska";"gm. Pniewy";"grójecki";"mazowieckie";3514;3910;1103;2411;0;44;0;0;0;0;0;0;0;2411;0;0;2411;66;26;40;0;2345;1197;1148;4
+"140611";"gmina miejsko-wiejska";"gm. Warka";"grójecki";"mazowieckie";13709;14957;4209;9500;8;46;0;0;0;0;0;0;0;9499;0;0;9499;229;93;136;0;9270;5061;4209;14
+"140701";"gmina wiejska";"gm. Garbatka-Letnisko";"kozienicki";"mazowieckie";4283;4593;1588;2695;13;30;0;0;0;0;0;0;0;2690;0;0;2690;65;27;38;0;2625;1693;932;6
+"140702";"gmina wiejska";"gm. Głowaczów";"kozienicki";"mazowieckie";5399;5830;1880;3519;22;18;2;2;0;0;0;0;2;3521;2;0;3521;84;30;54;0;3437;2583;854;6
+"140703";"gmina wiejska";"gm. Gniewoszów";"kozienicki";"mazowieckie";2900;3154;1082;1818;7;20;0;0;0;0;0;0;0;1817;0;0;1817;40;9;31;0;1777;1284;493;4
+"140704";"gmina wiejska";"gm. Grabów nad Pilicą";"kozienicki";"mazowieckie";2937;3212;1043;1894;1;10;1;1;0;0;0;0;1;1895;1;0;1895;49;9;40;0;1846;1393;453;4
+"140705";"gmina miejsko-wiejska";"gm. Kozienice";"kozienicki";"mazowieckie";22158;23756;7608;14550;15;88;0;0;0;0;0;0;0;14550;0;0;14550;376;130;246;0;14174;8295;5879;24
+"140706";"gmina wiejska";"gm. Magnuszew";"kozienicki";"mazowieckie";5122;5590;1705;3417;9;25;0;0;0;0;0;0;0;3416;0;0;3416;74;16;58;0;3342;2441;901;9
+"140707";"gmina wiejska";"gm. Sieciechów";"kozienicki";"mazowieckie";2956;3220;1217;1739;2;15;0;0;0;0;0;0;0;1739;0;0;1739;41;9;32;0;1698;1198;500;3
+"142301";"gmina wiejska";"gm. Borkowice";"przysuski";"mazowieckie";3290;3572;1296;1994;7;21;0;0;0;0;0;0;0;1994;0;1;1993;74;14;60;0;1919;1317;602;5
+"142302";"gmina wiejska";"gm. Gielniów";"przysuski";"mazowieckie";3448;3755;1172;2277;3;22;0;0;0;0;0;0;0;2277;0;0;2277;44;20;24;0;2233;1747;486;4
+"142303";"gmina wiejska";"gm. Klwów";"przysuski";"mazowieckie";2511;2725;715;1796;3;12;0;0;0;0;0;0;0;1796;0;0;1796;43;15;28;0;1753;1348;405;4
+"142304";"gmina wiejska";"gm. Odrzywół";"przysuski";"mazowieckie";2928;3168;820;2107;15;22;0;0;0;0;0;0;0;2106;0;0;2106;38;15;23;0;2068;1725;343;4
+"142305";"gmina wiejska";"gm. Potworów";"przysuski";"mazowieckie";3022;3295;1235;1787;0;15;0;0;0;0;0;0;0;1787;0;0;1787;49;16;33;0;1738;1384;354;4
+"142306";"gmina miejsko-wiejska";"gm. Przysucha";"przysuski";"mazowieckie";9153;9870;3127;6026;11;33;0;0;0;0;0;0;0;6026;0;0;6026;126;42;84;0;5900;3988;1912;8
+"142307";"gmina wiejska";"gm. Rusinów";"przysuski";"mazowieckie";3231;3537;930;2301;2;14;0;0;0;0;0;0;0;2301;0;0;2301;46;25;21;0;2255;1926;329;4
+"142308";"gmina wiejska";"gm. Wieniawa";"przysuski";"mazowieckie";4107;4426;1443;2664;10;24;0;0;0;0;0;0;0;2664;0;0;2664;57;6;51;0;2607;2041;566;4

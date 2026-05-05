@@ -1,0 +1,31 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Klaudiusz BALCERZAK";"Robert Jarosław PALUCH";"Wadim TYSZKIEWICZ";"Liczba obwodów"
+"080401";"gmina miejska";"m. Nowa Sól";"nowosolski";"lubuskie";27042;29203;9211;17831;22;90;5;5;1;0;0;0;4;17822;4;1;17821;197;76;121;0;17624;3938;636;13050;18
+"080402";"gmina miejsko-wiejska";"gm. Bytom Odrzański";"nowosolski";"lubuskie";3870;4189;1629;2241;4;11;1;1;0;0;0;0;1;2241;1;0;2241;48;13;35;0;2193;593;167;1433;2
+"080403";"gmina wiejska";"gm. Kolsko";"nowosolski";"lubuskie";2420;2693;1051;1369;1;50;0;0;0;0;0;0;0;1368;0;0;1368;21;4;17;0;1347;362;143;842;2
+"080404";"gmina miejsko-wiejska";"gm. Kożuchów";"nowosolski";"lubuskie";11222;12268;4830;6390;7;25;0;0;0;0;0;0;0;6389;0;0;6389;80;31;49;0;6309;1714;561;4034;11
+"080405";"gmina wiejska";"gm. Nowa Sól";"nowosolski";"lubuskie";4960;5461;1903;3054;0;13;0;0;0;0;0;0;0;3055;0;0;3055;33;13;20;0;3022;615;511;1896;7
+"080406";"gmina miejsko-wiejska";"gm. Nowe Miasteczko";"nowosolski";"lubuskie";3900;4167;1745;2155;5;3;0;0;0;0;0;0;0;2155;0;0;2155;31;14;17;0;2124;633;249;1242;7
+"080407";"gmina miejsko-wiejska";"gm. Otyń";"nowosolski";"lubuskie";4877;5359;1798;3079;3;7;0;0;0;0;0;0;0;3078;0;0;3078;50;18;32;0;3028;714;200;2114;4
+"080408";"gmina wiejska";"gm. Siedlisko";"nowosolski";"lubuskie";2440;2742;1152;1288;5;0;0;0;0;0;0;0;0;1288;0;0;1288;12;3;9;0;1276;380;120;776;2
+"081001";"gmina miejska";"m. Gozdnica";"żagański";"lubuskie";2260;2416;1157;1103;1;7;0;0;0;0;0;0;0;1103;0;0;1103;29;5;24;0;1074;380;258;436;3
+"081002";"gmina miejska";"m. Żagań";"żagański";"lubuskie";17997;19390;6600;11397;8;68;3;3;0;0;0;0;3;11400;3;0;11400;194;47;147;0;11206;2997;1952;6257;14
+"081003";"gmina wiejska";"gm. Brzeźnica";"żagański";"lubuskie";2600;2884;1102;1498;6;6;0;0;0;0;0;0;0;1498;0;0;1498;36;4;32;0;1462;540;287;635;4
+"081004";"gmina miejsko-wiejska";"gm. Iłowa";"żagański";"lubuskie";4920;5409;2263;2657;1;12;0;0;0;0;0;0;0;2656;0;0;2656;89;19;70;0;2567;917;622;1028;6
+"081005";"gmina miejsko-wiejska";"gm. Małomice";"żagański";"lubuskie";3790;4157;1771;2019;5;5;0;0;0;0;0;0;0;2018;0;0;2018;67;13;54;0;1951;657;362;932;3
+"081006";"gmina wiejska";"gm. Niegosławice";"żagański";"lubuskie";3170;3470;1442;1728;6;15;0;0;0;0;0;0;0;1728;0;0;1728;39;10;29;0;1689;746;292;651;3
+"081007";"gmina miejsko-wiejska";"gm. Szprotawa";"żagański";"lubuskie";14821;16044;6701;8120;7;44;3;3;1;0;0;0;2;8122;2;0;8122;197;40;157;0;7925;2805;1078;4042;12
+"081008";"gmina wiejska";"gm. Wymiarki";"żagański";"lubuskie";1680;1801;823;857;0;1;0;0;0;0;0;0;0;857;0;0;857;15;2;13;0;842;319;199;324;2
+"081009";"gmina wiejska";"gm. Żagań";"żagański";"lubuskie";5150;5657;2265;2885;2;0;0;0;0;0;0;0;0;2885;0;0;2885;61;10;51;0;2824;857;635;1332;10
+"081101";"gmina miejska";"m. Łęknica";"żarski";"lubuskie";1760;1940;726;1034;1;23;0;0;0;0;0;0;0;1033;0;0;1033;31;7;24;0;1002;297;221;484;2
+"081102";"gmina miejska";"m. Żary";"żarski";"lubuskie";26677;28723;10031;16646;13;76;4;4;0;0;0;0;4;16646;4;0;16646;462;161;301;0;16184;5112;3528;7544;23
+"081103";"gmina wiejska";"gm. Brody";"żarski";"lubuskie";2420;2620;1185;1234;3;8;0;0;0;0;0;0;0;1235;0;0;1235;47;11;36;0;1188;406;304;478;3
+"081104";"gmina miejsko-wiejska";"gm. Jasień";"żarski";"lubuskie";5050;5453;2363;2687;0;8;0;0;0;0;0;0;0;2686;0;0;2686;81;14;67;0;2605;777;813;1015;4
+"081105";"gmina wiejska";"gm. Lipinki Łużyckie";"żarski";"lubuskie";2340;2569;1091;1248;3;5;0;0;0;0;0;0;0;1249;0;0;1249;27;2;25;0;1222;472;322;428;4
+"081106";"gmina miejsko-wiejska";"gm. Lubsko";"żarski";"lubuskie";13370;14460;6000;7370;4;36;1;1;0;0;0;0;1;7368;1;0;7368;203;36;167;0;7165;2138;1846;3181;13
+"081107";"gmina wiejska";"gm. Przewóz";"żarski";"lubuskie";2270;2487;1020;1250;1;3;1;1;0;0;0;0;1;1250;1;0;1250;37;12;25;0;1213;529;328;356;3
+"081108";"gmina wiejska";"gm. Trzebiel";"żarski";"lubuskie";4110;4500;1880;2230;4;14;0;0;0;0;0;0;0;2230;0;0;2230;85;23;62;0;2145;780;662;703;5
+"081109";"gmina wiejska";"gm. Tuplice";"żarski";"lubuskie";2220;2429;1048;1172;0;11;0;0;0;0;0;0;0;1172;0;0;1172;45;7;38;0;1127;302;342;483;2
+"081110";"gmina wiejska";"gm. Żary";"żarski";"lubuskie";8690;9517;3784;4906;5;34;0;0;0;0;0;0;0;4906;0;0;4906;161;34;127;0;4745;1725;1249;1771;8
+"081201";"gmina miejsko-wiejska";"gm. Sława";"wschowski";"lubuskie";8920;9810;3633;5287;8;69;0;0;0;0;0;0;0;5287;0;0;5287;103;20;83;0;5184;2103;618;2463;12
+"081202";"gmina miejsko-wiejska";"gm. Szlichtyngowa";"wschowski";"lubuskie";3620;3922;1576;2044;3;7;0;0;0;0;0;0;0;2042;0;0;2042;73;28;45;0;1969;1040;445;484;4
+"081203";"gmina miejsko-wiejska";"gm. Wschowa";"wschowski";"lubuskie";15070;16490;6374;8696;9;46;1;1;0;0;0;0;1;8696;1;0;8696;212;49;163;0;8484;3798;1425;3261;16

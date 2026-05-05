@@ -1,0 +1,34 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Marzena Magdalena DĘBNIAK";"Dariusz Adam LORANTY";"Jarosław RUSIECKI";"Liczba obwodów"
+"260601";"gmina wiejska";"gm. Baćkowice";"opatowski";"świętokrzyskie";3665;3959;1555;2110;0;6;0;0;0;0;0;0;0;2110;0;0;2110;39;13;26;0;2071;274;216;1581;5
+"260602";"gmina wiejska";"gm. Iwaniska";"opatowski";"świętokrzyskie";4968;5489;2035;2933;8;20;0;0;0;0;0;0;0;2933;0;1;2932;67;20;47;0;2865;478;318;2069;6
+"260603";"gmina wiejska";"gm. Lipnik";"opatowski";"świętokrzyskie";4035;4373;1949;2086;0;9;0;0;0;0;0;0;0;2086;0;0;2086;45;8;37;0;2041;384;303;1354;4
+"260604";"gmina miejsko-wiejska";"gm. Opatów";"opatowski";"świętokrzyskie";9236;9628;3991;5245;10;21;0;0;0;0;0;0;0;5245;0;0;5245;163;53;110;0;5082;1351;882;2849;13
+"260605";"gmina miejsko-wiejska";"gm. Ożarów";"opatowski";"świętokrzyskie";8005;8663;3515;4490;10;26;4;3;0;0;0;0;3;4493;3;0;4493;120;29;91;0;4373;1380;774;2219;14
+"260606";"gmina wiejska";"gm. Sadowie";"opatowski";"świętokrzyskie";2892;3271;1136;1756;3;12;0;0;0;0;0;0;0;1756;0;1;1755;24;14;10;0;1731;474;234;1023;4
+"260607";"gmina wiejska";"gm. Tarłów";"opatowski";"świętokrzyskie";4074;4400;1930;2144;1;18;0;0;0;0;0;0;0;2144;0;0;2144;51;24;27;0;2093;501;260;1332;6
+"260608";"gmina wiejska";"gm. Wojciechowice";"opatowski";"świętokrzyskie";3081;3337;1370;1711;2;2;0;0;0;0;0;0;0;1711;0;0;1711;52;18;34;0;1659;482;273;904;4
+"260701";"gmina miejska";"m. Ostrowiec Świętokrzyski";"ostrowiecki";"świętokrzyskie";51738;54228;21483;30255;44;155;0;0;0;0;0;0;0;30249;0;1;30248;403;131;272;0;29845;15073;3427;11345;38
+"260702";"gmina wiejska";"gm. Bałtów";"ostrowiecki";"świętokrzyskie";2744;2985;1084;1660;5;8;0;0;0;0;0;0;0;1660;0;0;1660;20;6;14;0;1640;635;146;859;5
+"260703";"gmina wiejska";"gm. Bodzechów";"ostrowiecki";"świętokrzyskie";10041;10862;4256;5785;2;25;0;0;0;0;0;0;0;5785;0;0;5785;108;33;75;0;5677;2484;689;2504;12
+"260704";"gmina miejsko-wiejska";"gm. Ćmielów";"ostrowiecki";"świętokrzyskie";5487;5995;2571;2914;6;16;0;0;0;0;0;0;0;2916;0;0;2916;56;13;43;0;2860;1162;368;1330;6
+"260705";"gmina miejsko-wiejska";"gm. Kunów";"ostrowiecki";"świętokrzyskie";7367;7911;3061;4306;4;21;0;0;0;0;0;0;0;4305;0;0;4305;67;13;54;0;4238;1261;928;2049;11
+"260706";"gmina wiejska";"gm. Waśniów";"ostrowiecki";"świętokrzyskie";4998;5418;2349;2649;1;6;0;0;0;0;0;0;0;2648;0;0;2648;60;13;47;0;2588;596;320;1672;6
+"260901";"gmina miejska";"m. Sandomierz";"sandomierski";"świętokrzyskie";17887;19306;6650;11237;9;184;6;6;0;0;0;0;6;11240;6;2;11238;239;84;155;0;10999;3481;2851;4667;15
+"260902";"gmina wiejska";"gm. Dwikozy";"sandomierski";"świętokrzyskie";6571;7140;3127;3444;2;13;0;0;0;0;0;0;0;3444;0;0;3444;59;20;39;0;3385;939;738;1708;8
+"260903";"gmina miejsko-wiejska";"gm. Klimontów";"sandomierski";"świętokrzyskie";6102;6580;2921;3181;13;18;0;0;0;0;0;0;0;3181;0;0;3181;88;40;48;0;3093;598;520;1975;8
+"260904";"gmina miejsko-wiejska";"gm. Koprzywnica";"sandomierski";"świętokrzyskie";5199;5488;2101;3098;13;10;0;0;0;0;0;0;0;3097;0;0;3097;55;27;28;0;3042;631;491;1920;7
+"260905";"gmina wiejska";"gm. Łoniów";"sandomierski";"świętokrzyskie";5605;6059;2237;3368;18;13;0;0;0;0;0;0;0;3367;0;0;3367;78;13;65;0;3289;663;468;2158;4
+"260906";"gmina wiejska";"gm. Obrazów";"sandomierski";"świętokrzyskie";4849;5282;2239;2610;1;3;0;0;0;0;0;0;0;2610;0;0;2610;63;31;32;0;2547;580;463;1504;5
+"260907";"gmina wiejska";"gm. Samborzec";"sandomierski";"świętokrzyskie";6445;6999;2715;3730;11;12;0;0;0;0;0;0;0;3730;0;0;3730;64;28;36;0;3666;875;688;2103;7
+"260908";"gmina wiejska";"gm. Wilczyce";"sandomierski";"świętokrzyskie";2850;3097;1374;1476;2;10;0;0;0;0;0;0;0;1476;0;0;1476;33;10;23;0;1443;369;288;786;5
+"260909";"gmina miejsko-wiejska";"gm. Zawichost";"sandomierski";"świętokrzyskie";3310;3633;1496;1814;4;23;0;0;0;0;0;0;0;1812;0;0;1812;34;5;29;0;1778;439;334;1005;3
+"261001";"gmina miejska";"m. Skarżysko-Kamienna";"skarżyski";"świętokrzyskie";34368;36406;12896;21472;49;107;1;1;0;0;0;0;1;21468;1;1;21467;408;154;254;0;21059;6811;5170;9078;32
+"261002";"gmina wiejska";"gm. Bliżyn";"skarżyski";"świętokrzyskie";6205;6705;2605;3600;11;23;0;0;0;0;0;0;0;3600;0;0;3600;82;20;62;0;3518;853;690;1975;5
+"261003";"gmina wiejska";"gm. Łączna";"skarżyski";"świętokrzyskie";3794;4138;1467;2327;1;7;0;0;0;0;0;0;0;2326;0;0;2326;37;9;28;0;2289;412;413;1464;6
+"261004";"gmina wiejska";"gm. Skarżysko Kościelne";"skarżyski";"świętokrzyskie";4595;4953;1821;2774;0;5;0;0;0;0;0;0;0;2773;0;0;2773;62;19;43;0;2711;693;562;1456;5
+"261005";"gmina miejsko-wiejska";"gm. Suchedniów";"skarżyski";"świętokrzyskie";7729;8292;2896;4833;9;27;0;0;0;0;0;0;0;4833;0;0;4833;124;38;86;0;4709;1440;1223;2046;12
+"261101";"gmina miejska";"m. Starachowice";"starachowicki";"świętokrzyskie";36823;39069;13326;23497;41;137;1;1;0;0;0;0;1;23489;1;0;23489;504;165;339;0;22985;6951;6632;9402;24
+"261102";"gmina wiejska";"gm. Brody";"starachowicki";"świętokrzyskie";8183;8843;3279;4904;6;31;0;0;0;0;0;0;0;4904;0;0;4904;122;35;87;0;4782;1057;938;2787;12
+"261103";"gmina wiejska";"gm. Mirzec";"starachowicki";"świętokrzyskie";6180;6568;2196;3984;3;17;0;0;0;0;0;0;0;3984;0;0;3984;97;23;74;0;3887;744;761;2382;9
+"261104";"gmina wiejska";"gm. Pawłów";"starachowicki";"świętokrzyskie";11112;12011;4688;6424;3;29;0;0;0;0;0;0;0;6424;0;4;6420;160;45;115;0;6260;894;1060;4306;14
+"261105";"gmina miejsko-wiejska";"gm. Wąchock";"starachowicki";"świętokrzyskie";5219;5609;2016;3203;8;18;0;0;0;0;0;0;0;3201;0;0;3201;74;26;48;0;3127;764;747;1616;6

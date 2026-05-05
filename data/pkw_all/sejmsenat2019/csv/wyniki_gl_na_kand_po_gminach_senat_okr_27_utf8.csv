@@ -1,0 +1,41 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Radosław SAŁATA";"Michał SEWERYŃSKI";"Andrzej URBANIAK";"Jacek WALCZAK";"Liczba obwodów"
+"100901";"gmina miejsko-wiejska";"gm. Działoszyn";"pajęczański";"łódzkie";9202;9894;3271;5931;11;11;0;0;0;0;0;0;0;5929;0;0;5929;140;36;104;0;5789;711;3124;303;1651;8
+"100902";"gmina wiejska";"gm. Kiełczygłów";"pajęczański";"łódzkie";3072;3338;974;2098;8;5;0;0;0;0;0;0;0;2098;0;0;2098;45;9;36;0;2053;194;1407;126;326;3
+"100903";"gmina wiejska";"gm. Nowa Brzeźnica";"pajęczański";"łódzkie";3431;3778;1217;2214;4;15;0;0;0;0;0;0;0;2213;0;0;2213;52;5;47;0;2161;239;1312;90;520;4
+"100904";"gmina miejsko-wiejska";"gm. Pajęczno";"pajęczański";"łódzkie";8636;9409;3088;5549;18;29;0;0;0;0;0;0;0;5549;0;0;5549;111;43;68;0;5438;610;2911;260;1657;6
+"100905";"gmina wiejska";"gm. Rząśnia";"pajęczański";"łódzkie";3661;3961;1207;2454;14;15;0;0;0;0;0;0;0;2454;0;0;2454;67;20;47;0;2387;247;1589;121;430;5
+"100906";"gmina wiejska";"gm. Siemkowice";"pajęczański";"łódzkie";3574;3969;1310;2265;5;13;0;0;0;0;0;0;0;2265;0;0;2265;75;15;60;0;2190;229;1347;206;408;4
+"100907";"gmina wiejska";"gm. Strzelce Wielkie";"pajęczański";"łódzkie";3470;3723;1294;2176;0;13;0;0;0;0;0;0;0;2176;0;0;2176;62;20;42;0;2114;210;1379;127;398;4
+"100908";"gmina wiejska";"gm. Sulmierzyce";"pajęczański";"łódzkie";3341;3637;1004;2337;1;16;0;0;0;0;0;0;0;2337;0;0;2337;64;11;53;0;2273;244;1493;128;408;5
+"101401";"gmina miejska";"m. Sieradz";"sieradzki";"łódzkie";31839;33972;10051;21788;17;116;0;0;0;0;0;0;0;21782;0;0;21782;342;100;242;0;21440;2230;8623;596;9991;27
+"101402";"gmina miejsko-wiejska";"gm. Błaszki";"sieradzki";"łódzkie";10661;11646;4124;6538;4;26;0;0;0;0;0;0;0;6536;0;0;6536;201;62;139;0;6335;975;3636;398;1326;11
+"101403";"gmina wiejska";"gm. Brąszewice";"sieradzki";"łódzkie";3190;3467;1172;2018;0;11;0;0;0;0;0;0;0;2018;0;0;2018;34;13;21;0;1984;265;1340;56;323;4
+"101404";"gmina wiejska";"gm. Brzeźnio";"sieradzki";"łódzkie";4612;5021;1647;2965;1;17;0;0;0;0;0;0;0;2965;0;0;2965;73;20;53;0;2892;308;1561;130;893;5
+"101405";"gmina wiejska";"gm. Burzenin";"sieradzki";"łódzkie";4042;4415;1632;2410;1;15;0;0;0;0;0;0;0;2410;0;0;2410;34;10;24;0;2376;271;1327;145;633;7
+"101406";"gmina wiejska";"gm. Goszczanów";"sieradzki";"łódzkie";3978;4389;1754;2224;3;19;0;0;0;0;0;0;0;2224;0;0;2224;38;13;25;0;2186;241;1317;133;495;5
+"101407";"gmina wiejska";"gm. Klonowa";"sieradzki";"łódzkie";2105;2302;838;1267;3;11;0;0;0;0;0;0;0;1267;0;0;1267;25;5;20;0;1242;88;847;72;235;4
+"101408";"gmina wiejska";"gm. Sieradz";"sieradzki";"łódzkie";7568;8308;2398;5170;0;24;0;0;0;0;0;0;0;5168;0;0;5168;74;15;59;0;5094;519;2869;178;1528;7
+"101409";"gmina miejsko-wiejska";"gm. Warta";"sieradzki";"łódzkie";9714;10200;3887;5827;3;19;0;0;0;0;0;0;0;5827;0;0;5827;90;27;63;0;5737;663;3446;221;1407;12
+"101410";"gmina wiejska";"gm. Wróblew";"sieradzki";"łódzkie";4460;4881;1583;2877;0;10;1;1;0;0;0;0;1;2877;1;0;2877;68;21;47;0;2809;349;1696;123;641;4
+"101411";"gmina miejsko-wiejska";"gm. Złoczew";"sieradzki";"łódzkie";5281;5784;1998;3283;3;22;0;0;0;0;0;0;0;3283;0;0;3283;71;22;49;0;3212;348;1951;127;786;7
+"101701";"gmina wiejska";"gm. Biała";"wieluński";"łódzkie";4012;4405;1532;2480;3;8;0;0;0;0;0;0;0;2479;0;0;2479;71;8;63;0;2408;265;1438;159;546;7
+"101702";"gmina wiejska";"gm. Czarnożyły";"wieluński";"łódzkie";3301;3631;1139;2162;0;7;0;0;0;0;0;0;0;2162;0;0;2162;57;9;48;0;2105;224;1208;147;526;4
+"101703";"gmina wiejska";"gm. Konopnica";"wieluński";"łódzkie";2851;3121;1024;1827;2;12;0;0;0;0;0;0;0;1827;0;0;1827;45;7;38;0;1782;170;972;207;433;6
+"101704";"gmina wiejska";"gm. Mokrsko";"wieluński";"łódzkie";3921;4273;1404;2517;3;7;0;0;0;0;0;0;0;2516;0;0;2516;61;15;46;0;2455;272;1396;194;593;6
+"101705";"gmina wiejska";"gm. Osjaków";"wieluński";"łódzkie";3436;3768;1069;2367;2;35;0;0;0;0;0;0;0;2367;0;0;2367;56;11;45;0;2311;189;1238;496;388;6
+"101706";"gmina wiejska";"gm. Ostrówek";"wieluński";"łódzkie";3290;3615;1317;1973;4;7;0;0;0;0;0;0;0;1973;0;0;1973;36;4;32;0;1937;196;1163;120;458;6
+"101707";"gmina wiejska";"gm. Pątnów";"wieluński";"łódzkie";4741;5176;1575;3166;5;18;0;0;0;0;0;0;0;3166;0;0;3166;67;13;54;0;3099;299;2030;204;566;9
+"101708";"gmina wiejska";"gm. Skomlin";"wieluński";"łódzkie";2364;2589;895;1469;0;0;0;0;0;0;0;0;0;1469;0;0;1469;44;9;35;0;1425;175;782;82;386;4
+"101709";"gmina miejsko-wiejska";"gm. Wieluń";"wieluński";"łódzkie";23452;25170;7826;15624;9;104;0;0;0;0;0;0;0;15622;0;1;15621;319;119;200;0;15302;1644;6575;826;6257;24
+"101710";"gmina wiejska";"gm. Wierzchlas";"wieluński";"łódzkie";4898;5359;1789;3109;3;28;0;0;0;0;0;0;0;3109;0;0;3109;89;15;74;0;3020;323;1645;252;800;7
+"101801";"gmina wiejska";"gm. Bolesławiec";"wieruszowski";"łódzkie";2989;3285;1220;1769;0;13;0;0;0;0;0;0;0;1768;0;0;1768;47;10;37;0;1721;240;891;110;480;4
+"101802";"gmina wiejska";"gm. Czastary";"wieruszowski";"łódzkie";2878;3150;1163;1715;3;8;0;0;0;0;0;0;0;1715;0;0;1715;49;7;42;0;1666;184;967;107;408;3
+"101803";"gmina wiejska";"gm. Galewice";"wieruszowski";"łódzkie";4466;4925;1705;2761;2;5;0;0;0;0;0;0;0;2761;0;0;2761;70;17;53;0;2691;355;1512;157;667;5
+"101804";"gmina miejsko-wiejska";"gm. Lututów";"wieruszowski";"łódzkie";3315;3617;1224;2091;5;8;0;0;0;0;0;0;0;2091;0;0;2091;50;13;37;0;2041;189;1221;130;501;6
+"101805";"gmina wiejska";"gm. Łubnice";"wieruszowski";"łódzkie";3027;3327;1185;1842;3;4;0;0;0;0;0;0;0;1842;0;0;1842;48;5;43;0;1794;232;950;143;469;3
+"101806";"gmina wiejska";"gm. Sokolniki";"wieruszowski";"łódzkie";3654;3981;1390;2264;1;12;0;0;0;0;0;0;0;2264;0;0;2264;47;9;38;0;2217;241;1283;106;587;4
+"101807";"gmina miejsko-wiejska";"gm. Wieruszów";"wieruszowski";"łódzkie";10362;11396;3290;7071;7;25;0;0;0;0;0;0;0;7071;0;0;7071;118;38;80;0;6953;896;3134;326;2597;13
+"101901";"gmina miejska";"m. Zduńska Wola";"zduńskowolski";"łódzkie";29772;32379;9394;20393;16;82;1;0;0;0;0;0;0;20390;0;15;20375;304;86;218;0;20071;2172;8994;614;8291;23
+"101902";"gmina miejsko-wiejska";"gm. Szadek";"zduńskowolski";"łódzkie";5337;5911;1872;3465;9;28;0;0;0;0;0;0;0;3464;0;0;3464;51;12;39;0;3413;440;1842;195;936;8
+"101903";"gmina wiejska";"gm. Zapolice";"zduńskowolski";"łódzkie";3772;4108;1358;2414;5;6;0;0;0;0;0;0;0;2414;0;0;2414;51;16;35;0;2363;262;1270;101;730;4
+"101904";"gmina wiejska";"gm. Zduńska Wola";"zduńskowolski";"łódzkie";8695;9408;2972;5723;4;17;0;0;0;0;0;0;0;5721;0;0;5721;96;13;83;0;5625;693;3020;246;1666;7

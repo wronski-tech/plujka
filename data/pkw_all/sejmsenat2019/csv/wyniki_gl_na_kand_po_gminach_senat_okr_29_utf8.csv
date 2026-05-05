@@ -1,0 +1,36 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Rafał Michał AMBROZIK";"Artur Jan BAGIEŃSKI";"Liczba obwodów"
+"100701";"gmina wiejska";"gm. Białaczów";"opoczyński";"łódzkie";4252;4677;1549;2703;7;14;0;0;0;0;0;0;0;2700;0;0;2700;49;13;36;0;2651;1124;1527;6
+"100702";"gmina miejsko-wiejska";"gm. Drzewica";"opoczyński";"łódzkie";7728;8456;2396;5332;1;19;0;0;0;0;0;0;0;5332;0;0;5332;160;41;119;0;5172;3171;2001;13
+"100703";"gmina wiejska";"gm. Mniszków";"opoczyński";"łódzkie";3431;3780;1074;2357;1;14;0;0;0;0;0;0;0;2357;0;0;2357;58;10;48;0;2299;1237;1062;4
+"100704";"gmina miejsko-wiejska";"gm. Opoczno";"opoczyński";"łódzkie";24744;26820;7178;17565;35;61;4;3;0;0;0;0;3;17565;3;1;17564;350;112;238;0;17214;8194;9020;26
+"100705";"gmina wiejska";"gm. Paradyż";"opoczyński";"łódzkie";3161;3456;815;2346;0;11;0;0;0;0;0;0;0;2346;0;1;2345;35;9;26;0;2310;867;1443;4
+"100706";"gmina wiejska";"gm. Poświętne";"opoczyński";"łódzkie";2415;2643;689;1726;5;19;0;0;0;0;0;0;0;1724;0;0;1724;36;7;29;0;1688;920;768;4
+"100707";"gmina wiejska";"gm. Sławno";"opoczyński";"łódzkie";5442;5945;1802;3640;2;15;0;0;0;0;0;0;0;3639;0;0;3639;62;12;50;0;3577;1580;1997;8
+"100708";"gmina wiejska";"gm. Żarnów";"opoczyński";"łódzkie";4488;4942;1552;2935;8;33;0;0;0;0;0;0;0;2935;0;0;2935;48;19;29;0;2887;1349;1538;9
+"101301";"gmina miejska";"m. Rawa Mazowiecka";"rawski";"łódzkie";12445;13612;3685;8760;9;54;0;0;0;0;0;0;0;8760;0;0;8760;340;107;233;0;8420;4533;3887;9
+"101302";"gmina miejsko-wiejska";"gm. Biała Rawska";"rawski";"łódzkie";8213;9067;3247;4966;0;22;0;0;0;0;0;0;0;4965;0;0;4965;161;34;127;0;4804;2993;1811;7
+"101303";"gmina wiejska";"gm. Cielądz";"rawski";"łódzkie";2892;3205;1069;1823;3;5;0;0;0;0;0;0;0;1823;0;0;1823;61;9;52;0;1762;1338;424;3
+"101304";"gmina wiejska";"gm. Rawa Mazowiecka";"rawski";"łódzkie";6273;6935;2331;3941;3;12;0;0;0;0;0;0;0;3942;0;2;3940;133;30;103;0;3807;2602;1205;5
+"101305";"gmina wiejska";"gm. Regnów";"rawski";"łódzkie";1366;1496;502;865;1;1;0;0;0;0;0;0;0;865;0;1;864;38;5;33;0;826;589;237;1
+"101306";"gmina wiejska";"gm. Sadkowice";"rawski";"łódzkie";4042;4420;1728;2314;5;11;0;0;0;0;0;0;0;2314;0;0;2314;72;21;51;0;2242;1529;713;4
+"101501";"gmina wiejska";"gm. Bolimów";"skierniewicki";"łódzkie";2833;3152;994;1839;3;27;0;0;0;0;0;0;0;1839;0;0;1839;59;16;43;0;1780;1078;702;5
+"101502";"gmina wiejska";"gm. Głuchów";"skierniewicki";"łódzkie";4180;4604;1089;3091;11;5;0;0;0;0;0;0;0;3089;0;0;3089;93;30;63;0;2996;2274;722;4
+"101503";"gmina wiejska";"gm. Godzianów";"skierniewicki";"łódzkie";1889;2082;594;1295;1;1;0;0;0;0;0;0;0;1295;0;0;1295;46;6;40;0;1249;892;357;2
+"101504";"gmina wiejska";"gm. Kowiesy";"skierniewicki";"łódzkie";2158;2415;782;1376;0;22;0;0;0;0;0;0;0;1376;0;0;1376;33;2;31;0;1343;679;664;5
+"101505";"gmina wiejska";"gm. Lipce Reymontowskie";"skierniewicki";"łódzkie";2391;2618;778;1613;3;3;0;0;0;0;0;0;0;1613;0;0;1613;49;6;43;0;1564;1145;419;3
+"101506";"gmina wiejska";"gm. Maków";"skierniewicki";"łódzkie";4373;4786;1424;2948;1;1;0;0;0;0;0;0;0;2949;0;0;2949;93;18;75;0;2856;1802;1054;6
+"101507";"gmina wiejska";"gm. Nowy Kawęczyn";"skierniewicki";"łódzkie";2520;2798;845;1675;1;20;0;0;0;0;0;0;0;1675;0;0;1675;69;14;55;0;1606;968;638;4
+"101508";"gmina wiejska";"gm. Skierniewice";"skierniewicki";"łódzkie";5308;5838;1805;3503;2;20;0;0;0;0;0;0;0;3501;0;0;3501;94;19;75;0;3407;2084;1323;8
+"101509";"gmina wiejska";"gm. Słupia";"skierniewicki";"łódzkie";1853;2042;609;1244;0;8;0;0;0;0;0;0;0;1244;0;0;1244;38;4;34;0;1206;837;369;2
+"101601";"gmina miejska";"m. Tomaszów Mazowiecki";"tomaszowski";"łódzkie";44597;48078;14802;29820;44;100;0;0;0;0;0;0;0;29818;0;17;29801;1121;372;749;0;28680;13527;15153;28
+"101602";"gmina wiejska";"gm. Będków";"tomaszowski";"łódzkie";2473;2684;806;1666;0;3;0;0;0;0;0;0;0;1667;0;0;1667;48;10;38;0;1619;1037;582;3
+"101603";"gmina wiejska";"gm. Budziszewice";"tomaszowski";"łódzkie";1566;1698;512;1054;0;13;0;0;0;0;0;0;0;1052;0;0;1052;49;17;32;0;1003;619;384;3
+"101604";"gmina wiejska";"gm. Czerniewice";"tomaszowski";"łódzkie";3718;4050;1290;2428;2;10;0;0;0;0;0;0;0;2427;0;0;2427;116;19;97;0;2311;1448;863;4
+"101605";"gmina wiejska";"gm. Inowłódz";"tomaszowski";"łódzkie";2933;3176;1008;1925;2;24;0;0;0;0;0;0;0;1925;0;0;1925;87;19;68;0;1838;1010;828;4
+"101606";"gmina wiejska";"gm. Lubochnia";"tomaszowski";"łódzkie";5111;5554;1672;3439;3;22;0;0;0;0;0;0;0;3439;0;0;3439;109;28;81;0;3330;2166;1164;7
+"101607";"gmina wiejska";"gm. Rokiciny";"tomaszowski";"łódzkie";4479;4899;1401;3078;3;26;0;0;0;0;0;0;0;3075;0;1;3074;118;24;94;0;2956;1741;1215;4
+"101608";"gmina wiejska";"gm. Rzeczyca";"tomaszowski";"łódzkie";3528;3855;1298;2230;0;12;0;0;0;0;0;0;0;2230;0;0;2230;50;11;39;0;2180;1211;969;4
+"101609";"gmina wiejska";"gm. Tomaszów Mazowiecki";"tomaszowski";"łódzkie";7929;8709;2392;5537;1;41;1;1;0;0;0;0;1;5538;1;0;5538;205;55;150;0;5333;3015;2318;9
+"101610";"gmina wiejska";"gm. Ujazd";"tomaszowski";"łódzkie";5643;6111;1896;3747;0;16;0;0;0;0;0;0;0;3747;0;0;3747;150;40;110;0;3597;2030;1567;8
+"101611";"gmina wiejska";"gm. Żelechlinek";"tomaszowski";"łódzkie";2468;2665;870;1598;1;4;0;0;0;0;0;0;0;1598;0;0;1598;46;3;43;0;1552;1053;499;4
+"106301";"gmina miejska";"m. Skierniewice";"Skierniewice";"łódzkie";33919;36858;9297;24621;21;122;3;3;0;0;0;0;3;24613;3;2;24611;960;281;679;0;23651;10382;13269;27

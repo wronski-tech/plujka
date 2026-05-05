@@ -1,0 +1,40 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Henryk KIERZKOWSKI";"Józef Marian LEWANDOWSKI";"Jerzy Jan WENDERLICH";"Łukasz ZBONIKOWSKI";"Józef Mikołaj ŁYCZAK";"Liczba obwodów"
+"040101";"gmina miejska";"m. Aleksandrów Kujawski";"aleksandrowski";"kujawsko-pomorskie";8837;9708;3493;5344;4;59;0;0;0;0;0;0;0;5344;0;0;5344;83;28;55;0;5261;280;362;2247;468;1904;10
+"040102";"gmina miejska";"m. Ciechocinek";"aleksandrowski";"kujawsko-pomorskie";8729;10849;937;7792;14;2166;2;2;0;0;0;0;2;7791;2;0;7791;98;33;65;0;7693;383;511;3332;517;2950;7
+"040103";"gmina miejska";"m. Nieszawa";"aleksandrowski";"kujawsko-pomorskie";1399;1535;533;866;4;8;0;0;0;0;0;0;0;865;0;0;865;24;13;11;0;841;67;45;311;78;340;3
+"040104";"gmina wiejska";"gm. Aleksandrów Kujawski";"aleksandrowski";"kujawsko-pomorskie";8275;9103;3619;4656;4;23;1;1;0;0;0;0;1;4655;1;0;4655;105;31;74;0;4550;308;303;1400;420;2119;10
+"040105";"gmina wiejska";"gm. Bądkowo";"aleksandrowski";"kujawsko-pomorskie";3172;3461;1372;1800;2;15;0;0;0;0;0;0;0;1800;0;0;1800;29;8;21;0;1771;84;79;477;154;977;4
+"040106";"gmina wiejska";"gm. Koneck";"aleksandrowski";"kujawsko-pomorskie";2352;2646;1118;1234;2;4;0;0;0;0;0;0;0;1234;0;0;1234;36;4;32;0;1198;74;67;254;89;714;5
+"040107";"gmina wiejska";"gm. Raciążek";"aleksandrowski";"kujawsko-pomorskie";2450;2573;1031;1419;2;6;0;0;0;0;0;0;0;1419;0;0;1419;19;3;16;0;1400;66;87;451;130;666;5
+"040108";"gmina wiejska";"gm. Waganiec";"aleksandrowski";"kujawsko-pomorskie";3277;3614;1394;1883;2;1;0;0;0;0;0;0;0;1882;0;0;1882;31;7;24;0;1851;106;90;407;211;1037;7
+"040109";"gmina wiejska";"gm. Zakrzewo";"aleksandrowski";"kujawsko-pomorskie";2565;2822;1181;1385;0;3;0;0;0;0;0;0;0;1384;0;0;1384;35;5;30;0;1349;80;92;387;123;667;5
+"040801";"gmina miejska";"m. Lipno";"lipnowski";"kujawsko-pomorskie";10129;11113;4397;5732;12;29;0;0;0;0;0;0;0;5731;0;0;5731;125;52;73;0;5606;338;335;2410;471;2052;10
+"040802";"gmina wiejska";"gm. Bobrowniki";"lipnowski";"kujawsko-pomorskie";2211;2440;998;1213;1;5;0;0;0;0;0;0;0;1213;0;0;1213;37;8;29;0;1176;92;90;397;115;482;5
+"040803";"gmina wiejska";"gm. Chrostkowo";"lipnowski";"kujawsko-pomorskie";2151;2370;1046;1105;2;3;0;0;0;0;0;0;0;1105;0;0;1105;16;3;13;0;1089;72;59;217;124;617;4
+"040804";"gmina miejsko-wiejska";"gm. Dobrzyń nad Wisłą";"lipnowski";"kujawsko-pomorskie";5569;6171;2574;2995;3;5;0;0;0;0;0;0;0;2995;0;0;2995;104;32;72;0;2891;181;165;810;210;1525;10
+"040805";"gmina wiejska";"gm. Kikół";"lipnowski";"kujawsko-pomorskie";5033;5590;2285;2747;4;8;0;0;0;0;0;0;0;2748;0;0;2748;124;13;111;0;2624;227;151;846;235;1165;6
+"040806";"gmina wiejska";"gm. Lipno";"lipnowski";"kujawsko-pomorskie";8132;9164;3820;4312;2;14;0;0;0;0;0;0;0;4312;0;0;4312;92;32;60;0;4220;334;226;1323;393;1944;9
+"040807";"gmina miejsko-wiejska";"gm. Skępe";"lipnowski";"kujawsko-pomorskie";5368;5936;2392;2976;18;26;0;0;0;0;0;0;0;2976;0;0;2976;65;22;43;0;2911;174;195;926;246;1370;8
+"040808";"gmina wiejska";"gm. Tłuchowo";"lipnowski";"kujawsko-pomorskie";3303;3628;1464;1839;2;4;0;0;0;0;0;0;0;1839;0;0;1839;35;5;30;0;1804;121;119;436;144;984;5
+"040809";"gmina wiejska";"gm. Wielgie";"lipnowski";"kujawsko-pomorskie";4705;5210;2290;2415;9;5;0;0;0;0;0;0;0;2415;0;0;2415;47;9;38;0;2368;180;126;850;200;1012;11
+"041101";"gmina miejska";"m. Radziejów";"radziejowski";"kujawsko-pomorskie";4208;4574;1582;2626;9;23;1;1;0;0;0;0;1;2627;1;0;2627;49;14;35;0;2578;170;144;996;225;1043;6
+"041102";"gmina wiejska";"gm. Bytoń";"radziejowski";"kujawsko-pomorskie";2623;2869;1178;1445;2;3;0;0;0;0;0;0;0;1445;0;0;1445;32;4;28;0;1413;80;80;288;138;827;5
+"041103";"gmina wiejska";"gm. Dobre";"radziejowski";"kujawsko-pomorskie";3950;4325;1880;2070;8;4;1;1;0;0;0;0;1;2070;1;0;2070;61;10;51;0;2009;158;127;464;194;1066;6
+"041104";"gmina wiejska";"gm. Osięciny";"radziejowski";"kujawsko-pomorskie";5701;6241;2566;3135;14;16;0;0;0;0;0;0;0;3133;0;0;3133;71;31;40;0;3062;215;173;792;325;1557;8
+"041105";"gmina miejsko-wiejska";"gm. Piotrków Kujawski";"radziejowski";"kujawsko-pomorskie";6827;7518;3081;3746;10;32;0;0;0;0;0;0;0;3745;0;0;3745;82;23;59;0;3663;231;214;937;311;1970;12
+"041106";"gmina wiejska";"gm. Radziejów";"radziejowski";"kujawsko-pomorskie";3212;3552;1377;1835;5;2;1;1;0;0;0;0;1;1835;1;0;1835;34;10;24;0;1801;156;118;458;175;894;7
+"041107";"gmina wiejska";"gm. Topólka";"radziejowski";"kujawsko-pomorskie";3628;4005;1544;2084;3;17;0;0;0;0;0;0;0;2084;0;0;2084;52;14;38;0;2032;129;160;532;171;1040;7
+"041801";"gmina miejska";"m. Kowal";"włocławski";"kujawsko-pomorskie";2595;2776;1012;1583;3;6;0;0;0;0;0;0;0;1583;0;0;1583;33;12;21;0;1550;311;120;502;244;373;4
+"041802";"gmina wiejska";"gm. Baruchowo";"włocławski";"kujawsko-pomorskie";2521;2805;1104;1417;3;26;0;0;0;0;0;0;0;1417;0;0;1417;38;5;33;0;1379;322;78;259;184;536;5
+"041803";"gmina wiejska";"gm. Boniewo";"włocławski";"kujawsko-pomorskie";2486;2759;1222;1264;2;6;0;0;0;0;0;0;0;1264;0;0;1264;30;2;28;0;1234;115;74;309;137;599;5
+"041804";"gmina miejsko-wiejska";"gm. Brześć Kujawski";"włocławski";"kujawsko-pomorskie";8209;9302;3266;4943;4;329;0;0;0;0;0;0;0;4943;0;0;4943;109;34;75;0;4834;414;332;1786;407;1895;9
+"041805";"gmina wiejska";"gm. Choceń";"włocławski";"kujawsko-pomorskie";5792;6471;2838;2954;16;8;0;0;0;0;0;0;0;2954;0;0;2954;77;24;53;0;2877;329;159;826;342;1221;9
+"041806";"gmina miejsko-wiejska";"gm. Chodecz";"włocławski";"kujawsko-pomorskie";4466;4918;2344;2122;1;24;0;0;0;0;0;0;0;2122;0;0;2122;53;18;35;0;2069;247;130;516;220;956;6
+"041807";"gmina wiejska";"gm. Fabianki";"włocławski";"kujawsko-pomorskie";7089;7701;2990;4099;5;34;0;0;0;0;0;0;0;4099;0;0;4099;77;27;50;0;4022;324;285;1734;342;1337;5
+"041808";"gmina miejsko-wiejska";"gm. Izbica Kujawska";"włocławski";"kujawsko-pomorskie";5488;6049;2522;2966;0;7;0;0;0;0;0;0;0;2966;0;0;2966;49;12;37;0;2917;221;145;576;289;1686;6
+"041809";"gmina wiejska";"gm. Kowal";"włocławski";"kujawsko-pomorskie";2921;3226;1367;1554;1;8;0;0;0;0;0;0;0;1554;0;0;1554;27;8;19;0;1527;264;84;315;245;619;4
+"041810";"gmina wiejska";"gm. Lubanie";"włocławski";"kujawsko-pomorskie";3302;3670;1266;2036;10;3;0;0;0;0;0;0;0;2034;0;0;2034;29;14;15;0;2005;100;102;508;186;1109;5
+"041811";"gmina miejsko-wiejska";"gm. Lubień Kujawski";"włocławski";"kujawsko-pomorskie";5405;6014;2730;2675;4;17;0;0;0;0;0;0;0;2675;0;0;2675;80;23;57;0;2595;305;148;525;290;1327;9
+"041812";"gmina miejsko-wiejska";"gm. Lubraniec";"włocławski";"kujawsko-pomorskie";7040;7704;3058;3982;5;8;1;1;0;0;0;0;1;3983;1;0;3983;85;23;62;0;3898;321;232;1102;377;1866;7
+"041813";"gmina wiejska";"gm. Włocławek";"włocławski";"kujawsko-pomorskie";5246;5792;2051;3195;2;29;0;0;0;0;0;0;0;3195;0;0;3195;67;20;47;0;3128;327;221;1102;319;1159;6
+"046401";"gmina miejska";"m. Włocławek";"Włocławek";"kujawsko-pomorskie";79231;85539;29094;50137;78;268;12;12;0;0;0;0;12;50148;12;1;50147;878;322;556;0;49269;3626;3656;23266;3894;14827;68

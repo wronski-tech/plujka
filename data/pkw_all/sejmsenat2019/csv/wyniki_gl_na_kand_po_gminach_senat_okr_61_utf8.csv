@@ -1,0 +1,37 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Jacek BOGUCKI";"Aldona Anna SKIRGIEŁŁO";"Igor ŁUKASZUK";"Liczba obwodów"
+"200301";"gmina miejska";"m. Bielsk Podlaski";"bielski";"podlaskie";18646;20448;7389;11257;20;57;2;2;0;0;0;0;2;11259;2;0;11259;141;46;95;0;11118;3935;460;6723;14
+"200302";"gmina miejska";"m. Brańsk";"bielski";"podlaskie";2904;2966;1142;1762;10;11;0;0;0;0;0;0;0;1762;0;0;1762;27;8;19;0;1735;1330;75;330;3
+"200303";"gmina wiejska";"gm. Bielsk Podlaski";"bielski";"podlaskie";5132;5759;2530;2602;7;13;0;0;0;0;0;0;0;2602;0;0;2602;28;5;23;0;2574;1047;136;1391;9
+"200304";"gmina wiejska";"gm. Boćki";"bielski";"podlaskie";3295;3633;1459;1836;14;8;0;0;0;0;0;0;0;1836;0;0;1836;41;11;30;0;1795;1187;120;488;5
+"200305";"gmina wiejska";"gm. Brańsk";"bielski";"podlaskie";4239;4696;1460;2779;9;13;0;0;0;0;0;0;0;2779;0;0;2779;27;13;14;0;2752;2417;105;230;9
+"200306";"gmina wiejska";"gm. Orla";"bielski";"podlaskie";2146;2446;1082;1064;5;9;0;0;0;0;0;0;0;1064;0;0;1064;17;5;12;0;1047;224;55;768;5
+"200307";"gmina wiejska";"gm. Rudka";"bielski";"podlaskie";1377;1502;590;787;9;4;0;0;0;0;0;0;0;787;0;0;787;15;4;11;0;772;604;34;134;2
+"200308";"gmina wiejska";"gm. Wyszki";"bielski";"podlaskie";3213;3558;1186;2027;9;12;0;0;0;0;0;0;0;2027;0;0;2027;20;9;11;0;2007;1672;70;265;3
+"200501";"gmina miejska";"m. Hajnówka";"hajnowski";"podlaskie";15992;17018;6908;9084;5;72;1;1;0;0;0;0;1;9085;1;0;9085;146;44;102;0;8939;2505;579;5855;15
+"200502";"gmina wiejska";"gm. Białowieża";"hajnowski";"podlaskie";1818;1995;704;1114;1;3;2;2;0;0;0;0;2;1116;2;0;1116;21;6;15;0;1095;348;88;659;3
+"200503";"gmina wiejska";"gm. Czeremcha";"hajnowski";"podlaskie";2488;2696;1249;1239;4;7;0;0;0;0;0;0;0;1239;0;0;1239;30;5;25;0;1209;454;94;661;2
+"200504";"gmina wiejska";"gm. Czyże";"hajnowski";"podlaskie";1598;1740;912;686;0;3;0;0;0;0;0;0;0;686;0;0;686;18;2;16;0;668;146;54;468;4
+"200505";"gmina wiejska";"gm. Dubicze Cerkiewne";"hajnowski";"podlaskie";1233;1353;627;606;4;12;0;0;0;0;0;0;0;606;0;0;606;10;0;10;0;596;179;46;371;3
+"200506";"gmina wiejska";"gm. Hajnówka";"hajnowski";"podlaskie";3071;3296;1606;1465;2;7;0;0;0;0;0;0;0;1465;0;0;1465;41;9;32;0;1424;378;113;933;7
+"200507";"gmina miejsko-wiejska";"gm. Kleszczele";"hajnowski";"podlaskie";1940;2150;892;1048;1;21;0;0;0;0;0;0;0;1048;0;0;1048;30;5;25;0;1018;386;81;551;4
+"200508";"gmina wiejska";"gm. Narew";"hajnowski";"podlaskie";2746;3013;1471;1275;4;19;0;0;0;0;0;0;0;1275;0;0;1275;23;10;13;0;1252;397;91;764;5
+"200509";"gmina wiejska";"gm. Narewka";"hajnowski";"podlaskie";2846;3120;1476;1370;2;40;1;1;0;0;0;0;1;1370;1;0;1370;20;5;15;0;1350;417;141;792;4
+"201001";"gmina miejska";"m. Siemiatycze";"siemiatycki";"podlaskie";10930;11461;4756;6174;5;60;1;1;0;0;0;0;1;6174;1;0;6174;120;21;99;0;6054;2870;412;2772;10
+"201002";"gmina miejsko-wiejska";"gm. Drohiczyn";"siemiatycki";"podlaskie";4738;5147;2173;2565;7;34;0;0;0;0;0;0;0;2564;0;0;2564;41;12;29;0;2523;1793;157;573;5
+"201003";"gmina wiejska";"gm. Dziadkowice";"siemiatycki";"podlaskie";2050;2251;932;1118;1;10;0;0;0;0;0;0;0;1118;0;0;1118;21;4;17;0;1097;834;68;195;4
+"201004";"gmina wiejska";"gm. Grodzisk";"siemiatycki";"podlaskie";3129;3352;1400;1729;4;10;0;0;0;0;0;0;0;1729;0;0;1729;24;2;22;0;1705;1191;107;407;5
+"201005";"gmina wiejska";"gm. Mielnik";"siemiatycki";"podlaskie";1891;2090;762;1129;10;24;0;0;0;0;0;0;0;1129;0;0;1129;19;3;16;0;1110;488;100;522;3
+"201006";"gmina wiejska";"gm. Milejczyce";"siemiatycki";"podlaskie";1429;1575;727;702;2;10;0;0;0;0;0;0;0;702;0;0;702;14;1;13;0;688;304;60;324;5
+"201007";"gmina wiejska";"gm. Nurzec-Stacja";"siemiatycki";"podlaskie";3030;3294;1735;1295;1;6;0;0;0;0;0;0;0;1295;0;0;1295;22;9;13;0;1273;573;145;555;4
+"201008";"gmina wiejska";"gm. Perlejewo";"siemiatycki";"podlaskie";2167;2408;1027;1140;7;14;0;0;0;0;0;0;0;1140;0;0;1140;15;3;12;0;1125;895;70;160;4
+"201009";"gmina wiejska";"gm. Siemiatycze";"siemiatycki";"podlaskie";4506;4918;2283;2223;5;8;1;1;0;0;0;0;1;2224;1;0;2224;33;7;26;0;2191;1171;183;837;8
+"201301";"gmina miejska";"m. Wysokie Mazowieckie";"wysokomazowiecki";"podlaskie";6828;7292;2398;4430;3;21;0;0;0;0;0;0;0;4430;0;0;4430;137;61;76;0;4293;2640;289;1364;6
+"201302";"gmina miejsko-wiejska";"gm. Ciechanowiec";"wysokomazowiecki";"podlaskie";6617;7069;2954;3663;3;46;0;0;0;0;0;0;0;3663;0;0;3663;88;19;69;0;3575;2652;178;745;16
+"201303";"gmina miejsko-wiejska";"gm. Czyżew";"wysokomazowiecki";"podlaskie";4647;5132;1644;3003;5;24;0;0;0;0;0;0;0;3003;0;0;3003;49;8;41;0;2954;2467;135;352;5
+"201304";"gmina wiejska";"gm. Klukowo";"wysokomazowiecki";"podlaskie";3251;3519;1071;2180;4;6;1;1;0;0;0;0;1;2181;1;0;2181;31;7;24;0;2150;1871;84;195;3
+"201305";"gmina wiejska";"gm. Kobylin-Borzymy";"wysokomazowiecki";"podlaskie";2447;2670;914;1533;0;6;0;0;0;0;0;0;0;1533;0;0;1533;19;7;12;0;1514;1354;60;100;4
+"201306";"gmina wiejska";"gm. Kulesze Kościelne";"wysokomazowiecki";"podlaskie";2246;2450;677;1569;4;2;0;0;0;0;0;0;0;1569;0;0;1569;30;9;21;0;1539;1347;77;115;4
+"201307";"gmina wiejska";"gm. Nowe Piekuty";"wysokomazowiecki";"podlaskie";2865;3157;895;1970;17;4;0;0;0;0;0;0;0;1969;0;0;1969;25;3;22;0;1944;1656;88;200;3
+"201308";"gmina wiejska";"gm. Sokoły";"wysokomazowiecki";"podlaskie";4300;4638;1644;2656;0;9;0;0;0;0;0;0;0;2656;0;0;2656;46;12;34;0;2610;2160;162;288;5
+"201309";"gmina miejsko-wiejska";"gm. Szepietowo";"wysokomazowiecki";"podlaskie";5090;5565;1787;3303;1;11;0;0;0;0;0;0;0;3303;0;0;3303;60;25;35;0;3243;2432;167;644;6
+"201310";"gmina wiejska";"gm. Wysokie Mazowieckie";"wysokomazowiecki";"podlaskie";3825;4238;1357;2468;2;14;0;0;0;0;0;0;0;2468;0;0;2468;43;16;27;0;2425;1933;164;328;8

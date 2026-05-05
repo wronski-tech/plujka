@@ -1,0 +1,27 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Michał Tomasz KAMIŃSKI";"Konstanty RADZIWIŁŁ";"Liczba obwodów"
+"140501";"gmina miejska";"m. Milanówek";"grodziski";"mazowieckie";11723;12708;2366;9358;17;80;36;36;0;0;0;0;36;9392;36;0;9392;298;73;225;0;9094;5608;3486;7
+"140502";"gmina miejska";"m. Podkowa Leśna";"grodziski";"mazowieckie";3000;3100;489;2511;6;46;0;0;0;0;0;0;0;2511;0;0;2511;78;30;48;0;2433;1646;787;2
+"140503";"gmina wiejska";"gm. Baranów";"grodziski";"mazowieckie";3730;4191;1153;2576;3;17;0;0;0;0;0;0;0;2575;0;1;2574;99;32;67;0;2475;1026;1449;4
+"140504";"gmina miejsko-wiejska";"gm. Grodzisk Mazowiecki";"grodziski";"mazowieckie";32178;35523;7176;25000;27;184;0;0;0;0;0;0;0;24985;0;0;24985;736;278;458;0;24249;14801;9448;26
+"140505";"gmina wiejska";"gm. Jaktorów";"grodziski";"mazowieckie";8578;9503;2096;6483;4;24;0;0;0;0;0;0;0;6479;0;2;6477;190;63;127;0;6287;3305;2982;7
+"140506";"gmina wiejska";"gm. Żabia Wola";"grodziski";"mazowieckie";6372;6951;1643;4729;2;50;1;1;0;0;0;0;1;4724;1;0;4724;145;41;104;0;4579;2516;2063;5
+"141701";"gmina miejska";"m. Józefów";"otwocki";"mazowieckie";13578;15074;2011;11567;11;129;0;0;0;0;0;0;0;11563;0;0;11563;450;133;317;0;11113;6553;4560;9
+"141702";"gmina miejska";"m. Otwock";"otwocki";"mazowieckie";31640;34731;7358;24280;38;184;2;2;0;0;0;0;2;24281;2;3;24278;816;333;483;0;23462;12815;10647;30
+"141703";"gmina wiejska";"gm. Celestynów";"otwocki";"mazowieckie";8323;9176;1852;6471;2;24;0;0;0;0;0;0;0;6470;0;0;6470;238;72;166;0;6232;2649;3583;9
+"141704";"gmina miejsko-wiejska";"gm. Karczew";"otwocki";"mazowieckie";11289;12372;2839;8450;10;32;0;0;0;0;0;0;0;8447;0;0;8447;238;62;176;0;8209;3734;4475;9
+"141705";"gmina wiejska";"gm. Kołbiel";"otwocki";"mazowieckie";5850;6460;1692;4158;2;22;0;0;0;0;0;0;0;4158;0;0;4158;130;27;103;0;4028;1365;2663;7
+"141706";"gmina wiejska";"gm. Osieck";"otwocki";"mazowieckie";2589;2882;695;1894;0;25;0;0;0;0;0;0;0;1894;0;0;1894;65;13;52;0;1829;515;1314;4
+"141707";"gmina wiejska";"gm. Sobienie-Jeziory";"otwocki";"mazowieckie";4573;5066;1351;3222;2;30;0;0;0;0;0;0;0;3221;0;0;3221;83;20;63;0;3138;1293;1845;5
+"141708";"gmina wiejska";"gm. Wiązowna";"otwocki";"mazowieckie";9006;9931;1792;7211;3;83;0;0;0;0;0;0;0;7214;0;1;7213;212;67;145;0;7001;3589;3412;14
+"141801";"gmina miejsko-wiejska";"gm. Góra Kalwaria";"piaseczyński";"mazowieckie";18688;20671;5188;13503;7;106;1;1;0;0;0;0;1;13503;1;0;13503;449;121;328;0;13054;6941;6113;16
+"141802";"gmina miejsko-wiejska";"gm. Konstancin-Jeziorna";"piaseczyński";"mazowieckie";18311;20115;3808;14503;21;254;1;1;0;0;0;0;1;14501;1;2;14499;512;151;361;0;13987;8326;5661;24
+"141803";"gmina wiejska";"gm. Lesznowola";"piaseczyński";"mazowieckie";17187;19349;2159;15023;9;166;1;1;0;0;0;0;1;15019;1;1;15018;522;173;349;0;14496;9661;4835;13
+"141804";"gmina miejsko-wiejska";"gm. Piaseczno";"piaseczyński";"mazowieckie";53400;60056;7793;45605;24;583;6;5;0;0;0;0;5;45596;5;12;45584;1519;460;1059;0;44065;29388;14677;45
+"141805";"gmina wiejska";"gm. Prażmów";"piaseczyński";"mazowieckie";7617;8538;1846;5770;1;52;0;0;0;0;0;0;0;5770;0;0;5770;217;64;153;0;5553;3021;2532;5
+"141806";"gmina miejsko-wiejska";"gm. Tarczyn";"piaseczyński";"mazowieckie";7964;8968;2102;5862;9;79;0;0;0;0;0;0;0;5860;0;3;5857;197;60;137;0;5660;2598;3062;9
+"142101";"gmina miejska";"m. Piastów";"pruszkowski";"mazowieckie";15905;17589;2828;13077;6;114;3;3;0;0;0;0;3;13066;3;0;13066;435;135;300;0;12631;7262;5369;10
+"142102";"gmina miejska";"m. Pruszków";"pruszkowski";"mazowieckie";42215;46767;8486;33726;24;251;1;1;0;0;0;0;1;33724;1;2;33722;999;306;693;0;32723;20477;12246;30
+"142103";"gmina miejsko-wiejska";"gm. Brwinów";"pruszkowski";"mazowieckie";18386;20093;3379;15007;14;185;26;26;1;0;0;0;25;15029;25;1;15028;506;192;314;0;14522;9012;5510;16
+"142104";"gmina wiejska";"gm. Michałowice";"pruszkowski";"mazowieckie";13409;13824;2249;11156;7;106;0;0;0;0;0;0;0;11155;0;4;11151;367;121;246;0;10784;7023;3761;11
+"142105";"gmina wiejska";"gm. Nadarzyn";"pruszkowski";"mazowieckie";9826;10855;1711;8115;7;99;0;0;0;0;0;0;0;8109;0;1;8108;246;78;168;0;7862;4960;2902;7
+"142106";"gmina wiejska";"gm. Raszyn";"pruszkowski";"mazowieckie";14960;16600;2626;12332;9;125;0;0;0;0;0;0;0;12331;0;5;12326;411;128;283;0;11915;6412;5503;13

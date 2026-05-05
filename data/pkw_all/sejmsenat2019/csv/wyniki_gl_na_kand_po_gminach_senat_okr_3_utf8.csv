@@ -1,0 +1,26 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Dorota CZUDOWSKA";"Tymoteusz Dominik MYRDA";"Elżbieta Krystyna STĘPIEŃ";"Liczba obwodów"
+"020301";"gmina miejska";"m. Głogów";"głogowski";"dolnośląskie";47452;51453;16000;31452;22;178;2;2;0;0;0;0;2;31449;2;4;31445;632;156;476;0;30813;13396;5387;12030;36
+"020302";"gmina wiejska";"gm. Głogów";"głogowski";"dolnośląskie";4801;5237;1533;3268;1;9;0;0;0;0;0;0;0;3268;0;0;3268;55;12;43;0;3213;1571;576;1066;4
+"020303";"gmina wiejska";"gm. Jerzmanowa";"głogowski";"dolnośląskie";3599;3853;1103;2496;5;12;0;0;0;0;0;0;0;2495;0;0;2495;49;16;33;0;2446;1083;506;857;4
+"020304";"gmina wiejska";"gm. Kotla";"głogowski";"dolnośląskie";3100;3398;1383;1717;1;10;0;0;0;0;0;0;0;1717;0;0;1717;43;6;37;0;1674;919;293;462;5
+"020305";"gmina wiejska";"gm. Pęcław";"głogowski";"dolnośląskie";1601;1732;733;868;0;1;0;0;0;0;0;0;0;868;0;0;868;48;4;44;0;820;549;112;159;2
+"020306";"gmina wiejska";"gm. Żukowice";"głogowski";"dolnośląskie";2399;2681;995;1404;5;5;0;0;0;0;0;0;0;1404;0;0;1404;37;11;26;0;1367;703;273;391;2
+"020901";"gmina miejska";"m. Chojnów";"legnicki";"dolnośląskie";9537;10240;3864;5673;4;23;1;1;0;0;0;0;1;5674;1;1;5673;127;29;98;0;5546;2567;835;2144;7
+"020902";"gmina wiejska";"gm. Chojnów";"legnicki";"dolnośląskie";6794;7502;2761;4033;4;16;0;0;0;0;0;0;0;4033;0;0;4033;88;24;64;0;3945;2259;585;1101;8
+"020903";"gmina wiejska";"gm. Krotoszyce";"legnicki";"dolnośląskie";2400;2581;889;1511;2;6;0;0;0;0;0;0;0;1511;0;0;1511;39;5;34;0;1472;837;197;438;3
+"020904";"gmina wiejska";"gm. Kunice";"legnicki";"dolnośląskie";4730;5244;1270;3460;2;17;0;0;0;0;0;0;0;3460;0;0;3460;68;6;62;0;3392;1395;469;1528;5
+"020905";"gmina wiejska";"gm. Legnickie Pole";"legnicki";"dolnośląskie";3559;3818;1218;2341;2;6;0;0;0;0;0;0;0;2341;0;0;2341;55;8;47;0;2286;1215;316;755;6
+"020906";"gmina wiejska";"gm. Miłkowice";"legnicki";"dolnośląskie";4799;5191;1646;3153;1;10;0;0;0;0;0;0;0;3151;0;1;3150;52;12;40;0;3098;1505;585;1008;8
+"020907";"gmina miejsko-wiejska";"gm. Prochowice";"legnicki";"dolnośląskie";5292;5849;1946;3346;3;6;0;0;0;0;0;0;0;3346;0;0;3346;81;12;69;0;3265;1596;521;1148;6
+"020908";"gmina wiejska";"gm. Ruja";"legnicki";"dolnośląskie";1990;2034;1038;952;3;3;0;0;0;0;0;0;0;950;0;0;950;17;6;11;0;933;557;110;266;3
+"021101";"gmina miejska";"m. Lubin";"lubiński";"dolnośląskie";51813;55518;16601;35212;37;137;2;2;0;0;0;0;2;35204;2;0;35204;666;186;480;0;34538;15388;8979;10171;49
+"021102";"gmina wiejska";"gm. Lubin";"lubiński";"dolnośląskie";11101;12251;3290;7811;3;41;0;0;0;0;0;0;0;7810;0;0;7810;149;39;110;0;7661;3524;1598;2539;11
+"021103";"gmina wiejska";"gm. Rudna";"lubiński";"dolnośląskie";5697;6087;2219;3479;5;10;0;0;0;0;0;0;0;3476;0;0;3476;83;25;58;0;3393;1820;851;722;7
+"021104";"gmina miejsko-wiejska";"gm. Ścinawa";"lubiński";"dolnośląskie";6888;7683;2547;4341;4;12;0;0;0;0;0;0;0;4341;0;0;4341;77;24;53;0;4264;2418;962;884;8
+"021601";"gmina miejsko-wiejska";"gm. Chocianów";"polkowicki";"dolnośląskie";9100;9955;3231;5869;6;29;0;0;0;0;0;0;0;5867;0;0;5867;125;58;67;0;5742;3365;1165;1212;11
+"021602";"gmina wiejska";"gm. Gaworzyce";"polkowicki";"dolnośląskie";2699;3026;923;1776;11;4;0;0;0;0;0;0;0;1776;0;0;1776;49;12;37;0;1727;970;359;398;4
+"021603";"gmina wiejska";"gm. Grębocice";"polkowicki";"dolnośląskie";3899;4155;1655;2244;3;7;0;0;0;0;0;0;0;2244;0;0;2244;70;15;55;0;2174;1267;337;570;4
+"021604";"gmina miejsko-wiejska";"gm. Polkowice";"polkowicki";"dolnośląskie";18596;20286;6418;12178;15;72;1;1;0;0;0;0;1;12178;1;0;12178;307;96;211;0;11871;6080;2225;3566;15
+"021605";"gmina miejsko-wiejska";"gm. Przemków";"polkowicki";"dolnośląskie";6087;6616;2628;3459;3;19;0;0;0;0;0;0;0;3459;0;0;3459;91;19;72;0;3368;1934;554;880;7
+"021606";"gmina wiejska";"gm. Radwanice";"polkowicki";"dolnośląskie";3399;3721;1253;2146;4;5;0;0;0;0;0;0;0;2146;0;0;2146;39;8;31;0;2107;1148;338;621;2
+"026201";"gmina miejska";"m. Legnica";"Legnica";"dolnośląskie";68737;74607;24031;44705;35;239;6;6;0;0;0;0;6;44705;6;2;44703;876;240;636;0;43827;18246;6815;18766;49

@@ -1,0 +1,29 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Patryk Damian HAŁACZKIEWICZ";"Stanisław JURCEWICZ";"Aleksander Jakub SZWED";"Liczba obwodów"
+"020201";"gmina miejska";"m. Bielawa";"dzierżoniowski";"dolnośląskie";21951;23936;9011;12938;10;64;0;0;0;0;0;0;0;12937;0;0;12937;235;58;177;0;12702;4115;3880;4707;22
+"020202";"gmina miejska";"m. Dzierżoniów";"dzierżoniowski";"dolnośląskie";23849;26022;8352;15497;26;64;3;3;0;0;0;0;3;15498;3;0;15498;261;75;186;0;15237;2457;6869;5911;23
+"020203";"gmina miejsko-wiejska";"m. Pieszyce";"dzierżoniowski";"dolnośląskie";6902;7485;3026;3876;7;25;0;0;0;0;0;0;0;3876;0;0;3876;84;14;70;0;3792;602;1467;1723;9
+"020204";"gmina miejska";"m. Piława Górna";"dzierżoniowski";"dolnośląskie";4550;4963;2020;2530;4;5;1;1;0;0;0;0;1;2528;1;0;2528;46;10;36;0;2482;405;928;1149;3
+"020205";"gmina wiejska";"gm. Dzierżoniów";"dzierżoniowski";"dolnośląskie";6778;7370;2676;4102;4;19;0;0;0;0;0;0;0;4102;0;0;4102;88;22;66;0;4014;697;1307;2010;13
+"020206";"gmina wiejska";"gm. Łagiewniki";"dzierżoniowski";"dolnośląskie";5402;5967;2167;3234;3;14;2;1;0;0;0;0;1;3234;1;0;3234;67;16;51;0;3167;417;1010;1740;6
+"020207";"gmina miejsko-wiejska";"gm. Niemcza";"dzierżoniowski";"dolnośląskie";4062;4453;1814;2248;6;35;0;0;0;0;0;0;0;2248;0;0;2248;57;4;53;0;2191;354;864;973;6
+"020801";"gmina miejska";"m. Duszniki-Zdrój";"kłodzki";"dolnośląskie";3759;4089;1269;2490;8;393;0;0;0;0;0;0;0;2489;0;0;2489;32;13;19;0;2457;346;1167;944;4
+"020802";"gmina miejska";"m. Kłodzko";"kłodzki";"dolnośląskie";19800;21449;7361;12437;31;128;1;1;0;0;0;0;1;12438;1;0;12438;241;78;163;0;12197;1605;5903;4689;19
+"020803";"gmina miejska";"m. Kudowa-Zdrój";"kłodzki";"dolnośląskie";7502;8660;2225;5277;13;798;0;0;0;0;0;0;0;5277;0;0;5277;116;32;84;0;5161;772;2258;2131;7
+"020804";"gmina miejska";"m. Nowa Ruda";"kłodzki";"dolnośląskie";16394;17742;7237;9157;8;71;1;1;0;0;0;0;1;9156;1;0;9156;172;41;131;0;8984;1159;4376;3449;14
+"020805";"gmina miejska";"m. Polanica-Zdrój";"kłodzki";"dolnośląskie";4902;6120;1074;3828;7;711;0;0;0;0;0;0;0;3828;0;0;3828;64;11;53;0;3764;457;1871;1436;4
+"020806";"gmina miejsko-wiejska";"gm. Bystrzyca Kłodzka";"kłodzki";"dolnośląskie";13869;15253;5370;8499;14;214;0;0;0;0;0;0;0;8498;0;0;8498;212;43;169;0;8286;1167;3164;3955;18
+"020807";"gmina wiejska";"gm. Kłodzko";"kłodzki";"dolnośląskie";12360;13526;5343;7017;5;36;1;1;0;0;0;0;1;7018;1;0;7018;146;19;127;0;6872;899;2381;3592;15
+"020808";"gmina miejsko-wiejska";"gm. Lądek-Zdrój";"kłodzki";"dolnośląskie";6523;7243;2550;3973;9;474;3;3;0;0;0;0;3;3975;3;3;3972;74;13;61;0;3898;516;1695;1687;8
+"020809";"gmina wiejska";"gm. Lewin Kłodzki";"kłodzki";"dolnośląskie";1420;1618;559;861;5;72;0;0;0;0;0;0;0;861;0;0;861;9;6;3;0;852;141;334;377;2
+"020810";"gmina miejsko-wiejska";"gm. Międzylesie";"kłodzki";"dolnośląskie";5252;5814;2136;3116;2;55;0;0;0;0;0;0;0;3116;0;0;3116;66;12;54;0;3050;386;1287;1377;9
+"020811";"gmina wiejska";"gm. Nowa Ruda";"kłodzki";"dolnośląskie";8503;9279;3712;4791;2;32;0;0;0;0;0;0;0;4790;0;0;4790;108;16;92;0;4682;682;1879;2121;16
+"020812";"gmina miejsko-wiejska";"gm. Radków";"kłodzki";"dolnośląskie";6588;7242;2903;3685;9;90;0;0;0;0;0;0;0;3685;0;0;3685;67;16;51;0;3618;428;1275;1915;8
+"020813";"gmina miejsko-wiejska";"gm. Stronie Śląskie";"kłodzki";"dolnośląskie";5342;5903;2148;3194;2;145;0;0;0;0;0;0;0;3194;0;0;3194;54;8;46;0;3140;515;1440;1185;7
+"020814";"gmina miejsko-wiejska";"gm. Szczytna";"kłodzki";"dolnośląskie";5290;5819;2223;3067;2;91;0;0;0;0;0;0;0;3066;0;0;3066;62;18;44;0;3004;485;1237;1282;6
+"022401";"gmina miejsko-wiejska";"gm. Bardo";"ząbkowicki";"dolnośląskie";3870;4251;1655;2215;6;38;0;0;0;0;0;0;0;2214;0;0;2214;47;15;32;0;2167;307;899;961;4
+"022402";"gmina wiejska";"gm. Ciepłowody";"ząbkowicki";"dolnośląskie";2250;2482;1091;1159;3;2;0;0;0;0;0;0;0;1159;0;0;1159;24;3;21;0;1135;157;384;594;3
+"022403";"gmina wiejska";"gm. Kamieniec Ząbkowicki";"ząbkowicki";"dolnośląskie";6033;6549;2622;3411;9;21;0;0;0;0;0;0;0;3410;0;0;3410;73;14;59;0;3337;497;1255;1585;10
+"022404";"gmina wiejska";"gm. Stoszowice";"ząbkowicki";"dolnośląskie";3931;4359;1671;2260;1;86;1;1;0;0;0;0;1;2261;1;0;2261;51;15;36;0;2210;381;746;1083;5
+"022405";"gmina miejsko-wiejska";"gm. Ząbkowice Śląskie";"ząbkowicki";"dolnośląskie";15958;17343;6231;9727;14;47;0;0;0;0;0;0;0;9726;0;2;9724;168;46;122;0;9556;1142;4205;4209;22
+"022406";"gmina miejsko-wiejska";"gm. Ziębice";"ząbkowicki";"dolnośląskie";12535;13603;5698;6837;8;38;0;0;0;0;0;0;0;6837;0;0;6837;130;39;91;0;6707;916;2399;3392;23
+"022407";"gmina miejsko-wiejska";"gm. Złoty Stok";"ząbkowicki";"dolnośląskie";3330;3595;1475;1855;2;19;1;1;0;0;0;0;1;1856;1;0;1856;40;6;34;0;1816;255;703;858;7

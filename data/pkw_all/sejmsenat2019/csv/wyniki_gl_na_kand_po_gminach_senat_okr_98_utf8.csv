@@ -1,0 +1,55 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Magdalena Maria KOCHAN";"Edward KOSMAL";"Liczba obwodów"
+"320402";"gmina miejsko-wiejska";"gm. Goleniów";"goleniowski";"zachodniopomorskie";25654;28034;8947;16707;9;95;0;0;0;0;0;0;0;16703;0;4;16699;662;169;493;0;16037;10064;5973;20
+"320403";"gmina miejsko-wiejska";"gm. Maszewo";"goleniowski";"zachodniopomorskie";6089;6700;2962;3127;2;20;0;0;0;0;0;0;0;3125;0;0;3125;94;19;75;0;3031;1586;1445;5
+"320404";"gmina miejsko-wiejska";"gm. Nowogard";"goleniowski";"zachodniopomorskie";17590;19682;7227;10363;10;93;1;1;0;0;0;0;1;10361;1;0;10361;446;91;355;0;9915;5958;3957;18
+"320405";"gmina wiejska";"gm. Osina";"goleniowski";"zachodniopomorskie";2130;2345;992;1138;1;3;0;0;0;0;0;0;0;1138;0;0;1138;51;7;44;0;1087;554;533;2
+"320406";"gmina wiejska";"gm. Przybiernów";"goleniowski";"zachodniopomorskie";3576;3937;1699;1877;2;5;0;0;0;0;0;0;0;1877;0;0;1877;56;10;46;0;1821;874;947;3
+"320407";"gmina miejsko-wiejska";"gm. Stepnica";"goleniowski";"zachodniopomorskie";3409;3757;1701;1708;2;7;0;0;0;0;0;0;0;1706;0;0;1706;65;14;51;0;1641;987;654;3
+"320501";"gmina wiejska";"gm. Brojce";"gryficki";"zachodniopomorskie";2620;2924;1415;1205;1;3;0;0;0;0;0;0;0;1201;0;0;1201;48;7;41;0;1153;589;564;2
+"320502";"gmina miejsko-wiejska";"gm. Gryfice";"gryficki";"zachodniopomorskie";17031;18365;7332;9699;14;54;0;0;0;0;0;0;0;9698;0;0;9698;352;97;255;0;9346;5787;3559;17
+"320503";"gmina wiejska";"gm. Karnice";"gryficki";"zachodniopomorskie";2959;3209;1396;1563;6;8;0;0;0;0;0;0;0;1562;0;0;1562;54;6;48;0;1508;729;779;2
+"320504";"gmina miejsko-wiejska";"gm. Płoty";"gryficki";"zachodniopomorskie";6512;7195;3275;3237;3;11;0;0;0;0;0;0;0;3237;0;0;3237;93;23;70;0;3144;1619;1525;10
+"320507";"gmina wiejska";"gm. Rewal";"gryficki";"zachodniopomorskie";2889;3505;548;2341;3;375;0;0;0;0;0;0;0;2337;0;3;2334;76;26;50;0;2258;1461;797;3
+"320508";"gmina miejsko-wiejska";"gm. Trzebiatów";"gryficki";"zachodniopomorskie";11308;12506;4872;6436;17;304;0;0;0;0;0;0;0;6434;0;0;6434;234;43;191;0;6200;3659;2541;11
+"320601";"gmina wiejska";"gm. Banie";"gryfiński";"zachodniopomorskie";4537;4961;2386;2151;2;11;0;0;0;0;0;0;0;2150;0;0;2150;78;11;67;0;2072;1046;1026;4
+"320602";"gmina miejsko-wiejska";"gm. Cedynia";"gryfiński";"zachodniopomorskie";3120;3411;1634;1486;2;15;0;0;0;0;0;0;0;1484;0;0;1484;61;10;51;0;1423;889;534;3
+"320603";"gmina miejsko-wiejska";"gm. Chojna";"gryfiński";"zachodniopomorskie";9750;10669;4490;5260;5;31;0;0;0;0;0;0;0;5260;0;1;5259;217;56;161;0;5042;2775;2267;10
+"320604";"gmina miejsko-wiejska";"gm. Gryfino";"gryfiński";"zachodniopomorskie";22204;24018;7846;14358;7;46;0;0;0;0;0;0;0;14353;0;2;14351;643;155;488;0;13708;7895;5813;24
+"320605";"gmina miejsko-wiejska";"gm. Mieszkowice";"gryfiński";"zachodniopomorskie";5029;5457;2379;2650;3;11;1;1;0;0;0;0;1;2651;1;0;2651;111;14;97;0;2540;1468;1072;6
+"320606";"gmina miejsko-wiejska";"gm. Moryń";"gryfiński";"zachodniopomorskie";3090;3339;1508;1582;1;3;0;0;0;0;0;0;0;1582;0;0;1582;101;21;80;0;1481;804;677;4
+"320607";"gmina wiejska";"gm. Stare Czarnowo";"gryfiński";"zachodniopomorskie";2759;3045;1098;1661;1;7;0;0;0;0;0;0;0;1661;0;0;1661;56;12;44;0;1605;782;823;3
+"320608";"gmina miejsko-wiejska";"gm. Trzcińsko-Zdrój";"gryfiński";"zachodniopomorskie";3935;4265;1967;1968;2;8;0;0;0;0;0;0;0;1968;0;0;1968;62;9;53;0;1906;982;924;4
+"320609";"gmina wiejska";"gm. Widuchowa";"gryfiński";"zachodniopomorskie";3870;4230;2016;1854;4;15;0;0;0;0;0;0;0;1854;0;0;1854;67;17;50;0;1787;930;857;4
+"320701";"gmina miejsko-wiejska";"gm. Dziwnów";"kamieński";"zachodniopomorskie";3460;3688;1051;2409;3;477;0;0;0;0;0;0;0;2408;0;0;2408;83;19;64;0;2325;1606;719;5
+"320702";"gmina miejsko-wiejska";"gm. Golczewo";"kamieński";"zachodniopomorskie";4278;4670;2014;2264;2;12;0;0;0;0;0;0;0;2264;0;0;2264;81;21;60;0;2183;1185;998;3
+"320703";"gmina miejsko-wiejska";"gm. Kamień Pomorski";"kamieński";"zachodniopomorskie";10414;11462;4257;6157;6;227;0;0;0;0;0;0;0;6157;0;0;6157;199;69;130;0;5958;3762;2196;12
+"320704";"gmina miejsko-wiejska";"gm. Międzyzdroje";"kamieński";"zachodniopomorskie";4732;5436;1627;3105;1;367;2;2;0;0;0;0;2;3107;2;0;3107;78;28;50;0;3029;1956;1073;5
+"320705";"gmina wiejska";"gm. Świerzno";"kamieński";"zachodniopomorskie";3003;3313;1477;1526;0;11;0;0;0;0;0;0;0;1526;0;0;1526;61;15;46;0;1465;861;604;4
+"320706";"gmina miejsko-wiejska";"gm. Wolin";"kamieński";"zachodniopomorskie";8711;9606;3713;4998;1;53;0;0;0;0;0;0;0;4998;0;0;4998;181;42;139;0;4817;2776;2041;14
+"321001";"gmina miejsko-wiejska";"gm. Barlinek";"myśliborski";"zachodniopomorskie";13490;14628;5578;7912;18;28;0;0;0;0;0;0;0;7912;0;1;7911;294;66;228;0;7617;4437;3180;17
+"321002";"gmina wiejska";"gm. Boleszkowice";"myśliborski";"zachodniopomorskie";2040;2274;911;1129;3;3;0;0;0;0;0;0;0;1129;0;0;1129;42;7;35;0;1087;668;419;3
+"321003";"gmina miejsko-wiejska";"gm. Dębno";"myśliborski";"zachodniopomorskie";14329;15580;6228;8101;17;30;0;0;0;0;0;0;0;8101;0;0;8101;351;73;278;0;7750;4657;3093;14
+"321004";"gmina miejsko-wiejska";"gm. Myślibórz";"myśliborski";"zachodniopomorskie";14281;15510;6585;7696;8;37;0;0;0;0;0;0;0;7696;0;0;7696;280;73;207;0;7416;4228;3188;16
+"321005";"gmina wiejska";"gm. Nowogródek Pomorski";"myśliborski";"zachodniopomorskie";2420;2625;1277;1143;0;6;0;0;0;0;0;0;0;1143;0;0;1143;43;7;36;0;1100;615;485;3
+"321201";"gmina wiejska";"gm. Bielice";"pyrzycki";"zachodniopomorskie";2190;2410;1047;1143;5;3;0;0;0;0;0;0;0;1143;0;1;1142;46;11;35;0;1096;461;635;2
+"321202";"gmina wiejska";"gm. Kozielice";"pyrzycki";"zachodniopomorskie";1850;2020;896;954;5;3;0;0;0;0;0;0;0;954;0;0;954;48;13;35;0;906;376;530;2
+"321203";"gmina miejsko-wiejska";"gm. Lipiany";"pyrzycki";"zachodniopomorskie";4270;4637;1975;2295;5;11;0;0;0;0;0;0;0;2293;0;0;2293;89;15;74;0;2204;1107;1097;4
+"321204";"gmina wiejska";"gm. Przelewice";"pyrzycki";"zachodniopomorskie";3650;3991;1845;1805;0;7;0;0;0;0;0;0;0;1803;0;0;1803;67;15;52;0;1736;811;925;4
+"321205";"gmina miejsko-wiejska";"gm. Pyrzyce";"pyrzycki";"zachodniopomorskie";13688;14873;5371;8317;11;16;3;2;0;0;0;0;2;8315;2;0;8315;345;91;254;0;7970;4021;3949;13
+"321206";"gmina wiejska";"gm. Warnice";"pyrzycki";"zachodniopomorskie";2510;2700;1220;1290;0;0;0;0;0;0;0;0;0;1290;0;0;1290;55;13;42;0;1235;439;796;2
+"321401";"gmina miejska";"m. Stargard";"stargardzki";"zachodniopomorskie";47231;51371;15027;32203;37;166;4;4;0;0;0;0;4;32201;4;1;32200;1252;373;879;0;30948;19084;11864;37
+"321402";"gmina miejsko-wiejska";"gm. Chociwel";"stargardzki";"zachodniopomorskie";4232;4659;1870;2362;3;19;0;0;0;0;0;0;0;2362;0;0;2362;73;17;56;0;2289;1246;1043;3
+"321403";"gmina miejsko-wiejska";"gm. Dobrzany";"stargardzki";"zachodniopomorskie";3530;3812;1803;1727;5;9;0;0;0;0;0;0;0;1726;0;0;1726;67;10;57;0;1659;759;900;2
+"321404";"gmina wiejska";"gm. Dolice";"stargardzki";"zachodniopomorskie";5500;5980;2834;2666;1;8;0;0;0;0;0;0;0;2666;0;0;2666;88;16;72;0;2578;1291;1287;7
+"321405";"gmina miejsko-wiejska";"gm. Ińsko";"stargardzki";"zachodniopomorskie";2530;2757;1246;1284;7;8;0;0;0;0;0;0;0;1284;0;1;1283;44;16;28;0;1239;681;558;2
+"321406";"gmina wiejska";"gm. Kobylanka";"stargardzki";"zachodniopomorskie";3993;4434;1008;2985;1;36;0;0;0;0;0;0;0;2985;0;0;2985;112;33;79;0;2873;1770;1103;3
+"321408";"gmina wiejska";"gm. Marianowo";"stargardzki";"zachodniopomorskie";2190;2402;1032;1158;2;8;0;0;0;0;0;0;0;1158;0;0;1158;35;2;33;0;1123;475;648;4
+"321409";"gmina wiejska";"gm. Stara Dąbrowa";"stargardzki";"zachodniopomorskie";2614;2894;1329;1285;3;8;0;0;0;0;0;0;0;1285;0;0;1285;31;14;17;0;1254;553;701;3
+"321410";"gmina wiejska";"gm. Stargard";"stargardzki";"zachodniopomorskie";9320;10280;3929;5391;6;17;0;0;0;0;0;0;0;5390;0;0;5390;156;36;120;0;5234;2788;2446;10
+"321411";"gmina miejsko-wiejska";"gm. Suchań";"stargardzki";"zachodniopomorskie";3015;3331;1499;1516;1;6;0;0;0;0;0;0;0;1516;0;0;1516;66;10;56;0;1450;671;779;4
+"321801";"gmina miejsko-wiejska";"gm. Dobra";"łobeski";"zachodniopomorskie";3090;3370;1659;1431;3;10;0;0;0;0;0;0;0;1431;0;0;1431;37;5;32;0;1394;682;712;3
+"321802";"gmina miejsko-wiejska";"gm. Łobez";"łobeski";"zachodniopomorskie";9741;10569;4157;5584;11;40;1;1;0;0;0;0;1;5585;1;0;5585;212;45;167;0;5373;3300;2073;11
+"321803";"gmina wiejska";"gm. Radowo Małe";"łobeski";"zachodniopomorskie";2630;2824;1384;1246;2;7;0;0;0;0;0;0;0;1246;0;0;1246;38;7;31;0;1208;704;504;4
+"321804";"gmina miejsko-wiejska";"gm. Resko";"łobeski";"zachodniopomorskie";5597;6060;2767;2830;6;13;0;0;0;0;0;0;0;2830;0;0;2830;108;28;80;0;2722;1557;1165;7
+"321805";"gmina miejsko-wiejska";"gm. Węgorzyno";"łobeski";"zachodniopomorskie";4987;5460;2436;2551;7;19;1;1;0;0;0;0;1;2552;1;0;2552;107;12;95;0;2445;1248;1197;4
+"326301";"gmina miejska";"m. Świnoujście";"Świnoujście";"zachodniopomorskie";29689;32269;9687;20002;22;1390;1;1;0;1;0;0;1;19999;1;2;19997;716;189;527;0;19281;12828;6453;27

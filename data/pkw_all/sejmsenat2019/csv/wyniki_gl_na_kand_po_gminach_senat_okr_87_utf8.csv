@@ -1,0 +1,37 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Małgorzata KOPICZKO";"Jolanta PIOTROWSKA";"Stanisław TOŁWIŃSKI";"Liczba obwodów"
+"280501";"gmina miejska";"m. Ełk";"ełcki";"warmińsko-mazurskie";41792;44810;17873;23917;35;159;2;2;0;0;0;0;2;23917;2;0;23917;498;137;361;0;23419;9759;9597;4063;22
+"280502";"gmina wiejska";"gm. Ełk";"ełcki";"warmińsko-mazurskie";8094;8831;3978;4116;2;40;0;0;0;0;0;0;0;4116;0;0;4116;97;27;70;0;4019;1855;1452;712;12
+"280503";"gmina wiejska";"gm. Kalinowo";"ełcki";"warmińsko-mazurskie";4830;5248;2729;2101;5;21;0;0;0;0;0;0;0;2101;0;0;2101;49;12;37;0;2052;1252;466;334;7
+"280504";"gmina wiejska";"gm. Prostki";"ełcki";"warmińsko-mazurskie";5136;5568;2951;2184;1;22;0;0;0;0;0;0;0;2185;0;0;2185;46;4;42;0;2139;1215;624;300;8
+"280505";"gmina wiejska";"gm. Stare Juchy";"ełcki";"warmińsko-mazurskie";2728;2989;1471;1257;2;31;0;0;0;0;0;0;0;1257;0;0;1257;22;2;20;0;1235;614;414;207;4
+"280601";"gmina miejska";"m. Giżycko";"giżycki";"warmińsko-mazurskie";20182;22473;7183;12998;16;141;2;2;0;0;0;0;2;12997;2;2;12995;219;66;153;0;12776;3858;6651;2267;13
+"280604";"gmina wiejska";"gm. Giżycko";"giżycki";"warmińsko-mazurskie";6105;6730;2575;3530;6;71;0;0;0;0;0;0;0;3530;0;0;3530;60;17;43;0;3470;1268;1558;644;13
+"280605";"gmina wiejska";"gm. Kruklanki";"giżycki";"warmińsko-mazurskie";2279;2471;1039;1240;0;21;0;0;0;0;0;0;0;1240;0;0;1240;29;8;21;0;1211;394;617;200;4
+"280606";"gmina wiejska";"gm. Miłki";"giżycki";"warmińsko-mazurskie";2776;3024;1406;1370;1;8;0;0;0;0;0;0;0;1369;0;0;1369;16;2;14;0;1353;627;505;221;3
+"280608";"gmina miejsko-wiejska";"gm. Ryn";"giżycki";"warmińsko-mazurskie";4182;4596;2063;2119;4;53;0;0;0;0;0;0;0;2119;0;0;2119;44;7;37;0;2075;860;853;362;7
+"280610";"gmina wiejska";"gm. Wydminy";"giżycki";"warmińsko-mazurskie";4610;5078;2245;2365;6;28;0;0;0;0;0;0;0;2365;0;0;2365;46;13;33;0;2319;1018;953;348;8
+"280801";"gmina miejska";"m. Kętrzyn";"kętrzyński";"warmińsko-mazurskie";19791;21199;7943;11848;15;75;2;2;0;0;0;0;2;11847;2;0;11847;220;38;182;0;11627;4029;4883;2715;16
+"280802";"gmina wiejska";"gm. Barciany";"kętrzyński";"warmińsko-mazurskie";4446;4821;2650;1796;3;14;0;0;0;0;0;0;0;1796;0;0;1796;38;13;25;0;1758;874;492;392;5
+"280803";"gmina wiejska";"gm. Kętrzyn";"kętrzyński";"warmińsko-mazurskie";5821;6323;3058;2763;1;12;0;0;0;0;0;0;0;2763;0;0;2763;53;12;41;0;2710;1094;918;698;12
+"280804";"gmina miejsko-wiejska";"gm. Korsze";"kętrzyński";"warmińsko-mazurskie";7438;7982;4103;3335;5;19;0;0;0;0;0;0;0;3335;0;0;3335;71;8;63;0;3264;1492;1038;734;10
+"280805";"gmina miejsko-wiejska";"gm. Reszel";"kętrzyński";"warmińsko-mazurskie";5698;6130;2639;3069;4;37;1;1;0;0;0;0;1;3070;1;0;3070;73;15;58;0;2997;1135;1241;621;10
+"280806";"gmina wiejska";"gm. Srokowo";"kętrzyński";"warmińsko-mazurskie";2849;3069;1512;1337;2;11;0;0;0;0;0;0;0;1337;0;0;1337;30;1;29;0;1307;570;435;302;5
+"281001";"gmina miejska";"m. Mrągowo";"mrągowski";"warmińsko-mazurskie";15609;17093;5746;9862;22;142;0;0;0;0;0;0;0;9863;0;0;9863;195;64;131;0;9668;3392;4554;1722;13
+"281002";"gmina miejsko-wiejska";"gm. Mikołajki";"mrągowski";"warmińsko-mazurskie";5888;6521;2654;3232;3;134;0;0;0;0;0;0;0;3234;0;0;3234;57;11;46;0;3177;1188;1429;560;7
+"281003";"gmina wiejska";"gm. Mrągowo";"mrągowski";"warmińsko-mazurskie";5708;6274;2610;3098;0;48;0;0;0;0;0;0;0;3098;0;0;3098;65;14;51;0;3033;1182;1239;612;8
+"281004";"gmina wiejska";"gm. Piecki";"mrągowski";"warmińsko-mazurskie";5496;5977;2662;2834;3;27;0;0;0;0;0;0;0;2834;0;0;2834;62;13;49;0;2772;1325;913;534;9
+"281005";"gmina wiejska";"gm. Sorkwity";"mrągowski";"warmińsko-mazurskie";3427;3695;1612;1815;1;7;0;0;0;0;0;0;0;1814;0;0;1814;45;2;43;0;1769;740;698;331;6
+"281303";"gmina wiejska";"gm. Kowale Oleckie";"olecki";"warmińsko-mazurskie";3552;3870;2073;1479;0;9;0;0;0;0;0;0;0;1479;0;0;1479;36;6;30;0;1443;776;452;215;6
+"281304";"gmina miejsko-wiejska";"gm. Olecko";"olecki";"warmińsko-mazurskie";15303;16544;6863;8441;10;93;2;2;0;0;0;0;2;8441;2;0;8441;166;37;129;0;8275;3798;3095;1382;16
+"281305";"gmina wiejska";"gm. Świętajno";"olecki";"warmińsko-mazurskie";2833;3081;1577;1256;4;29;0;0;0;0;0;0;0;1256;0;0;1256;21;6;15;0;1235;631;401;203;5
+"281306";"gmina wiejska";"gm. Wieliczki";"olecki";"warmińsko-mazurskie";2375;2603;1189;1186;0;5;0;0;0;0;0;0;0;1186;0;0;1186;25;11;14;0;1161;717;259;185;6
+"281601";"gmina miejsko-wiejska";"gm. Biała Piska";"piski";"warmińsko-mazurskie";8321;9050;4267;4054;4;29;0;0;0;0;0;0;0;4054;0;0;4054;89;15;74;0;3965;2247;1140;578;9
+"281602";"gmina miejsko-wiejska";"gm. Orzysz";"piski";"warmińsko-mazurskie";6436;7052;3041;3395;8;49;0;0;0;0;0;0;0;3395;0;0;3395;72;11;61;0;3323;1620;1124;579;8
+"281603";"gmina miejsko-wiejska";"gm. Pisz";"piski";"warmińsko-mazurskie";19683;21302;8848;10835;19;95;0;0;0;0;0;0;0;10835;0;1;10834;200;36;164;0;10634;5595;3339;1700;18
+"281604";"gmina miejsko-wiejska";"gm. Ruciane-Nida";"piski";"warmińsko-mazurskie";5928;6515;2543;3385;1;114;0;0;0;0;0;0;0;3384;0;0;3384;72;17;55;0;3312;1584;1060;668;9
+"281801";"gmina wiejska";"gm. Banie Mazurskie";"gołdapski";"warmińsko-mazurskie";2793;3027;1508;1285;1;11;0;0;0;0;0;0;0;1285;0;0;1285;25;3;22;0;1260;510;468;282;4
+"281802";"gmina wiejska";"gm. Dubeninki";"gołdapski";"warmińsko-mazurskie";2134;2303;1155;978;0;3;0;0;0;0;0;0;0;979;0;0;979;30;5;25;0;949;539;202;208;3
+"281803";"gmina miejsko-wiejska";"gm. Gołdap";"gołdapski";"warmińsko-mazurskie";14351;15879;6772;7579;11;160;2;2;0;0;0;1;1;7579;1;0;7579;118;27;91;0;7461;2887;2931;1643;18
+"281901";"gmina wiejska";"gm. Budry";"węgorzewski";"warmińsko-mazurskie";2131;2315;1098;1033;0;7;1;1;0;0;0;0;1;1034;1;0;1034;23;5;18;0;1011;514;301;196;4
+"281902";"gmina wiejska";"gm. Pozezdrze";"węgorzewski";"warmińsko-mazurskie";2388;2652;1127;1261;1;26;1;1;0;0;0;0;1;1262;1;0;1262;27;6;21;0;1235;512;477;246;3
+"281903";"gmina miejsko-wiejska";"gm. Węgorzewo";"węgorzewski";"warmińsko-mazurskie";12186;12916;5534;6652;10;99;1;1;0;0;0;0;1;6652;1;0;6652;96;24;72;0;6556;2239;2816;1501;18

@@ -1,0 +1,394 @@
+﻿"Nr komisji";"Siedziba komisji";"TERYT Gminy";"Gmina";"Powiat";"Województwo";"Liczba komisji";"Liczba uwzględnionych komisji";"KUBIAK Janusz - KW PRAWO I SPRAWIEDLIWOŚĆ";"KOŁOS Józef - KW KONFEDERACJA WOLNOŚĆ I NIEPODLEGŁOŚĆ";"SZEJNFELD Adam Stanisław - KKW KOALICJA OBYWATELSKA PO .N IPL ZIELONI";"PRZYBYŁ Justyna Agnieszka - KW NOWA DEMOKRACJA - TAK"
+1;"""Dzienny Dom Senior-Wigor"" (budynek Dworca PKP), ul. Dworcowa 1, 64-800 Chodzież";300101;"m. Chodzież";"chodzieski";"wielkopolskie";1;1;366;121;938;138
+2;"Szkoła Podstawowa nr 1 (budynek hali sportowej), ul. Ignacego Jana Paderewskiego 13, 64-800 Chodzież";300101;"m. Chodzież";"chodzieski";"wielkopolskie";1;1;280;105;820;147
+3;"Miejski Ośrodek Rozwiązywania Problemów Alkoholowych, ul. Władysława Reymonta 12, 64-800 Chodzież";300101;"m. Chodzież";"chodzieski";"wielkopolskie";1;1;286;83;848;130
+4;"Zespół Szkół im. Hipolita Cegielskiego, ul. Prymasa Stefana Wyszyńskiego 2, 64-800 Chodzież";300101;"m. Chodzież";"chodzieski";"wielkopolskie";1;1;309;87;668;99
+5;"I Liceum Ogólnokształcące im. św. Barbary, ul. Stefana Żeromskiego 11, 64-800 Chodzież";300101;"m. Chodzież";"chodzieski";"wielkopolskie";1;1;250;94;696;131
+6;"Szkoła Podstawowa nr 1 im. Stanisława Staszica (sala gimnastyczna), ul. Stanisława Staszica 19, 64-800 Chodzież";300101;"m. Chodzież";"chodzieski";"wielkopolskie";1;1;271;114;689;108
+7;"Chodzieski Dom Kultury im. Stanisława Moniuszki, ul. Warsztatów Jazzowych 2, 64-800 Chodzież";300101;"m. Chodzież";"chodzieski";"wielkopolskie";1;1;167;71;495;77
+8;"Szkoła Podstawowa Nr 3 im. Powstańców Wielkopolskich, ul. Jana Kochanowskiego 1, 64-800 Chodzież";300101;"m. Chodzież";"chodzieski";"wielkopolskie";1;1;351;131;951;113
+9;"Budynek Domu Pomocy Społecznej, ul. Ujska 47, 64-800 Chodzież";300101;"m. Chodzież";"chodzieski";"wielkopolskie";1;1;14;4;16;5
+10;"Budynek Szpitala Powiatowego, ul. Stefana Żeromskiego 29, 64-800 Chodzież";300101;"m. Chodzież";"chodzieski";"wielkopolskie";1;1;26;5;42;7
+11;"Budynek Szpitala w Chodzieży, ul. Strzelecka 32, 64-800 Chodzież";300101;"m. Chodzież";"chodzieski";"wielkopolskie";1;1;40;2;30;8
+1;"Szkoła Podstawowa im. Powstańców Wielkopolskich, os. Wierzbowe 7, 64-840 Budzyń";300102;"gm. Budzyń";"chodzieski";"wielkopolskie";1;1;273;119;594;79
+2;"Szkoła Podstawowa im. Powstańców Wielkopolskich, ul. Rogozińska 52, 64-840 Budzyń";300102;"gm. Budzyń";"chodzieski";"wielkopolskie";1;1;356;159;844;102
+3;"Gminny Ośrodek Kultury, ul. Władysława Łokietka 31, 64-840 Budzyń";300102;"gm. Budzyń";"chodzieski";"wielkopolskie";1;1;98;34;126;30
+4;"Budynek byłej Szkoły Podstawowej, Sokołowo Budzyńskie 28, 64-841 Sokołowo Budzyńskie";300102;"gm. Budzyń";"chodzieski";"wielkopolskie";1;1;78;23;60;12
+5;"Wiejski Dom Kultury w Wyszynach, ul. Czarnkowska 2, 64-834 Wyszyny";300102;"gm. Budzyń";"chodzieski";"wielkopolskie";1;1;140;58;225;50
+6;"Świetlica Wiejska, Dziewoklucz 17A, 64-840 Budzyń";300102;"gm. Budzyń";"chodzieski";"wielkopolskie";1;1;73;22;75;15
+7;"Świetlica Wiejska, Bukowiec 23, 64-834 Wyszyny";300102;"gm. Budzyń";"chodzieski";"wielkopolskie";1;1;54;31;93;27
+8;"Świetlica Wiejska, Ostrówki 15A, 64-840 Budzyń";300102;"gm. Budzyń";"chodzieski";"wielkopolskie";1;1;36;13;60;7
+9;"Świetlica Wiejska, Podstolice 65, 64-840 Budzyń";300102;"gm. Budzyń";"chodzieski";"wielkopolskie";1;1;41;21;69;23
+10;"Świetlica Wiejska, Prosna 2, 64-834 Wyszyny";300102;"gm. Budzyń";"chodzieski";"wielkopolskie";1;1;49;28;73;25
+1;"Świetlica Wiejska w Ratajach, Rataje os. Osiedle Wichrowe Wzgórze 1, 64-800 Chodzież";300103;"gm. Chodzież";"chodzieski";"wielkopolskie";1;1;146;70;477;87
+2;"Świetlica Wiejska w Strzelcach, Strzelce 24, 64-800 Chodzież";300103;"gm. Chodzież";"chodzieski";"wielkopolskie";1;1;91;47;229;56
+3;"Świetlica Wiejska w Zacharzynie, ul. Cicha 19, 64-813 Zacharzyn";300103;"gm. Chodzież";"chodzieski";"wielkopolskie";1;1;191;90;288;92
+4;"Świetlica Wiejska w Podaninie, Podanin 28, 64-800 Chodzież";300103;"gm. Chodzież";"chodzieski";"wielkopolskie";1;1;91;39;152;22
+5;"Wiejski Klub Kultury w Stróżewie, Stróżewo 55A, 64-800 Chodzież";300103;"gm. Chodzież";"chodzieski";"wielkopolskie";1;1;92;41;190;27
+6;"Szkoła Podstawowa w Oleśnicy, Oleśnica 5, 64-800 Chodzież";300103;"gm. Chodzież";"chodzieski";"wielkopolskie";1;1;47;26;116;26
+7;"Świetlica Wiejska w Nietuszkowie, Nietuszkowo 52, 64-800 Chodzież";300103;"gm. Chodzież";"chodzieski";"wielkopolskie";1;1;62;13;70;26
+8;"Wiejski Klub Kultury w Milczu, Milcz 73A, 64-800 Chodzież";300103;"gm. Chodzież";"chodzieski";"wielkopolskie";1;1;140;60;236;39
+1;"Miejsko-Gminny Ośrodek Kultury, ul. Powstańców Wielkopolskich 15, 64-830 Margonin";300104;"gm. Margonin";"chodzieski";"wielkopolskie";1;1;253;131;775;125
+2;"Urząd Stanu Cywilnego, ul. Poznańska 8, 64-830 Margonin";300104;"gm. Margonin";"chodzieski";"wielkopolskie";1;1;141;60;198;54
+3;"Świetlica Wiejska Dom Strażaka, Zbyszewice 2c, 64-830 Margonin";300104;"gm. Margonin";"chodzieski";"wielkopolskie";1;1;113;35;111;25
+4;"Spółdzielnia ""Adorol"", Adolfowo 22A, 64-830 Margonin";300104;"gm. Margonin";"chodzieski";"wielkopolskie";1;1;61;32;179;28
+5;"Miejsko-Gminna Biblioteka Publiczna w Margoninie, Filia w Lipinach, Lipiny 38, 64-830 Margonin";300104;"gm. Margonin";"chodzieski";"wielkopolskie";1;1;105;38;98;30
+6;"Miejsko-Gminna Biblioteka Publiczna w Margoninie, Filia w Radwankach, Radwanki 30b, 64-830 Margonin";300104;"gm. Margonin";"chodzieski";"wielkopolskie";1;1;54;25;78;14
+7;"Świetlica Wiejska, Próchnowo 30E, 64-830 Margonin";300104;"gm. Margonin";"chodzieski";"wielkopolskie";1;1;49;21;93;15
+8;"Sala Wiejska, Margońska Wieś 14, 64-830 Margonin";300104;"gm. Margonin";"chodzieski";"wielkopolskie";1;1;151;59;196;33
+9;"Świetlica Wiejska, Sypniewo 8, 64-830 Margonin";300104;"gm. Margonin";"chodzieski";"wielkopolskie";1;1;50;26;121;15
+1;"Biblioteka Publiczna, ul. Rynek 1, 64-820 Szamocin";300105;"gm. Szamocin";"chodzieski";"wielkopolskie";1;1;307;103;540;99
+2;"Szkoła Podstawowa w Szamocinie, ul. 19 Stycznia 29, 64-820 Szamocin";300105;"gm. Szamocin";"chodzieski";"wielkopolskie";1;1;275;114;509;114
+3;"Dom Kultury, Lipia Góra 88a, 64-820 Szamocin";300105;"gm. Szamocin";"chodzieski";"wielkopolskie";1;1;181;71;187;46
+4;"Świetlica Wiejska, Nałęcza 25a, 64-820 Szamocin";300105;"gm. Szamocin";"chodzieski";"wielkopolskie";1;1;112;32;131;46
+5;"Ośrodek Szkolenia i Wychowania OHP, ul. Szkolna 11, 64-820 Szamocin";300105;"gm. Szamocin";"chodzieski";"wielkopolskie";1;1;166;64;288;60
+6;"Świetlica Wiejska, Heliodorowo 16, 64-820 Szamocin";300105;"gm. Szamocin";"chodzieski";"wielkopolskie";1;1;43;24;70;8
+7;"Świetlica Wiejska, Lipa 33, 64-820 Szamocin";300105;"gm. Szamocin";"chodzieski";"wielkopolskie";1;1;104;35;70;11
+1;"Przedszkole Miejskie Nr 2, ul. Osiedle Parkowe 10, 64-700 Czarnków";300201;"m. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;280;71;630;133
+2;"Szkoła Podstawowa nr 2, ul. Wroniecka 136, 64-700 Czarnków";300201;"m. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;288;81;658;131
+3;"Miejskie Centrum Kultury, ul. Kościuszki 60, 64-700 Czarnków";300201;"m. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;238;87;536;105
+4;"Przedszkole Miejskie Nr 1, ul. Rolna 2, 64-700 Czarnków";300201;"m. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;338;110;744;173
+5;"Muzeum Ziemi Czarnkowskiej, ul. Wroniecka 32, 64-700 Czarnków";300201;"m. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;245;79;618;133
+6;"Szpital Powiatowy w Czarnkowie, ul. Kościuszki 94, 64-700 Czarnków";300201;"m. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;2;0;9;1
+1;"Szkoła Podstawowa, Romanowo Dolne 123, 64-704 Romanowo Dolne";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;153;62;161;60
+2;"Szkoła Podstawowa, Sarbia 1, 64-705 Sarbia";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;64;15;46;13
+3;"Szkoła Podstawowa im. Leśników Polskich, ul. Szkolna 2, 64-707 Gębice";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;220;55;178;68
+4;"Sala Wiejska w Hucie, ul. Leśna 12, 64-708 Huta";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;80;31;114;71
+5;"Szkoła Podstawowa, Śmieszkowo ul. Szkolna 38, 64-700 Czarnków";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;193;78;346;161
+6;"Sala Wiejska, Ciszkowo ul. Lipowa 7, 64-700 Czarnków";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;45;21;81;18
+7;"Szkoła Podstawowa, Jędrzejewo 25, 64-713 Jędrzejewo";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;128;60;212;66
+8;"Sala Wiejska, Gajewo 51, 64-713 Jędrzejewo";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;113;57;128;46
+9;"Szkoła Podstawowa im. Powstańców Wielkopolskich 1918/1919, Kuźnica Czarnkowska ul. Szkolna 10, 64-700 Czarnków";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;203;75;340;78
+10;"Szkoła Podstawowa, Romanowo Górne 72, 64-704 Romanowo Dolne";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;145;48;143;52
+11;"Sala Wiejska, Brzeźno ul. Dolna 1, 64-700 Czarnków";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;100;37;213;85
+12;"Sala Wiejska, Góra nad Notecią 2, 64-700 Czarnków";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;78;25;139;27
+13;"Sala Wiejska, Komorzewo 43, 64-700 Czarnków";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;48;24;42;54
+14;"Sala Wiejska, Marunowo 13, 64-700 Czarnków";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;42;13;73;11
+15;"Sala Wiejska, Mikołajewo 39, 64-700 Czarnków";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;76;24;49;27
+16;"Sala Wiejska, Sarbka 21A, 64-700 Czarnków";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;48;22;79;20
+17;"Sala Wiejska, Zofiowo 24A, 64-700 Czarnków";300202;"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;62;42;90;26
+1;"Urząd Gminy Drawsko sala narad, ul. Powstańców Wielkopolskich 121, 64-733 Drawsko";300203;"gm. Drawsko";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;296;79;348;87
+2;"Sala Wiejska w Drawskim Młynie, Drawski Młyn ul. Szosa Dworcowa 2, 64-731 Drawsko";300203;"gm. Drawsko";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;171;73;224;71
+3;"Świetlica Wiejska w Piłce, Piłka 93a, 64-733 Drawsko";300203;"gm. Drawsko";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;172;55;130;37
+4;"Szkoła Podstawowa im. Józefa Noji w Pęckowie, Pęckowo ul. Powstańców Wielkopolskich 1, 64-733 Drawsko";300203;"gm. Drawsko";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;225;93;184;65
+5;"Świetlica Wiejska w Chełście, Chełst 78A, 64-733 Drawsko";300203;"gm. Drawsko";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;140;33;100;30
+6;"Świetlica Wiejska w Kamienniku, Kamiennik 58, 64-733 Drawsko";300203;"gm. Drawsko";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;81;28;88;17
+7;"Świetlica Wiejska w Kawczynie, Kawczyn 39a, 64-733 Drawsko";300203;"gm. Drawsko";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;83;28;82;21
+1;"Zespół Szkół Ogólnokształcących, ul. Wojska Polskiego 31, 64-761 Krzyż Wielkopolski";300204;"gm. Krzyż Wielkopolski";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;377;108;725;105
+2;"Miejsko-Gminny Ośrodek Kultury, ul. Wojska Polskiego 11, 64-761 Krzyż Wielkopolski";300204;"gm. Krzyż Wielkopolski";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;374;85;412;70
+3;"Zespół Szkół Ogólnokształcących, ul. Henryka Sienkiewicza 1, 64-761 Krzyż Wielkopolski";300204;"gm. Krzyż Wielkopolski";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;387;148;650;125
+4;"Sala wiejska, Kuźnica Żelichowska nr działki 170/8, 64-761 Krzyż Wielkopolski";300204;"gm. Krzyż Wielkopolski";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;66;18;54;17
+5;"Sala wiejska, Huta Szklana 73, 64-761 Krzyż Wielkopolski";300204;"gm. Krzyż Wielkopolski";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;117;41;132;29
+6;"Sala wiejska, Żelichowo 23A, 64-761 Krzyż Wielkopolski";300204;"gm. Krzyż Wielkopolski";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;45;6;43;5
+1;"Publiczna Szkoła Podstawowa, ul. Szkolna 6, 64-720 Lubasz";300205;"gm. Lubasz";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;234;91;367;172
+2;"Publiczna Szkoła Podstawowa, ul. Szkolna 6, 64-720 Lubasz";300205;"gm. Lubasz";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;233;96;437;159
+3;"Spółdzielnia Produkcji Rolnej, Sławno 1, 64-720 Lubasz";300205;"gm. Lubasz";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;40;16;51;52
+4;"Publiczna Szkoła Podstawowa, Miłkowo 11, 64-720 Lubasz";300205;"gm. Lubasz";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;77;22;113;47
+5;"Publiczna Szkoła Podstawowa, Krucz 62, 64-720 Lubasz";300205;"gm. Lubasz";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;134;44;174;101
+6;"Publiczna Szkoła Podstawowa, ul. Podgórna 8A, 64-720 Lubasz";300205;"gm. Lubasz";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;60;22;100;52
+7;"Publiczne Przedszkole w Dębem, Dębe ul. Starowiejska 3, 64-720 Lubasz";300205;"gm. Lubasz";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;95;46;220;71
+8;"Publiczna Szkoła Podstawowa, Jędrzejewo 40A, 64-720 Lubasz";300205;"gm. Lubasz";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;100;32;82;43
+9;"Publiczne Przedszkole w Kamionce, Kamionka 31, 64-720 Lubasz";300205;"gm. Lubasz";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;61;25;45;39
+10;"Świetlica Wiejska, Sokołowo 48A, 64-720 Lubasz";300205;"gm. Lubasz";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;65;16;56;47
+11;"Świetlica Wiejska, Stajkowo 39, 64-720 Lubasz";300205;"gm. Lubasz";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;71;36;76;59
+1;"Szkoła Podstawowa im. Arkadego Fiedlera, ul. Leśna 1, 64-710 Połajewo";300206;"gm. Połajewo";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;533;162;577;154
+2;"Gminny Ośrodek Kultury, ul. Obornicka 1, 64-710 Połajewo";300206;"gm. Połajewo";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;126;43;111;32
+3;"Szkoła Podstawowa im. Kornela Makuszyńskiego, Boruszyn 25, 64-710 Połajewo";300206;"gm. Połajewo";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;139;41;121;37
+4;"Szkoła Podstawowa im. Jana Pawła II, Młynkowo 109, 64-710 Połajewo";300206;"gm. Połajewo";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;178;82;126;52
+5;"Sala wiejska w Tarnówku, Tarnówko 46a, 64-710 Połajewo";300206;"gm. Połajewo";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;135;55;108;36
+6;"Sala wiejska w Krosinie, Krosin 86c, 64-710 Połajewo";300206;"gm. Połajewo";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;131;39;112;24
+7;"Sala wiejska w Sierakówku, Sierakówko 5a, 64-710 Połajewo";300206;"gm. Połajewo";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;93;32;36;19
+1;"Zespół Szkół Technicznych w Trzciance, ul. 27 Stycznia 100, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;397;123;970;116
+2;"Szkoła Podstawowa Nr 2 w Trzciance, ul. Fryderyka Chopina 36, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;396;128;785;92
+3;"Szkoła Podstawowa Nr 1 w Trzciance, ul. Stanisława Staszica 6, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;315;102;857;95
+4;"Szkoła Podstawowa Nr 3 w Trzciance, ul. Władysława Broniewskiego 2, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;350;120;809;102
+5;"Centrum Usług Społecznych, os. Juliusza Słowackiego 24, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;429;144;900;119
+6;"Hala Sportowo-Widowiskowa, ul. Stefana Żeromskiego 28, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;366;130;836;116
+7;"Szkoła Podstawowa w Łomnicy, Łomnica 7, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;109;34;141;18
+8;"Szkoła Podstawowa w Białej, Biała ul. Radolińska 9, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;191;76;309;54
+9;"Szkoła Podstawowa w Siedlisku, Siedlisko 160, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;108;49;190;46
+10;"Biblioteka Publiczna i Centrum Kultury w Trzciance Filia w Nowej Wsi, Nowa Wieś 37, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;76;21;93;25
+11;"Szkoła Podstawowa w Przyłękach, Przyłęki 38, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;95;47;125;28
+12;"Szkoła Podstawowa w Rychliku, Rychlik 16, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;50;14;99;32
+13;"Biblioteka Publiczna i Centrum Kultury w Trzciance Filia w Niekursku, Niekursko ul. Szkolna 2, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;64;43;145;25
+14;"Sala wiejska w Radolinie, Radolin 24, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;86;32;139;31
+15;"Sala wiejska w Runowie, Runowo 39A, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;59;21;59;28
+16;"Sala wiejska w Stobnie, Stobno ul. Kasztanowa 31, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;143;45;172;32
+17;"Sala wiejska w Straduniu, Straduń 30B, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;58;24;193;23
+18;"Szpital Powiatowy im. Jana Pawła II w Trzciance, ul. gen. Władysława Sikorskiego 9, 64-980 Trzcianka";300207;"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;17;3;15;4
+1;"Szkoła Podstawowa Nr 1 w Wieleniu, ul. Szkolna 4, 64-730 Wieleń";300208;"gm. Wieleń";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;351;105;376;88
+2;"Zamiejscowy Oddział Przedszkolny Szkoły Podstawowej w Rosku z siedzibą we Wrzeszczynie, Wrzeszczyna ul. 4 Lutego 13, 64-730 Wieleń";300208;"gm. Wieleń";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;133;38;68;34
+3;"Mediateka, ul. Jaryńska 7B, 64-730 Wieleń";300208;"gm. Wieleń";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;448;120;726;121
+4;"Szkoła Podstawowa nr 2 w Wieleniu, ul. Jana Pawła II 3, 64-730 Wieleń";300208;"gm. Wieleń";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;262;81;318;64
+5;"Szkoła Podstawowa w Rosku, Rosko ul. Powstańców Wielkopolskich 15, 64-730 Wieleń";300208;"gm. Wieleń";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;191;86;376;65
+6;"Szkoła Podstawowa w Dzierżążnie Wielkim, Dzierżążno Wielkie 24, 64-730 Wieleń";300208;"gm. Wieleń";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;177;63;222;50
+7;"Świetlica wiejska w Folsztynie, Folsztyn 41A, 64-730 Wieleń";300208;"gm. Wieleń";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;173;77;174;30
+8;"Szkoła Podstawowa w Gulczu, Gulcz ul. Czarnkowska 10, 64-730 Wieleń";300208;"gm. Wieleń";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;150;36;155;73
+9;"Szkoła Podstawowa w Miałach, Miały ul. Powstańców Wielkopolskich 13, 64-730 Wieleń";300208;"gm. Wieleń";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;173;60;205;49
+10;"Zespół Domów Pomocy Społecznej, ul. Stanisława Staszica 2, 64-730 Wieleń";300208;"gm. Wieleń";"czarnkowsko-trzcianecki";"wielkopolskie";1;1;76;8;5;2
+1;"Szkoła Podstawowa nr 5 im. Dzieci Polskich w Pile, ul. aleja Niepodległości 18, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;455;138;982;138
+2;"Szkoła Podstawowa nr 5 im. Dzieci Polskich w Pile, ul. Kujawska 18, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;515;128;1007;139
+3;"I Liceum Ogólnokształcące im. Marii Skłodowskiej-Curie, ul. Wincentego Pola 11, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;485;149;875;146
+4;"Regionalne Centrum Kultury-Fabryka Emocji, pl. plac Staszica 1, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;536;143;842;149
+5;"Szkoła Podstawowa nr 7 im. Adama Mickiewicza w Pile, ul. aleja Wojska Polskiego 45, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;477;168;1003;155
+6;"Publiczne Przedszkole nr 13 w Pile, ul. Kraszewskiego 2, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;338;159;919;143
+7;"Publiczne Przedszkole nr 12 w Pile, ul. Reja 11, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;445;108;944;140
+8;"Szkoła Podstawowa nr 6 im. Lotników Polskich w Pile, ul. Żeromskiego 41, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;312;98;616;87
+9;"Szkoła Podstawowa nr 6 im. Lotników Polskich w Pile, ul. Żeromskiego 41, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;318;112;668;95
+10;"Miejski Ośrodek Sportu i Rekreacji-Mała Hala Treningowa, ul. Żeromskiego 90, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;122;46;241;31
+11;"Szkoła Podstawowa nr 3 im. Jana Brzechwy w Pile, ul. Brzozowa 4, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;298;98;752;103
+12;"Liceum Ogólnokształcące Towarzystwa Salezjańskiego im. Św. Jana Bosko, ul. Edwarda Dembowskiego 4, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;385;121;763;101
+13;"ENEA Operator Sp. z o. o. Rejon Dystrybucji Piła, ul. aleja Poznańska 34, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;237;77;456;76
+14;"Siedziba Osiedla Motylewo, ul. Sowia 2, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;107;65;389;45
+15;"Specjalny Ośrodek Szkolno-Wychowawczy im. Marii Grzegorzewskiej w Pile, ul. Śniadeckich 27a/b, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;107;36;294;29
+16;"Publiczne Przedszkole nr 19 im. Misia Uszatka w Pile, ul. Królowej Jadwigi 20, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;109;55;541;61
+17;"Szkoła Podstawowa nr 11 im. Królowej Jadwigi w Pile, ul. Królowej Jadwigi 2, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;416;97;821;94
+18;"Liga Obrony Kraju Ośrodek Szkolenia Kierowców, ul. aleja Niepodległości 154, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;177;64;407;44
+19;"Powiatowa i Miejska Biblioteka Publiczna im. Pantaleona Szumana w Pile-Filia nr 9, ul. Wenedów 8a, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;185;68;713;75
+20;"Niepubliczne Przedszkole Kreatywne ""Wesoła Przygoda"", ul. Poprzeczna 2a, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;251;166;1377;137
+21;"Szkoła Podstawowa nr 12 z Oddziałami Integracyjnymi im. Janusza Korczaka w Pile, ul. Lelewela 140, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;521;169;1132;193
+22;"Centrum Rekreacji AQUA-PIL Sp. z o. o., ul. Artura Grottgera 4, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;420;156;880;129
+23;"Miejska Energetyka Cieplna Sp. z o. o., ul. Kaczorska 20, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;363;124;611;92
+24;"Szkoła Podstawowa nr 4 im. Mikołaja Kopernika w Pile, ul. Grabowa 18, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;394;149;947;164
+25;"Zespół Szkół Muzycznych im. Fryderyka Chopina w Pile, ul. Młodych 1, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;171;57;366;55
+26;"Szkoła Podstawowa nr 2 im. Olimpijczyków Polskich w Pile-sala gimnastyczna, ul. Bydgoska 23, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;264;74;510;82
+27;"Szkoła Podstawowa nr 2 im. Olimpijczyków Polskich w Pile, ul. Bydgoska 23, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;271;92;667;75
+28;"Szkoła Podstawowa nr 2 im. Olimpijczyków Polskich w Pile, ul. Roosevelta 12, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;238;63;478;68
+29;"Publiczne Przedszkole nr 16 im. Czerwonego Kapturka w Pile, ul. aleja Powstańców Wielkopolskich 86A, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;464;125;953;129
+30;"Salezjańska Szkoła Podstawowa im. Jana Pawła II, ul. gen. Władysława Andersa 34, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;206;108;619;123
+31;"Publiczne Przedszkole nr 4 w Pile, ul. Kusocińskiego 10A, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;159;90;697;73
+32;"Dom Pomocy Społecznej im. Jana Pawła II, ul. 11 Listopada 40, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;21;2;5;4
+33;"Szpital Specjalistyczny w Pile im. Stanisława Staszica, ul. Rydygiera Ludwika 1, 64-920 Piła";301901;"m. Piła";"pilski";"wielkopolskie";1;1;34;3;57;6
+1;"Remiza Ochotniczej Straży Pożarnej, ul. 4 Stycznia 65, 89-340 Białośliwie";301902;"gm. Białośliwie";"pilski";"wielkopolskie";1;1;313;109;309;80
+2;"Gminny Ośrodek Kultury, ul. Podgórna 47, 89-340 Białośliwie";301902;"gm. Białośliwie";"pilski";"wielkopolskie";1;1;231;80;304;56
+3;"Świetlica Wiejska, Krostkowo 16a, 89-334 Krostkowo";301902;"gm. Białośliwie";"pilski";"wielkopolskie";1;1;95;49;110;27
+4;"Samorządowe Przedszkole w Białośliwiu, Oddział Nieżychowo, Nieżychowo 16, 89-340 Białośliwie";301902;"gm. Białośliwie";"pilski";"wielkopolskie";1;1;124;70;89;38
+5;"Regionalne Centrum Sadownictwa, Pobórka Wielka 59, 89-340 Białośliwie";301902;"gm. Białośliwie";"pilski";"wielkopolskie";1;1;89;50;84;20
+6;"Świetlica wiejska, Dworzakowo 35, 89-340 Białośliwie";301902;"gm. Białośliwie";"pilski";"wielkopolskie";1;1;64;12;39;12
+1;"Wiejski Dom Kultury, Śmiłowo ul. Osiedle Sportowe 1, 64-810 Kaczory";301903;"gm. Kaczory";"pilski";"wielkopolskie";1;1;167;73;206;77
+2;"Miejsko-Gminne Centrum Kultury, ul. Pilska 1A, 64-810 Kaczory";301903;"gm. Kaczory";"pilski";"wielkopolskie";1;1;484;197;805;169
+3;"Wiejski Dom Kultury, Dziembowo ul. Główna 101, 64-810 Kaczory";301903;"gm. Kaczory";"pilski";"wielkopolskie";1;1;144;55;154;46
+4;"Wiejski Dom Kultury, Rzadkowo ul. Powstańców Wielkopolskich 26, 64-810 Kaczory";301903;"gm. Kaczory";"pilski";"wielkopolskie";1;1;119;41;126;29
+5;"Wiejski Dom Kultury, Morzewo ul. Krótka 1, 64-810 Kaczory";301903;"gm. Kaczory";"pilski";"wielkopolskie";1;1;154;37;114;37
+6;"Wiejski Dom Kultury, Dziembówko ul. Sportowa 13, 64-810 Kaczory";301903;"gm. Kaczory";"pilski";"wielkopolskie";1;1;75;30;154;41
+7;"Wiejski Dom Kultury, Jeziorki ul. Graniczna 32, 64-810 Kaczory";301903;"gm. Kaczory";"pilski";"wielkopolskie";1;1;23;13;94;18
+8;"Wiejski Dom Kultury, Krzewina ul. Łączna 1, 64-810 Kaczory";301903;"gm. Kaczory";"pilski";"wielkopolskie";1;1;42;11;48;11
+9;"Wiejski Dom Kultury, Równopole 35, 64-810 Kaczory";301903;"gm. Kaczory";"pilski";"wielkopolskie";1;1;56;24;65;16
+10;"Wiejski Dom Kultury, Zelgniewo ul. Wspólna 16, 64-810 Kaczory";301903;"gm. Kaczory";"pilski";"wielkopolskie";1;1;120;38;99;33
+1;"Szkoła Podstawowa im. Komisji Edukacji Narodowej, ul. Adama Mickiewicza 20a, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;261;76;213;52
+2;"Szkoła Podstawowa im. Komisji Edukacji Narodowej, ul. Sikorskiego 3, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;353;89;350;67
+3;"Szkoła Podstawowa, Wiktorówko 65, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;112;46;45;22
+4;"Szkoła Podstawowa, Fanianowo 29, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;280;79;152;68
+5;"Szkoła Podstawowa, Dźwierszno Małe 8, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;279;78;121;35
+6;"Sala OSP, Luchowo 75B, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;152;59;94;22
+7;"Centrum Edukacyjno-Przyrodnicze, Chlebno 11A, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;28;10;22;17
+8;"Świetlica Wiejska, Kościerzyn Mały 40, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;77;37;22;12
+9;"Świetlica Wiejska, Kruszki 3, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;57;36;34;7
+10;"Świetlica Wiejska, Piesno 48, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;67;17;12;5
+11;"Świetlica Wiejska, Rataje 13, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;103;18;49;19
+12;"Świetlica Wiejska, Szczerbin 28A, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;79;18;18;6
+13;"Świetlica Wiejska, Trzeboń 29C, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;58;19;22;14
+14;"Świetlica Wiejska-Sala OSP, Walentynowo 17, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;102;42;32;16
+15;"Świetlica Wiejska, Witrogoszcz 23, 89-310 Łobżenica";301904;"gm. Łobżenica";"pilski";"wielkopolskie";1;1;120;35;63;17
+1;"Szkoła Podstawowa im. kmdra Bolesława Romanowskiego w Miasteczku Krajeńskim, ul. Szkolna 1, 89-350 Miasteczko Krajeńskie";301905;"gm. Miasteczko Krajeńskie";"pilski";"wielkopolskie";1;1;159;68;333;58
+2;"Świetlica Wiejska w Brzostowie, ul. Łączna 1, 89-350 Brzostowo";301905;"gm. Miasteczko Krajeńskie";"pilski";"wielkopolskie";1;1;136;58;159;23
+3;"Świetlica Wiejska w Grabównie, ul. Lipowa 22, 89-350 Grabówno";301905;"gm. Miasteczko Krajeńskie";"pilski";"wielkopolskie";1;1;87;34;84;28
+4;"Szkoła Podstawowa w Grabionnej, ul. Krajeńska 8, 89-350 Grabionna";301905;"gm. Miasteczko Krajeńskie";"pilski";"wielkopolskie";1;1;70;39;82;18
+5;"Świetlica Wiejska w Okalińcu, Okaliniec 15A, 89-350 Okaliniec";301905;"gm. Miasteczko Krajeńskie";"pilski";"wielkopolskie";1;1;32;24;45;14
+1;"Centrum Upowszechniania Kultury w Szydłowie, Szydłowo 89A, 64-930 Szydłowo";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;168;83;493;78
+2;"Warsztaty Terapii Zajęciowej w Leżenicy, Leżenica 39, 64-930 Szydłowo";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;29;12;43;15
+3;"Zespół Szkół im. Władysława Stanisława Reymonta w Starej Łubiance, ul. Polna 11, 64-932 Stara Łubianka";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;311;105;348;96
+4;"Świetlica Wiejska w Róży Wielkiej, Róża Wielka 19, 64-930 Róża Wielka";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;94;40;91;24
+5;"Szkoła Podstawowa im. Bohaterów Wyzwolenia Ziemi Wałeckiej w Skrzatuszu, Skrzatusz ul. Rafała Leszczyńskiego 1, 64-930 Szydłowo";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;113;54;186;48
+6;"Świetlica Wiejska w Dobrzycy, Dobrzyca 35A, 64-930 Szydłowo";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;55;51;219;34
+7;"Świetlica Wiejska w Kotuniu, Kotuń 28, 64-930 Szydłowo";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;120;69;212;35
+8;"Świetlica Wiejska w Jaraczewie, Jaraczewo 11B, 64-930 Szydłowo";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;63;42;134;33
+9;"Świetlica Wiejska w Zawadzie, Zawada 21, 64-930 Szydłowo";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;93;37;244;42
+10;"Świetlica Wiejska w Nowym Dworze, Nowy Dwór 29, 64-930 Szydłowo";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;49;17;46;18
+11;"Świetlica Wiejska w Pokrzywnicy, Pokrzywnica 10, 64-930 Szydłowo";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;74;41;126;34
+12;"Świetlica Wiejska w Krępsku, Krępsko 69, 64-930 Szydłowo";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;42;20;66;12
+13;"Świetlica Wiejska w Dolaszewie, Dolaszewo 4A, 64-930 Szydłowo";301906;"gm. Szydłowo";"pilski";"wielkopolskie";1;1;103;58;548;44
+1;"Ujski Dom Kultury w Ujściu, ul. Czarnkowska 32, 64-850 Ujście";301907;"gm. Ujście";"pilski";"wielkopolskie";1;1;267;83;405;82
+2;"Urząd Miejski w Ujściu, pl. Plac Wiosny Ludów 2, 64-850 Ujście";301907;"gm. Ujście";"pilski";"wielkopolskie";1;1;270;103;521;101
+3;"Świetlica wiejska w Mirosławiu, Mirosław 73, 64-850 Ujście";301907;"gm. Ujście";"pilski";"wielkopolskie";1;1;89;50;98;30
+4;"Świetlica wiejska w Jabłonowie, Jabłonowo 50, 64-850 Ujście";301907;"gm. Ujście";"pilski";"wielkopolskie";1;1;82;22;119;33
+5;"Wiejski Dom Kultury w Kruszewie, Kruszewo ul. Parkowa 2, 64-850 Ujście";301907;"gm. Ujście";"pilski";"wielkopolskie";1;1;181;69;249;66
+6;"Szkoła Podstawowa w Nowej Wsi Ujskiej-budynek w Nowej Wsi Ujskiej, Nowa Wieś Ujska 1, 64-850 Ujście";301907;"gm. Ujście";"pilski";"wielkopolskie";1;1;135;62;250;51
+7;"Świetlica Wiejska w Byszkach, Byszki 26, 64-850 Ujście";301907;"gm. Ujście";"pilski";"wielkopolskie";1;1;56;12;84;16
+8;"Świetlica środowiskowa w Ługach Ujskich, Ługi Ujskie 69, 64-850 Ujście";301907;"gm. Ujście";"pilski";"wielkopolskie";1;1;103;53;167;25
+9;"Świetlica Wiejska w Chrustowie, Chrustowo 12, 64-850 Ujście";301907;"gm. Ujście";"pilski";"wielkopolskie";1;1;42;11;85;10
+1;"Siedziba Straży Miejskiej, ul. Bydgoska 32, 89-300 Wyrzysk";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;249;82;348;69
+2;"Miejsko-Gminny Ośrodek Kultury, ul. Kościuszki 15, 89-300 Wyrzysk";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;234;83;368;63
+3;"Klub Miejski, ul. Młyńska 2, 89-300 Wyrzysk";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;287;139;483;93
+4;"Szkoła Podstawowa, ul. Główna 58, 89-333 Osiek nad Notecią";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;333;146;387;91
+5;"Szkoła Podstawowa, ul. Szkolna 2, 89-333 Osiek nad Notecią";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;358;134;337;77
+6;"Szkoła Podstawowa, Falmierowo 29, 89-311 Falmierowo";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;70;54;49;21
+7;"Świetlica Wiejska, Kościerzyn Wielki 16a, 89-311 Falmierowo";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;91;48;47;12
+8;"Szkoła Podstawowa, Glesno 9, 89-300 Wyrzysk";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;181;77;166;31
+9;"Szkoła Podstawowa, Kosztowo 79, 89-300 Wyrzysk";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;118;92;108;23
+10;"Przedszkole Publiczne, ul. Bohaterów 28, 89-333 Osiek nad Notecią";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;176;98;105;34
+11;"Świetlica Wiejska, Auguścin 42, 89-300 Wyrzysk";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;52;19;37;15
+12;"Świetlica Wiejska, Dobrzyniewo 29, 89-311 Falmierowo";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;55;29;49;9
+13;"Świetlica Wiejska, Gromadno 55, 89-311 Falmierowo";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;76;39;49;22
+14;"Świetlica Wiejska, Polanowo 36, 89-300 Wyrzysk";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;53;25;40;14
+15;"Szpital Powiatowy w Wyrzysku Spółka z o. o., ul. 22 Stycznia 41, 89-300 Wyrzysk";301908;"gm. Wyrzysk";"pilski";"wielkopolskie";1;1;10;3;9;3
+1;"Sala ślubów, Urząd Miasta i Gminy w Wysokiej, pl. Plac Powstańców Wielkopolskich 20/21, 89-320 Wysoka";301909;"gm. Wysoka";"pilski";"wielkopolskie";1;1;470;170;581;107
+2;"Szkoła Podstawowa w Czajczu, Czajcze 26, 89-320 Wysoka";301909;"gm. Wysoka";"pilski";"wielkopolskie";1;1;135;38;53;22
+3;"Świetlica Wiejska, Rudna 1a, 89-320 Wysoka";301909;"gm. Wysoka";"pilski";"wielkopolskie";1;1;37;18;46;7
+4;"Świetlica Wiejska, Wysoka Mała 50a, 89-320 Wysoka";301909;"gm. Wysoka";"pilski";"wielkopolskie";1;1;81;32;36;16
+5;"Remiza OSP Bądecz, Bądecz 18B, 89-320 Wysoka";301909;"gm. Wysoka";"pilski";"wielkopolskie";1;1;134;47;95;22
+6;"Świetlica Wiejska, Jeziorki Kosztowskie 6, 89-320 Wysoka";301909;"gm. Wysoka";"pilski";"wielkopolskie";1;1;68;46;46;23
+7;"Świetlica Wiejska, Kijaszkowo 17, 89-321 Tłukomy";301909;"gm. Wysoka";"pilski";"wielkopolskie";1;1;45;23;23;8
+8;"Świetlica Wiejska, Młotkowo 5, 89-320 Wysoka";301909;"gm. Wysoka";"pilski";"wielkopolskie";1;1;56;27;27;15
+9;"Filialna Szkoła Podstawowa w Mościskach, Mościska 9, 89-320 Wysoka";301909;"gm. Wysoka";"pilski";"wielkopolskie";1;1;74;14;39;10
+10;"Świetlica OSP Stare, Stare 12, 89-320 Wysoka";301909;"gm. Wysoka";"pilski";"wielkopolskie";1;1;73;21;48;13
+11;"Świetlica Wiejska, Tłukomy 19, 89-321 Tłukomy";301909;"gm. Wysoka";"pilski";"wielkopolskie";1;1;58;20;27;16
+12;"Świetlica Wiejska, Wysoczka 17, 89-320 Wysoka";301909;"gm. Wysoka";"pilski";"wielkopolskie";1;1;33;19;51;9
+1;"Szkoła Podstawowa Nr 3, ul. Letnia 1, 62-100 Wągrowiec";302801;"m. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;492;175;1205;145
+2;"Biblioteka Pedagogiczna, ul. Wierzbowa 1, 62-100 Wągrowiec";302801;"m. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;356;139;734;133
+3;"Miejska Biblioteka Publiczna, ul. Średnia 18, 62-100 Wągrowiec";302801;"m. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;366;82;677;103
+4;"Miejski Dom Kultury, ul. Kościuszki 55, 62-100 Wągrowiec";302801;"m. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;336;104;679;85
+5;"Liceum Ogólnokształcące, ul. Klasztorna 17A, 62-100 Wągrowiec";302801;"m. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;244;93;429;97
+6;"Szkoła Podstawowa nr 4, ul. Reja 10, 62-100 Wągrowiec";302801;"m. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;233;79;503;66
+7;"Zespół Szkół nr 1, ul. Kcyńska 48, 62-100 Wągrowiec";302801;"m. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;291;106;625;96
+8;"Szkoła Podstawowa nr 1, ul. Św. Wojciecha 20, 62-100 Wągrowiec";302801;"m. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;321;128;698;95
+9;"Miejskie Przedsiębiorstwo Wodociągów i Kanalizacji Spółka z o. o., ul. Janowiecka 100, 62-100 Wągrowiec";302801;"m. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;320;145;788;130
+10;"Szkoła Podstawowa nr 2, ul. Krótka 4, 62-100 Wągrowiec";302801;"m. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;300;101;659;112
+11;"Żłobek Miejski nr 1, ul. Stanisława Mikołajczyka 25, 62-100 Wągrowiec";302801;"m. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;332;149;829;144
+12;"Szpital Powiatowy, ul. Kościuszki 74, 62-100 Wągrowiec";302801;"m. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;9;3;9;0
+1;"Gminny Ośrodek Kultury w Damasławku, ul. Żnińska 9, 62-110 Damasławek";302802;"gm. Damasławek";"wągrowiecki";"wielkopolskie";1;1;388;149;445;107
+2;"Świetlica Wiejska w Międzylesiu, Międzylesie 44a, 62-110 Damasławek";302802;"gm. Damasławek";"wągrowiecki";"wielkopolskie";1;1;98;16;39;8
+3;"Świetlica Wiejska w Niemczynie, Niemczyn 67, 62-110 Damasławek";302802;"gm. Damasławek";"wągrowiecki";"wielkopolskie";1;1;279;87;275;77
+4;"Świetlica Wiejska w Mokronosach, Mokronosy 5, 62-110 Damasławek";302802;"gm. Damasławek";"wągrowiecki";"wielkopolskie";1;1;118;28;40;12
+5;"Świetlica Wiejska w Dąbrowie, Dąbrowa 18, 62-110 Damasławek";302802;"gm. Damasławek";"wągrowiecki";"wielkopolskie";1;1;79;25;52;15
+6;"Świetlica Wiejska w Stępuchowie, Stępuchowo 1, 62-110 Damasławek";302802;"gm. Damasławek";"wągrowiecki";"wielkopolskie";1;1;97;24;53;15
+7;"Świetlica Wiejska w Turzy, Turza 55A, 62-110 Damasławek";302802;"gm. Damasławek";"wągrowiecki";"wielkopolskie";1;1;97;33;83;23
+1;"Przedszkole Publiczne, ul. Karola Libelta 1, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;217;94;305;78
+2;"Gołaniecki Ośrodek Kultury, ul. Doktora Piotra Kowalika 1, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;303;134;440;91
+3;"Zespół Szkół, ul. Walki Młodych 35, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;143;49;100;41
+4;"Świetlica Wiejska w Chojnie, Chojna 55, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;62;16;44;10
+5;"Świetlica Wiejska w Czesławicach, Czesławice 20, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;125;26;92;20
+6;"Szkoła Podstawowa w Panigrodzu, Panigródz 24, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;117;33;74;36
+7;"Świetlica Wiejska w Czeszewie, Czeszewo 58, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;95;27;69;24
+8;"Świetlica Wiejska w Chawłodnie, Chawłodno 26, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;45;17;39;18
+9;"Świetlica Wiejska w Czerlinie, Czerlin 44, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;52;18;37;6
+10;"Szkoła Podstawowa w Morakowie, Morakowo 57A, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;66;22;62;18
+11;"Świetlica Wiejska w Olesznie, Oleszno 7, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;72;20;57;17
+12;"Świetlica Wiejska w Potulinie, Potulin 3, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;46;12;55;9
+13;"Świetlica Wiejska w Rybowie, Rybowo 87, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;81;25;57;11
+14;"Świetlica Wiejska w Smogulcu, Smogulec 7, 62-130 Gołańcz";302803;"gm. Gołańcz";"wągrowiecki";"wielkopolskie";1;1;44;28;59;16
+1;"Sala Widowiskowa Domu Kultury w Mieścisku, ul. Kościuszki 11, 62-290 Mieścisko";302804;"gm. Mieścisko";"wągrowiecki";"wielkopolskie";1;1;282;108;479;73
+2;"Świetlica Wiejska, Kłodzin 28, 62-290 Mieścisko";302804;"gm. Mieścisko";"wągrowiecki";"wielkopolskie";1;1;96;41;55;19
+3;"Dom Kultury, Popowo Kościelne 27, 62-285 Popowo Kościelne";302804;"gm. Mieścisko";"wągrowiecki";"wielkopolskie";1;1;139;50;199;36
+4;"Świetlica Wiejska, Żabiczyn 28, 62-290 Mieścisko";302804;"gm. Mieścisko";"wągrowiecki";"wielkopolskie";1;1;61;14;39;14
+5;"Gminna Biblioteka Publiczna w Mieścisku, ul. Kościuszki 11, 62-290 Mieścisko";302804;"gm. Mieścisko";"wągrowiecki";"wielkopolskie";1;1;132;31;97;20
+6;"Świetlica Wiejska, Gołaszewo 8, 62-290 Mieścisko";302804;"gm. Mieścisko";"wągrowiecki";"wielkopolskie";1;1;68;26;66;24
+7;"Świetlica Wiejska, Sarbia 13A, 62-290 Mieścisko";302804;"gm. Mieścisko";"wągrowiecki";"wielkopolskie";1;1;118;32;93;22
+8;"Świetlica Wiejska, Zbietka 22, 62-290 Mieścisko";302804;"gm. Mieścisko";"wągrowiecki";"wielkopolskie";1;1;58;16;68;14
+9;"Budynek po gimnazjum, ul. św. Wojciecha 3, 62-290 Mieścisko";302804;"gm. Mieścisko";"wągrowiecki";"wielkopolskie";1;1;157;53;232;41
+1;"Szkoła Podstawowa, ul. Poznańska 2, 62-085 Skoki";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;180;91;356;42
+2;"Przedszkole Samorządowe, ul. Henryka Sienkiewicza 19, 62-085 Skoki";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;223;82;488;46
+3;"Przedszkole Samorządowe, ul. Henryka Sienkiewicza 19, 62-085 Skoki";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;273;143;738;72
+4;"Świetlica Wiejska, Kakulin 17A, 62-285 Kakulin";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;52;23;70;14
+5;"Świetlica Wiejska, Bliżyce 28A, 62-085 Bliżyce";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;103;34;85;14
+6;"Świetlica Wiejska, Rejowiec 34, 62-093 Rejowiec";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;158;76;356;52
+7;"Świetlica Wiejska, ul. Skocka 45, 62-085 Potrzanowo";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;165;97;319;54
+8;"Szkoła Podstawowa, Lechlin 9, 62-085 Lechlin";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;68;26;121;29
+9;"Szkoła Podstawowa, Jabłkowo 16A, 62-285 Jabłkowo";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;97;27;58;21
+10;"Przedszkole Publiczne w Jabłkowie Oddział Łosiniec, Łosiniec 23, 62-285 Łosiniec";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;103;39;125;32
+11;"Świetlica Wiejska, Rościnno 24B, 62-085 Rościnno";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;50;24;100;15
+12;"Świetlica Wiejska, Pawłowo Skockie 10B/2, 62-093 Pawłowo Skockie";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;60;32;90;9
+13;"Dom Pomocy Społecznej Mateusz Kozłowski, Jabłkowo 19, 62-285 Jabłkowo";302805;"gm. Skoki";"wągrowiecki";"wielkopolskie";1;1;9;1;1;2
+1;"Szkoła Podstawowa im. Adama Mickiewicza, pl. Mickiewicza 2, 62-120 Wapno";302806;"gm. Wapno";"wągrowiecki";"wielkopolskie";1;1;242;89;337;92
+2;"Dom Pomocy Społecznej, Srebrna Góra 62, 62-120 Wapno";302806;"gm. Wapno";"wągrowiecki";"wielkopolskie";1;1;156;57;140;57
+3;"Świetlica Wiejska, Stołężyn ul. Kcyńska 6, 62-120 Wapno";302806;"gm. Wapno";"wągrowiecki";"wielkopolskie";1;1;80;33;109;27
+1;"Szkoła Podstawowa im. Marii Konopnickiej, ul. Kolejowa 14, 62-100 Wągrowiec";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;38;16;65;11
+2;"Świetlica Wiejska, Łaziska 51, 62-100 Wągrowiec";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;101;65;173;38
+3;"Świetlica Wiejska, Sienno 26b, 62-100 Wągrowiec";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;148;76;196;50
+4;"Szkoła Podstawowa im. Stanisława Staszica, Żelice 14A, 62-113 Żelice";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;125;33;115;25
+5;"Wiejski Ośrodek Integracji i Aktywizacji Wsi, Pawłowo Żońskie 13a, 62-104 Pawłowo Żońskie";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;167;58;159;40
+6;"Zespół Szkolno-Przedszkolny w Łeknie, ul. Pocztowa 7, 62-105 Łekno";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;332;95;348;91
+7;"Świetlica Wiejska, Rąbczyn 68, 62-106 Rąbczyn";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;113;31;163;44
+8;"Świetlica Wiejska, Grylewo 6, 62-104 Grylewo";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;119;45;150;51
+9;"Ośrodek Edukacji Ekologicznej, Kobylec ul. Ratownicza 8A, 62-100 Wągrowiec";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;164;55;390;61
+10;"Świetlica Wiejska, Łęgowo 41A, 62-100 Wągrowiec";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;76;37;129;31
+11;"Ośrodek Edukacji Ekologicznej, Micharzewo 21, 62-100 Wągrowiec";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;72;41;111;18
+12;"Ośrodek Edukacji Ekologicznej, Nowe 27, 62-100 Wągrowiec";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;55;21;35;11
+13;"Świetlica Wiejska, Ochodza 53A, 62-100 Wągrowiec";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;69;40;131;19
+14;"Biblioteka Publiczna w Łeknie Filia w Potulicach, Potulice 13A, 62-112 Potulice";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;123;47;100;33
+15;"Wiejski Ośrodek Integracji i Aktywizacji Wsi w Rgielsku, Rgielsko 22, 62-100 Wągrowiec";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;78;25;70;26
+16;"Świetlica Wiejska, Rudnicze 8A, 62-113 Rudnicze";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;76;47;98;24
+17;"Świetlica Wiejska, Siedleczko 25, 62-105 Łekno";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;88;9;67;22
+18;"Świetlica Wiejska, Werkowo 31A, 62-105 Łekno";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;59;22;55;26
+19;"Szkoła Podstawowa w Wiatrowie, Wiatrowo 1, 62-100 Wągrowiec";302807;"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";1;1;107;37;174;23
+1;"Klub ""Ziemowit"", ul. Bohaterów Westerplatte 12, 77-400 Złotów";303101;"m. Złotów";"złotowski";"wielkopolskie";1;1;313;113;754;82
+2;"Sala Centrum Kształcenia Zawodowego i Ustawicznego w Złotowie, ul. Norwida 10, 77-400 Złotów";303101;"m. Złotów";"złotowski";"wielkopolskie";1;1;297;101;657;88
+3;"Sala Zespołu Szkół Katolickich, ul. Moniuszki 18, 77-400 Złotów";303101;"m. Złotów";"złotowski";"wielkopolskie";1;1;320;110;705;98
+4;"Złotowski Dom Kultury, al. Piasta 26, 77-400 Złotów";303101;"m. Złotów";"złotowski";"wielkopolskie";1;1;344;91;593;86
+5;"Sala Sesyjna Urzędu Miejskiego w Złotowie, al. Piasta 1, 77-400 Złotów";303101;"m. Złotów";"złotowski";"wielkopolskie";1;1;295;105;559;82
+6;"Miejski Ośrodek Pomocy Społecznej w Złotowie, ul. Królowej Jadwigi 54, 77-400 Złotów";303101;"m. Złotów";"złotowski";"wielkopolskie";1;1;276;131;743;79
+7;"Warsztaty Terapii Zajęciowej, ul. Michała Hubego 1, 77-400 Złotów";303101;"m. Złotów";"złotowski";"wielkopolskie";1;1;337;183;1052;101
+8;"Sala Szkoły Podstawowej Nr 2 w Złotowie, ul. 8 Marca 16, 77-400 Złotów";303101;"m. Złotów";"złotowski";"wielkopolskie";1;1;210;54;373;52
+9;"Budynek Administracji, pokój A105 w Szpitalu Powiatowym im. Alfreda Sokołowskiego w Złotowie, ul. Szpitalna 28, 77-400 Złotów";303101;"m. Złotów";"złotowski";"wielkopolskie";1;1;10;3;12;3
+10;"Sala narad w Zakładzie Karnym w Czarnem Oddział Zewnętrzny w Złotowie, pl. Kościuszki 3, 77-400 Złotów";303101;"m. Złotów";"złotowski";"wielkopolskie";1;1;17;27;47;11
+1;"Szkoła Podstawowa nr 1 w Jastrowiu, ul. Kilińszczaków 18, 64-915 Jastrowie";303102;"gm. Jastrowie";"złotowski";"wielkopolskie";1;1;302;108;509;80
+2;"Miejska Biblioteka Publiczna w Jastrowiu, ul. Wojska Polskiego 11, 64-915 Jastrowie";303102;"gm. Jastrowie";"złotowski";"wielkopolskie";1;1;317;94;378;90
+3;"Specjalny Ośrodek Szkolno-Wychowawczy w Jastrowiu, ul. Wojska Polskiego 25, 64-915 Jastrowie";303102;"gm. Jastrowie";"złotowski";"wielkopolskie";1;1;403;126;751;110
+4;"Zespół Szkół w Jastrowiu, ul. Poznańska 35, 64-915 Jastrowie";303102;"gm. Jastrowie";"złotowski";"wielkopolskie";1;1;174;54;311;66
+5;"Szkoła Podstawowa w Brzeźnicy, Brzeźnica 61, 64-915 Jastrowie";303102;"gm. Jastrowie";"złotowski";"wielkopolskie";1;1;136;39;123;33
+6;"Wiejski Dom Kultury w Sypniewie, Sypniewo ul. Mickiewicza 43, 64-915 Jastrowie";303102;"gm. Jastrowie";"złotowski";"wielkopolskie";1;1;207;65;243;30
+7;"Świetlica Wiejska, Samborsko 6, 64-915 Jastrowie";303102;"gm. Jastrowie";"złotowski";"wielkopolskie";1;1;54;23;82;29
+8;"Świetlica Wiejska, Nadarzyce 31, 64-915 Jastrowie";303102;"gm. Jastrowie";"złotowski";"wielkopolskie";1;1;68;15;24;22
+1;"Krajeński Ośrodek Kultury w Krajence, ul. Rynek 1, 77-430 Krajenka";303103;"gm. Krajenka";"złotowski";"wielkopolskie";1;1;248;86;399;67
+2;"Warsztat Terapii Zajęciowej w Krajence, ul. Bydgoska 3, 77-430 Krajenka";303103;"gm. Krajenka";"złotowski";"wielkopolskie";1;1;125;44;196;35
+3;"Dom Strażaka w Krajence, ul. Floriańska 6, 77-430 Krajenka";303103;"gm. Krajenka";"złotowski";"wielkopolskie";1;1;381;134;439;95
+4;"Szkoła Podstawowa w Głubczynie, Głubczyn 23, 77-430 Krajenka";303103;"gm. Krajenka";"złotowski";"wielkopolskie";1;1;109;61;165;46
+5;"Szkoła Podstawowa w Śmiardowie Kraj., Śmiardowo Krajeńskie 68, 77-430 Krajenka";303103;"gm. Krajenka";"złotowski";"wielkopolskie";1;1;79;29;87;29
+6;"Szkoła Podstawowa w Podróżnej, Podróżna 50, 77-430 Krajenka";303103;"gm. Krajenka";"złotowski";"wielkopolskie";1;1;93;34;91;13
+7;"Szkoła Podstawowa w Dolniku, Dolnik 13, 77-430 Krajenka";303103;"gm. Krajenka";"złotowski";"wielkopolskie";1;1;83;35;100;21
+8;"Szkoła Podstawowa w Skórce, ul. Złotowska 4, 64-917 Skórka";303103;"gm. Krajenka";"złotowski";"wielkopolskie";1;1;73;54;299;53
+1;"Wiejski Dom Kultury, Wielki Buczek 1A, 77-420 Lipka";303104;"gm. Lipka";"złotowski";"wielkopolskie";1;1;123;46;124;28
+2;"Gminny Ośrodek Kultury, ul. IV Dywizji Piechoty 2, 77-420 Lipka";303104;"gm. Lipka";"złotowski";"wielkopolskie";1;1;223;100;269;67
+3;"Gminny Ośrodek Kultury, ul. IV Dywizji Piechoty 2, 77-420 Lipka";303104;"gm. Lipka";"złotowski";"wielkopolskie";1;1;225;102;463;81
+4;"Szkoła Podstawowa im. Janusza Korczaka w Łąkiem, Łąkie 89, 77-420 Lipka";303104;"gm. Lipka";"złotowski";"wielkopolskie";1;1;87;24;84;15
+5;"Sala Wiejska, Debrzno-Wieś 16C, 77-420 Lipka";303104;"gm. Lipka";"złotowski";"wielkopolskie";1;1;66;25;72;15
+6;"Sala Wiejska, Kiełpin 39a, 77-420 Lipka";303104;"gm. Lipka";"złotowski";"wielkopolskie";1;1;91;18;49;12
+7;"Sala Wiejska, Scholastykowo 31, 77-420 Lipka";303104;"gm. Lipka";"złotowski";"wielkopolskie";1;1;62;12;40;16
+1;"Szkoła Podstawowa w Okonku, ul. Niepodległości 23, 64-965 Okonek";303105;"gm. Okonek";"złotowski";"wielkopolskie";1;1;252;67;358;50
+2;"Szkoła Podstawowa w Okonku, ul. Niepodległości 23, 64-965 Okonek";303105;"gm. Okonek";"złotowski";"wielkopolskie";1;1;333;120;490;91
+3;"Szkoła Podstawowa w Okonku, ul. Niepodległości 24, 64-965 Okonek";303105;"gm. Okonek";"złotowski";"wielkopolskie";1;1;35;16;63;6
+4;"Zespół Szkół w Lotyniu, ul. Polna 9, 64-918 Lotyń";303105;"gm. Okonek";"złotowski";"wielkopolskie";1;1;230;56;227;58
+5;"Świetlica Wiejska, Węgorzewo 15, 64-965 Okonek";303105;"gm. Okonek";"złotowski";"wielkopolskie";1;1;133;31;89;22
+6;"Świetlica Wiejska, Pniewo 52A, 64-965 Okonek";303105;"gm. Okonek";"złotowski";"wielkopolskie";1;1;46;19;67;13
+7;"Świetlica Wiejska, Podgaje ul. Gdańska 3, 64-965 Okonek";303105;"gm. Okonek";"złotowski";"wielkopolskie";1;1;89;36;91;16
+8;"Świetlica Wiejska, Lędyczek ul. Moniuszki 5, 64-965 Okonek";303105;"gm. Okonek";"złotowski";"wielkopolskie";1;1;57;21;102;12
+9;"Świetlica Wiejska, Borucino 46, 64-965 Okonek";303105;"gm. Okonek";"złotowski";"wielkopolskie";1;1;41;22;91;17
+10;"Świetlica Wiejska, Ciosaniec 35A, 64-965 Okonek";303105;"gm. Okonek";"złotowski";"wielkopolskie";1;1;74;23;62;14
+11;"Świetlica Wiejska, Łomczewo 8, 64-965 Okonek";303105;"gm. Okonek";"złotowski";"wielkopolskie";1;1;104;17;48;8
+1;"Zespół Szkół, ul. Zwycięstwa 27, 77-416 Tarnówka";303106;"gm. Tarnówka";"złotowski";"wielkopolskie";1;1;353;133;438;80
+2;"Sala wiejska, Piecewo 23, 77-416 Tarnówka";303106;"gm. Tarnówka";"złotowski";"wielkopolskie";1;1;73;34;93;14
+3;"Świetlica wiejska, Bartoszkowo 17, 77-416 Tarnówka";303106;"gm. Tarnówka";"złotowski";"wielkopolskie";1;1;86;33;108;25
+4;"Sala wiejska, Sokolna 24, 77-416 Tarnówka";303106;"gm. Tarnówka";"złotowski";"wielkopolskie";1;1;44;7;42;12
+1;"""Dom Polski""-Centrum Idei Rodła, ul. ks. dr. Bolesława Domańskiego 18, 77-424 Zakrzewo";303107;"gm. Zakrzewo";"złotowski";"wielkopolskie";1;1;221;92;353;52
+2;"Sala gimnastyczna, Stara Wiśniewka 59, 77-411 Stara Wiśniewka";303107;"gm. Zakrzewo";"złotowski";"wielkopolskie";1;1;150;57;153;54
+3;"Świetlica wiejska w Śmiardowie Złotowskim, Śmiardowo Złotowskie 31d, 77-424 Zakrzewo";303107;"gm. Zakrzewo";"złotowski";"wielkopolskie";1;1;32;18;63;8
+4;"Hala Sportowo-Widowiskowa, ul. Marii Magdaleny Gąszczak 29, 77-424 Zakrzewo";303107;"gm. Zakrzewo";"złotowski";"wielkopolskie";1;1;186;87;220;42
+5;"Sala wiejska w Czernicach, Czernice 49, 77-424 Zakrzewo";303107;"gm. Zakrzewo";"złotowski";"wielkopolskie";1;1;46;38;66;14
+6;"Sala wiejska w Drożyskach Wielkich, Drożyska Wielkie 55, 77-424 Zakrzewo";303107;"gm. Zakrzewo";"złotowski";"wielkopolskie";1;1;88;39;108;23
+7;"Sala wiejska w Kujanie, Kujan 23, 77-424 Zakrzewo";303107;"gm. Zakrzewo";"złotowski";"wielkopolskie";1;1;39;14;107;22
+8;"Sala wiejska w Wersku, Wersk 45, 77-424 Zakrzewo";303107;"gm. Zakrzewo";"złotowski";"wielkopolskie";1;1;27;16;51;27
+1;"Szkoła Podstawowa, Radawnica ul. Szkolna 2, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;108;46;131;30
+2;"Urząd Gminy, ul. Leśna 7, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;101;42;245;39
+3;"Szkoła Podstawowa, Święta ul. Szkolna 12, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;284;108;543;96
+4;"Szkoła Podstawowa, Kleszczyna 28, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;90;45;68;29
+5;"Sala Wiejska w Sławianowie, Sławianowo 1, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;193;57;153;32
+6;"Sala Wiejska w Józefowie, Józefowo 19a, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;108;47;119;33
+7;"Sala Wiejska w Nowym Dworze, Nowy Dwór 2, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;74;36;84;34
+8;"Sala Wiejska w Kamieniu, Kamień 46c, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;45;17;52;12
+9;"Szkoła Podstawowa w Górznej, Górzna 22, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;80;45;122;28
+10;"Sala Wiejska w Dzierzążenku, Dzierzążenko ul. Gajowa 28, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;71;40;249;27
+11;"Sala Wiejska w Międzybłociu, Międzybłocie ul. Trzech Króli 7, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;50;43;149;23
+12;"Sala Wiejska w Zalesiu, Zalesie 1a, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;53;22;82;17
+13;"Sala Wiejska w Pieczynku, Pieczynek 13, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;57;24;48;10
+14;"Sala Wiejska w Klukowie, Klukowo 17a, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;20;7;62;12
+15;"Oddział Przedszkolny w Skicu, Skic 70A, 77-400 Złotów";303108;"gm. Złotów";"złotowski";"wielkopolskie";1;1;187;38;117;27

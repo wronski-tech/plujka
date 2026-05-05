@@ -1,0 +1,28 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Wiktor Michał DURLAK";"Stanisław KOGUT";"Liczba obwodów"
+"120501";"gmina miejska";"m. Gorlice";"gorlicki";"małopolskie";20730;21968;7952;12778;20;96;8;8;0;0;0;0;8;12778;8;0;12778;2457;1119;1338;0;10321;5709;4612;22
+"120502";"gmina miejsko-wiejska";"gm. Biecz";"gorlicki";"małopolskie";12382;13416;4890;7492;14;28;3;3;0;0;0;0;3;7493;3;0;7493;711;297;414;0;6782;4357;2425;12
+"120503";"gmina miejsko-wiejska";"gm. Bobowa";"gorlicki";"małopolskie";6782;7372;2340;4442;4;29;0;0;0;0;0;0;0;4441;0;0;4441;206;56;150;0;4235;2266;1969;7
+"120504";"gmina wiejska";"gm. Gorlice";"gorlicki";"małopolskie";12712;13672;4724;7988;7;47;2;2;0;0;0;0;2;7989;2;0;7989;730;341;389;0;7259;4395;2864;11
+"120505";"gmina wiejska";"gm. Lipinki";"gorlicki";"małopolskie";5000;5447;1863;3137;2;10;0;0;0;0;0;0;0;3137;0;0;3137;232;101;131;0;2905;1803;1102;7
+"120506";"gmina wiejska";"gm. Łużna";"gorlicki";"małopolskie";6030;6605;2234;3796;8;17;0;0;0;0;0;0;0;3796;0;0;3796;269;85;184;0;3527;1968;1559;9
+"120507";"gmina wiejska";"gm. Moszczenica";"gorlicki";"małopolskie";3567;3832;1418;2149;8;11;0;0;0;0;0;0;0;2149;0;0;2149;126;44;82;0;2023;1253;770;3
+"120508";"gmina wiejska";"gm. Ropa";"gorlicki";"małopolskie";3782;4139;1297;2484;14;15;0;0;0;0;0;0;0;2485;0;0;2485;168;65;103;0;2317;1422;895;5
+"120509";"gmina wiejska";"gm. Sękowa";"gorlicki";"małopolskie";3682;4022;1396;2286;1;55;0;0;0;0;0;0;0;2286;0;0;2286;315;124;191;0;1971;1138;833;6
+"120510";"gmina wiejska";"gm. Uście Gorlickie";"gorlicki";"małopolskie";4868;5519;1897;2971;2;236;0;0;0;0;0;0;0;2970;0;0;2970;335;117;218;0;2635;1346;1289;10
+"121001";"gmina miejska";"m. Grybów";"nowosądecki";"małopolskie";4389;4702;1254;3135;10;11;0;0;0;0;0;0;0;3135;0;0;3135;265;140;125;0;2870;1390;1480;4
+"121002";"gmina wiejska";"gm. Chełmiec";"nowosądecki";"małopolskie";19944;21513;5997;13947;8;97;1;1;0;0;0;0;1;13948;1;0;13948;1120;431;689;0;12828;8282;4546;27
+"121003";"gmina wiejska";"gm. Gródek nad Dunajcem";"nowosądecki";"małopolskie";6500;7137;2168;4332;3;80;0;0;0;0;0;0;0;4331;0;0;4331;259;75;184;0;4072;2293;1779;7
+"121004";"gmina wiejska";"gm. Grybów";"nowosądecki";"małopolskie";17264;18773;4434;12830;24;29;0;0;0;0;0;0;0;12829;0;0;12829;407;183;224;0;12422;6476;5946;15
+"121005";"gmina wiejska";"gm. Kamionka Wielka";"nowosądecki";"małopolskie";7145;7774;1867;5278;0;22;0;0;0;0;0;0;0;5277;0;0;5277;308;117;191;0;4969;3343;1626;8
+"121006";"gmina wiejska";"gm. Korzenna";"nowosądecki";"małopolskie";10083;11062;3070;7013;15;38;0;0;0;0;0;0;0;7013;0;0;7013;258;65;193;0;6755;3732;3023;9
+"121007";"gmina miejsko-wiejska";"gm. Krynica-Zdrój";"nowosądecki";"małopolskie";13938;15268;4249;9701;7;1788;0;0;0;0;0;0;0;9694;0;2;9692;1339;596;743;0;8353;4431;3922;18
+"121008";"gmina wiejska";"gm. Łabowa";"nowosądecki";"małopolskie";4076;4429;1402;2674;0;30;0;0;0;0;0;0;0;2674;0;0;2674;177;59;118;0;2497;1718;779;5
+"121009";"gmina wiejska";"gm. Łącko";"nowosądecki";"małopolskie";11342;12283;3668;7674;4;69;0;0;0;0;0;0;0;7672;0;0;7672;546;178;368;0;7126;5013;2113;12
+"121010";"gmina wiejska";"gm. Łososina Dolna";"nowosądecki";"małopolskie";7506;8232;2034;5472;5;57;0;0;0;0;0;0;0;5471;0;0;5471;225;58;167;0;5246;3663;1583;8
+"121011";"gmina miejsko-wiejska";"gm. Muszyna";"nowosądecki";"małopolskie";8366;9474;2594;5772;8;404;0;0;0;0;0;0;0;5770;0;0;5770;577;234;343;0;5193;3159;2034;14
+"121012";"gmina wiejska";"gm. Nawojowa";"nowosądecki";"małopolskie";5889;6362;1891;3998;6;20;0;0;0;0;0;0;0;3993;0;0;3993;313;132;181;0;3680;2587;1093;8
+"121013";"gmina miejsko-wiejska";"gm. Piwniczna-Zdrój";"nowosądecki";"małopolskie";7555;8506;2709;4846;9;173;0;0;0;0;0;0;0;4844;0;0;4844;382;148;234;0;4462;3071;1391;8
+"121014";"gmina wiejska";"gm. Podegrodzie";"nowosądecki";"małopolskie";8898;9762;2495;6402;7;27;0;0;0;0;0;0;0;6400;0;0;6400;398;149;249;0;6002;4161;1841;13
+"121015";"gmina wiejska";"gm. Rytro";"nowosądecki";"małopolskie";2641;2910;826;1815;1;23;0;0;0;0;0;0;0;1811;0;0;1811;134;64;70;0;1677;1186;491;2
+"121016";"gmina miejsko-wiejska";"gm. Stary Sącz";"nowosądecki";"małopolskie";16652;18162;5080;11572;14;84;0;0;0;0;0;0;0;11565;0;0;11565;1052;420;632;0;10513;7243;3270;15
+"126201";"gmina miejska";"m. Nowy Sącz";"Nowy Sącz";"małopolskie";59180;63838;17745;41436;45;250;10;10;0;0;0;0;10;41421;10;0;41421;6518;3193;3325;0;34903;19714;15189;53

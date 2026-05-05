@@ -1,0 +1,29 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Jerzy CZERWIŃSKI";"Adam Józef MAZGUŁA";"Janusz Antoni SANOCKI";"Jan Franciszek WOŹNIAK";"Liczba obwodów"
+"160101";"gmina miejska";"m. Brzeg";"brzeski";"opolskie";25641;27660;9278;16364;20;68;1;1;0;0;0;0;1;16363;1;0;16363;304;97;207;0;16059;6807;1066;1936;6250;24
+"160102";"gmina wiejska";"gm. Skarbimierz";"brzeski";"opolskie";5618;6118;1864;3754;3;19;0;0;0;0;0;0;0;3753;0;0;3753;67;18;49;0;3686;1867;243;430;1146;12
+"160103";"gmina miejsko-wiejska";"gm. Grodków";"brzeski";"opolskie";13881;15060;6049;7832;7;51;0;0;0;0;0;0;0;7832;0;0;7832;171;36;135;0;7661;3536;518;833;2774;19
+"160104";"gmina miejsko-wiejska";"gm. Lewin Brzeski";"brzeski";"opolskie";9277;10107;4073;5204;5;32;1;1;0;0;0;0;1;5203;1;0;5203;124;41;83;0;5079;2447;392;573;1667;7
+"160105";"gmina wiejska";"gm. Lubsza";"brzeski";"opolskie";6482;7043;2604;3878;1;10;0;0;0;0;0;0;0;3878;0;0;3878;85;16;69;0;3793;1941;252;427;1173;11
+"160106";"gmina wiejska";"gm. Olszanka";"brzeski";"opolskie";3566;3861;1321;2245;7;5;0;0;0;0;0;0;0;2245;0;0;2245;38;5;33;0;2207;1251;132;240;584;6
+"160401";"gmina miejsko-wiejska";"gm. Byczyna";"kluczborski";"opolskie";6789;7336;3165;3624;2;17;0;0;0;0;0;0;0;3624;0;0;3624;71;14;57;0;3553;1767;249;327;1210;9
+"160402";"gmina miejsko-wiejska";"gm. Kluczbork";"kluczborski";"opolskie";26662;28953;11104;15552;25;62;0;0;0;0;0;0;0;15554;0;0;15554;436;82;354;0;15118;5973;1254;1706;6185;29
+"160403";"gmina wiejska";"gm. Lasowice Wielkie";"kluczborski";"opolskie";5128;5555;2976;2152;0;8;0;0;0;0;0;0;0;2152;0;0;2152;111;8;103;0;2041;817;220;251;753;10
+"160404";"gmina miejsko-wiejska";"gm. Wołczyn";"kluczborski";"opolskie";9665;10427;4387;5278;14;27;0;0;0;0;0;0;0;5278;0;0;5278;115;25;90;0;5163;2745;315;461;1642;15
+"160601";"gmina wiejska";"gm. Domaszowice";"namysłowski";"opolskie";2654;2870;987;1666;3;7;0;0;0;0;0;0;0;1667;0;0;1667;48;7;41;0;1619;849;93;139;538;7
+"160602";"gmina miejsko-wiejska";"gm. Namysłów";"namysłowski";"opolskie";18989;20509;7047;11942;7;45;0;0;0;0;0;0;0;11942;0;0;11942;262;65;197;0;11680;5389;802;1187;4302;28
+"160603";"gmina wiejska";"gm. Pokój";"namysłowski";"opolskie";3910;4185;1960;1950;2;23;0;0;0;0;0;0;0;1950;0;0;1950;48;5;43;0;1902;724;165;216;797;9
+"160604";"gmina wiejska";"gm. Świerczów";"namysłowski";"opolskie";2571;2779;1118;1453;0;0;0;0;0;0;0;0;0;1453;0;0;1453;34;8;26;0;1419;683;125;139;472;5
+"160605";"gmina wiejska";"gm. Wilków";"namysłowski";"opolskie";3220;3495;1508;1712;0;3;0;0;0;0;0;0;0;1712;0;0;1712;31;9;22;0;1681;887;126;153;515;7
+"160701";"gmina miejsko-wiejska";"gm. Głuchołazy";"nyski";"opolskie";18239;19779;8076;10162;16;184;1;1;0;0;0;0;1;10164;1;0;10164;201;59;142;0;9963;4539;701;1184;3539;20
+"160702";"gmina wiejska";"gm. Kamiennik";"nyski";"opolskie";2576;2764;1221;1355;1;3;0;0;0;0;0;0;0;1355;0;0;1355;21;4;17;0;1334;720;81;154;379;5
+"160703";"gmina miejsko-wiejska";"gm. Korfantów";"nyski";"opolskie";6924;7485;3517;3405;1;25;0;0;0;0;0;0;0;3407;0;0;3407;84;14;70;0;3323;1885;220;378;840;11
+"160704";"gmina wiejska";"gm. Łambinowice";"nyski";"opolskie";5448;5939;2516;2932;3;11;0;0;0;0;0;0;0;2932;0;0;2932;79;10;69;0;2853;1373;201;384;895;8
+"160705";"gmina miejsko-wiejska";"gm. Nysa";"nyski";"opolskie";42461;45628;16733;25724;51;149;5;5;0;0;0;0;5;25728;5;6;25722;532;163;369;0;25190;9859;3489;3296;8546;35
+"160706";"gmina miejsko-wiejska";"gm. Otmuchów";"nyski";"opolskie";10070;10987;4090;5980;11;38;0;0;0;0;0;0;0;5980;0;0;5980;115;29;86;0;5865;2498;306;375;2686;15
+"160707";"gmina miejsko-wiejska";"gm. Paczków";"nyski";"opolskie";9305;9997;4223;5082;7;34;0;0;0;0;0;0;0;5082;0;0;5082;99;18;81;0;4983;2517;326;424;1716;14
+"160708";"gmina wiejska";"gm. Pakosławice";"nyski";"opolskie";2730;2954;1147;1583;3;6;0;0;0;0;0;0;0;1583;0;0;1583;26;2;24;0;1557;815;118;197;427;6
+"160709";"gmina wiejska";"gm. Skoroszyce";"nyski";"opolskie";4550;4940;2001;2549;7;10;0;0;0;0;0;0;0;2547;0;0;2547;36;10;26;0;2511;1362;191;315;643;6
+"161001";"gmina miejsko-wiejska";"gm. Biała";"prudnicki";"opolskie";7894;8567;4394;3500;3;5;0;0;0;0;0;0;0;3500;0;0;3500;203;23;180;0;3297;1438;335;427;1097;18
+"161002";"gmina miejsko-wiejska";"gm. Głogówek";"prudnicki";"opolskie";9611;10468;4857;4754;13;20;0;0;0;0;0;0;0;4754;0;0;4754;223;60;163;0;4531;1987;390;628;1526;16
+"161003";"gmina wiejska";"gm. Lubrza";"prudnicki";"opolskie";3222;3456;1364;1858;1;4;0;0;0;0;0;0;0;1858;0;0;1858;50;14;36;0;1808;909;118;187;594;9
+"161004";"gmina miejsko-wiejska";"gm. Prudnik";"prudnicki";"opolskie";19843;21053;8201;11642;14;59;1;1;0;0;0;0;1;11644;1;0;11644;275;83;192;0;11369;5841;869;1060;3599;27

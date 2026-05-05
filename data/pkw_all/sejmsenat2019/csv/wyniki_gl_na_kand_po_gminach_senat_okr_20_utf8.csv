@@ -1,0 +1,24 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Robert DOWHAN";"Zbigniew KOŚCIK";"Liczba obwodów"
+"080201";"gmina miejska";"m. Gubin";"krośnieński";"lubuskie";11658;12640;4684;6974;8;57;1;1;0;0;0;0;1;6975;1;0;6975;254;50;204;0;6721;4824;1897;10
+"080202";"gmina wiejska";"gm. Bobrowice";"krośnieński";"lubuskie";2340;2545;1048;1292;1;9;0;0;0;0;0;0;0;1292;0;0;1292;52;5;47;0;1240;719;521;3
+"080203";"gmina wiejska";"gm. Bytnica";"krośnieński";"lubuskie";1800;1962;949;851;1;12;0;0;0;0;0;0;0;851;0;3;848;19;3;16;0;829;448;381;2
+"080204";"gmina wiejska";"gm. Dąbie";"krośnieński";"lubuskie";3540;3934;1488;2052;1;9;0;0;0;0;0;0;0;2052;0;0;2052;94;20;74;0;1958;1147;811;7
+"080205";"gmina wiejska";"gm. Gubin";"krośnieński";"lubuskie";5260;5726;2562;2698;4;16;0;0;0;0;0;0;0;2698;0;0;2698;105;22;83;0;2593;1528;1065;12
+"080206";"gmina miejsko-wiejska";"gm. Krosno Odrzańskie";"krośnieński";"lubuskie";12778;13878;4889;7889;5;46;0;0;0;0;0;0;0;7887;0;0;7887;286;72;214;0;7601;4958;2643;14
+"080207";"gmina wiejska";"gm. Maszewo";"krośnieński";"lubuskie";2050;2234;1002;1048;0;4;0;0;0;0;0;0;0;1048;0;0;1048;37;7;30;0;1011;518;493;2
+"080801";"gmina wiejska";"gm. Lubrza";"świebodziński";"lubuskie";2550;2796;1055;1495;1;21;0;0;0;0;0;0;0;1494;0;0;1494;50;5;45;0;1444;845;599;2
+"080802";"gmina wiejska";"gm. Łagów";"świebodziński";"lubuskie";3680;4031;1602;2078;4;41;0;0;0;0;0;0;0;2077;0;0;2077;87;15;72;0;1990;1180;810;3
+"080803";"gmina wiejska";"gm. Skąpe";"świebodziński";"lubuskie";3685;4026;1597;2087;0;23;1;1;0;0;0;0;1;2089;1;0;2089;78;16;62;0;2011;1201;810;4
+"080804";"gmina wiejska";"gm. Szczaniec";"świebodziński";"lubuskie";2789;3091;1181;1608;1;3;0;0;0;0;0;0;0;1608;0;0;1608;81;21;60;0;1527;765;762;3
+"080805";"gmina miejsko-wiejska";"gm. Świebodzin";"świebodziński";"lubuskie";21279;22680;8343;12935;14;84;2;2;0;0;0;0;2;12937;2;9;12928;429;106;323;0;12499;7784;4715;21
+"080806";"gmina miejsko-wiejska";"gm. Zbąszynek";"świebodziński";"lubuskie";5870;6350;2069;3801;3;20;1;1;0;0;0;0;1;3801;1;0;3801;127;42;85;0;3674;2335;1339;5
+"080901";"gmina miejsko-wiejska";"gm. Babimost";"zielonogórski";"lubuskie";4440;4902;1560;2880;2;36;0;0;0;0;0;0;0;2880;0;0;2880;112;31;81;0;2768;1713;1055;4
+"080902";"gmina wiejska";"gm. Bojadła";"zielonogórski";"lubuskie";2380;2606;1118;1262;3;8;0;0;0;0;0;0;0;1262;0;0;1262;60;15;45;0;1202;670;532;3
+"080903";"gmina miejsko-wiejska";"gm. Czerwieńsk";"zielonogórski";"lubuskie";6985;7622;2702;4283;1;22;0;0;0;0;0;0;0;4283;0;1;4282;123;32;91;0;4159;2638;1521;7
+"080904";"gmina miejsko-wiejska";"gm. Kargowa";"zielonogórski";"lubuskie";4180;4583;1663;2517;3;24;0;0;0;0;0;0;0;2517;0;0;2517;76;16;60;0;2441;1499;942;3
+"080905";"gmina miejsko-wiejska";"gm. Nowogród Bobrzański";"zielonogórski";"lubuskie";7408;8001;3170;4235;1;13;1;1;0;0;0;0;1;4239;1;0;4239;160;46;114;0;4079;2583;1496;7
+"080906";"gmina miejsko-wiejska";"gm. Sulechów";"zielonogórski";"lubuskie";18326;19780;6716;11607;20;67;0;0;0;0;0;0;0;11610;0;4;11606;405;94;311;0;11201;7044;4157;15
+"080907";"gmina wiejska";"gm. Świdnica";"zielonogórski";"lubuskie";4710;5144;1438;3269;0;22;0;0;0;0;0;0;0;3271;0;2;3269;104;34;70;0;3165;2168;997;4
+"080908";"gmina wiejska";"gm. Trzebiechów";"zielonogórski";"lubuskie";2350;2564;1120;1228;1;3;0;0;0;0;0;0;0;1230;0;0;1230;67;12;55;0;1163;693;470;5
+"080909";"gmina wiejska";"gm. Zabór";"zielonogórski";"lubuskie";2980;3285;945;2034;3;7;4;4;0;0;0;0;4;2037;4;0;2037;75;20;55;0;1962;1380;582;3
+"086201";"gmina miejska";"m. Zielona Góra";"Zielona Góra";"lubuskie";96804;105352;25015;71779;89;559;11;11;0;0;0;0;11;71769;11;48;71721;2342;682;1660;0;69379;48758;20621;76

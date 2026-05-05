@@ -1,0 +1,38 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Jan AUGUSTYN";"Adam Stanisław SZEJNFELD";"Jolanta Małgorzata TURCZYNOWICZ-KIERYŁŁO";"Liczba obwodów"
+"300101";"gmina miejska";"m. Chodzież";"chodzieski";"wielkopolskie";13868;14769;4270;9598;12;49;0;0;0;0;0;0;0;9596;0;0;9596;271;82;189;0;9325;1816;4771;2738;11
+"300102";"gmina wiejska";"gm. Budzyń";"chodzieski";"wielkopolskie";5924;6447;2350;3574;7;6;0;0;0;0;0;0;0;3572;0;0;3572;93;13;80;0;3479;643;1588;1248;5
+"300103";"gmina wiejska";"gm. Chodzież";"chodzieski";"wielkopolskie";4221;4605;1471;2750;3;9;0;0;0;0;0;0;0;2750;0;0;2750;69;13;56;0;2681;506;1294;881;8
+"300104";"gmina miejsko-wiejska";"gm. Margonin";"chodzieski";"wielkopolskie";4510;4935;1414;3096;3;15;0;0;0;0;0;0;0;3095;0;0;3095;95;22;73;0;3000;537;1407;1056;7
+"300105";"gmina miejsko-wiejska";"gm. Szamocin";"chodzieski";"wielkopolskie";5405;5818;2252;3153;2;21;0;0;0;0;0;0;0;3153;0;0;3153;67;23;44;0;3086;605;1255;1226;5
+"300201";"gmina miejska";"m. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";7846;8457;2559;5287;10;25;0;0;0;0;0;0;0;5287;0;1;5286;120;27;93;0;5166;857;2676;1633;6
+"300202";"gmina wiejska";"gm. Czarnków";"czarnkowsko-trzcianecki";"wielkopolskie";8027;8817;3216;4811;1;30;0;0;0;0;0;0;0;4811;0;0;4811;115;21;94;0;4696;789;1907;2000;11
+"300203";"gmina wiejska";"gm. Drawsko";"czarnkowsko-trzcianecki";"wielkopolskie";4232;4615;1604;2628;2;9;0;0;0;0;0;0;0;2627;0;0;2627;68;15;53;0;2559;419;940;1200;5
+"300204";"gmina miejsko-wiejska";"gm. Krzyż Wielkopolski";"czarnkowsko-trzcianecki";"wielkopolskie";6250;6860;2648;3602;4;17;0;0;0;0;0;0;0;3601;0;0;3601;96;31;65;0;3505;495;1647;1363;5
+"300205";"gmina wiejska";"gm. Lubasz";"czarnkowsko-trzcianecki";"wielkopolskie";5390;5826;1929;3461;0;10;0;0;0;0;0;0;0;3460;0;0;3460;93;24;69;0;3367;643;1458;1266;6
+"300206";"gmina wiejska";"gm. Połajewo";"czarnkowsko-trzcianecki";"wielkopolskie";4384;4814;1721;2662;1;6;0;0;0;0;0;0;0;2662;0;0;2662;72;20;52;0;2590;354;1055;1181;4
+"300207";"gmina miejsko-wiejska";"gm. Trzcianka";"czarnkowsko-trzcianecki";"wielkopolskie";16944;18425;6066;10878;19;75;1;1;0;0;0;0;1;10877;1;0;10877;290;73;217;0;10587;1978;4999;3610;14
+"300208";"gmina miejsko-wiejska";"gm. Wieleń";"czarnkowsko-trzcianecki";"wielkopolskie";8767;9605;3603;5164;3;36;0;0;0;0;0;0;0;5163;0;0;5163;142;24;118;0;5021;833;2033;2155;10
+"301901";"gmina miejska";"m. Piła";"pilski";"wielkopolskie";50783;55130;14842;35943;48;241;4;4;0;0;0;0;4;35940;4;0;35940;989;354;635;0;34951;5924;16610;12417;33
+"301902";"gmina wiejska";"gm. Białośliwie";"pilski";"wielkopolskie";3398;3706;1198;2200;4;7;0;0;0;0;0;0;0;2200;0;0;2200;63;14;49;0;2137;401;718;1018;5
+"301903";"gmina wiejska";"gm. Kaczory";"pilski";"wielkopolskie";5568;6113;1877;3691;9;27;0;0;0;0;0;0;0;3691;0;0;3691;100;56;44;0;3591;685;1196;1710;5
+"301904";"gmina miejsko-wiejska";"gm. Łobżenica";"pilski";"wielkopolskie";6702;7343;2874;3828;2;8;0;0;0;0;0;0;0;3828;0;0;3828;92;38;54;0;3736;576;963;2197;6
+"301905";"gmina wiejska";"gm. Miasteczko Krajeńskie";"pilski";"wielkopolskie";2293;2504;936;1357;2;6;0;0;0;0;0;0;0;1356;0;5;1351;51;7;44;0;1300;254;509;537;3
+"301906";"gmina wiejska";"gm. Szydłowo";"pilski";"wielkopolskie";6292;6859;2315;3977;8;18;1;1;0;0;0;0;1;3978;1;0;3978;111;44;67;0;3867;710;1696;1461;7
+"301907";"gmina miejsko-wiejska";"gm. Ujście";"pilski";"wielkopolskie";5705;6220;2134;3570;1;22;0;0;0;0;0;0;0;3570;0;0;3570;125;36;89;0;3445;679;1368;1398;8
+"301908";"gmina miejsko-wiejska";"gm. Wyrzysk";"pilski";"wielkopolskie";9926;10773;4172;5754;5;23;1;1;0;0;0;0;1;5755;1;3;5752;156;36;120;0;5596;922;1922;2752;11
+"301909";"gmina miejsko-wiejska";"gm. Wysoka";"pilski";"wielkopolskie";4674;5047;2009;2665;1;8;0;0;0;0;0;0;0;2665;0;0;2665;62;12;50;0;2603;403;861;1339;4
+"302801";"gmina miejska";"m. Wągrowiec";"wągrowiecki";"wielkopolskie";18104;19630;5684;12420;11;69;0;0;0;0;0;0;0;12417;0;0;12417;282;106;176;0;12135;2214;5884;4037;12
+"302802";"gmina wiejska";"gm. Damasławek";"wągrowiecki";"wielkopolskie";3863;4174;1581;2282;1;4;0;0;0;0;0;0;0;2282;0;0;2282;56;15;41;0;2226;279;782;1165;4
+"302803";"gmina miejsko-wiejska";"gm. Gołańcz";"wągrowiecki";"wielkopolskie";5724;6259;2341;3383;3;8;0;0;0;0;0;0;0;3382;0;0;3382;106;44;62;0;3276;600;1212;1464;7
+"302804";"gmina wiejska";"gm. Mieścisko";"wągrowiecki";"wielkopolskie";4243;4643;1705;2538;1;5;0;0;0;0;0;0;0;2538;0;1;2537;69;12;57;0;2468;402;946;1120;5
+"302805";"gmina miejsko-wiejska";"gm. Skoki";"wągrowiecki";"wielkopolskie";6595;7397;2431;4164;3;30;0;0;0;0;0;0;0;4164;0;0;4164;67;16;51;0;4097;573;2025;1499;9
+"302806";"gmina wiejska";"gm. Wapno";"wągrowiecki";"wielkopolskie";2133;2334;966;1167;0;2;0;0;0;0;0;0;0;1167;0;0;1167;30;8;22;0;1137;249;435;453;2
+"302807";"gmina wiejska";"gm. Wągrowiec";"wągrowiecki";"wielkopolskie";8390;9325;3492;4898;2;22;0;0;0;0;0;0;0;4898;0;0;4898;127;29;98;0;4771;878;1871;2022;7
+"303101";"gmina miejska";"m. Złotów";"złotowski";"wielkopolskie";13527;14476;4744;8783;13;49;2;2;0;0;0;0;2;8784;2;0;8784;178;57;121;0;8606;1596;4079;2931;10
+"303102";"gmina miejsko-wiejska";"gm. Jastrowie";"złotowski";"wielkopolskie";7986;8731;3686;4300;7;34;1;1;0;0;0;0;1;4301;1;0;4301;119;17;102;0;4182;663;1797;1722;6
+"303103";"gmina miejsko-wiejska";"gm. Krajenka";"złotowski";"wielkopolskie";5363;5789;2059;3304;4;25;0;0;0;0;0;0;0;3304;0;0;3304;101;27;74;0;3203;648;1270;1285;8
+"303104";"gmina wiejska";"gm. Lipka";"złotowski";"wielkopolskie";3899;4292;1814;2085;2;8;0;0;0;0;0;0;0;2085;0;0;2085;45;11;34;0;2040;434;739;867;4
+"303105";"gmina miejsko-wiejska";"gm. Okonek";"złotowski";"wielkopolskie";6204;6711;3032;3172;2;26;0;0;0;0;0;0;0;3172;0;0;3172;98;22;76;0;3074;470;1288;1316;8
+"303106";"gmina wiejska";"gm. Tarnówka";"złotowski";"wielkopolskie";2152;2364;906;1245;0;6;0;0;0;0;0;0;0;1246;0;0;1246;34;8;26;0;1212;209;469;534;3
+"303107";"gmina wiejska";"gm. Zakrzewo";"złotowski";"wielkopolskie";3551;3904;1352;2199;0;8;0;0;0;0;0;0;0;2199;0;0;2199;48;9;39;0;2151;393;799;959;4
+"303108";"gmina wiejska";"gm. Złotów";"złotowski";"wielkopolskie";6642;7290;2959;3683;1;15;0;0;0;0;0;0;0;3683;0;0;3683;99;15;84;0;3584;648;1404;1532;5

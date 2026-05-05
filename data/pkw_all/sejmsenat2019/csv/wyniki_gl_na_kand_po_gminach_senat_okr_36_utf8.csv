@@ -1,0 +1,32 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Bronisław DUTKA";"Jan Wincenty HAMERSKI";"Bogusław WAKSMUNDZKI";"Liczba obwodów"
+"120701";"gmina miejska";"m. Limanowa";"limanowski";"małopolskie";11048;11762;3430;7618;12;86;1;1;1;0;0;0;0;7618;0;0;7618;204;81;123;0;7414;1809;4492;1113;15
+"120702";"gmina miejska";"m. Mszana Dolna";"limanowski";"małopolskie";5767;6120;2041;3726;12;23;0;0;0;0;0;0;0;3726;0;0;3726;76;18;58;0;3650;968;2237;445;4
+"120703";"gmina wiejska";"gm. Dobra";"limanowski";"małopolskie";7128;7696;2746;4382;2;26;3;3;1;0;0;0;2;4384;2;0;4384;85;26;59;0;4299;975;2979;345;9
+"120704";"gmina wiejska";"gm. Jodłownik";"limanowski";"małopolskie";6173;6613;2327;3846;1;20;0;0;0;0;0;0;0;3846;0;0;3846;107;22;85;0;3739;865;2633;241;10
+"120705";"gmina wiejska";"gm. Kamienica";"limanowski";"małopolskie";5569;5898;2091;3478;6;38;0;0;0;0;0;0;0;3477;0;1;3476;116;22;94;0;3360;594;2511;255;6
+"120706";"gmina wiejska";"gm. Laskowa";"limanowski";"małopolskie";5540;6077;1320;4220;8;27;0;0;0;0;0;0;0;4220;0;0;4220;75;14;61;0;4145;554;3375;216;7
+"120707";"gmina wiejska";"gm. Limanowa";"limanowski";"małopolskie";17796;19107;5369;12427;6;58;2;2;0;0;1;0;1;12428;1;0;12428;321;66;255;0;12107;2482;8646;979;19
+"120708";"gmina wiejska";"gm. Łukowica";"limanowski";"małopolskie";7029;7458;2301;4728;5;27;0;0;0;0;0;0;0;4728;0;0;4728;113;27;86;0;4615;959;3394;262;7
+"120709";"gmina wiejska";"gm. Mszana Dolna";"limanowski";"małopolskie";12342;13229;4345;7997;13;46;3;3;0;0;0;0;3;8000;3;0;8000;142;31;111;0;7858;1212;6091;555;14
+"120710";"gmina wiejska";"gm. Niedźwiedź";"limanowski";"małopolskie";5144;5427;2358;2786;3;41;0;0;0;0;0;0;0;2786;0;0;2786;77;25;52;0;2709;468;2007;234;4
+"120711";"gmina wiejska";"gm. Słopnice";"limanowski";"małopolskie";4553;4880;1502;3051;0;14;0;0;0;0;0;0;0;3051;0;0;3051;59;12;47;0;2992;406;2376;210;5
+"120712";"gmina wiejska";"gm. Tymbark";"limanowski";"małopolskie";4628;4945;1342;3286;7;10;0;0;0;0;0;0;0;3286;0;0;3286;71;18;53;0;3215;559;2385;271;5
+"121101";"gmina miejska";"m. Nowy Targ";"nowotarski";"małopolskie";24074;25924;9053;15021;13;131;4;4;0;0;0;0;4;15025;4;0;15025;272;59;213;0;14753;3746;7006;4001;22
+"121102";"gmina miejsko-wiejska";"gm. Szczawnica";"nowotarski";"małopolskie";5335;6501;1504;3831;7;689;1;1;0;0;0;0;1;3832;1;0;3832;72;11;61;0;3760;888;1954;918;6
+"121103";"gmina wiejska";"gm. Czarny Dunajec";"nowotarski";"małopolskie";16333;17404;8404;7929;2;112;0;0;0;0;0;0;0;7929;0;0;7929;160;39;121;0;7769;941;5729;1099;23
+"121104";"gmina wiejska";"gm. Czorsztyn";"nowotarski";"małopolskie";5384;6049;2036;3348;1;173;0;0;0;0;0;0;0;3348;0;0;3348;55;13;42;0;3293;604;1862;827;7
+"121105";"gmina wiejska";"gm. Jabłonka";"nowotarski";"małopolskie";12957;14317;4857;8100;9;61;0;0;0;0;0;0;0;8100;0;0;8100;160;33;127;0;7940;691;6264;985;11
+"121106";"gmina wiejska";"gm. Krościenko nad Dunajcem";"nowotarski";"małopolskie";4839;5362;1670;3169;22;128;1;1;0;0;0;0;1;3168;1;0;3168;39;11;28;0;3129;381;1401;1347;6
+"121107";"gmina wiejska";"gm. Lipnica Wielka";"nowotarski";"małopolskie";4127;4530;1592;2535;2;11;0;0;0;0;0;0;0;2535;0;0;2535;64;14;50;0;2471;222;1908;341;5
+"121108";"gmina wiejska";"gm. Łapsze Niżne";"nowotarski";"małopolskie";6641;7326;2935;3706;1;108;0;0;0;0;0;0;0;3706;0;0;3706;67;8;59;0;3639;534;2457;648;9
+"121109";"gmina wiejska";"gm. Nowy Targ";"nowotarski";"małopolskie";17014;18490;7297;9717;3;77;0;0;0;0;0;0;0;9717;0;0;9717;188;33;155;0;9529;1348;6249;1932;21
+"121110";"gmina wiejska";"gm. Ochotnica Dolna";"nowotarski";"małopolskie";5936;6518;2137;3799;2;41;0;0;0;0;0;0;0;3798;0;0;3798;63;12;51;0;3735;384;2882;469;4
+"121111";"gmina wiejska";"gm. Raba Wyżna";"nowotarski";"małopolskie";10397;11181;4283;6114;7;30;0;0;0;0;0;0;0;6114;0;0;6114;122;20;102;0;5992;909;4159;924;11
+"121112";"gmina miejsko-wiejska";"gm. Rabka-Zdrój";"nowotarski";"małopolskie";12479;13870;4142;8336;21;348;2;2;0;0;0;0;2;8340;2;0;8340;168;47;121;0;8172;1853;4972;1347;13
+"121113";"gmina wiejska";"gm. Spytkowice";"nowotarski";"małopolskie";3205;3489;1290;1915;8;12;0;0;0;0;0;0;0;1915;0;0;1915;38;7;31;0;1877;228;1370;279;5
+"121114";"gmina wiejska";"gm. Szaflary";"nowotarski";"małopolskie";7727;8435;3804;3923;2;72;0;0;0;0;0;0;0;3921;0;0;3921;63;6;57;0;3858;467;2844;547;10
+"121701";"gmina miejska";"m. Zakopane";"tatrzański";"małopolskie";20554;24278;4319;16235;28;2952;3;3;0;0;0;0;3;16232;3;0;16232;363;103;260;0;15869;5359;7298;3212;24
+"121702";"gmina wiejska";"gm. Biały Dunajec";"tatrzański";"małopolskie";5022;5650;2061;2961;2;176;0;0;0;0;0;0;0;2961;0;0;2961;68;19;49;0;2893;497;2122;274;8
+"121703";"gmina wiejska";"gm. Bukowina Tatrzańska";"tatrzański";"małopolskie";9281;10611;3153;6128;2;605;0;0;0;0;0;0;0;6127;0;0;6127;90;20;70;0;6037;1096;4166;775;10
+"121704";"gmina wiejska";"gm. Kościelisko";"tatrzański";"małopolskie";6162;7077;2189;3973;7;312;1;1;0;0;0;0;1;3974;1;2;3972;71;22;49;0;3901;938;2330;633;4
+"121705";"gmina wiejska";"gm. Poronin";"tatrzański";"małopolskie";8033;9177;3047;4984;5;379;0;0;0;0;0;0;0;4983;0;0;4983;97;23;74;0;4886;942;3355;589;8

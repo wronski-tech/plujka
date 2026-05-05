@@ -1,0 +1,35 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Arkadiusz Stanisław CIACH";"Wiesław Józef DOBKOWSKI";"Stanisław WITASZCZYK";"Liczba obwodów"
+"100101";"gmina miejska";"m. Bełchatów";"bełchatowski";"łódzkie";42520;44620;13563;28956;16;90;1;1;0;0;0;0;1;28956;1;0;28956;981;362;619;0;27975;7246;15982;4747;28
+"100102";"gmina wiejska";"gm. Bełchatów";"bełchatowski";"łódzkie";8383;9058;2298;6085;0;18;0;0;0;0;0;0;0;6084;0;0;6084;191;68;123;0;5893;1064;3959;870;8
+"100103";"gmina wiejska";"gm. Drużbice";"bełchatowski";"łódzkie";3925;4260;1342;2583;4;16;0;0;0;0;0;0;0;2583;0;1;2582;71;14;57;0;2511;422;1647;442;6
+"100104";"gmina wiejska";"gm. Kleszczów";"bełchatowski";"łódzkie";4254;4543;1335;2919;1;16;0;0;0;0;0;0;0;2919;0;3;2916;99;30;69;0;2817;591;1684;542;5
+"100105";"gmina wiejska";"gm. Kluki";"bełchatowski";"łódzkie";3260;3541;1126;2134;2;5;0;0;0;0;0;0;0;2133;0;0;2133;66;15;51;0;2067;328;1459;280;3
+"100106";"gmina wiejska";"gm. Rusiec";"bełchatowski";"łódzkie";3850;4178;1182;2668;7;16;0;0;0;0;0;0;0;2667;0;0;2667;59;26;33;0;2608;385;1717;506;5
+"100107";"gmina wiejska";"gm. Szczerców";"bełchatowski";"łódzkie";5993;6561;1767;4226;10;16;0;0;0;0;0;0;0;4225;0;0;4225;117;46;71;0;4108;655;2764;689;7
+"100108";"gmina miejsko-wiejska";"gm. Zelów";"bełchatowski";"łódzkie";10849;11809;3837;7012;3;22;1;1;0;0;0;0;1;7012;1;0;7012;149;35;114;0;6863;1230;4422;1211;10
+"101001";"gmina wiejska";"gm. Aleksandrów";"piotrkowski";"łódzkie";3403;3727;1174;2229;5;32;0;0;0;0;0;0;0;2229;0;0;2229;48;5;43;0;2181;292;1472;417;5
+"101002";"gmina wiejska";"gm. Czarnocin";"piotrkowski";"łódzkie";2972;3275;923;2049;1;8;0;0;0;0;0;0;0;2049;0;0;2049;37;9;28;0;2012;318;1293;401;4
+"101003";"gmina wiejska";"gm. Gorzkowice";"piotrkowski";"łódzkie";6256;6822;2124;4132;8;14;0;0;0;0;0;0;0;4132;0;0;4132;111;25;86;0;4021;688;2676;657;9
+"101004";"gmina wiejska";"gm. Grabica";"piotrkowski";"łódzkie";4351;4764;1528;2822;3;12;2;2;0;0;0;0;2;2824;2;0;2824;26;2;24;0;2798;332;1904;562;5
+"101005";"gmina wiejska";"gm. Łęki Szlacheckie";"piotrkowski";"łódzkie";2629;2889;1087;1542;0;17;0;0;0;0;0;0;0;1542;0;0;1542;32;10;22;0;1510;202;1028;280;4
+"101006";"gmina wiejska";"gm. Moszczenica";"piotrkowski";"łódzkie";9341;10143;3093;6248;10;22;1;1;0;0;0;0;1;6249;1;0;6249;114;37;77;0;6135;1075;3884;1176;9
+"101007";"gmina wiejska";"gm. Ręczno";"piotrkowski";"łódzkie";2686;3011;971;1715;4;16;0;0;0;0;0;0;0;1715;0;0;1715;59;6;53;0;1656;275;1093;288;4
+"101008";"gmina wiejska";"gm. Rozprza";"piotrkowski";"łódzkie";8697;9527;3107;5589;5;22;0;0;0;0;0;0;0;5586;0;0;5586;134;42;92;0;5452;807;3659;986;10
+"101009";"gmina miejsko-wiejska";"gm. Sulejów";"piotrkowski";"łódzkie";11920;12927;3999;7921;8;49;0;0;0;0;0;0;0;7920;0;0;7920;165;60;105;0;7755;1818;4474;1463;12
+"101010";"gmina wiejska";"gm. Wola Krzysztoporska";"piotrkowski";"łódzkie";8501;9263;2785;5716;0;10;0;0;0;0;0;0;0;5715;0;0;5715;110;25;85;0;5605;779;4000;826;8
+"101011";"gmina miejsko-wiejska";"gm. Wolbórz";"piotrkowski";"łódzkie";5944;6331;1769;4175;4;42;0;0;0;0;0;0;0;4175;0;0;4175;126;31;95;0;4049;749;2392;908;8
+"101201";"gmina miejska";"m. Radomsko";"radomszczański";"łódzkie";34026;36701;11701;22325;19;110;1;1;0;0;0;0;1;22322;1;1;22321;562;232;330;0;21759;6613;8883;6263;24
+"101202";"gmina wiejska";"gm. Dobryszyce";"radomszczański";"łódzkie";3138;3441;1083;2055;5;11;0;0;0;0;0;0;0;2055;0;0;2055;85;33;52;0;1970;464;1009;497;3
+"101203";"gmina wiejska";"gm. Gidle";"radomszczański";"łódzkie";4600;5059;1870;2730;8;11;1;1;0;0;0;0;1;2730;1;0;2730;58;14;44;0;2672;655;1401;616;6
+"101204";"gmina wiejska";"gm. Gomunice";"radomszczański";"łódzkie";4305;4787;1440;2865;11;9;0;0;0;0;0;0;0;2865;0;0;2865;52;9;43;0;2813;616;1572;625;5
+"101205";"gmina miejsko-wiejska";"gm. Kamieńsk";"radomszczański";"łódzkie";4332;4716;1431;2901;5;14;0;0;0;0;0;0;0;2900;0;0;2900;88;25;63;0;2812;485;1863;464;5
+"101206";"gmina wiejska";"gm. Kobiele Wielkie";"radomszczański";"łódzkie";3229;3535;1307;1922;6;14;0;0;0;0;0;0;0;1922;0;0;1922;43;11;32;0;1879;473;941;465;4
+"101207";"gmina wiejska";"gm. Kodrąb";"radomszczański";"łódzkie";3407;3770;1363;2044;4;9;0;0;0;0;0;0;0;2044;0;0;2044;62;9;53;0;1982;401;1012;569;6
+"101208";"gmina wiejska";"gm. Lgota Wielka";"radomszczański";"łódzkie";3144;3441;1149;1995;3;15;0;0;0;0;0;0;0;1995;0;0;1995;56;13;43;0;1939;357;1146;436;4
+"101209";"gmina wiejska";"gm. Ładzice";"radomszczański";"łódzkie";3518;3859;1474;2044;0;11;0;0;0;0;0;0;0;2044;0;0;2044;44;10;34;0;2000;358;1131;511;5
+"101210";"gmina wiejska";"gm. Masłowice";"radomszczański";"łódzkie";3107;3431;1157;1950;2;17;0;0;0;0;0;0;0;1950;0;0;1950;71;16;55;0;1879;444;1092;343;4
+"101211";"gmina miejsko-wiejska";"gm. Przedbórz";"radomszczański";"łódzkie";5434;5945;2297;3137;6;29;1;1;0;0;0;0;1;3138;1;0;3138;106;26;80;0;3032;531;1730;771;7
+"101212";"gmina wiejska";"gm. Radomsko";"radomszczański";"łódzkie";4043;4400;1500;2543;1;9;0;0;0;0;0;0;0;2543;0;0;2543;79;16;63;0;2464;567;1191;706;6
+"101213";"gmina wiejska";"gm. Wielgomłyny";"radomszczański";"łódzkie";3432;3745;1436;1996;3;26;0;0;0;0;0;0;0;1996;0;0;1996;56;17;39;0;1940;284;1132;524;6
+"101214";"gmina wiejska";"gm. Żytno";"radomszczański";"łódzkie";3895;4319;1667;2228;1;31;0;0;0;0;0;0;0;2228;0;0;2228;68;16;52;0;2160;340;1367;453;4
+"106201";"gmina miejska";"m. Piotrków Trybunalski";"Piotrków Trybunalski";"łódzkie";53700;57059;17290;36410;55;167;5;5;0;0;0;0;5;36411;5;2;36409;899;323;576;0;35510;12564;15833;7113;41

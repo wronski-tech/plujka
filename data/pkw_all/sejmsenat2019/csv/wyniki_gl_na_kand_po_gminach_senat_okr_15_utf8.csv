@@ -1,0 +1,45 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Grzegorz CZELEJ";"Paweł Adam GÓRNIK";"Krzysztof Zbigniew KAMIŃSKI";"Liczba obwodów"
+"060501";"gmina wiejska";"gm. Batorz";"janowski";"lubelskie";2441;2634;798;1643;5;2;0;0;0;0;0;0;0;1643;0;0;1643;47;13;34;0;1596;1277;105;214;4
+"060502";"gmina wiejska";"gm. Chrzanów";"janowski";"lubelskie";2187;2396;647;1540;4;7;0;0;0;0;0;0;0;1540;0;0;1540;23;8;15;0;1517;1300;99;118;4
+"060503";"gmina wiejska";"gm. Dzwola";"janowski";"lubelskie";4730;5091;1614;3116;13;15;0;0;0;0;0;0;0;3116;0;0;3116;65;25;40;0;3051;2539;262;250;5
+"060504";"gmina wiejska";"gm. Godziszów";"janowski";"lubelskie";4327;4711;1059;3267;28;11;0;0;0;0;0;0;0;3267;0;0;3267;72;35;37;0;3195;2776;176;243;5
+"060505";"gmina miejsko-wiejska";"gm. Janów Lubelski";"janowski";"lubelskie";11939;12784;4232;7706;14;52;0;0;0;0;0;0;0;7703;0;0;7703;162;62;100;0;7541;5112;568;1861;11
+"060506";"gmina miejsko-wiejska";"gm. Modliborzyce";"janowski";"lubelskie";5216;5660;2137;3079;13;18;0;0;0;0;0;0;0;3079;0;0;3079;63;12;51;0;3016;2167;248;601;6
+"060507";"gmina wiejska";"gm. Potok Wielki";"janowski";"lubelskie";3486;3812;1505;1981;7;10;0;0;0;0;0;0;0;1981;0;0;1981;48;10;38;0;1933;1424;161;348;3
+"060701";"gmina miejska";"m. Kraśnik";"kraśnicki";"lubelskie";25466;27331;9578;15888;38;61;2;2;0;0;0;0;2;15887;2;1;15886;425;133;292;0;15461;8297;1388;5776;23
+"060702";"gmina miejsko-wiejska";"gm. Annopol";"kraśnicki";"lubelskie";6399;6979;2750;3649;11;23;0;0;0;0;0;0;0;3649;0;0;3649;96;25;71;0;3553;2351;312;890;10
+"060703";"gmina wiejska";"gm. Dzierzkowice";"kraśnicki";"lubelskie";3911;4245;1576;2335;1;10;0;0;0;0;0;0;0;2335;0;0;2335;58;17;41;0;2277;1509;213;555;6
+"060704";"gmina wiejska";"gm. Gościeradów";"kraśnicki";"lubelskie";5286;5738;2291;2995;10;15;0;0;0;0;0;0;0;2995;0;0;2995;79;18;61;0;2916;1975;239;702;8
+"060705";"gmina wiejska";"gm. Kraśnik";"kraśnicki";"lubelskie";5309;5730;2086;3223;4;11;0;0;0;0;0;0;0;3221;0;2;3219;57;10;47;0;3162;2085;305;772;5
+"060706";"gmina wiejska";"gm. Szastarka";"kraśnicki";"lubelskie";4323;4712;1661;2662;7;11;0;0;0;0;0;0;0;2662;0;0;2662;33;8;25;0;2629;2070;176;383;5
+"060707";"gmina wiejska";"gm. Trzydnik Duży";"kraśnicki";"lubelskie";4774;5181;2145;2629;1;8;0;0;0;0;0;0;0;2628;0;0;2628;63;10;53;0;2565;1710;214;641;10
+"060708";"gmina miejsko-wiejska";"gm. Urzędów";"kraśnicki";"lubelskie";6433;6912;2606;3827;15;10;0;0;0;0;0;0;0;3825;0;0;3825;99;19;80;0;3726;2472;350;904;9
+"060709";"gmina wiejska";"gm. Wilkołaz";"kraśnicki";"lubelskie";4000;4304;1346;2654;3;8;0;0;0;0;0;0;0;2653;0;0;2653;59;22;37;0;2594;1938;207;449;4
+"060710";"gmina wiejska";"gm. Zakrzówek";"kraśnicki";"lubelskie";4863;5250;1947;2916;6;4;0;0;0;0;0;0;0;2916;0;0;2916;50;14;36;0;2866;2076;231;559;6
+"060901";"gmina miejsko-wiejska";"gm. Bełżyce";"lubelski";"lubelskie";9707;10504;3748;5959;3;9;0;0;0;0;0;0;0;5959;0;0;5959;146;46;100;0;5813;3574;607;1632;12
+"060902";"gmina wiejska";"gm. Borzechów";"lubelski";"lubelskie";2864;3111;968;1896;4;2;0;0;0;0;0;0;0;1896;0;0;1896;45;10;35;0;1851;1308;178;365;6
+"060903";"gmina miejsko-wiejska";"gm. Bychawa";"lubelski";"lubelskie";8742;9383;3553;5189;8;10;0;0;0;0;0;0;0;5189;0;0;5189;135;36;99;0;5054;3165;591;1298;16
+"060904";"gmina wiejska";"gm. Garbów";"lubelski";"lubelskie";6545;7243;2236;4309;6;53;0;0;0;0;0;0;0;4309;0;0;4309;116;55;61;0;4193;2626;420;1147;10
+"060905";"gmina wiejska";"gm. Głusk";"lubelski";"lubelskie";7773;8626;2012;5761;5;28;0;0;0;0;0;0;0;5761;0;3;5758;113;46;67;0;5645;2888;539;2218;6
+"060906";"gmina wiejska";"gm. Jabłonna";"lubelski";"lubelskie";5788;6370;2414;3374;4;7;0;0;0;0;0;0;0;3373;0;2;3371;98;24;74;0;3273;1972;394;907;6
+"060907";"gmina wiejska";"gm. Jastków";"lubelski";"lubelskie";9902;10920;2692;7210;9;44;0;0;0;0;0;0;0;7210;0;0;7210;179;48;131;0;7031;3948;639;2444;8
+"060908";"gmina wiejska";"gm. Konopnica";"lubelski";"lubelskie";9893;10758;2592;7301;7;43;2;2;0;0;0;0;2;7301;2;0;7301;183;57;126;0;7118;3267;666;3185;6
+"060909";"gmina wiejska";"gm. Krzczonów";"lubelski";"lubelskie";3497;3781;1471;2026;6;10;0;0;0;0;0;0;0;2026;0;0;2026;42;7;35;0;1984;1287;212;485;6
+"060910";"gmina wiejska";"gm. Niedrzwica Duża";"lubelski";"lubelskie";8433;9138;2866;5567;5;22;0;0;0;0;0;0;0;5567;0;0;5567;98;34;64;0;5469;3318;553;1598;9
+"060911";"gmina wiejska";"gm. Niemce";"lubelski";"lubelskie";14006;15245;4145;9861;25;67;0;0;0;0;0;0;0;9858;0;0;9858;275;90;185;0;9583;5146;972;3465;11
+"060912";"gmina wiejska";"gm. Strzyżewice";"lubelski";"lubelskie";5740;6176;2237;3503;8;9;0;0;0;0;0;0;0;3503;0;0;3503;81;21;60;0;3422;2062;340;1020;7
+"060913";"gmina wiejska";"gm. Wojciechów";"lubelski";"lubelskie";4328;4738;1653;2675;3;13;0;0;0;0;0;0;0;2675;0;0;2675;57;20;37;0;2618;1627;345;646;6
+"060914";"gmina wiejska";"gm. Wólka";"lubelski";"lubelskie";8360;9328;2404;5956;1;52;0;0;0;0;0;0;0;5956;0;1;5955;115;43;72;0;5840;3046;672;2122;9
+"060915";"gmina wiejska";"gm. Wysokie";"lubelski";"lubelskie";3482;3813;1427;2055;6;12;0;0;0;0;0;0;0;2055;0;0;2055;38;8;30;0;2017;1423;184;410;6
+"060916";"gmina wiejska";"gm. Zakrzew";"lubelski";"lubelskie";2225;2433;985;1240;3;6;0;0;0;0;0;0;0;1240;0;0;1240;30;2;28;0;1210;908;116;186;4
+"061001";"gmina wiejska";"gm. Cyców";"łęczyński";"lubelskie";5542;6083;2318;3224;5;15;0;0;0;0;0;0;0;3224;0;0;3224;82;24;58;0;3142;1870;482;790;12
+"061002";"gmina wiejska";"gm. Ludwin";"łęczyński";"lubelskie";3904;4302;1538;2366;0;15;0;0;0;0;0;0;0;2366;0;0;2366;35;8;27;0;2331;1342;332;657;5
+"061003";"gmina miejsko-wiejska";"gm. Łęczna";"łęczyński";"lubelskie";16674;17895;5586;11088;8;101;0;0;0;0;0;0;0;11087;0;0;11087;274;91;183;0;10813;5822;1515;3476;16
+"061004";"gmina wiejska";"gm. Milejów";"łęczyński";"lubelskie";6547;7138;2962;3585;5;14;0;0;0;0;0;0;0;3585;0;0;3585;95;27;68;0;3490;2008;510;972;9
+"061005";"gmina wiejska";"gm. Puchaczów";"łęczyński";"lubelskie";4017;4381;1399;2618;4;7;0;0;0;0;0;0;0;2617;0;0;2617;59;11;48;0;2558;1587;361;610;6
+"061006";"gmina wiejska";"gm. Spiczyn";"łęczyński";"lubelskie";4084;4466;1627;2457;0;7;0;0;0;0;0;0;0;2457;0;0;2457;64;12;52;0;2393;1319;328;746;5
+"061701";"gmina miejska";"m. Świdnik";"świdnicki";"lubelskie";28568;30557;9267;19302;27;129;1;1;1;0;0;0;0;19300;0;0;19300;467;149;318;0;18833;9484;1739;7610;23
+"061702";"gmina wiejska";"gm. Mełgiew";"świdnicki";"lubelskie";6944;7638;2314;4660;8;17;0;0;0;0;0;0;0;4660;0;0;4660;68;11;57;0;4592;2656;499;1437;7
+"061703";"gmina miejsko-wiejska";"gm. Piaski";"świdnicki";"lubelskie";7723;8510;2929;4793;10;23;0;0;0;0;0;0;0;4793;0;0;4793;119;25;94;0;4674;2732;478;1464;12
+"061704";"gmina wiejska";"gm. Rybczewice";"świdnicki";"lubelskie";2625;2889;1093;1532;0;5;0;0;0;0;0;0;0;1532;0;0;1532;54;11;43;0;1478;1009;169;300;5
+"061705";"gmina wiejska";"gm. Trawniki";"świdnicki";"lubelskie";6535;7099;2987;3548;5;8;0;0;0;0;0;0;0;3547;0;0;3547;84;10;74;0;3463;2133;432;898;6

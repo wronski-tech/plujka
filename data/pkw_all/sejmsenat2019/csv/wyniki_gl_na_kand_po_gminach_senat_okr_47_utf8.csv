@@ -1,0 +1,37 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Maria Zofia KOC";"Mirosław KRUSIEWICZ";"Krzysztof Paweł PROKOPCZYK";"Leszek Bogdan SZYMAŃSKI";"Liczba obwodów"
+"140301";"gmina miejska";"m. Garwolin";"garwoliński";"mazowieckie";12172;13266;3102;9070;10;48;0;0;0;0;0;0;0;9066;0;0;9066;148;60;88;0;8918;4975;3019;451;473;16
+"140302";"gmina miejska";"m. Łaskarzew";"garwoliński";"mazowieckie";3542;3867;1130;2412;5;9;0;0;0;0;0;0;0;2412;0;0;2412;54;14;40;0;2358;1551;604;97;106;4
+"140303";"gmina wiejska";"gm. Borowie";"garwoliński";"mazowieckie";3777;4168;1211;2566;1;5;0;0;0;0;0;0;0;2566;0;0;2566;34;12;22;0;2532;1953;381;97;101;5
+"140304";"gmina wiejska";"gm. Garwolin";"garwoliński";"mazowieckie";9033;9987;2642;6391;9;32;0;0;0;0;0;0;0;6390;0;0;6390;123;37;86;0;6267;4202;1426;309;330;12
+"140305";"gmina wiejska";"gm. Górzno";"garwoliński";"mazowieckie";4656;5094;1404;3252;0;11;0;0;0;0;0;0;0;3252;0;0;3252;56;22;34;0;3196;2545;404;131;116;8
+"140306";"gmina wiejska";"gm. Łaskarzew";"garwoliński";"mazowieckie";3876;4231;1287;2589;3;5;0;0;0;0;0;0;0;2589;0;0;2589;34;7;27;0;2555;1911;405;133;106;5
+"140307";"gmina wiejska";"gm. Maciejowice";"garwoliński";"mazowieckie";5180;5675;1872;3308;2;25;0;0;0;0;0;0;0;3308;0;0;3308;62;16;46;0;3246;2575;452;107;112;8
+"140308";"gmina wiejska";"gm. Miastków Kościelny";"garwoliński";"mazowieckie";3459;3775;1101;2358;1;7;0;0;0;0;0;0;0;2358;0;0;2358;49;14;35;0;2309;1777;362;79;91;6
+"140309";"gmina wiejska";"gm. Parysów";"garwoliński";"mazowieckie";2930;3208;1083;1847;6;6;0;0;0;0;0;0;0;1847;0;0;1847;34;0;34;0;1813;1456;199;73;85;4
+"140310";"gmina miejsko-wiejska";"gm. Pilawa";"garwoliński";"mazowieckie";7679;8410;2383;5296;5;27;0;0;0;0;0;0;0;5296;0;1;5295;93;19;74;0;5202;3602;1117;240;243;10
+"140311";"gmina wiejska";"gm. Sobolew";"garwoliński";"mazowieckie";5799;6349;1899;3900;7;25;0;0;0;0;0;0;0;3899;0;0;3899;65;12;53;0;3834;3013;544;127;150;6
+"140312";"gmina wiejska";"gm. Trojanów";"garwoliński";"mazowieckie";5310;5840;1658;3652;4;16;0;0;0;0;0;0;0;3652;0;0;3652;58;14;44;0;3594;2921;427;129;117;7
+"140313";"gmina wiejska";"gm. Wilga";"garwoliński";"mazowieckie";3843;4282;1298;2545;0;11;0;0;0;0;0;0;0;2545;0;0;2545;53;15;38;0;2492;1581;663;120;128;5
+"140314";"gmina miejsko-wiejska";"gm. Żelechów";"garwoliński";"mazowieckie";6015;6531;2005;4010;5;13;0;0;0;0;0;0;0;4010;0;0;4010;70;22;48;0;3940;3066;613;142;119;6
+"141201";"gmina miejska";"m. Mińsk Mazowiecki";"miński";"mazowieckie";27758;30564;6234;21523;14;110;0;0;0;0;0;0;0;21516;0;22;21494;295;95;200;0;21199;8880;10507;948;864;22
+"141204";"gmina wiejska";"gm. Cegłów";"miński";"mazowieckie";4371;4817;1318;3054;0;14;0;0;0;0;0;0;0;3052;0;0;3052;85;19;66;0;2967;1650;1047;144;126;7
+"141205";"gmina wiejska";"gm. Dębe Wielkie";"miński";"mazowieckie";7260;7940;2193;5067;5;23;1;1;0;0;0;0;1;5065;1;0;5065;111;23;88;0;4954;2746;1646;276;286;6
+"141206";"gmina wiejska";"gm. Dobre";"miński";"mazowieckie";4365;4817;1502;2863;3;20;0;0;0;0;0;0;0;2863;0;0;2863;41;5;36;0;2822;1895;718;111;98;5
+"141207";"gmina miejsko-wiejska";"gm. Halinów";"miński";"mazowieckie";10885;12059;2614;8273;6;82;2;2;0;0;0;0;2;8272;2;0;8272;144;67;77;0;8128;4047;3268;407;406;10
+"141208";"gmina wiejska";"gm. Jakubów";"miński";"mazowieckie";3604;3942;1205;2399;0;6;0;0;0;0;0;0;0;2398;0;0;2398;44;3;41;0;2354;1626;570;78;80;4
+"141209";"gmina miejsko-wiejska";"gm. Kałuszyn";"miński";"mazowieckie";4207;4595;1440;2767;2;13;0;0;0;0;0;0;0;2767;0;0;2767;61;20;41;0;2706;1729;779;108;90;5
+"141210";"gmina wiejska";"gm. Latowicz";"miński";"mazowieckie";3804;4167;1428;2375;2;6;0;0;0;0;0;0;0;2375;0;0;2375;47;5;42;0;2328;1680;430;102;116;4
+"141211";"gmina wiejska";"gm. Mińsk Mazowiecki";"miński";"mazowieckie";10680;11737;3102;7578;4;23;0;0;0;0;0;0;0;7578;0;0;7578;118;33;85;0;7460;4098;2666;373;323;11
+"141212";"gmina miejsko-wiejska";"gm. Mrozy";"miński";"mazowieckie";6391;6948;2084;4307;1;28;0;0;0;0;0;0;0;4307;0;0;4307;84;18;66;0;4223;2438;1461;161;163;10
+"141213";"gmina wiejska";"gm. Siennica";"miński";"mazowieckie";5518;6012;1935;3583;5;19;0;0;0;0;0;0;0;3583;0;0;3583;73;21;52;0;3510;2053;1123;172;162;7
+"141214";"gmina wiejska";"gm. Stanisławów";"miński";"mazowieckie";4837;5361;1531;3306;7;29;0;0;0;0;0;0;0;3306;0;0;3306;51;18;33;0;3255;2293;722;138;102;5
+"141215";"gmina miejska";"m. Sulejówek";"miński";"mazowieckie";13874;15480;2575;11297;8;127;2;2;0;0;0;0;2;11295;2;8;11287;191;46;145;0;11096;5023;5052;557;464;9
+"143301";"gmina miejska";"m. Węgrów";"węgrowski";"mazowieckie";9261;10133;2913;6348;10;36;1;1;0;0;0;0;1;6349;1;0;6349;103;36;67;0;6246;3703;2101;192;250;6
+"143302";"gmina wiejska";"gm. Grębków";"węgrowski";"mazowieckie";3202;3596;1251;1951;6;11;0;0;0;0;0;0;0;1951;0;1;1950;39;4;35;0;1911;1470;318;49;74;3
+"143303";"gmina wiejska";"gm. Korytnica";"węgrowski";"mazowieckie";4538;4953;1656;2882;2;12;0;0;0;0;0;0;0;2882;0;0;2882;45;19;26;0;2837;2259;386;71;121;5
+"143304";"gmina wiejska";"gm. Liw";"węgrowski";"mazowieckie";5424;5948;1925;3498;6;32;0;0;0;0;0;0;0;3499;0;0;3499;57;15;42;0;3442;2483;670;96;193;6
+"143305";"gmina miejsko-wiejska";"gm. Łochów";"węgrowski";"mazowieckie";12798;14043;4108;8690;7;63;0;0;0;0;0;0;0;8688;0;0;8688;93;30;63;0;8595;5987;1894;347;367;16
+"143306";"gmina wiejska";"gm. Miedzna";"węgrowski";"mazowieckie";2942;3214;950;1992;5;6;0;0;0;0;0;0;0;1992;0;0;1992;31;7;24;0;1961;1535;297;66;63;5
+"143307";"gmina wiejska";"gm. Sadowne";"węgrowski";"mazowieckie";4326;4727;1556;2769;1;25;0;0;0;0;0;0;0;2769;0;0;2769;36;1;35;0;2733;2078;513;68;74;6
+"143308";"gmina wiejska";"gm. Stoczek";"węgrowski";"mazowieckie";3653;3977;1378;2275;3;14;0;0;0;0;0;0;0;2275;0;0;2275;35;7;28;0;2240;1702;396;71;71;6
+"143309";"gmina wiejska";"gm. Wierzbno";"węgrowski";"mazowieckie";2067;2278;703;1363;4;4;0;0;0;0;0;0;0;1364;0;0;1364;21;3;18;0;1343;1046;234;24;39;4

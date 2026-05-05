@@ -1,0 +1,31 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Elżbieta Agnieszka KOMOSA";"Marta Ewelina MICHALSKA-WILK";"Wojciech SKURKIEWICZ";"Liczba obwodów"
+"140901";"gmina wiejska";"gm. Chotcza";"lipski";"mazowieckie";1791;1938;871;920;1;4;0;0;0;0;0;0;0;920;0;0;920;22;3;19;0;898;113;176;609;3
+"140902";"gmina wiejska";"gm. Ciepielów";"lipski";"mazowieckie";4142;4534;1739;2403;3;19;0;0;0;0;0;0;0;2403;0;1;2402;69;11;58;0;2333;293;462;1578;7
+"140903";"gmina miejsko-wiejska";"gm. Lipsko";"lipski";"mazowieckie";8534;9054;3644;4903;7;23;0;0;0;0;0;0;0;4901;0;0;4901;82;20;62;0;4819;647;1500;2672;12
+"140904";"gmina wiejska";"gm. Rzeczniów";"lipski";"mazowieckie";3259;3575;1333;1926;2;7;0;0;0;0;0;0;0;1926;0;0;1926;54;13;41;0;1872;218;354;1300;5
+"140905";"gmina wiejska";"gm. Sienno";"lipski";"mazowieckie";4407;4793;1857;2550;3;22;0;0;0;0;0;0;0;2550;0;0;2550;68;10;58;0;2482;277;606;1599;7
+"140906";"gmina wiejska";"gm. Solec nad Wisłą";"lipski";"mazowieckie";3818;4124;1817;2001;3;19;0;0;0;0;0;0;0;2001;0;0;2001;56;6;50;0;1945;259;498;1188;8
+"142501";"gmina miejska";"m. Pionki";"radomski";"mazowieckie";13623;14606;5416;8206;7;29;1;1;0;0;0;0;1;8207;1;0;8207;160;30;130;0;8047;954;2971;4122;17
+"142502";"gmina wiejska";"gm. Gózd";"radomski";"mazowieckie";6284;6877;1970;4314;3;10;0;0;0;0;0;0;0;4314;0;1;4313;78;20;58;0;4235;403;655;3177;6
+"142503";"gmina miejsko-wiejska";"gm. Iłża";"radomski";"mazowieckie";11146;12171;4694;6451;4;20;1;1;0;0;0;0;1;6452;1;0;6452;158;31;127;0;6294;781;1694;3819;16
+"142504";"gmina wiejska";"gm. Jastrzębia";"radomski";"mazowieckie";5022;5559;1706;3316;7;6;0;0;0;0;0;0;0;3316;0;0;3316;56;12;44;0;3260;346;725;2189;8
+"142505";"gmina wiejska";"gm. Jedlińsk";"radomski";"mazowieckie";10050;11063;3563;6487;7;16;0;0;0;0;0;0;0;6486;0;0;6486;146;26;120;0;6340;622;1400;4318;9
+"142506";"gmina wiejska";"gm. Jedlnia-Letnisko";"radomski";"mazowieckie";9270;10113;2784;6486;10;33;0;0;0;0;0;0;0;6486;0;5;6481;110;29;81;0;6371;711;1723;3937;7
+"142507";"gmina wiejska";"gm. Kowala";"radomski";"mazowieckie";8491;9256;2705;5786;4;8;0;0;0;0;0;0;0;5784;0;1;5783;77;17;60;0;5706;730;1275;3701;7
+"142508";"gmina wiejska";"gm. Pionki";"radomski";"mazowieckie";7484;8140;2948;4536;3;35;0;0;0;0;0;0;0;4535;0;0;4535;84;21;63;0;4451;524;1004;2923;9
+"142509";"gmina wiejska";"gm. Przytyk";"radomski";"mazowieckie";5208;5710;1731;3477;1;12;0;0;0;0;0;0;0;3477;0;0;3477;59;5;54;0;3418;266;520;2632;5
+"142510";"gmina miejsko-wiejska";"gm. Skaryszew";"radomski";"mazowieckie";10289;11233;3268;7021;10;14;0;0;0;0;0;0;0;7017;0;0;7017;87;33;54;0;6930;623;1223;5084;9
+"142511";"gmina wiejska";"gm. Wierzbica";"radomski";"mazowieckie";7010;7617;2716;4294;4;14;0;0;0;0;0;0;0;4294;0;0;4294;89;17;72;0;4205;559;846;2800;7
+"142512";"gmina wiejska";"gm. Wolanów";"radomski";"mazowieckie";6334;6985;2101;4233;7;9;0;0;0;0;0;0;0;4233;0;0;4233;80;13;67;0;4153;454;845;2854;6
+"142513";"gmina wiejska";"gm. Zakrzew";"radomski";"mazowieckie";9053;9938;2495;6556;6;19;0;0;0;0;0;0;0;6556;0;0;6556;125;42;83;0;6431;606;1435;4390;8
+"143001";"gmina wiejska";"gm. Chlewiska";"szydłowiecki";"mazowieckie";4618;5031;2031;2587;10;18;0;0;0;0;0;0;0;2587;0;0;2587;106;15;91;0;2481;335;442;1704;7
+"143002";"gmina wiejska";"gm. Jastrząb";"szydłowiecki";"mazowieckie";3806;4164;1458;2348;3;4;0;0;0;0;0;0;0;2348;0;0;2348;36;11;25;0;2312;310;419;1583;3
+"143003";"gmina wiejska";"gm. Mirów";"szydłowiecki";"mazowieckie";2775;3049;1118;1657;3;2;0;0;0;0;0;0;0;1657;0;0;1657;55;13;42;0;1602;181;230;1191;3
+"143004";"gmina wiejska";"gm. Orońsko";"szydłowiecki";"mazowieckie";4220;4678;1419;2801;3;6;0;0;0;0;0;0;0;2799;0;0;2799;54;10;44;0;2745;276;508;1961;5
+"143005";"gmina miejsko-wiejska";"gm. Szydłowiec";"szydłowiecki";"mazowieckie";13671;14757;5250;8421;10;36;2;2;0;0;0;0;2;8421;2;0;8421;152;53;99;0;8269;834;2237;5198;11
+"143601";"gmina wiejska";"gm. Kazanów";"zwoleński";"mazowieckie";3365;3666;1268;2097;7;8;0;0;0;0;0;0;0;2097;0;0;2097;33;3;30;0;2064;209;411;1444;6
+"143602";"gmina wiejska";"gm. Policzna";"zwoleński";"mazowieckie";4293;4741;1866;2427;7;11;0;0;0;0;0;0;0;2427;0;0;2427;56;14;42;0;2371;304;530;1537;5
+"143603";"gmina wiejska";"gm. Przyłęk";"zwoleński";"mazowieckie";4519;4938;2097;2422;1;11;0;0;0;0;0;0;0;2422;0;0;2422;47;9;38;0;2375;339;398;1638;7
+"143604";"gmina wiejska";"gm. Tczów";"zwoleński";"mazowieckie";3487;3819;1387;2100;2;10;0;0;0;0;0;0;0;2100;0;0;2100;53;7;46;0;2047;225;375;1447;5
+"143605";"gmina miejsko-wiejska";"gm. Zwoleń";"zwoleński";"mazowieckie";11175;12129;4067;7108;12;42;0;0;0;0;0;0;0;7108;0;0;7108;154;37;117;0;6954;795;2049;4110;14
+"146301";"gmina miejska";"m. Radom";"Radom";"mazowieckie";148590;160150;44688;103905;92;472;20;19;2;0;0;0;17;103913;17;2;103911;1477;425;1052;0;102434;11001;41842;49591;115

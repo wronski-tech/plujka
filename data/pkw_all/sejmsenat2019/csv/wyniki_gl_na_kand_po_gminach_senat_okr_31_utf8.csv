@@ -1,0 +1,31 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Janusz Lucjan BARGIEŁ";"Marek PĘK";"Liczba obwodów"
+"120601";"gmina wiejska";"gm. Czernichów";"krakowski";"małopolskie";10362;11441;3267;7095;7;21;1;1;0;0;0;0;1;7095;1;0;7095;208;44;164;0;6887;2617;4270;12
+"120602";"gmina wiejska";"gm. Igołomia-Wawrzeńczyce";"krakowski";"małopolskie";5623;6201;2252;3371;12;14;1;1;0;0;0;0;1;3372;1;0;3372;93;22;71;0;3279;966;2313;7
+"120603";"gmina wiejska";"gm. Iwanowice";"krakowski";"małopolskie";6523;7248;2010;4513;7;60;0;0;0;0;0;0;0;4513;0;0;4513;121;38;83;0;4392;1371;3021;6
+"120604";"gmina wiejska";"gm. Jerzmanowice-Przeginia";"krakowski";"małopolskie";8011;8812;2255;5756;5;27;1;1;0;0;0;0;1;5757;1;0;5757;201;51;150;0;5556;1772;3784;8
+"120605";"gmina wiejska";"gm. Kocmyrzów-Luborzyca";"krakowski";"małopolskie";11046;12199;3440;7606;0;36;1;1;0;0;0;0;1;7607;1;0;7607;207;48;159;0;7400;3109;4291;10
+"120606";"gmina miejsko-wiejska";"gm. Krzeszowice";"krakowski";"małopolskie";23476;25711;7005;16469;25;100;3;3;0;0;0;0;3;16468;3;0;16468;604;169;435;0;15864;7270;8594;26
+"120607";"gmina wiejska";"gm. Liszki";"krakowski";"małopolskie";12022;13357;3388;8634;6;57;0;0;0;0;0;0;0;8634;0;0;8634;278;52;226;0;8356;2877;5479;12
+"120608";"gmina wiejska";"gm. Michałowice";"krakowski";"małopolskie";7302;8134;1753;5549;7;41;1;1;0;0;0;0;1;5548;1;2;5546;178;48;130;0;5368;2648;2720;5
+"120609";"gmina wiejska";"gm. Mogilany";"krakowski";"małopolskie";9827;10882;2179;7648;9;61;0;0;0;0;0;0;0;7647;0;0;7647;297;95;202;0;7350;3398;3952;9
+"120610";"gmina miejsko-wiejska";"gm. Skała";"krakowski";"małopolskie";7544;8358;2168;5376;0;31;0;0;0;0;0;0;0;5376;0;0;5376;183;65;118;0;5193;1992;3201;7
+"120611";"gmina miejsko-wiejska";"gm. Skawina";"krakowski";"małopolskie";30574;33658;9194;21379;56;81;0;0;0;0;0;0;0;21373;0;0;21373;751;258;493;0;20622;9070;11552;25
+"120612";"gmina miejsko-wiejska";"gm. Słomniki";"krakowski";"małopolskie";9855;10806;3526;6328;6;26;0;0;0;0;0;0;0;6329;0;1;6328;195;46;149;0;6133;2014;4119;12
+"120613";"gmina wiejska";"gm. Sułoszowa";"krakowski";"małopolskie";4185;4605;1147;3038;1;16;0;0;0;0;0;0;0;3037;0;0;3037;105;23;82;0;2932;648;2284;5
+"120614";"gmina miejsko-wiejska";"gm. Świątniki Górne";"krakowski";"małopolskie";7202;7986;2087;5115;3;14;0;0;0;0;0;0;0;5115;0;0;5115;177;54;123;0;4938;1937;3001;5
+"120615";"gmina wiejska";"gm. Wielka Wieś";"krakowski";"małopolskie";8821;9756;1852;6969;8;53;0;0;0;0;0;0;0;6969;0;0;6969;238;84;154;0;6731;3278;3453;9
+"120616";"gmina wiejska";"gm. Zabierzów";"krakowski";"małopolskie";18838;21055;3869;14968;27;122;0;0;0;0;0;0;0;14962;0;1;14961;636;179;457;0;14325;7400;6925;22
+"120617";"gmina wiejska";"gm. Zielonki";"krakowski";"małopolskie";15067;16620;2971;12096;9;102;0;0;0;0;0;0;0;12087;0;0;12087;444;136;308;0;11643;6653;4990;14
+"120801";"gmina wiejska";"gm. Charsznica";"miechowski";"małopolskie";5559;6123;2226;3333;12;4;0;0;0;0;0;0;0;3333;0;0;3333;91;29;62;0;3242;1020;2222;8
+"120802";"gmina wiejska";"gm. Gołcza";"miechowski";"małopolskie";4512;4979;1612;2899;4;19;0;0;0;0;0;0;0;2900;0;0;2900;91;22;69;0;2809;795;2014;7
+"120803";"gmina wiejska";"gm. Kozłów";"miechowski";"małopolskie";3500;3834;1543;1957;0;7;0;0;0;0;0;0;0;1957;0;0;1957;65;14;51;0;1892;448;1444;9
+"120804";"gmina wiejska";"gm. Książ Wielki";"miechowski";"małopolskie";3826;4230;1413;2413;2;35;0;0;0;0;0;0;0;2413;0;0;2413;48;10;38;0;2365;653;1712;11
+"120805";"gmina miejsko-wiejska";"gm. Miechów";"miechowski";"małopolskie";14478;15677;5247;9231;10;36;0;0;0;0;0;0;0;9231;0;0;9231;278;108;170;0;8953;3709;5244;24
+"120806";"gmina wiejska";"gm. Racławice";"miechowski";"małopolskie";1890;2063;878;1012;3;4;0;0;0;0;0;0;0;1012;0;0;1012;33;12;21;0;979;276;703;3
+"120807";"gmina wiejska";"gm. Słaboszów";"miechowski";"małopolskie";2643;2913;1211;1432;1;4;0;0;0;0;0;0;0;1432;0;0;1432;35;7;28;0;1397;407;990;4
+"121201";"gmina miejska";"m. Bukowno";"olkuski";"małopolskie";7497;8164;2479;5018;10;16;1;1;1;0;0;0;0;5017;0;0;5017;159;60;99;0;4858;2647;2211;9
+"121203";"gmina wiejska";"gm. Bolesław";"olkuski";"małopolskie";5844;6420;2115;3729;5;20;0;0;0;0;0;0;0;3729;0;0;3729;140;53;87;0;3589;1904;1685;5
+"121204";"gmina wiejska";"gm. Klucze";"olkuski";"małopolskie";11208;12246;3322;7886;11;34;0;0;0;0;0;0;0;7886;0;0;7886;255;100;155;0;7631;3855;3776;14
+"121205";"gmina miejsko-wiejska";"gm. Olkusz";"olkuski";"małopolskie";35673;38531;10203;25468;25;104;4;4;0;0;0;0;4;25464;4;1;25463;1041;422;619;0;24422;11369;13053;34
+"121206";"gmina wiejska";"gm. Trzyciąż";"olkuski";"małopolskie";5171;5696;1681;3490;13;13;0;0;0;0;0;0;0;3488;0;0;3488;111;21;90;0;3377;883;2494;4
+"121207";"gmina miejsko-wiejska";"gm. Wolbrom";"olkuski";"małopolskie";16830;18395;5289;11541;13;40;0;0;0;0;0;0;0;11539;0;0;11539;465;131;334;0;11074;4103;6971;20

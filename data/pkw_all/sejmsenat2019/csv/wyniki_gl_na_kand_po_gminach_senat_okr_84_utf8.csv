@@ -1,0 +1,29 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Artur Ryszard PIEGDOŃ";"Sławomir SADOWSKI";"Jerzy WCISŁA";"Liczba obwodów"
+"280101";"gmina miejska";"m. Bartoszyce";"bartoszycki";"warmińsko-mazurskie";17062;18238;6665;10397;10;99;0;0;0;0;0;0;0;10397;0;0;10397;279;53;226;0;10118;1703;3990;4425;13
+"280102";"gmina miejska";"m. Górowo Iławeckie";"bartoszycki";"warmińsko-mazurskie";2986;3217;1269;1717;3;7;0;0;0;0;0;0;0;1717;0;0;1717;38;7;31;0;1679;250;641;788;2
+"280103";"gmina wiejska";"gm. Bartoszyce";"bartoszycki";"warmińsko-mazurskie";7825;8464;3879;3946;4;43;0;0;0;0;0;0;0;3946;0;0;3946;98;35;63;0;3848;713;1944;1191;9
+"280104";"gmina miejsko-wiejska";"gm. Bisztynek";"bartoszycki";"warmińsko-mazurskie";4656;4995;2529;2127;1;14;0;0;0;0;0;0;0;2127;0;0;2127;51;7;44;0;2076;455;908;713;6
+"280105";"gmina wiejska";"gm. Górowo Iławeckie";"bartoszycki";"warmińsko-mazurskie";5918;6388;3594;2324;2;15;0;0;0;0;0;0;0;2324;0;0;2324;83;4;79;0;2241;368;924;949;8
+"280106";"gmina miejsko-wiejska";"gm. Sępopol";"bartoszycki";"warmińsko-mazurskie";4592;4973;2575;2017;2;37;0;0;0;0;0;0;0;2017;0;0;2017;62;10;52;0;1955;311;1016;628;7
+"280201";"gmina miejska";"m. Braniewo";"braniewski";"warmińsko-mazurskie";12176;13263;4750;7426;14;36;0;0;0;0;0;0;0;7426;0;0;7426;184;65;119;0;7242;1483;2442;3317;10
+"280202";"gmina wiejska";"gm. Braniewo";"braniewski";"warmińsko-mazurskie";4397;4772;2358;2039;3;8;0;0;0;0;0;0;0;2039;0;0;2039;43;14;29;0;1996;559;854;583;5
+"280203";"gmina miejsko-wiejska";"gm. Frombork";"braniewski";"warmińsko-mazurskie";2923;3079;1404;1519;6;40;0;0;0;0;0;0;0;1519;0;0;1519;32;8;24;0;1487;301;534;652;4
+"280204";"gmina wiejska";"gm. Lelkowo";"braniewski";"warmińsko-mazurskie";2142;2332;1261;881;1;2;0;0;0;0;0;0;0;881;0;0;881;27;2;25;0;854;182;428;244;4
+"280205";"gmina miejsko-wiejska";"gm. Pieniężno";"braniewski";"warmińsko-mazurskie";4769;5069;2552;2217;1;14;0;0;0;0;0;0;0;2217;0;0;2217;49;7;42;0;2168;336;1128;704;7
+"280206";"gmina wiejska";"gm. Płoskinia";"braniewski";"warmińsko-mazurskie";1811;2011;937;874;1;5;0;0;0;0;0;0;0;874;0;0;874;17;4;13;0;857;148;421;288;3
+"280207";"gmina wiejska";"gm. Wilczęta";"braniewski";"warmińsko-mazurskie";2140;2309;1094;1047;6;7;0;0;0;0;0;0;0;1046;0;0;1046;23;1;22;0;1023;147;485;391;4
+"280401";"gmina wiejska";"gm. Elbląg";"elbląski";"warmińsko-mazurskie";5241;5750;2446;2795;3;12;1;1;0;0;1;0;0;2795;0;3;2792;52;13;39;0;2740;434;1107;1199;5
+"280402";"gmina wiejska";"gm. Godkowo";"elbląski";"warmińsko-mazurskie";2241;2484;1232;1009;1;10;0;0;0;0;0;0;0;1009;0;0;1009;19;1;18;0;990;130;618;242;3
+"280403";"gmina wiejska";"gm. Gronowo Elbląskie";"elbląski";"warmińsko-mazurskie";3573;3890;1760;1813;3;5;0;0;0;0;0;0;0;1813;0;0;1813;68;34;34;0;1745;299;679;767;2
+"280404";"gmina wiejska";"gm. Markusy";"elbląski";"warmińsko-mazurskie";2863;3145;1505;1358;0;12;0;0;0;0;0;0;0;1358;0;0;1358;20;2;18;0;1338;218;683;437;3
+"280405";"gmina wiejska";"gm. Milejewo";"elbląski";"warmińsko-mazurskie";2455;2678;1007;1448;3;6;0;0;0;0;0;0;0;1448;0;0;1448;32;6;26;0;1416;249;617;550;2
+"280406";"gmina miejsko-wiejska";"gm. Młynary";"elbląski";"warmińsko-mazurskie";3379;3555;1633;1746;1;12;0;0;0;0;0;0;0;1745;0;1;1744;38;5;33;0;1706;289;710;707;3
+"280407";"gmina miejsko-wiejska";"gm. Pasłęk";"elbląski";"warmińsko-mazurskie";13918;15076;6353;7565;5;21;0;0;0;0;0;0;0;7564;0;0;7564;117;21;96;0;7447;1133;3239;3075;15
+"280408";"gmina wiejska";"gm. Rychliki";"elbląski";"warmińsko-mazurskie";2747;3005;1547;1200;2;6;0;0;0;0;0;0;0;1200;0;0;1200;19;0;19;0;1181;191;570;420;3
+"280409";"gmina miejsko-wiejska";"gm. Tolkmicko";"elbląski";"warmińsko-mazurskie";4659;5134;2203;2456;1;10;0;0;0;0;0;0;0;2455;0;1;2454;60;11;49;0;2394;376;1048;970;7
+"280901";"gmina miejska";"m. Lidzbark Warmiński";"lidzbarski";"warmińsko-mazurskie";11273;12149;4171;7101;7;64;0;0;0;0;0;0;0;7100;0;0;7100;196;58;138;0;6904;1142;2372;3390;11
+"280902";"gmina wiejska";"gm. Kiwity";"lidzbarski";"warmińsko-mazurskie";2439;2689;1162;1277;2;9;2;2;0;0;0;0;2;1279;2;0;1279;49;6;43;0;1230;241;623;366;4
+"280903";"gmina wiejska";"gm. Lidzbark Warmiński";"lidzbarski";"warmińsko-mazurskie";4850;5330;2564;2286;1;40;0;0;0;0;0;0;0;2286;0;0;2286;68;11;57;0;2218;380;1025;813;8
+"280904";"gmina wiejska";"gm. Lubomino";"lidzbarski";"warmińsko-mazurskie";2557;2804;1357;1200;0;10;0;0;0;0;0;0;0;1200;0;0;1200;41;6;35;0;1159;195;598;366;3
+"280905";"gmina miejsko-wiejska";"gm. Orneta";"lidzbarski";"warmińsko-mazurskie";8655;9412;4016;4639;12;15;0;0;0;0;0;0;0;4639;0;0;4639;112;22;90;0;4527;778;2067;1682;8
+"286101";"gmina miejska";"m. Elbląg";"Elbląg";"warmińsko-mazurskie";83772;90392;29492;54280;56;331;9;9;2;0;0;0;7;54281;7;1;54280;1038;272;766;0;53242;6699;19378;27165;62

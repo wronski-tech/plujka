@@ -1,0 +1,47 @@
+﻿"Kod TERYT";"Rodzaj jednostki";"Gmina";"Powiat";"Województwo";"Komisje obwodowe otrzymały kart do głosowania";"Liczba wyborców uprawnionych do głosowania";"Nie wykorzystano kart do głosowania";"Liczba wyborców, którym wydano karty do głosowania";"Liczba wyborców głosujących przez pełnomocnika";"Liczba wyborców głosujących na podstawie zaświadczenia o prawie do głosowania";"Liczba wyborców, którym wysłano pakiety wyborcze";"Liczba otrzymanych kopert zwrotnych";"Liczba kopert zwrotnych, w których nie było oświadczenia o osobistym i tajnym oddaniu głosu";"Liczba kopert zwrotnych, w których oświadczenie nie było podpisane";"Liczba kopert zwrotnych, w których nie było koperty na kartę do głosowania";"Liczba kopert zwrotnych, w których znajdowała się niezaklejona koperta na kartę do głosowania";"Liczba kopert na kartę do głosowania wrzuconych do urny";"Liczba kart wyjętych z urny";"W tym liczba kart wyjętych z kopert na kartę do głosowania";"Liczba kart nieważnych";"Liczba kart ważnych";"Liczba głosów nieważnych";"W tym z powodu postawienia znaku „X” obok nazwiska dwóch lub większej liczby kandydatów";"W tym z powodu niepostawienia znaku „X” obok nazwiska żadnego kandydata";"W tym z powodu postawienia znaku „X” wyłącznie obok skreślonego nazwiska kandydata";"Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów";"Robert Adam MAMĄTOW";"Tadeusz NALEWAJK";"Liczba obwodów"
+"141101";"gmina miejska";"m. Maków Mazowiecki";"makowski";"mazowieckie";7097;7909;2622;4475;7;26;0;0;0;0;0;0;0;4475;0;0;4475;140;39;101;0;4335;2293;2042;7
+"141102";"gmina wiejska";"gm. Czerwonka";"makowski";"mazowieckie";1940;2124;737;1203;8;10;0;0;0;0;0;0;0;1202;0;0;1202;34;2;32;0;1168;867;301;4
+"141103";"gmina wiejska";"gm. Karniewo";"makowski";"mazowieckie";3762;4109;1501;2261;3;7;0;0;0;0;0;0;0;2261;0;0;2261;57;19;38;0;2204;1482;722;4
+"141104";"gmina wiejska";"gm. Krasnosielc";"makowski";"mazowieckie";4670;5050;2061;2609;8;11;0;0;0;0;0;0;0;2609;0;0;2609;86;22;64;0;2523;1669;854;6
+"141105";"gmina wiejska";"gm. Młynarze";"makowski";"mazowieckie";1240;1360;426;814;1;2;0;0;0;0;0;0;0;814;0;0;814;36;11;25;0;778;535;243;3
+"141106";"gmina wiejska";"gm. Płoniawy-Bramura";"makowski";"mazowieckie";4040;4441;1704;2336;0;10;0;0;0;0;0;0;0;2336;0;0;2336;79;19;60;0;2257;1583;674;8
+"141107";"gmina miejsko-wiejska";"gm. Różan";"makowski";"mazowieckie";3243;3581;1178;2064;4;39;0;0;0;0;0;0;0;2065;0;0;2065;51;11;40;0;2014;1195;819;3
+"141108";"gmina wiejska";"gm. Rzewnie";"makowski";"mazowieckie";1977;2202;635;1342;0;30;0;0;0;0;0;0;0;1342;0;0;1342;40;5;35;0;1302;874;428;3
+"141109";"gmina wiejska";"gm. Sypniewo";"makowski";"mazowieckie";2400;2605;829;1571;3;4;0;0;0;0;0;0;0;1571;0;0;1571;36;10;26;0;1535;1068;467;4
+"141110";"gmina wiejska";"gm. Szelków";"makowski";"mazowieckie";2660;2906;991;1669;1;18;0;0;0;0;0;0;0;1668;0;0;1668;35;8;27;0;1633;1093;540;7
+"141501";"gmina wiejska";"gm. Baranowo";"ostrołęcki";"mazowieckie";4794;5213;2168;2626;6;5;0;0;0;0;0;0;0;2626;0;0;2626;62;9;53;0;2564;1668;896;6
+"141502";"gmina wiejska";"gm. Czarnia";"ostrołęcki";"mazowieckie";1798;1949;879;919;0;2;0;0;0;0;0;0;0;919;0;0;919;21;3;18;0;898;632;266;4
+"141503";"gmina wiejska";"gm. Czerwin";"ostrołęcki";"mazowieckie";3758;4152;1466;2292;12;15;0;0;0;0;0;0;0;2292;0;0;2292;32;2;30;0;2260;1640;620;7
+"141504";"gmina wiejska";"gm. Goworowo";"ostrołęcki";"mazowieckie";6185;6717;2805;3380;14;21;0;0;0;0;0;0;0;3378;0;0;3378;148;34;114;0;3230;2261;969;8
+"141505";"gmina wiejska";"gm. Kadzidło";"ostrołęcki";"mazowieckie";8162;8851;3504;4658;2;21;0;0;0;0;0;0;0;4658;0;0;4658;151;29;122;0;4507;3032;1475;15
+"141506";"gmina wiejska";"gm. Lelis";"ostrołęcki";"mazowieckie";6779;7396;2524;4255;2;8;0;0;0;0;0;0;0;4255;0;0;4255;129;40;89;0;4126;2810;1316;8
+"141507";"gmina wiejska";"gm. Łyse";"ostrołęcki";"mazowieckie";5987;6471;2800;3187;1;10;0;0;0;0;0;0;0;3187;0;0;3187;80;16;64;0;3107;2078;1029;8
+"141508";"gmina miejsko-wiejska";"gm. Myszyniec";"ostrołęcki";"mazowieckie";7564;8223;3372;4192;12;15;0;0;0;0;0;0;0;4192;0;0;4192;140;26;114;0;4052;2858;1194;14
+"141509";"gmina wiejska";"gm. Olszewo-Borki";"ostrołęcki";"mazowieckie";7611;8313;2746;4865;4;26;0;0;0;0;0;0;0;4861;0;1;4860;133;38;95;0;4727;3023;1704;7
+"141510";"gmina wiejska";"gm. Rzekuń";"ostrołęcki";"mazowieckie";8165;8867;2899;5266;2;15;0;0;0;0;0;0;0;5264;0;0;5264;131;39;92;0;5133;3075;2058;7
+"141511";"gmina wiejska";"gm. Troszyn";"ostrołęcki";"mazowieckie";3450;3769;1345;2105;5;14;0;0;0;0;0;0;0;2105;0;0;2105;48;20;28;0;2057;1520;537;6
+"141601";"gmina miejska";"m. Ostrów Mazowiecka";"ostrowski";"mazowieckie";16380;17706;5938;10442;20;54;0;0;0;0;0;0;0;10439;0;0;10439;237;75;162;0;10202;5313;4889;13
+"141602";"gmina wiejska";"gm. Andrzejewo";"ostrowski";"mazowieckie";3087;3387;1066;2021;2;6;0;0;0;0;0;0;0;2021;0;0;2021;36;15;21;0;1985;1596;389;4
+"141603";"gmina wiejska";"gm. Boguty-Pianki";"ostrowski";"mazowieckie";1963;2103;682;1281;10;8;0;0;0;0;0;0;0;1281;0;0;1281;16;6;10;0;1265;1050;215;5
+"141604";"gmina miejsko-wiejska";"gm. Brok";"ostrowski";"mazowieckie";2128;2309;770;1358;5;22;0;0;0;0;0;0;0;1358;0;0;1358;35;9;26;0;1323;829;494;3
+"141605";"gmina wiejska";"gm. Małkinia Górna";"ostrowski";"mazowieckie";8529;9303;3098;5431;8;14;0;0;0;0;0;0;0;5431;0;0;5431;209;34;175;0;5222;3687;1535;13
+"141606";"gmina wiejska";"gm. Nur";"ostrowski";"mazowieckie";2145;2333;768;1377;8;13;0;0;0;0;0;0;0;1377;0;0;1377;27;2;25;0;1350;1053;297;4
+"141607";"gmina wiejska";"gm. Ostrów Mazowiecka";"ostrowski";"mazowieckie";9334;10172;3719;5615;3;25;0;0;0;0;0;0;0;5615;0;0;5615;141;27;114;0;5474;3843;1631;16
+"141608";"gmina wiejska";"gm. Stary Lubotyń";"ostrowski";"mazowieckie";2702;2920;1032;1670;0;11;0;0;0;0;0;0;0;1670;0;0;1670;43;8;35;0;1627;1336;291;6
+"141609";"gmina wiejska";"gm. Szulborze Wielkie";"ostrowski";"mazowieckie";1253;1392;446;807;6;3;0;0;0;0;0;0;0;807;0;0;807;23;8;15;0;784;540;244;2
+"141610";"gmina wiejska";"gm. Wąsewo";"ostrowski";"mazowieckie";3190;3455;1180;2010;9;12;0;0;0;0;0;0;0;2010;0;0;2010;74;19;55;0;1936;1244;692;5
+"141611";"gmina wiejska";"gm. Zaręby Kościelne";"ostrowski";"mazowieckie";2707;2951;1019;1688;12;9;0;0;0;0;0;0;0;1686;0;0;1686;34;7;27;0;1652;1263;389;3
+"142401";"gmina wiejska";"gm. Gzy";"pułtuski";"mazowieckie";2830;3078;1152;1678;0;1;0;0;0;0;0;0;0;1678;0;0;1678;48;15;33;0;1630;1017;613;5
+"142402";"gmina wiejska";"gm. Obryte";"pułtuski";"mazowieckie";3557;3887;1094;2463;7;12;0;0;0;0;0;0;0;2463;0;0;2463;94;27;67;0;2369;1525;844;7
+"142403";"gmina wiejska";"gm. Pokrzywnica";"pułtuski";"mazowieckie";3671;3975;1423;2248;3;12;1;0;0;0;0;0;0;2248;0;0;2248;55;15;40;0;2193;1275;918;5
+"142404";"gmina miejsko-wiejska";"gm. Pułtusk";"pułtuski";"mazowieckie";17399;19161;6050;11347;15;69;1;1;0;0;0;0;1;11348;1;5;11343;422;184;238;0;10921;5171;5750;19
+"142405";"gmina wiejska";"gm. Świercze";"pułtuski";"mazowieckie";3482;3786;1490;1992;5;6;0;0;0;0;0;0;0;1992;0;0;1992;60;18;42;0;1932;1113;819;5
+"142406";"gmina wiejska";"gm. Winnica";"pułtuski";"mazowieckie";2938;3237;779;2159;14;16;0;0;0;0;0;0;0;2159;0;0;2159;82;25;57;0;2077;1191;886;4
+"142407";"gmina wiejska";"gm. Zatory";"pułtuski";"mazowieckie";3574;3873;1261;2313;4;10;0;0;0;0;0;0;0;2313;0;0;2313;74;18;56;0;2239;1395;844;6
+"143501";"gmina wiejska";"gm. Brańszczyk";"wyszkowski";"mazowieckie";6262;6675;2393;3869;7;17;0;0;0;0;0;0;0;3868;0;0;3868;109;21;88;0;3759;2488;1271;9
+"143502";"gmina wiejska";"gm. Długosiodło";"wyszkowski";"mazowieckie";5576;6103;2117;3459;4;17;0;0;0;0;0;0;0;3459;0;0;3459;125;40;85;0;3334;2216;1118;6
+"143503";"gmina wiejska";"gm. Rząśnik";"wyszkowski";"mazowieckie";5076;5474;1682;3394;2;15;0;0;0;0;0;0;0;3394;0;0;3394;99;17;82;0;3295;2373;922;9
+"143504";"gmina wiejska";"gm. Somianka";"wyszkowski";"mazowieckie";4188;4608;1381;2807;2;27;0;0;0;0;0;0;0;2805;0;0;2805;91;21;70;0;2714;1709;1005;7
+"143505";"gmina miejsko-wiejska";"gm. Wyszków";"wyszkowski";"mazowieckie";27787;30451;8919;18866;43;115;0;0;0;0;0;0;0;18865;0;0;18865;606;171;435;0;18259;10118;8141;28
+"143506";"gmina wiejska";"gm. Zabrodzie";"wyszkowski";"mazowieckie";4236;4722;1447;2789;2;30;0;0;0;0;0;0;0;2789;0;0;2789;62;14;48;0;2727;1888;839;5
+"146101";"gmina miejska";"m. Ostrołęka";"Ostrołęka";"mazowieckie";37160;40107;12934;24226;20;125;6;6;0;0;0;0;6;24228;6;0;24228;768;246;522;0;23460;12205;11255;29
