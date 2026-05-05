@@ -29,7 +29,8 @@ def init_database() -> None:
                 CREATE TABLE IF NOT EXISTS elections (
                     id SERIAL PRIMARY KEY,
                     year INT NOT NULL,
-                    type TEXT NOT NULL
+                    type TEXT NOT NULL,
+                    UNIQUE (year, type)
                 );
                 """
             )
@@ -42,6 +43,32 @@ def init_database() -> None:
                     votes INT NOT NULL,
                     district TEXT NOT NULL,
                     list_position INT NOT NULL DEFAULT 1
+                );
+                """
+            )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS source_files (
+                    id SERIAL PRIMARY KEY,
+                    election_key TEXT NOT NULL,
+                    year INT,
+                    file_path TEXT NOT NULL UNIQUE,
+                    file_name TEXT NOT NULL,
+                    column_count INT NOT NULL,
+                    header JSONB NOT NULL,
+                    profiled_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                );
+                """
+            )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS source_columns (
+                    id SERIAL PRIMARY KEY,
+                    source_file_id INT NOT NULL REFERENCES source_files(id) ON DELETE CASCADE,
+                    column_index INT NOT NULL,
+                    column_name TEXT NOT NULL,
+                    is_committee BOOLEAN NOT NULL DEFAULT FALSE,
+                    UNIQUE (source_file_id, column_index)
                 );
                 """
             )
