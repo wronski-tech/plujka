@@ -21,7 +21,20 @@ COMMITTEE_ALIASES = {
 def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
     lowered = question.lower()
 
-    if any(token in lowered for token in ["wesz", "mandat", "weszli do sejmu", "wybrani do sejmu"]):
+    if any(
+        token in lowered
+        for token in [
+            "wesz",
+            "mandat",
+            "weszli do sejmu",
+            "wybrani do sejmu",
+            "posł",
+            "posl",
+            "poseł",
+            "poslowie",
+            "posłowie",
+        ]
+    ):
         alias = _extract_alias_from_question(question)
         return "elected_candidates_sejm", alias
 

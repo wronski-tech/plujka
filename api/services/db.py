@@ -95,3 +95,19 @@ def run_sql(sql: str, params: dict[str, Any]) -> list[dict[str, Any]]:
             columns = [desc.name for desc in cur.description]
             rows = cur.fetchall()
     return [dict(zip(columns, row)) for row in rows]
+
+
+def get_latest_election_year(election_type: str = "sejm") -> int | None:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT MAX(year) FROM elections WHERE type = %s", (election_type,))
+            row = cur.fetchone()
+    return row[0] if row and row[0] is not None else None
+
+
+def get_latest_elected_candidates_year() -> int | None:
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT MAX(year) FROM elected_candidates")
+            row = cur.fetchone()
+    return row[0] if row and row[0] is not None else None

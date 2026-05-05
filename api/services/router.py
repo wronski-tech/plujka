@@ -21,21 +21,39 @@ def route_question(question: str) -> dict:
     year = _extract_year(question)
     years = _extract_years(question)
     is_comparison = _is_year_comparison_question(question, years)
+    default_year = year if year is not None else db.get_latest_election_year("sejm")
 
     intent = llm_intent if llm_intent in SQL_TEMPLATES else _fallback_semantic_intent(question_embedding)
     if intent == "elected_candidates_sejm":
         sql = SQL_TEMPLATES["elected_candidates_sejm"]
-        params = {"year": year, "candidate_pattern": f"%{llm_entity}%"} if llm_entity else {"year": year, "candidate_pattern": None}
+        elected_default_year = year if year is not None else db.get_latest_elected_candidates_year()
+        params = (
+            {"year": elected_default_year, "candidate_pattern": f"%{llm_entity}%"}
+            if llm_entity
+            else {"year": elected_default_year, "candidate_pattern": None}
+        )
         result = db.run_sql(sql, params)
-        return {"question": question, "intent": intent, "entity": llm_entity, "year": year, "years": years, "sql": sql, "params": params, "result": result}
+        if not result and year is None and elected_default_year is not None:
+            params["year"] = None
+            result = db.run_sql(sql, params)
+        return {
+            "question": question,
+            "intent": intent,
+            "entity": llm_entity,
+            "year": params["year"],
+            "years": years,
+            "sql": sql,
+            "params": params,
+            "result": result,
+        }
 
-    sql, params = _resolve_sql(intent, llm_entity, year, years, is_comparison)
+    sql, params = _resolve_sql(intent, llm_entity, default_year, years, is_comparison)
     result = db.run_sql(sql, params)
     return {
         "question": question,
         "intent": intent,
         "entity": llm_entity,
-        "year": year,
+        "year": default_year,
         "years": years,
         "sql": sql,
         "params": params,
