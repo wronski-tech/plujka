@@ -21,6 +21,10 @@ COMMITTEE_ALIASES = {
 def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
     lowered = question.lower()
 
+    if any(token in lowered for token in ["wesz", "mandat", "weszli do sejmu", "wybrani do sejmu"]):
+        alias = _extract_alias_from_question(question)
+        return "elected_candidates_sejm", alias
+
     if not OPENAI_API_KEY:
         if "trend" in lowered or "okręg" in lowered or "district" in lowered:
             entity = _extract_after_keyword(question, ["dla", "for"])
@@ -40,7 +44,7 @@ def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
     prompt = (
         "You are an intent extractor for a deterministic SQL system. "
         "Return JSON only with keys: intent, entity. "
-        "Allowed intents: total_votes_by_candidate, votes_for_candidate, trend_by_district_for_candidate."
+        "Allowed intents: total_votes_by_candidate, votes_for_candidate, trend_by_district_for_candidate, elected_candidates_sejm."
     )
     response = client.chat.completions.create(
         model=OPENAI_CHAT_MODEL,

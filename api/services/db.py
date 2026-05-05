@@ -48,6 +48,20 @@ def init_database() -> None:
             )
             cur.execute(
                 """
+                CREATE TABLE IF NOT EXISTS elected_candidates (
+                    id SERIAL PRIMARY KEY,
+                    year INT NOT NULL,
+                    district TEXT NOT NULL,
+                    committee_name TEXT NOT NULL,
+                    candidate_name TEXT NOT NULL,
+                    candidate_votes INT NOT NULL,
+                    list_position INT,
+                    UNIQUE (year, district, committee_name, candidate_name)
+                );
+                """
+            )
+            cur.execute(
+                """
                 CREATE TABLE IF NOT EXISTS source_files (
                     id SERIAL PRIMARY KEY,
                     election_key TEXT NOT NULL,
