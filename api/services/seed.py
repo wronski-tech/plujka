@@ -89,7 +89,6 @@ def _is_committee_column(name: str) -> bool:
         "siedziba",
         "komisj",
         "kart",
-        "wyborc",
         "kopert",
         "urn",
         "głosów",
@@ -172,11 +171,22 @@ def profile_all_csv_sources() -> None:
 
 
 def _dataset_candidates() -> list[tuple[int, Path]]:
-    return [
-        (2019, Path("data/pkw_all/sejmsenat2019/csv/wyniki_gl_na_listy_po_obwodach_sejm.csv")),
-        (2023, Path("data/pkw_all/sejmsenat2023/csv/wyniki_gl_na_listy_po_obwodach_sejm.csv")),
-        (2023, Path(SEED_SAMPLE_CSV)),
-    ]
+    candidates: list[tuple[int, Path]] = []
+    p2019 = Path("data/pkw_all/sejmsenat2019/csv/wyniki_gl_na_listy_po_obwodach_sejm.csv")
+    p2023 = Path("data/pkw_all/sejmsenat2023/csv/wyniki_gl_na_listy_po_obwodach_sejm.csv")
+    p2023_utf8 = Path("data/pkw_all/sejmsenat2023/csv/wyniki_gl_na_listy_po_obwodach_sejm_utf8.csv")
+
+    if p2019.exists():
+        candidates.append((2019, p2019))
+    if p2023.exists():
+        candidates.append((2023, p2023))
+    elif p2023_utf8.exists():
+        candidates.append((2023, p2023_utf8))
+
+    sample = Path(SEED_SAMPLE_CSV)
+    if sample.exists():
+        candidates.append((2023, sample))
+    return candidates
 
 
 def _extract_2019_candidate_votes_by_district() -> dict[tuple[str, str], list[tuple[str, int, int]]]:
