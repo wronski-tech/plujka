@@ -10,9 +10,11 @@ API_URL = os.getenv("API_URL", "http://localhost:8000")
 st.set_page_config(page_title="Plujka PKW AI", layout="wide")
 st.title("PKW AI: Pytanie -> Intencja -> SQL -> PostgreSQL")
 
-question = st.text_input("Pytanie", placeholder="Ile głosów ma KO?")
+with st.form("ask_form", clear_on_submit=False):
+    question = st.text_input("Pytanie", placeholder="Ile głosów ma KO?")
+    submitted = st.form_submit_button("Zapytaj")
 
-if st.button("Zapytaj") and question.strip():
+if submitted and question.strip():
     with st.spinner("Wysyłam zapytanie do API..."):
         try:
             response = requests.post(f"{API_URL}/ask", json={"question": question}, timeout=60)
@@ -21,6 +23,9 @@ if st.button("Zapytaj") and question.strip():
         except requests.RequestException as error:
             st.error(f"API jest chwilowo niedostępne lub zwróciło błąd: {error}")
             st.stop()
+
+    st.subheader("Wynik")
+    st.dataframe(data["result"], use_container_width=True)
 
     st.subheader("Wykryta intencja")
     st.code(data["intent"])
@@ -34,5 +39,4 @@ if st.button("Zapytaj") and question.strip():
     st.subheader("Parametry SQL")
     st.json(data["params"])
 
-    st.subheader("Wynik")
-    st.dataframe(data["result"], use_container_width=True)
+

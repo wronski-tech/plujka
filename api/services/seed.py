@@ -301,31 +301,31 @@ def _extract_2023_candidate_votes_by_district() -> dict[tuple[str, str], list[tu
             reader = csv.reader(file, delimiter=";")
             header = [c.replace("\ufeff", "").strip('"') for c in next(reader, [])]
 
-        position_by_committee: dict[str, int] = {}
-        candidate_cols: list[tuple[int, str, str, int]] = []
-        for idx, col in enumerate(header):
-            if idx < 6:
-                continue
-            raw = col.strip()
-            if " - " not in raw:
-                continue
-            name_part, com_raw = raw.rsplit(" - ", 1)
-            committee = _list_committee_from_2023_candidate_suffix(com_raw)
-            pos = position_by_committee.get(committee, 0) + 1
-            position_by_committee[committee] = pos
-            candidate_cols.append((idx, name_part.strip(), committee, pos))
+            position_by_committee: dict[str, int] = {}
+            candidate_cols: list[tuple[int, str, str, int]] = []
+            for idx, col in enumerate(header):
+                if idx < 6:
+                    continue
+                raw = col.strip()
+                if " - " not in raw:
+                    continue
+                name_part, com_raw = raw.rsplit(" - ", 1)
+                committee = _list_committee_from_2023_candidate_suffix(com_raw)
+                pos = position_by_committee.get(committee, 0) + 1
+                position_by_committee[committee] = pos
+                candidate_cols.append((idx, name_part.strip(), committee, pos))
 
-        for row in reader:
-            for idx, candidate_name, committee, position in candidate_cols:
-                if idx >= len(row):
-                    continue
-                votes = _parse_int(row[idx])
-                if votes <= 0:
-                    continue
-                key = (district, committee)
-                result.setdefault(key, {})
-                cand_key = (candidate_name, position)
-                result[key][cand_key] = result[key].get(cand_key, 0) + votes
+            for row in reader:
+                for idx, candidate_name, committee, position in candidate_cols:
+                    if idx >= len(row):
+                        continue
+                    votes = _parse_int(row[idx])
+                    if votes <= 0:
+                        continue
+                    key = (district, committee)
+                    result.setdefault(key, {})
+                    cand_key = (candidate_name, position)
+                    result[key][cand_key] = result[key].get(cand_key, 0) + votes
 
     flattened: dict[tuple[str, str], list[tuple[str, int, int]]] = {}
     for key, data in result.items():
