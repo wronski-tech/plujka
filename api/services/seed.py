@@ -47,11 +47,29 @@ FIXED_COLUMNS = {
 
 ELECTION_PATH_RE = re.compile(r"(sejmsenat20\d{2})")
 LIST_POSITION_RE = re.compile(r"\s-\s*nr na liście\s*(\d+)\s*$", re.IGNORECASE)
-SEJM_2019_DISTRICT_SEATS = {
+# Mandates per Sejm district (2019 apportionment; unchanged for 2023 — 41 districts, 460 seats).
+SEJM_DISTRICT_SEATS = {
     "1": 12, "2": 8, "3": 14, "4": 12, "5": 13, "6": 15, "7": 12, "8": 12, "9": 14, "10": 9,
     "11": 12, "12": 8, "13": 14, "14": 10, "15": 9, "16": 10, "17": 12, "18": 12, "19": 9, "20": 12,
     "21": 20, "22": 11, "23": 15, "24": 14, "25": 12, "26": 14, "27": 9, "28": 7, "29": 9, "30": 9,
     "31": 10, "32": 9, "33": 8, "34": 8, "35": 9, "36": 12, "37": 9, "38": 9, "39": 13, "40": 8, "41": 12,
+}
+
+# 2023 candidate CSV uses abbreviated committee labels in column titles; list-level data uses full PKW names.
+SEJM_2023_COLUMN_COMMITTEE_TO_LIST_NAME: dict[str, str] = {
+    "KW BEZPARTYJNI SAMORZĄDOWCY": "KOMITET WYBORCZY BEZPARTYJNI SAMORZĄDOWCY",
+    "KKW TRZECIA DROGA PSL-PL2050 SZYMONA HOŁOWNI": (
+        "KOALICYJNY KOMITET WYBORCZY TRZECIA DROGA POLSKA 2050 SZYMONA HOŁOWNI - POLSKIE STRONNICTWO LUDOWE"
+    ),
+    "KW NOWA LEWICA": "KOMITET WYBORCZY NOWA LEWICA",
+    "KW PRAWO I SPRAWIEDLIWOŚĆ": "KOMITET WYBORCZY PRAWO I SPRAWIEDLIWOŚĆ",
+    "KW KONFEDERACJA WOLNOŚĆ I NIEPODLEGŁOŚĆ": "KOMITET WYBORCZY KONFEDERACJA WOLNOŚĆ I NIEPODLEGŁOŚĆ",
+    "KKW KOALICJA OBYWATELSKA PO .N IPL ZIELONI": (
+        "KOALICYJNY KOMITET WYBORCZY KOALICJA OBYWATELSKA PO .N IPL ZIELONI"
+    ),
+    "KW POLSKA JEST JEDNA": "KOMITET WYBORCZY POLSKA JEST JEDNA",
+    "KWW MNIEJSZOŚĆ NIEMIECKA": "KOMITET WYBORCZY WYBORCÓW MNIEJSZOŚĆ NIEMIECKA",
+    "KWW RDIP": "KOMITET WYBORCZY WYBORCÓW RUCHU DOBROBYTU I POKOJU",
 }
 
 
@@ -257,8 +275,71 @@ def _extract_2019_candidate_votes_by_district() -> dict[tuple[str, str], list[tu
     return flattened
 
 
-def _seed_elected_candidates_2019() -> None:
-    candidate_votes = _extract_2019_candidate_votes_by_district()
+def _list_committee_from_2023_candidate_suffix(committee_raw: str) -> str:
+    committee_raw = committee_raw.strip().strip('"')
+    mapped = SEJM_2023_COLUMN_COMMITTEE_TO_LIST_NAME.get(committee_raw)
+    if mapped:
+        return mapped
+    upper = committee_raw.upper()
+    if upper.startswith("KW "):
+        return "KOMITET WYBORCZY " + committee_raw[3:].strip()
+    return committee_raw
+
+
+def _extract_2023_candidate_votes_by_district() -> dict[tuple[str, str], list[tuple[str, int, int]]]:
+    base = Path("data/pkw_all/sejmsenat2023/csv/wyniki_gl_na_kandydatow_po_gminach_sejm_csv")
+    if not base.is_dir():
+        return {}
+
+    result: dict[tuple[str, str], dict[tuple[str, int], int]] = {}
+    for csv_path in sorted(base.glob("okreg_*_utf8.csv")):
+        district_match = re.search(r"okreg_(\d+)_utf8\.csv$", csv_path.name, re.IGNORECASE)
+        if not district_match:
+            continue
+        district = district_match.group(1)
+        with csv_path.open("r", encoding="utf-8", newline="") as file:
+            reader = csv.reader(file, delimiter=";")
+            header = [c.replace("\ufeff", "").strip('"') for c in next(reader, [])]
+
+        position_by_committee: dict[str, int] = {}
+        candidate_cols: list[tuple[int, str, str, int]] = []
+        for idx, col in enumerate(header):
+            if idx < 6:
+                continue
+            raw = col.strip()
+            if " - " not in raw:
+                continue
+            name_part, com_raw = raw.rsplit(" - ", 1)
+            committee = _list_committee_from_2023_candidate_suffix(com_raw)
+            pos = position_by_committee.get(committee, 0) + 1
+            position_by_committee[committee] = pos
+            candidate_cols.append((idx, name_part.strip(), committee, pos))
+
+        for row in reader:
+            for idx, candidate_name, committee, position in candidate_cols:
+                if idx >= len(row):
+                    continue
+                votes = _parse_int(row[idx])
+                if votes <= 0:
+                    continue
+                key = (district, committee)
+                result.setdefault(key, {})
+                cand_key = (candidate_name, position)
+                result[key][cand_key] = result[key].get(cand_key, 0) + votes
+
+    flattened: dict[tuple[str, str], list[tuple[str, int, int]]] = {}
+    for key, data in result.items():
+        flattened[key] = [
+            (name, position, votes)
+            for (name, position), votes in sorted(data.items(), key=lambda item: (-item[1], item[0][1], item[0][0]))
+        ]
+    return flattened
+
+
+def _seed_elected_candidates(
+    year: int,
+    candidate_votes: dict[tuple[str, str], list[tuple[str, int, int]]],
+) -> None:
     if not candidate_votes:
         return
 
@@ -270,9 +351,10 @@ def _seed_elected_candidates_2019() -> None:
                 FROM results r
                 JOIN elections e ON e.id = r.election_id
                 JOIN candidates c ON c.id = r.candidate_id
-                WHERE e.year = 2019 AND e.type = 'sejm'
+                WHERE e.year = %s AND e.type = 'sejm'
                 GROUP BY r.district, c.name
-                """
+                """,
+                (year,),
             )
             district_committee_votes_rows = cur.fetchall()
 
@@ -282,9 +364,10 @@ def _seed_elected_candidates_2019() -> None:
                 FROM results r
                 JOIN elections e ON e.id = r.election_id
                 JOIN candidates c ON c.id = r.candidate_id
-                WHERE e.year = 2019 AND e.type = 'sejm'
+                WHERE e.year = %s AND e.type = 'sejm'
                 GROUP BY c.name
-                """
+                """,
+                (year,),
             )
             national_rows = cur.fetchall()
 
@@ -306,9 +389,9 @@ def _seed_elected_candidates_2019() -> None:
                 district_votes.setdefault(str(district), {})
                 district_votes[str(district)][committee] = int(votes)
 
-            cur.execute("DELETE FROM elected_candidates WHERE year = 2019")
+            cur.execute("DELETE FROM elected_candidates WHERE year = %s", (year,))
 
-            for district, seats in SEJM_2019_DISTRICT_SEATS.items():
+            for district, seats in SEJM_DISTRICT_SEATS.items():
                 committee_votes = district_votes.get(district, {})
                 if not committee_votes:
                     continue
@@ -335,7 +418,7 @@ def _seed_elected_candidates_2019() -> None:
                             SET candidate_votes = EXCLUDED.candidate_votes,
                                 list_position = EXCLUDED.list_position
                             """,
-                            (2019, district, committee, candidate_name, votes, position),
+                            (year, district, committee, candidate_name, votes, position),
                         )
 
 
@@ -403,6 +486,11 @@ def seed_if_empty() -> None:
         for year, csv_path in _dataset_candidates():
             if csv_path.exists():
                 _import_dataset(csv_path, year)
-        _seed_elected_candidates_2019()
+        votes_2019 = _extract_2019_candidate_votes_by_district()
+        if votes_2019:
+            _seed_elected_candidates(2019, votes_2019)
+        votes_2023 = _extract_2023_candidate_votes_by_district()
+        if votes_2023:
+            _seed_elected_candidates(2023, votes_2023)
     finally:
         seed_complete.set()
