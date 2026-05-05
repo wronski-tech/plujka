@@ -28,6 +28,147 @@ _POLITICIAN_COMMITTEE_PATTERNS: list[tuple[re.Pattern[str], str]] = [
 ]
 
 
+def _elected_sejm_candidate_pattern(question: str) -> str | None:
+    """Match known politicians to a substring for ILIKE on elected_candidates.candidate_name."""
+    if re.search(r"\bdonald\s+tusk\b", question, re.IGNORECASE) or re.search(
+        r"\btusk\b", question, re.IGNORECASE
+    ):
+        return "Tusk"
+    if re.search(r"\bmateusz\s+morawiecki\b", question, re.IGNORECASE) or re.search(
+        r"\bmorawiecki\b", question, re.IGNORECASE
+    ):
+        return "Morawiecki"
+    if re.search(r"\bjarosław\s+kaczy", question, re.IGNORECASE) or re.search(
+        r"\bkaczy(?:ń|n)ski\b", question, re.IGNORECASE
+    ):
+        return "Kaczyński"
+    return None
+
+
+_PARTICIPATION_STOPWORDS = frozenset(
+    {
+        "wszystkie",
+        "wszystkich",
+        "jakie",
+        "które",
+        "ktore",
+        "których",
+        "ktorych",
+        "latach",
+        "lat",
+        "wyborach",
+        "wybory",
+        "kadencje",
+        "kadencji",
+        "kadencyjnych",
+        "sejm",
+        "sejmu",
+        "pytanie",
+        "podaj",
+        "wskaż",
+        "wskaz",
+        "wskaże",
+        "startował",
+        "startowal",
+        "startowała",
+        "startowala",
+        "kandydował",
+        "kandydowal",
+        "kandydowała",
+        "kandydowala",
+        "osoby",
+        "osoba",
+        "jakich",
+        "which",
+        "what",
+        "elections",
+    }
+)
+
+
+def _question_asks_candidate_participation(question: str) -> bool:
+    """Pytania o lata/kadencje wyborów, w których ktoś był kandydatem do Sejmu."""
+    lowered = question.lower()
+    return any(
+        p in lowered
+        for p in (
+            "kadencj",
+            "startował",
+            "startowal",
+            "startowała",
+            "startowala",
+            "kandydował",
+            "kandydowal",
+            "kandydowała",
+            "kandydowala",
+            "w których latach",
+            "których wyborach",
+            "ktorych wyborach",
+            "które wybory",
+            "ktore wybory",
+            "w jakich latach",
+            "jakie lata",
+            "jakie roczniki",
+            "which years",
+            "election years",
+        )
+    )
+
+
+def person_name_fragment_from_question(question: str) -> str | None:
+    """Bare substring for ILIKE on candidate_name (router wraps with %)."""
+    m = re.search(
+        r"(?:startował|startowal|startowała|startowala|kandydował|kandydowal|kandydowała|kandydowala)\s+"
+        r"([A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż][^\s,.;:?]*(?:\s+[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż][^\s,.;:?]*)?)",
+        question,
+        re.IGNORECASE,
+    )
+    if m:
+        return m.group(1).strip()
+    tokens = re.findall(r"[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż]{4,}", question)
+    for t in sorted(tokens, key=len, reverse=True):
+        if t.lower() not in _PARTICIPATION_STOPWORDS and len(t) >= 5:
+            return t
+    for t in sorted(tokens, key=len, reverse=True):
+        if t.lower() not in _PARTICIPATION_STOPWORDS and len(t) >= 4:
+            return t
+    return None
+
+
+def _question_asks_personal_candidate_votes(question: str) -> bool:
+    """Prefer routing to imienne / preferencyjne głosy kandydata (elected_candidates), nie sumy na listę."""
+    lowered = question.lower()
+    return any(
+        phrase in lowered
+        for phrase in (
+            "preferencyjn",
+            "głosów imiennych",
+            "glosow imiennych",
+            "głosy imienne",
+            "glosy imienne",
+            "osobistych głos",
+            "osobiste głos",
+            "osobiście",
+            "osobiscie",
+            "na nazwisko",
+            "jako kandydat",
+            "jako kandydaci",
+            "na kandydata",
+            "oddanych na",
+            "oddane na",
+            "na tuska",
+            "na morawieckiego",
+            "na kaczyńskiego",
+            "na kaczynskiego",
+            "ile zebrał",
+            "ile zebral",
+            "zdobył osobiście",
+            "zdobyl osobiscie",
+            "poparcie osobiste",
+        )
+    )
+
+
 def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
     lowered = question.lower()
 
@@ -45,10 +186,45 @@ def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
             "posłowie",
         ]
     ):
+        person = _elected_sejm_candidate_pattern(question)
+        if person:
+            return "elected_candidates_sejm", person
         alias = _extract_alias_from_question(question)
         return "elected_candidates_sejm", alias
 
+    if _question_asks_candidate_participation(question):
+        frag = person_name_fragment_from_question(question)
+        if frag:
+            return "candidate_sejm_participation", frag
+
     committee = _committee_from_politician_name(question)
+
+    if _question_asks_vote_totals(question):
+        person = _elected_sejm_candidate_pattern(question)
+        if person and _question_asks_personal_candidate_votes(question):
+            return "sejm_candidate_personal_votes", person
+
+    if _question_asks_vote_totals(question):
+        if any(t in lowered for t in ("gmina", "gminie", "gminy")):
+            ent = committee or _extract_alias_from_question(question) or _normalize_entity(None, question)
+            return "sejm_votes_by_gmina", ent
+        if any(
+            t in lowered
+            for t in (
+                "województwo",
+                "województwie",
+                "województwach",
+                "wojewodztwo",
+                "wojewodztwie",
+                "wojewodztwach",
+            )
+        ):
+            ent = committee or _extract_alias_from_question(question) or _normalize_entity(None, question)
+            return "sejm_votes_by_wojewodztwo", ent
+        if "powiat" in lowered:
+            ent = committee or _extract_alias_from_question(question) or _normalize_entity(None, question)
+            return "sejm_votes_by_powiat", ent
+
     if committee and _question_asks_vote_totals(question):
         if _question_asks_multiple_election_years(question):
             return "votes_for_candidate_all_years", committee
@@ -74,7 +250,8 @@ def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
         "You are an intent extractor for a deterministic SQL system. "
         "Return JSON only with keys: intent, entity. "
         "Allowed intents: total_votes_by_candidate, votes_for_candidate, votes_for_candidate_all_years, "
-        "trend_by_district_for_candidate, elected_candidates_sejm."
+        "trend_by_district_for_candidate, elected_candidates_sejm, candidate_sejm_participation, "
+        "sejm_candidate_personal_votes, sejm_votes_by_powiat, sejm_votes_by_gmina, sejm_votes_by_wojewodztwo."
     )
     response = client.chat.completions.create(
         model=OPENAI_CHAT_MODEL,

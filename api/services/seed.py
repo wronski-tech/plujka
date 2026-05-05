@@ -78,6 +78,257 @@ def _parse_int(value: str) -> int:
     return int(value) if value.isdigit() else 0
 
 
+def _parse_pl_float(value: str) -> float | None:
+    raw = (value or "").strip().strip('"')
+    if not raw:
+        return None
+    normalized = raw.replace(" ", "").replace(",", ".")
+    try:
+        return float(normalized)
+    except ValueError:
+        return None
+
+
+SENATE_VALID_VOTES_TOTAL_COL = "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów"
+
+# Sejm list aggregates (official rollups). Obwód-level detail lives in `results` from list-by-precinct import.
+SEJM_AGGREGATE_FILE_STEMS: list[tuple[str, str, bool]] = [
+    ("po_wojewodztwach_sejm", "voivodeship", False),
+    ("po_wojewodztwach_proc_sejm", "voivodeship", True),
+    ("po_powiatach_sejm", "powiat", False),
+    ("po_powiatach_proc_sejm", "powiat", True),
+    ("po_gminach_sejm", "gmina", False),
+    ("po_gminach_proc_sejm", "gmina", True),
+    ("po_okregach_sejm", "district", False),
+    ("po_okregach_proc_sejm", "district", True),
+]
+
+
+def _sejm_aggregate_csv_path(year: int, stem: str) -> Path:
+    base = Path(f"data/pkw_all/sejmsenat{year}/csv")
+    if year == 2019:
+        return base / f"wyniki_gl_na_listy_{stem}.csv"
+    return base / f"wyniki_gl_na_listy_{stem}_utf8.csv"
+
+
+def _iter_csv_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
+    with path.open("r", encoding="utf-8", newline="") as file:
+        reader = csv.reader(file, delimiter=";")
+        header = [c.replace("\ufeff", "").strip('"') for c in next(reader, [])]
+        rows: list[dict[str, str]] = []
+        for raw in reader:
+            row = {header[i]: (raw[i] if i < len(raw) else "") for i in range(len(header))}
+            rows.append(row)
+        return header, rows
+
+
+def _aggregate_geo_dims(level: str, row: dict[str, str]) -> dict[str, str]:
+    if level == "voivodeship":
+        return {
+            "sejm_district": "",
+            "teryt": "",
+            "gmina": "",
+            "powiat": "",
+            "wojewodztwo": (row.get("Województwo") or "").strip(),
+        }
+    if level == "powiat":
+        return {
+            "sejm_district": "",
+            "teryt": (row.get("Kod TERYT") or "").strip(),
+            "gmina": "",
+            "powiat": (row.get("Powiat") or "").strip(),
+            "wojewodztwo": (row.get("Województwo") or "").strip(),
+        }
+    if level == "gmina":
+        return {
+            "sejm_district": _extract_district(row),
+            "teryt": (row.get("TERYT Gminy") or "").strip(),
+            "gmina": (row.get("Gmina") or "").strip(),
+            "powiat": (row.get("Powiat") or "").strip(),
+            "wojewodztwo": (row.get("Województwo") or "").strip(),
+        }
+    if level == "district":
+        return {
+            "sejm_district": _extract_district(row),
+            "teryt": "",
+            "gmina": "",
+            "powiat": "",
+            "wojewodztwo": "",
+        }
+    return {"sejm_district": "", "teryt": "", "gmina": "", "powiat": "", "wojewodztwo": ""}
+
+
+def _import_sejm_aggregates(year: int) -> None:
+    election_id: int | None = None
+    with db.get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT id FROM elections WHERE year = %s AND type = %s LIMIT 1",
+                (year, "sejm"),
+            )
+            row_e = cur.fetchone()
+            if not row_e:
+                return
+            election_id = row_e[0]
+            cur.execute(
+                "SELECT COUNT(*) FROM sejm_aggregate_results WHERE election_id = %s",
+                (election_id,),
+            )
+            if cur.fetchone()[0] > 0:
+                return
+
+    assert election_id is not None
+
+    for stem, geography_level, is_proc in SEJM_AGGREGATE_FILE_STEMS:
+        path = _sejm_aggregate_csv_path(year, stem)
+        if not path.is_file():
+            continue
+        header, rows = _iter_csv_rows(path)
+        committees = [c for c in header if _is_committee_column(c)]
+        if not committees:
+            continue
+        with db.get_connection() as conn:
+            with conn.cursor() as cur:
+                for row in rows:
+                    dims = _aggregate_geo_dims(geography_level, row)
+                    for committee in committees:
+                        raw_val = (row.get(committee) or "").strip()
+                        if not raw_val:
+                            continue
+                        if is_proc:
+                            metric = _parse_pl_float(raw_val)
+                        else:
+                            metric = float(_parse_int(raw_val))
+                        if metric is None:
+                            continue
+                        cur.execute(
+                            """
+                            INSERT INTO sejm_aggregate_results (
+                                election_id, geography_level, sejm_district, teryt, gmina, powiat,
+                                wojewodztwo, committee_name, metric_value, is_percentage
+                            )
+                            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                            ON CONFLICT (
+                                election_id, geography_level, sejm_district, teryt, gmina, powiat,
+                                wojewodztwo, committee_name, is_percentage
+                            ) DO UPDATE SET metric_value = EXCLUDED.metric_value
+                            """,
+                            (
+                                election_id,
+                                geography_level,
+                                dims["sejm_district"],
+                                dims["teryt"],
+                                dims["gmina"],
+                                dims["powiat"],
+                                dims["wojewodztwo"],
+                                committee,
+                                metric,
+                                is_proc,
+                            ),
+                        )
+
+
+def _senate_candidate_columns(header: list[str]) -> list[tuple[int, str]]:
+    try:
+        start = header.index(SENATE_VALID_VOTES_TOTAL_COL) + 1
+    except ValueError:
+        return []
+    out: list[tuple[int, str]] = []
+    for idx in range(start, len(header)):
+        name = header[idx].strip().strip('"')
+        if name:
+            out.append((idx, name))
+    return out
+
+
+def _import_senate_obwody(year: int) -> None:
+    base = Path(f"data/pkw_all/sejmsenat{year}/csv")
+    if not base.is_dir():
+        return
+
+    paths = sorted(p for p in base.glob("wyniki_gl_na_kand_po_obwodach_senat_okr_*.csv") if "_utf8" not in p.name)
+    if not paths:
+        return
+
+    with db.get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT id FROM elections WHERE year = %s AND type = %s LIMIT 1",
+                (year, "senate"),
+            )
+            row_e = cur.fetchone()
+            if row_e:
+                election_id = row_e[0]
+            else:
+                cur.execute(
+                    "INSERT INTO elections (year, type) VALUES (%s, %s) RETURNING id",
+                    (year, "senate"),
+                )
+                election_id = cur.fetchone()[0]
+
+            cur.execute(
+                "SELECT COUNT(*) FROM senate_results WHERE election_id = %s",
+                (election_id,),
+            )
+            if cur.fetchone()[0] > 0:
+                return
+
+            for csv_path in paths:
+                district_match = re.search(r"_okr_(\d+)", csv_path.name)
+                senate_district = district_match.group(1) if district_match else "unknown"
+                with csv_path.open("r", encoding="utf-8", newline="") as file:
+                    reader = csv.reader(file, delimiter=";")
+                    header = [c.replace("\ufeff", "").strip('"') for c in next(reader, [])]
+                    cand_cols = _senate_candidate_columns(header)
+                    if not cand_cols:
+                        continue
+                    key_symbol = header.index("Symbol kontrolny") if "Symbol kontrolny" in header else 0
+                    idx_teryt = header.index("Kod TERYT") if "Kod TERYT" in header else None
+                    idx_numer = header.index("Numer") if "Numer" in header else None
+                    idx_gmina = header.index("Gmina") if "Gmina" in header else None
+                    idx_powiat = header.index("Powiat") if "Powiat" in header else None
+                    idx_woj = header.index("Województwo") if "Województwo" in header else None
+
+                    for raw in reader:
+                        symbol = (raw[key_symbol] if key_symbol < len(raw) else "").strip().strip('"')
+                        if not symbol:
+                            continue
+                        teryt = (raw[idx_teryt] if idx_teryt is not None and idx_teryt < len(raw) else "") or ""
+                        numer = (raw[idx_numer] if idx_numer is not None and idx_numer < len(raw) else "") or ""
+                        gmina = (raw[idx_gmina] if idx_gmina is not None and idx_gmina < len(raw) else "") or ""
+                        powiat = (raw[idx_powiat] if idx_powiat is not None and idx_powiat < len(raw) else "") or ""
+                        woj = (raw[idx_woj] if idx_woj is not None and idx_woj < len(raw) else "") or ""
+                        for idx, cand_name in cand_cols:
+                            if idx >= len(raw):
+                                continue
+                            votes = _parse_int(raw[idx])
+                            if votes <= 0:
+                                continue
+                            cur.execute(
+                                """
+                                INSERT INTO senate_results (
+                                    election_id, senate_district, symbol_kontrolny, teryt, numer_obwodu,
+                                    gmina, powiat, wojewodztwo, candidate_name, votes
+                                )
+                                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+                                ON CONFLICT (election_id, symbol_kontrolny, candidate_name) DO UPDATE
+                                SET votes = EXCLUDED.votes
+                                """,
+                                (
+                                    election_id,
+                                    senate_district,
+                                    symbol,
+                                    teryt.strip(),
+                                    numer.strip(),
+                                    gmina.strip(),
+                                    powiat.strip(),
+                                    woj.strip(),
+                                    cand_name,
+                                    votes,
+                                ),
+                            )
+
+
 def _extract_district(row: dict[str, str]) -> str:
     candidates = [
         "Nr okręgu",
@@ -336,6 +587,35 @@ def _extract_2023_candidate_votes_by_district() -> dict[tuple[str, str], list[tu
     return flattened
 
 
+def _seed_sejm_candidate_ballots(
+    year: int,
+    candidate_votes: dict[tuple[str, str], list[tuple[str, int, int]]],
+) -> None:
+    """All list candidates who received votes in gmina CSVs (not only mandate winners)."""
+    if not candidate_votes:
+        return
+
+    with db.get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM sejm_candidate_ballots WHERE year = %s", (year,))
+            for (district, committee), ranked in candidate_votes.items():
+                for candidate_name, position, votes in ranked:
+                    if votes <= 0:
+                        continue
+                    cur.execute(
+                        """
+                        INSERT INTO sejm_candidate_ballots
+                            (year, district, committee_name, candidate_name, list_position, total_votes)
+                        VALUES (%s, %s, %s, %s, %s, %s)
+                        ON CONFLICT (year, district, committee_name, candidate_name)
+                        DO UPDATE SET
+                            total_votes = EXCLUDED.total_votes,
+                            list_position = EXCLUDED.list_position
+                        """,
+                        (year, district, committee, candidate_name, position, votes),
+                    )
+
+
 def _seed_elected_candidates(
     year: int,
     candidate_votes: dict[tuple[str, str], list[tuple[str, int, int]]],
@@ -486,11 +766,16 @@ def seed_if_empty() -> None:
         for year, csv_path in _dataset_candidates():
             if csv_path.exists():
                 _import_dataset(csv_path, year)
+        _import_sejm_aggregates(2019)
+        _import_sejm_aggregates(2023)
+        _import_senate_obwody(2019)
         votes_2019 = _extract_2019_candidate_votes_by_district()
         if votes_2019:
+            _seed_sejm_candidate_ballots(2019, votes_2019)
             _seed_elected_candidates(2019, votes_2019)
         votes_2023 = _extract_2023_candidate_votes_by_district()
         if votes_2023:
+            _seed_sejm_candidate_ballots(2023, votes_2023)
             _seed_elected_candidates(2023, votes_2023)
     finally:
         seed_complete.set()

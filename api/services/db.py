@@ -86,6 +86,66 @@ def init_database() -> None:
                 );
                 """
             )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS sejm_aggregate_results (
+                    id SERIAL PRIMARY KEY,
+                    election_id INT NOT NULL REFERENCES elections(id),
+                    geography_level TEXT NOT NULL,
+                    sejm_district TEXT NOT NULL DEFAULT '',
+                    teryt TEXT NOT NULL DEFAULT '',
+                    gmina TEXT NOT NULL DEFAULT '',
+                    powiat TEXT NOT NULL DEFAULT '',
+                    wojewodztwo TEXT NOT NULL DEFAULT '',
+                    committee_name TEXT NOT NULL,
+                    metric_value DOUBLE PRECISION NOT NULL,
+                    is_percentage BOOLEAN NOT NULL DEFAULT FALSE,
+                    UNIQUE (
+                        election_id,
+                        geography_level,
+                        sejm_district,
+                        teryt,
+                        gmina,
+                        powiat,
+                        wojewodztwo,
+                        committee_name,
+                        is_percentage
+                    )
+                );
+                """
+            )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS senate_results (
+                    id SERIAL PRIMARY KEY,
+                    election_id INT NOT NULL REFERENCES elections(id),
+                    senate_district TEXT NOT NULL,
+                    symbol_kontrolny TEXT NOT NULL,
+                    teryt TEXT NOT NULL DEFAULT '',
+                    numer_obwodu TEXT NOT NULL DEFAULT '',
+                    gmina TEXT NOT NULL DEFAULT '',
+                    powiat TEXT NOT NULL DEFAULT '',
+                    wojewodztwo TEXT NOT NULL DEFAULT '',
+                    candidate_name TEXT NOT NULL,
+                    votes INT NOT NULL,
+                    UNIQUE (election_id, symbol_kontrolny, candidate_name)
+                );
+                """
+            )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS sejm_candidate_ballots (
+                    id SERIAL PRIMARY KEY,
+                    year INT NOT NULL,
+                    district TEXT NOT NULL,
+                    committee_name TEXT NOT NULL,
+                    candidate_name TEXT NOT NULL,
+                    list_position INT,
+                    total_votes INT NOT NULL,
+                    UNIQUE (year, district, committee_name, candidate_name)
+                );
+                """
+            )
 
 
 def run_sql(sql: str, params: dict[str, Any]) -> list[dict[str, Any]]:
