@@ -5,6 +5,7 @@ import re
 from api.services import db
 from api.services.embeddings import embed_text
 from api.services.llm import extract_intent_and_entity
+from api.services.locations import districts_for_question
 from api.services.sql_templates import SQL_TEMPLATES
 
 INTENT_TEXT = {
@@ -27,10 +28,20 @@ def route_question(question: str) -> dict:
     if intent == "elected_candidates_sejm":
         sql = SQL_TEMPLATES["elected_candidates_sejm"]
         elected_default_year = year if year is not None else db.get_latest_elected_candidates_year()
+        location_districts = districts_for_question(question)
+        district_csv = ",".join(location_districts) if location_districts else None
         params = (
-            {"year": elected_default_year, "candidate_pattern": f"%{llm_entity}%"}
+            {
+                "year": elected_default_year,
+                "candidate_pattern": f"%{llm_entity}%",
+                "district_csv": district_csv,
+            }
             if llm_entity
-            else {"year": elected_default_year, "candidate_pattern": None}
+            else {
+                "year": elected_default_year,
+                "candidate_pattern": None,
+                "district_csv": district_csv,
+            }
         )
         result = db.run_sql(sql, params)
         if not result and year is None and elected_default_year is not None:
