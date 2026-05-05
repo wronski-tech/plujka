@@ -17,6 +17,16 @@ COMMITTEE_ALIASES = {
     "trzecia droga": "TRZECIA DROGA",
 }
 
+# Osoba publiczna → fragment nazwy komitetu (jak w `candidates.name` / CSV list). To nie są głosy imienne.
+_POLITICIAN_COMMITTEE_PATTERNS: list[tuple[re.Pattern[str], str]] = [
+    (re.compile(r"\bdonald\s+tusk\b", re.IGNORECASE), "KOALICJA OBYWATELSKA"),
+    (re.compile(r"\btusk\b", re.IGNORECASE), "KOALICJA OBYWATELSKA"),
+    (re.compile(r"\bmateusz\s+morawiecki\b", re.IGNORECASE), "PRAWO I SPRAWIEDLIWOŚĆ"),
+    (re.compile(r"\bmorawiecki\b", re.IGNORECASE), "PRAWO I SPRAWIEDLIWOŚĆ"),
+    (re.compile(r"\bjarosław\s+kaczy(?:ń|n)ski\b", re.IGNORECASE), "PRAWO I SPRAWIEDLIWOŚĆ"),
+    (re.compile(r"\bkaczy(?:ń|n)ski\b", re.IGNORECASE), "PRAWO I SPRAWIEDLIWOŚĆ"),
+]
+
 
 def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
     lowered = question.lower()
@@ -38,6 +48,12 @@ def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
         alias = _extract_alias_from_question(question)
         return "elected_candidates_sejm", alias
 
+    committee = _committee_from_politician_name(question)
+    if committee and _question_asks_vote_totals(question):
+        if _question_asks_multiple_election_years(question):
+            return "votes_for_candidate_all_years", committee
+        return "votes_for_candidate", committee
+
     if not OPENAI_API_KEY:
         if "trend" in lowered or "okręg" in lowered or "district" in lowered:
             entity = _extract_after_keyword(question, ["dla", "for"])
@@ -57,7 +73,8 @@ def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
     prompt = (
         "You are an intent extractor for a deterministic SQL system. "
         "Return JSON only with keys: intent, entity. "
-        "Allowed intents: total_votes_by_candidate, votes_for_candidate, trend_by_district_for_candidate, elected_candidates_sejm."
+        "Allowed intents: total_votes_by_candidate, votes_for_candidate, votes_for_candidate_all_years, "
+        "trend_by_district_for_candidate, elected_candidates_sejm."
     )
     response = client.chat.completions.create(
         model=OPENAI_CHAT_MODEL,
@@ -85,6 +102,58 @@ def _extract_after_keyword(text: str, keywords: list[str]) -> str | None:
         if match:
             return text[match.start(1) :].strip(" ?.")
     return None
+
+
+def _committee_from_politician_name(question: str) -> str | None:
+    for pattern, committee in _POLITICIAN_COMMITTEE_PATTERNS:
+        if pattern.search(question):
+            return committee
+    return None
+
+
+def _question_asks_vote_totals(question: str) -> bool:
+    lowered = question.lower()
+    if re.search(r"\bile\b", lowered):
+        return True
+    return any(
+        tok in lowered
+        for tok in (
+            "wynik",
+            "głos",
+            "glos",
+            "poparc",
+            "procent",
+            "wybor",
+            "elekcj",
+            "mandat",
+            "dostał",
+            "dostal",
+            "zdobył",
+            "zdobyl",
+        )
+    )
+
+
+def _question_asks_multiple_election_years(question: str) -> bool:
+    lowered = question.lower()
+    if len(re.findall(r"\b20\d{2}\b", lowered)) >= 2:
+        return True
+    return any(
+        p in lowered
+        for p in (
+            "kolejn",
+            "wszystkich wybor",
+            "wszystkie wybory",
+            "wszystkie lata",
+            "każde wybory",
+            "kazde wybory",
+            "różnych lat",
+            "roznych lat",
+            "na przestrzeni",
+            "z lat ",
+            "z roku na rok",
+        )
+    )
 
 
 def _extract_alias_from_question(question: str) -> str | None:

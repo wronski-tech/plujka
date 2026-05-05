@@ -30,6 +30,15 @@ SQL_TEMPLATES = {
         GROUP BY e.year, c.name
         ORDER BY e.year ASC, votes DESC;
     """,
+    "votes_for_candidate_all_years": """
+        SELECT e.year, c.name AS candidate, SUM(r.votes) AS votes
+        FROM results r
+        JOIN candidates c ON c.id = r.candidate_id
+        JOIN elections e ON e.id = r.election_id
+        WHERE c.name ILIKE %(candidate_pattern)s
+        GROUP BY e.year, c.name
+        ORDER BY e.year ASC, votes DESC;
+    """,
     "elected_candidates_sejm": """
         SELECT year, district, committee_name, candidate_name, candidate_votes, list_position
         FROM elected_candidates

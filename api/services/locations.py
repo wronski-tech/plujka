@@ -3,6 +3,9 @@
 Uses PKW / Kodeks wyborczy numbering (41 districts, unchanged 2019–2023).
 Matching is substring-based on the lowercased question; **longer phrases are
 checked first** so specific names win over shorter ones (np. „lubliniec” vs „lublin”).
+
+Województwa mapujemy na **wiele okręgów** (np. śląskie → 27–32). Nie używamy
+samych „śląsk”/„slask” — występują w „dolnośląskie”; stosujemy „śląskie”, „śląska” itd.
 """
 
 from __future__ import annotations
@@ -71,7 +74,6 @@ _RAW_LOCATION_RULES: list[tuple[str, str]] = [
     ("chelm", "7"),
     ("zamość", "7"),
     ("zamosc", "7"),
-    ("lubuskie", "8"),
     ("łódź", "9"),
     ("lodz", "9"),
     ("skierniewice", "10"),
@@ -94,7 +96,6 @@ _RAW_LOCATION_RULES: list[tuple[str, str]] = [
     ("warszawę", "19"),
     ("warszawe", "19"),
     ("opole", "21"),
-    ("opolskie", "21"),
     ("krosno", "22"),
     ("przemyśl", "22"),
     ("przemysl", "22"),
@@ -103,7 +104,6 @@ _RAW_LOCATION_RULES: list[tuple[str, str]] = [
     ("tarnobrzeg", "23"),
     ("białystok", "24"),
     ("bialystok", "24"),
-    ("podlaskie", "24"),
     ("gdańsk", "25"),
     ("gdansk", "25"),
     ("sopot", "25"),
@@ -131,8 +131,6 @@ _RAW_LOCATION_RULES: list[tuple[str, str]] = [
     ("jaworzno", "32"),
     ("zawiercie", "32"),
     ("kielce", "33"),
-    ("świętokrzyskie", "33"),
-    ("swietokrzyskie", "33"),
     ("elbląg", "34"),
     ("elblag", "34"),
     ("olsztyn", "35"),
@@ -155,12 +153,55 @@ _LOCATION_RULES_SORTED: list[tuple[str, str]] = sorted(
     reverse=True,
 )
 
+# Województwo → numery okręgów sejmowych (PKW; podział 2019–2023).
+_VOIVODESHIP_DISTRICT_RULES_RAW: list[tuple[str, list[str]]] = [
+    ("warmińsko-mazurskie", ["34", "35"]),
+    ("warminsko-mazurskie", ["34", "35"]),
+    ("kujawsko-pomorskie", ["4", "5"]),
+    ("kujawsko pomorskie", ["4", "5"]),
+    ("zachodniopomorskie", ["40", "41"]),
+    ("dolnośląskie", ["1", "2", "3"]),
+    ("dolnoslaskie", ["1", "2", "3"]),
+    ("małopolskie", ["12", "13", "14", "15"]),
+    ("malopolskie", ["12", "13", "14", "15"]),
+    ("mazowieckie", ["16", "17", "18", "19", "20"]),
+    ("wielkopolskie", ["36", "37", "38", "39"]),
+    ("podkarpackie", ["22", "23"]),
+    ("łódzkie", ["9", "10", "11"]),
+    ("lodzkie", ["9", "10", "11"]),
+    ("lubelskie", ["6", "7"]),
+    ("pomorskie", ["25", "26"]),
+    ("śląskie", ["27", "28", "29", "30", "31", "32"]),
+    ("slaskie", ["27", "28", "29", "30", "31", "32"]),
+    # potocznie / odmiany (bez „śląsk” — zawarte w „dolnośląskie”)
+    ("śląskiem", ["27", "28", "29", "30", "31", "32"]),
+    ("slaskiem", ["27", "28", "29", "30", "31", "32"]),
+    ("śląska", ["27", "28", "29", "30", "31", "32"]),
+    ("slaska", ["27", "28", "29", "30", "31", "32"]),
+    ("śląsku", ["27", "28", "29", "30", "31", "32"]),
+    ("slasku", ["27", "28", "29", "30", "31", "32"]),
+    ("lubuskie", ["8"]),
+    ("opolskie", ["21"]),
+    ("podlaskie", ["24"]),
+    ("świętokrzyskie", ["33"]),
+    ("swietokrzyskie", ["33"]),
+]
+
+_VOIVODESHIP_DISTRICT_RULES_SORTED: list[tuple[str, list[str]]] = sorted(
+    _VOIVODESHIP_DISTRICT_RULES_RAW,
+    key=lambda item: len(item[0]),
+    reverse=True,
+)
+
 
 def districts_for_question(question: str) -> list[str] | None:
     lowered = question.lower()
     for key, district in _LOCATION_RULES_SORTED:
         if key in lowered:
             return [district]
+    for key, districts in _VOIVODESHIP_DISTRICT_RULES_SORTED:
+        if key in lowered:
+            return list(districts)
     if "warszaw" in lowered:
         return ["19"]
     return None

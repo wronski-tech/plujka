@@ -11,6 +11,7 @@ from api.services.sql_templates import SQL_TEMPLATES
 INTENT_TEXT = {
     "total_votes_by_candidate": "pokaż sumę głosów dla wszystkich list",
     "votes_for_candidate": "ile głosów ma konkretna lista lub komitet",
+    "votes_for_candidate_all_years": "głosy listy we wszystkich latach wyborów w bazie",
     "trend_by_district_for_candidate": "trend głosów po okręgach dla listy",
     "elected_candidates_sejm": "kandydaci którzy weszli do sejmu",
 }
@@ -60,11 +61,12 @@ def route_question(question: str) -> dict:
 
     sql, params = _resolve_sql(intent, llm_entity, default_year, years, is_comparison)
     result = db.run_sql(sql, params)
+    response_year = None if intent == "votes_for_candidate_all_years" else default_year
     return {
         "question": question,
         "intent": intent,
         "entity": llm_entity,
-        "year": default_year,
+        "year": response_year,
         "years": years,
         "sql": sql,
         "params": params,
@@ -93,6 +95,10 @@ def _resolve_sql(
     years: list[int],
     is_comparison: bool,
 ) -> tuple[str, dict]:
+    if intent == "votes_for_candidate_all_years" and entity:
+        return SQL_TEMPLATES["votes_for_candidate_all_years"], {
+            "candidate_pattern": f"%{entity}%",
+        }
     if intent == "votes_for_candidate" and entity:
         if is_comparison and len(years) >= 2:
             y1, y2 = sorted(years)[:2]
