@@ -1,0 +1,76 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: plujka-postgres
+    environment:
+      POSTGRES_DB: plujka
+      POSTGRES_USER: plujka
+      POSTGRES_PASSWORD: plujka
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U plujka -d plujka"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  opensearch:
+    image: opensearchproject/opensearch:2.15.0
+    container_name: plujka-opensearch
+    environment:
+      discovery.type: single-node
+      plugins.security.disabled: "true"
+      DISABLE_INSTALL_DEMO_CONFIG: "true"
+      OPENSEARCH_INITIAL_ADMIN_PASSWORD: ${OPENSEARCH_INITIAL_ADMIN_PASSWORD:-PlujkaAdmin123!}
+      OPENSEARCH_JAVA_OPTS: "-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s http://localhost:9200 >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  api:
+    build:
+      context: .
+      dockerfile: docker/api.Dockerfile
+    container_name: plujka-api
+    environment:
+      DATABASE_URL: postgresql://plujka:plujka@postgres:5432/plujka
+      OPENSEARCH_URL: http://opensearch:9200
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_CHAT_MODEL: ${OPENAI_CHAT_MODEL:-gpt-4o-mini}
+      OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
+      EMBEDDING_DIM: "128"
+      SEED_SAMPLE_CSV: /app/data/sample/sejm_results_sample_1000.csv
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      opensearch:
+        condition: service_healthy
+
+  streamlit:
+    build:
+      context: .
+      dockerfile: docker/streamlit.Dockerfile
+    container_name: plujka-streamlit
+    environment:
+      API_URL: http://api:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+
+volumes:
+  postgres_data:
+  opensearch_data:
