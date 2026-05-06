@@ -16,6 +16,7 @@ _READINESS_POLL_INTERVAL = timedelta(seconds=15)
 
 
 def _feedback_fingerprint(question: str, data: dict) -> str:
+    """Feedback fingerprint."""
     blob = json.dumps(
         {
             "question": question,
@@ -30,6 +31,7 @@ def _feedback_fingerprint(question: str, data: dict) -> str:
 
 
 def _fetch_question_hints(question: str, exclude: str | None = None, *, limit: int = 8) -> dict:
+    """Fetch question hints."""
     try:
         response = requests.post(
             f"{API_URL}/question-hints",
@@ -43,6 +45,7 @@ def _fetch_question_hints(question: str, exclude: str | None = None, *, limit: i
 
 
 def _hint_button_label(text: str, max_len: int = 52) -> str:
+    """Hint button label."""
     stripped = text.strip()
     if len(stripped) <= max_len:
         return stripped
@@ -55,6 +58,7 @@ def _render_hint_buttons(
     *,
     empty_caption: str | None = None,
 ) -> None:
+    """Render hint buttons."""
     if not hits:
         if empty_caption:
             st.caption(empty_caption)
@@ -74,7 +78,7 @@ def _render_hint_buttons(
 
 
 st.set_page_config(
-    page_title="Plujka PKW",
+    page_title="Plujka KBW",
     page_icon="🗳️",
     layout="wide",
     initial_sidebar_state="collapsed",
@@ -133,8 +137,9 @@ st.markdown(
 
 @st.fragment(run_every=_READINESS_POLL_INTERVAL)
 def _api_data_readiness_banner() -> None:
+    """Api data readiness banner."""
     if st.session_state.get("_plujka_api_data_ready"):
-        st.success("**Baza gotowa** — możesz korzystać z pełnych danych PKW.")
+        st.success("**Baza gotowa** — możesz korzystać z pełnych danych KBW.")
         return
 
     try:
@@ -146,17 +151,17 @@ def _api_data_readiness_banner() -> None:
         return
     if payload.get("data_ready"):
         st.session_state["_plujka_api_data_ready"] = True
-        st.success("**Baza gotowa** — możesz korzystać z pełnych danych PKW.")
+        st.success("**Baza gotowa** — możesz korzystać z pełnych danych KBW.")
     else:
         st.warning("**Ładowanie danych** — trwa import (seed). Za chwilę odświeżę status…")
 
 
 _api_data_readiness_banner()
 
-with st.expander("Dane PKW — przeładuj z dysku", expanded=False):
+with st.expander("Dane KBW — przeładuj z dysku", expanded=False):
     st.caption(
-        "Kasuje zaimportowane wiersze wyborów (PKW z `./data/pkw_all` oraz fakty KBW CSV → `kbw_facts`) "
-        "i wczytuje je ponownie z dysku (bez `docker compose build`). Na czas importu zapytania mogą być niedostępne."
+        "Kasuje zaimportowane fakty KBW (`kbw_facts`) i wczytuje je ponownie z `./data/kbw_mirror` "
+        "(bez `docker compose build`). Na czas importu zapytania mogą być niedostępne."
     )
     if not RESEED_TOKEN:
         st.info(
@@ -258,7 +263,7 @@ if last:
         st.caption("Parametry")
         st.json(data["params"])
 
-    st.caption("Dane: PKW · Odpowiedzi mogą być przybliżone do poziomu okręgu sejmowego, nie do gminy.")
+    st.caption("Dane: KBW · Odpowiedzi mogą być przybliżone do poziomu okręgu sejmowego, nie do gminy.")
 
     rk = f"rel:{fp}"
     if st.session_state.get("_related_hist_key") != rk:

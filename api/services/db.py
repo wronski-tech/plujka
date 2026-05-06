@@ -8,13 +8,16 @@ from api.services.config import DATABASE_URL
 
 
 def get_connection() -> psycopg.Connection:
+    """Get connection."""
     return psycopg.connect(DATABASE_URL, autocommit=True)
 
 
 def init_database() -> None:
+    """Init database."""
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
+            cur.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm;")
             cur.execute(
                 """
                 CREATE TABLE IF NOT EXISTS candidates (
@@ -219,9 +222,22 @@ def init_database() -> None:
             cur.execute(
                 "CREATE INDEX IF NOT EXISTS idx_kbw_facts_source ON kbw_facts (source_file_id);"
             )
+            cur.execute(
+                """
+                CREATE INDEX IF NOT EXISTS idx_kbw_facts_subject_column_trgm
+                ON kbw_facts USING gin ((subject->>'column') gin_trgm_ops);
+                """
+            )
+            cur.execute(
+                """
+                CREATE INDEX IF NOT EXISTS idx_kbw_facts_geo_folded_trgm
+                ON kbw_facts USING gin ((translate(lower(geography::text), 'ąćęłńóśźż', 'acelnoszz')) gin_trgm_ops);
+                """
+            )
 
 
 def run_sql(sql: str, params: dict[str, Any]) -> list[dict[str, Any]]:
+    """Run sql."""
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(sql, params)
@@ -231,6 +247,7 @@ def run_sql(sql: str, params: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def get_latest_election_year(election_type: str = "sejm") -> int | None:
+    """Get latest election year."""
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT MAX(year) FROM elections WHERE type = %s", (election_type,))
@@ -239,6 +256,7 @@ def get_latest_election_year(election_type: str = "sejm") -> int | None:
 
 
 def get_latest_elected_candidates_year() -> int | None:
+    """Get latest elected candidates year."""
     with get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("SELECT MAX(year) FROM elected_candidates")

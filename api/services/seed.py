@@ -76,11 +76,13 @@ SEJM_2023_COLUMN_COMMITTEE_TO_LIST_NAME: dict[str, str] = {
 
 
 def _parse_int(value: str) -> int:
+    """Parse int."""
     value = (value or "").strip()
     return int(value) if value.isdigit() else 0
 
 
 def _parse_pl_float(value: str) -> float | None:
+    """Parse pl float."""
     raw = (value or "").strip().strip('"')
     if not raw:
         return None
@@ -107,6 +109,7 @@ SEJM_AGGREGATE_FILE_STEMS: list[tuple[str, str, bool]] = [
 
 
 def _sejm_aggregate_csv_path(year: int, stem: str) -> Path:
+    """Sejm aggregate csv path."""
     base = Path(f"data/pkw_all/sejmsenat{year}/csv")
     if year == 2019:
         return base / f"wyniki_gl_na_listy_{stem}.csv"
@@ -114,6 +117,7 @@ def _sejm_aggregate_csv_path(year: int, stem: str) -> Path:
 
 
 def _iter_csv_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
+    """Iter csv rows."""
     with path.open("r", encoding="utf-8", newline="") as file:
         reader = csv.reader(file, delimiter=";")
         header = [c.replace("\ufeff", "").strip('"') for c in next(reader, [])]
@@ -125,6 +129,7 @@ def _iter_csv_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
 
 
 def _aggregate_geo_dims(level: str, row: dict[str, str]) -> dict[str, str]:
+    """Aggregate geo dims."""
     if level == "voivodeship":
         return {
             "sejm_district": "",
@@ -161,6 +166,7 @@ def _aggregate_geo_dims(level: str, row: dict[str, str]) -> dict[str, str]:
 
 
 def _import_sejm_aggregates(year: int) -> None:
+    """Import sejm aggregates."""
     election_id: int | None = None
     with db.get_connection() as conn:
         with conn.cursor() as cur:
@@ -231,6 +237,7 @@ def _import_sejm_aggregates(year: int) -> None:
 
 
 def _senate_candidate_columns(header: list[str]) -> list[tuple[int, str]]:
+    """Senate candidate columns."""
     try:
         start = header.index(SENATE_VALID_VOTES_TOTAL_COL) + 1
     except ValueError:
@@ -244,6 +251,7 @@ def _senate_candidate_columns(header: list[str]) -> list[tuple[int, str]]:
 
 
 def _import_senate_obwody(year: int) -> None:
+    """Import senate obwody."""
     base = Path(f"data/pkw_all/sejmsenat{year}/csv")
     if not base.is_dir():
         return
@@ -332,6 +340,7 @@ def _import_senate_obwody(year: int) -> None:
 
 
 def _extract_district(row: dict[str, str]) -> str:
+    """Extract district."""
     candidates = [
         "Nr okręgu",
         "Numer okręgu",
@@ -347,6 +356,7 @@ def _extract_district(row: dict[str, str]) -> str:
 
 
 def _detect_year_from_path(path: Path) -> int | None:
+    """Detect year from path."""
     match = ELECTION_PATH_RE.search(str(path))
     if not match:
         return None
@@ -355,6 +365,7 @@ def _detect_year_from_path(path: Path) -> int | None:
 
 
 def _is_committee_column(name: str) -> bool:
+    """Is committee column."""
     lowered = name.strip().lower()
     if not lowered:
         return False
@@ -398,6 +409,7 @@ def _is_committee_column(name: str) -> bool:
 
 
 def profile_all_csv_sources() -> None:
+    """Profile all csv sources."""
     root = Path("data/pkw_all")
     if not root.exists():
         return
@@ -458,6 +470,7 @@ def profile_all_csv_sources() -> None:
 
 
 def _dataset_candidates() -> list[tuple[int, Path]]:
+    """Dataset candidates."""
     candidates: list[tuple[int, Path]] = []
     p2019 = Path("data/pkw_all/sejmsenat2019/csv/wyniki_gl_na_listy_po_obwodach_sejm.csv")
     p2023 = Path("data/pkw_all/sejmsenat2023/csv/wyniki_gl_na_listy_po_obwodach_sejm.csv")
@@ -477,6 +490,7 @@ def _dataset_candidates() -> list[tuple[int, Path]]:
 
 
 def _extract_2019_candidate_votes_by_district() -> dict[tuple[str, str], list[tuple[str, int, int]]]:
+    """Extract 2019 candidate votes by district."""
     base = Path("data/pkw_all/sejmsenat2019/csv")
     result: dict[tuple[str, str], dict[tuple[str, int], int]] = {}
     for csv_path in sorted(base.glob("wyniki_gl_na_kand_po_gminach_sejm_okr_*_utf8.csv")):
@@ -529,6 +543,7 @@ def _extract_2019_candidate_votes_by_district() -> dict[tuple[str, str], list[tu
 
 
 def _list_committee_from_2023_candidate_suffix(committee_raw: str) -> str:
+    """List committee from 2023 candidate suffix."""
     committee_raw = committee_raw.strip().strip('"')
     mapped = SEJM_2023_COLUMN_COMMITTEE_TO_LIST_NAME.get(committee_raw)
     if mapped:
@@ -540,6 +555,7 @@ def _list_committee_from_2023_candidate_suffix(committee_raw: str) -> str:
 
 
 def _extract_2023_candidate_votes_by_district() -> dict[tuple[str, str], list[tuple[str, int, int]]]:
+    """Extract 2023 candidate votes by district."""
     base = Path("data/pkw_all/sejmsenat2023/csv/wyniki_gl_na_kandydatow_po_gminach_sejm_csv")
     if not base.is_dir():
         return {}
@@ -622,6 +638,7 @@ def _seed_elected_candidates(
     year: int,
     candidate_votes: dict[tuple[str, str], list[tuple[str, int, int]]],
 ) -> None:
+    """Seed elected candidates."""
     if not candidate_votes:
         return
 
@@ -705,10 +722,7 @@ def _seed_elected_candidates(
 
 
 def clear_election_seed_data() -> None:
-    """Remove rows produced by the PKW seed so imports can run again from CSV files.
-
-    Also clears KBW mirror fact tables so a forced reseed can reload them from disk.
-    """
+    """Clear imported election data so KBW facts can be rebuilt from disk."""
     with db.get_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM results")
@@ -721,29 +735,15 @@ def clear_election_seed_data() -> None:
             cur.execute("DELETE FROM kbw_election_runs")
 
 
-def _run_seed_pipeline(*, import_kbw_facts: bool = False) -> None:
-    profile_all_csv_sources()
+def _run_seed_pipeline(*, import_kbw_facts: bool = True) -> None:
+    """Run seed pipeline."""
     kbw_catalog.profile_mirror_if_present()
-    for year, csv_path in _dataset_candidates():
-        if csv_path.exists():
-            _import_dataset(csv_path, year)
-    _import_sejm_aggregates(2019)
-    _import_sejm_aggregates(2023)
-    _import_senate_obwody(2019)
-    votes_2019 = _extract_2019_candidate_votes_by_district()
-    if votes_2019:
-        _seed_sejm_candidate_ballots(2019, votes_2019)
-        _seed_elected_candidates(2019, votes_2019)
-    votes_2023 = _extract_2023_candidate_votes_by_district()
-    if votes_2023:
-        _seed_sejm_candidate_ballots(2023, votes_2023)
-        _seed_elected_candidates(2023, votes_2023)
-
     if import_kbw_facts and kbw_catalog.DEFAULT_KBW_ROOT.is_dir():
         kbw_import.import_all_kbw_csv_facts(root=kbw_catalog.DEFAULT_KBW_ROOT)
 
 
 def _import_dataset(csv_path: Path, year: int) -> None:
+    """Import dataset."""
     with csv_path.open("r", encoding="utf-8", newline="") as file:
         reader = csv.DictReader(file, delimiter=";")
         rows = list(reader)
@@ -802,13 +802,14 @@ seed_complete = threading.Event()
 
 
 def seed_if_empty(*, force: bool = False) -> None:
+    """Seed if empty."""
     with _seed_lock:
         if force:
             seed_complete.clear()
         try:
             if force:
                 clear_election_seed_data()
-            _run_seed_pipeline(import_kbw_facts=force)
+            _run_seed_pipeline(import_kbw_facts=True)
         finally:
             seed_complete.set()
 

@@ -44,6 +44,7 @@ _KW = re.compile(r"kw[_\s]?(\d+)", re.IGNORECASE)
 
 
 def _segments_after_dane(rel: Path) -> list[str]:
+    """Segments after dane."""
     parts = rel.parts
     try:
         idx = parts.index("dane")
@@ -53,6 +54,7 @@ def _segments_after_dane(rel: Path) -> list[str]:
 
 
 def _pick_year(segments: list[str], filename: str) -> int | None:
+    """Pick year."""
     m = re.search(r"(19\d{2}|20\d{2})", filename)
     if m:
         return int(m.group(1))
@@ -63,6 +65,7 @@ def _pick_year(segments: list[str], filename: str) -> int | None:
 
 
 def _pick_round_prezydent(segments: list[str]) -> int:
+    """Pick round prezydent."""
     for i, seg in enumerate(segments):
         if seg == "prezydent" and i + 1 < len(segments) and segments[i + 1].isdigit():
             return int(segments[i + 1])
@@ -70,6 +73,7 @@ def _pick_round_prezydent(segments: list[str]) -> int:
 
 
 def _rw_slice_variant(filename: str) -> tuple[str, str]:
+    """Rw slice variant."""
     m = _KW.search(filename)
     slice_s = f"kw_{m.group(1)}" if m else ""
     lower = filename.lower()
@@ -83,6 +87,7 @@ def _rw_slice_variant(filename: str) -> tuple[str, str]:
 
 
 def _family_from_segments(segments: list[str]) -> str:
+    """Family from segments."""
     if not segments:
         return "other"
     if segments[0] == "RW":
@@ -141,6 +146,7 @@ def infer_election_run(rel_path: Path) -> InferredRun | None:
 
 
 def _guess_delim(line: str) -> str:
+    """Guess delim."""
     line = line.rstrip("\r\n")
     if not line:
         return ";"
@@ -150,6 +156,7 @@ def _guess_delim(line: str) -> str:
 
 
 def _normalize_cell(raw: str) -> str:
+    """Normalize cell."""
     s = (raw or "").strip().strip('"')
     if len(s) >= 4 and s.startswith('="') and s.endswith('"'):
         s = s[2:-1]
@@ -157,6 +164,7 @@ def _normalize_cell(raw: str) -> str:
 
 
 def _parse_number(raw: str) -> float | None:
+    """Parse number."""
     s = _normalize_cell(raw).replace(" ", "").replace("\xa0", "")
     if not s or s in ("-", ".", ","):
         return None
@@ -197,6 +205,7 @@ _GEO_SUBSTRINGS = (
 
 
 def _is_geo_column(name: str) -> bool:
+    """Is geo column."""
     n = name.strip().lower()
     if not n:
         return True
@@ -204,11 +213,13 @@ def _is_geo_column(name: str) -> bool:
 
 
 def _is_pct_column(name: str) -> bool:
+    """Is pct column."""
     n = name.strip().lower()
     return "proc" in n or "%" in n or "procent" in n or "proc." in n
 
 
 def _is_prez_ballot_stat_column(col: str) -> bool:
+    """Is prez ballot stat column."""
     n = col.lower()
     keys = (
         "frekw",
@@ -233,6 +244,7 @@ def _is_prez_ballot_stat_column(col: str) -> bool:
 
 
 def _subject_for_column(family: str, col: str) -> dict[str, Any]:
+    """Subject for column."""
     if family == "prezydent":
         if _is_prez_ballot_stat_column(col):
             return {"kind": "ballot_stat", "column": col}
@@ -245,11 +257,13 @@ def _subject_for_column(family: str, col: str) -> dict[str, Any]:
 
 
 def _metric_slug(col: str) -> str:
+    """Metric slug."""
     s = re.sub(r"[^\w]+", "_", col.strip().lower())
     return s[:180] if s else "value"
 
 
 def ensure_election_run(cur: Any, inferred: InferredRun) -> int:
+    """Ensure election run."""
     cur.execute(
         """
         INSERT INTO kbw_election_runs (family, year, round, slice, variant, dataset_hint)
@@ -309,6 +323,7 @@ def _read_csv_rows(path: Path) -> tuple[list[str], list[dict[str, str]], str]:
 
 
 def _decode_bytes(data: bytes) -> tuple[str, str]:
+    """Decode bytes."""
     last_err = ""
     for encoding in ENCodings_TRIED:
         try:
@@ -319,6 +334,7 @@ def _decode_bytes(data: bytes) -> tuple[str, str]:
 
 
 def _read_csv_rows_from_bytes(data: bytes) -> tuple[list[str], list[dict[str, str]], str]:
+    """Read csv rows from bytes."""
     text, encoding = _decode_bytes(data)
     sample = text[:65536]
     if not sample.strip():
@@ -336,6 +352,7 @@ def _read_csv_rows_from_bytes(data: bytes) -> tuple[list[str], list[dict[str, st
 
 
 def _xlsx_col_to_idx(cell_ref: str) -> int:
+    """Xlsx col to idx."""
     col = "".join(ch for ch in cell_ref if ch.isalpha()).upper()
     idx = 0
     for ch in col:
@@ -344,6 +361,7 @@ def _xlsx_col_to_idx(cell_ref: str) -> int:
 
 
 def _xlsx_shared_strings(zf: zipfile.ZipFile) -> list[str]:
+    """Xlsx shared strings."""
     try:
         root = ET.fromstring(zf.read("xl/sharedStrings.xml"))
     except KeyError:
@@ -362,6 +380,7 @@ def _xlsx_shared_strings(zf: zipfile.ZipFile) -> list[str]:
 
 
 def _read_xlsx_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
+    """Read xlsx rows."""
     with zipfile.ZipFile(path) as zf:
         sheet_name = "xl/worksheets/sheet1.xml"
         if sheet_name not in zf.namelist():
@@ -419,6 +438,7 @@ def _read_xlsx_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
 
 
 def _read_xls_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
+    """Read xls rows."""
     if xlrd is None:
         raise RuntimeError("xlrd is required to import .xls files (pip install xlrd)")
 
@@ -446,6 +466,7 @@ def _import_rows(
     inferred: InferredRun,
     clear_existing: bool,
 ) -> int:
+    """Import rows."""
     if not header:
         return 0
     value_cols = [h for h in header if h and not _is_geo_column(h)]
@@ -539,6 +560,7 @@ def import_xlsx_path(
     inferred: InferredRun,
     clear_existing: bool = True,
 ) -> int:
+    """Import xlsx path."""
     header, rows = _read_xlsx_rows(path)
     return _import_rows(
         header=header,
@@ -556,6 +578,7 @@ def import_xls_path(
     inferred: InferredRun,
     clear_existing: bool = True,
 ) -> int:
+    """Import xls path."""
     header, rows = _read_xls_rows(path)
     return _import_rows(
         header=header,
@@ -600,6 +623,8 @@ def import_all_kbw_csv_facts(
     root: Path | None = None,
     limit: int | None = None,
     progress_every: int = 25,
+    years: set[int] | None = None,
+    exts: set[str] | None = None,
 ) -> dict[str, int]:
     """Import every supported catalogued file under mirror into kbw_facts."""
     root = root or Path("data/kbw_mirror/dane")
@@ -615,20 +640,28 @@ def import_all_kbw_csv_facts(
         "skipped_no_year": 0,
         "skipped_missing_file": 0,
         "skipped_unsupported": 0,
+        "skipped_year_filter": 0,
+        "skipped_ext_filter": 0,
         "errors": 0,
     }
     error_details: list[dict[str, str]] = []
 
+    query = """
+        SELECT id, rel_path
+        FROM kbw_dane_files
+        WHERE file_ext = ANY(%(allowed_exts)s)
+          AND (%(years)s::int[] IS NULL OR year = ANY(%(years)s::int[]))
+          AND (%(exts)s::text[] IS NULL OR file_ext = ANY(%(exts)s::text[]))
+        ORDER BY rel_path
+    """
+    params = {
+        "allowed_exts": ["csv", "zip", "xlsx", "xls"],
+        "years": sorted(years) if years else None,
+        "exts": sorted(exts) if exts else None,
+    }
     with db.get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT id, rel_path
-                FROM kbw_dane_files
-                WHERE file_ext IN ('csv', 'zip', 'xlsx', 'xls')
-                ORDER BY rel_path
-                """,
-            )
+            cur.execute(query, params)
             rows = cur.fetchall()
 
     for fid, rel_str in rows:
@@ -647,10 +680,19 @@ def import_all_kbw_csv_facts(
             stats["skipped_no_year"] += 1
             print(f"[kbw-import] SKIP no_year {rel_str}", flush=True)
             continue
+        if years is not None and inferred.year not in years:
+            stats["skipped_year_filter"] += 1
+            print(f"[kbw-import] SKIP year_filter year={inferred.year} {rel_str}", flush=True)
+            continue
 
         try:
             n = 0
             ext = path.suffix.lower().lstrip(".")
+            # SQL already filters requested extensions; keep this guard for safety.
+            if exts is not None and ext not in exts:
+                stats["skipped_ext_filter"] += 1
+                print(f"[kbw-import] SKIP ext_filter ext={ext} {rel_str}", flush=True)
+                continue
             if ext == "csv":
                 n = import_csv_path(path, rel_str, source_file_id=fid, inferred=inferred)
                 stats["files_imported_csv"] += 1

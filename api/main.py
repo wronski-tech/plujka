@@ -28,6 +28,7 @@ class QuestionHintsRequest(BaseModel):
 
 
 def _run_seed_background() -> None:
+    """Run seed background."""
     try:
         seed.seed_if_empty(force=config.FORCE_RESEED)
     except Exception:
@@ -39,6 +40,7 @@ def _run_seed_background() -> None:
 
 @app.on_event("startup")
 def startup() -> None:
+    """Startup."""
     db.init_database()
     opensearch_store.ensure_index()
     threading.Thread(target=_run_seed_background, name="seed", daemon=True).start()
@@ -46,12 +48,13 @@ def startup() -> None:
 
 @app.get("/health")
 def health() -> dict[str, str | bool]:
+    """Health."""
     return {"status": "ok", "data_ready": seed.seed_complete.is_set()}
 
 
 @app.post("/reseed")
 def reseed(x_reseed_token: str | None = Header(None, alias="X-Reseed-Token")) -> dict[str, str | bool]:
-    """Reload PKW data from data/pkw_all and KBW CSV facts from data/kbw_mirror (same as FORCE_RESEED on startup). Requires RESEED_TOKEN."""
+    """Reload KBW mirror facts from data/kbw_mirror (same as FORCE_RESEED on startup). Requires RESEED_TOKEN."""
     if not config.RESEED_TOKEN:
         raise HTTPException(
             status_code=503,
@@ -66,6 +69,7 @@ def reseed(x_reseed_token: str | None = Header(None, alias="X-Reseed-Token")) ->
 
 @app.post("/ask")
 def ask(request: AskRequest) -> dict:
+    """Ask."""
     if not request.question.strip():
         raise HTTPException(status_code=400, detail="Question is required.")
 
@@ -81,6 +85,7 @@ def ask(request: AskRequest) -> dict:
 
 @app.post("/feedback")
 def feedback(request: FeedbackRequest) -> dict[str, bool]:
+    """Feedback."""
     if request.rating == "thumbs_down":
         if not request.ask_response:
             raise HTTPException(
@@ -117,6 +122,7 @@ def question_hints(body: QuestionHintsRequest) -> dict[str, Any]:
     exclude = (body.exclude_question or "").strip().lower()
 
     def _drop_excluded(hits: list[dict]) -> list[dict]:
+        """Drop excluded."""
         if not exclude:
             return hits
         return [h for h in hits if (h.get("question") or "").strip().lower() != exclude]

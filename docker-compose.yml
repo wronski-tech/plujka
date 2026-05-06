@@ -74,6 +74,31 @@ services:
     depends_on:
       - api
 
+  loader:
+    build:
+      context: .
+      dockerfile: docker/loader.Dockerfile
+    container_name: plujka-loader
+    environment:
+      DATABASE_URL: postgresql://plujka:plujka@postgres:5432/plujka
+      OPENSEARCH_URL: http://opensearch:9200
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+    volumes:
+      - ./data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - python
+      - -u
+      - scripts/kbw_stage_duckdb.py
+      - --root
+      - /app/data/kbw_mirror/dane
+      - --out
+      - /app/data/kbw_stage_parquet
+    profiles:
+      - tools
+
 volumes:
   postgres_data:
   opensearch_data:
