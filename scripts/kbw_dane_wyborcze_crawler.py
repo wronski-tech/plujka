@@ -55,6 +55,7 @@ def request_url_ascii(url: str) -> str:
 
 
 def _ssl_context(insecure: bool) -> ssl.SSLContext:
+    """Ssl context."""
     if insecure:
         return ssl._create_unverified_context()
     try:
@@ -95,10 +96,12 @@ USER_AGENT = (
 
 class _HrefCollector(HTMLParser):
     def __init__(self) -> None:
+        """Init."""
         super().__init__()
         self.hrefs: list[str] = []
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        """Handle starttag."""
         if tag.lower() != "a":
             return
         for key, val in attrs:
@@ -107,6 +110,7 @@ class _HrefCollector(HTMLParser):
 
 
 def _normalize_href(href: str) -> str:
+    """Normalize href."""
     href = href.strip()
     if href.startswith("//"):
         return "https:" + href
@@ -120,6 +124,7 @@ def canonical_page_url(url: str) -> str:
 
 
 def should_queue_html(url: str) -> bool:
+    """Should queue html."""
     parsed = urlparse(url)
     if parsed.scheme not in ("http", "https"):
         return False
@@ -143,6 +148,7 @@ def should_queue_html(url: str) -> bool:
 
 
 def is_download_target(url: str) -> bool:
+    """Is download target."""
     lower = url.lower()
     if "/dane/" in lower:
         return True
@@ -151,6 +157,7 @@ def is_download_target(url: str) -> bool:
 
 
 def local_path_for_url(url: str, out_root: Path) -> Path:
+    """Local path for url."""
     parsed = urlparse(url)
     rel = unquote((parsed.path or "").lstrip("/"))
     if not rel:
@@ -159,6 +166,7 @@ def local_path_for_url(url: str, out_root: Path) -> Path:
 
 
 def http_get(url: str, ssl_ctx: ssl.SSLContext, binary: bool = True) -> tuple[bytes | None, str | None]:
+    """Http get."""
     req = Request(request_url_ascii(url), headers={"User-Agent": USER_AGENT, "Accept": "*/*"})
     try:
         with urlopen(req, timeout=180, context=ssl_ctx) as resp:
@@ -177,6 +185,7 @@ def http_get(url: str, ssl_ctx: ssl.SSLContext, binary: bool = True) -> tuple[by
 
 
 def append_manifest(manifest_path: Path, record: dict) -> None:
+    """Append manifest."""
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     with manifest_path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(record, ensure_ascii=False) + "\n")
@@ -191,6 +200,7 @@ def crawl(
     manifest_path: Path,
     ssl_ctx: ssl.SSLContext,
 ) -> int:
+    """Crawl."""
     seen_html: set[str] = set()
     downloaded_urls: set[str] = set()
     queue: deque[str] = deque()
@@ -300,6 +310,7 @@ def crawl(
 
 
 def main() -> None:
+    """Main."""
     ap = argparse.ArgumentParser(description="Mirror KBW Dane Wyborcze index pages and download /dane/ files.")
     ap.add_argument(
         "--out",

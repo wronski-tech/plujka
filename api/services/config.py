@@ -15,6 +15,7 @@ QUESTION_HINTS_SEMANTIC_MIN_CHARS = int(os.getenv("QUESTION_HINTS_SEMANTIC_MIN_C
 
 
 def _env_truthy(name: str) -> bool:
+    """Env truthy."""
     return os.getenv(name, "").strip().lower() in ("1", "true", "yes")
 
 
