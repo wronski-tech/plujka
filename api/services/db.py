@@ -146,6 +146,79 @@ def init_database() -> None:
                 );
                 """
             )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS kbw_dane_files (
+                    id SERIAL PRIMARY KEY,
+                    rel_path TEXT NOT NULL UNIQUE,
+                    file_name TEXT NOT NULL,
+                    file_ext TEXT NOT NULL,
+                    file_kind TEXT NOT NULL,
+                    size_bytes BIGINT,
+                    mtime TIMESTAMPTZ,
+                    dataset_key TEXT,
+                    year INT,
+                    csv_delimiter TEXT,
+                    encoding_used TEXT,
+                    column_count INT,
+                    header JSONB,
+                    profile_error TEXT,
+                    profiled_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                );
+                """
+            )
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_kbw_dane_files_year ON kbw_dane_files (year);"
+            )
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_kbw_dane_files_dataset ON kbw_dane_files (dataset_key);"
+            )
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_kbw_dane_files_ext ON kbw_dane_files (file_ext);"
+            )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS kbw_election_runs (
+                    id SERIAL PRIMARY KEY,
+                    family TEXT NOT NULL,
+                    year INT NOT NULL,
+                    round INT NOT NULL DEFAULT 0,
+                    slice TEXT NOT NULL DEFAULT '',
+                    variant TEXT NOT NULL DEFAULT '',
+                    dataset_hint TEXT,
+                    UNIQUE (family, year, round, slice, variant)
+                );
+                """
+            )
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_kbw_runs_family_year ON kbw_election_runs (family, year);"
+            )
+            cur.execute(
+                """
+                CREATE TABLE IF NOT EXISTS kbw_facts (
+                    id BIGSERIAL PRIMARY KEY,
+                    election_run_id INT NOT NULL REFERENCES kbw_election_runs(id) ON DELETE CASCADE,
+                    geography JSONB NOT NULL DEFAULT '{}',
+                    subject JSONB NOT NULL DEFAULT '{}',
+                    metric TEXT NOT NULL,
+                    value DOUBLE PRECISION NOT NULL,
+                    is_percentage BOOLEAN NOT NULL DEFAULT FALSE,
+                    source_file_id INT REFERENCES kbw_dane_files(id) ON DELETE SET NULL
+                );
+                """
+            )
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_kbw_facts_run ON kbw_facts (election_run_id);"
+            )
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_kbw_facts_gin_geo ON kbw_facts USING gin (geography);"
+            )
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_kbw_facts_gin_sub ON kbw_facts USING gin (subject);"
+            )
+            cur.execute(
+                "CREATE INDEX IF NOT EXISTS idx_kbw_facts_source ON kbw_facts (source_file_id);"
+            )
 
 
 def run_sql(sql: str, params: dict[str, Any]) -> list[dict[str, Any]]:

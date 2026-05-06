@@ -1,0 +1,152 @@
+[
+  {
+    "rel_path": "data/kbw_mirror/dane/1990/prezydent/1990-zagranica.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1990/prezydent/prez1990gm-proc.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1990/prezydent/prez1990gm.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1990/prezydent/zagr-i-statki90.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1991/sejm/1991-listy-obwody.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1991/sejm/kandsejm1991kom.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1991/sejm/listyokr1991.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1991/sejm/okreg1991sejm.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1991/sejm/sejm1991-lis-okr-proc.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1991/sejm/sejm1991-lis-okr.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1991/senat/KANSEN1991.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1993/sejm/1993-frekw-gm.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1993/sejm/kandsejm1993kom.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1993/sejm/kom-glosy-1993.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1993/sejm/okregi1993.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1993/sejm/sejm1993lis-okr-proc.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1993/sejm/sejm1993lis-okr.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1993/senat/1993-frekw-gm.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1993/senat/KANSEN1993.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1994/samo1994/samo1994gm.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1997/sejm/1997-frekw-gm.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1997/sejm/kandsejm1997kom.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1997/sejm/kandsejm1997pop.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1997/sejm/sejm1997obw.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1997/sejm/sejm1997okregi.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1997/senat/1997-frekw-gm.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1997/senat/ksenat1997pop.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1997/senat/ksenat1997.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1997/senat/senat1997okr.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/1998/sejmik/1998mazowieckie.xls",
+    "ext": "xls",
+    "error": "RuntimeError: xlrd is required to import .xls files (pip install xlrd)"
+  }
+]
