@@ -9,6 +9,7 @@ import requests
 import streamlit as st
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
+RESEED_TOKEN = (os.getenv("RESEED_TOKEN") or "").strip()
 
 # How often the readiness fragment may refresh while data is still loading (avoid hammering /health).
 _READINESS_POLL_INTERVAL = timedelta(seconds=15)
@@ -152,6 +153,41 @@ def _api_data_readiness_banner() -> None:
 
 _api_data_readiness_banner()
 
+with st.expander("Dane PKW — przeładuj z dysku", expanded=False):
+    st.caption(
+        "Kasuje zaimportowane wiersze wyborów (PKW z `./data/pkw_all` oraz fakty KBW CSV → `kbw_facts`) "
+        "i wczytuje je ponownie z dysku (bez `docker compose build`). Na czas importu zapytania mogą być niedostępne."
+    )
+    if not RESEED_TOKEN:
+        st.info(
+            "Aby włączyć ten przycisk, ustaw tę samą zmienną **RESEED_TOKEN** w serwisach "
+            "`api` i `streamlit` (np. w `.env` przy `docker compose`)."
+        )
+    elif st.button("🔄 Przeładuj dane (reseed)", key="plujka_reseed", type="secondary"):
+        try:
+            response = requests.post(
+                f"{API_URL}/reseed",
+                headers={"X-Reseed-Token": RESEED_TOKEN},
+                timeout=30,
+            )
+        except requests.RequestException as err:
+            st.error(f"Brak połączenia z API: {err}")
+        else:
+            if response.status_code == 503:
+                st.error(
+                    "Endpoint /reseed jest wyłączony po stronie API — dodaj **RESEED_TOKEN** "
+                    "do serwisu `api` (ta sama wartość co tutaj)."
+                )
+            elif response.status_code == 403:
+                st.error("Token odrzucony — ujednolić RESEED_TOKEN w `api` i `streamlit`.")
+            elif response.ok:
+                st.session_state["_plujka_api_data_ready"] = False
+                detail = response.json().get("message", "Import w toku.")
+                st.success(detail)
+                st.rerun()
+            else:
+                st.error(f"API ({response.status_code}): {response.text or response.reason}")
+
 with st.container(border=True):
     question = st.text_input(
         "Twoje pytanie",
@@ -227,7 +263,7 @@ if last:
     rk = f"rel:{fp}"
     if st.session_state.get("_related_hist_key") != rk:
         st.session_state["_related_hist_key"] = rk
-        st.session_state["_related_hist_val"] = _fetch_question_hints(q, exclude_question=q)
+        st.session_state["_related_hist_val"] = _fetch_question_hints(q, exclude=q)
     related_hints = st.session_state.get("_related_hist_val") or {"text_hits": [], "semantic_hits": []}
     rel_text = related_hints.get("text_hits") or []
     rel_sem = related_hints.get("semantic_hits") or []

@@ -4,3 +4,4 @@ psycopg[binary]==3.2.1
 openai==1.52.2
 opensearch-py==2.7.1
 pydantic==2.9.2
+xlrd==2.0.2

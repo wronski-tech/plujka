@@ -6,8 +6,10 @@ import re
 import threading
 from pathlib import Path
 
-from api.services import db
+from api.services import db, kbw_catalog, kbw_import
 from api.services.config import SEED_SAMPLE_CSV
+
+_seed_lock = threading.Lock()
 
 FIXED_COLUMNS = {
     "Nr komisji",
@@ -702,6 +704,45 @@ def _seed_elected_candidates(
                         )
 
 
+def clear_election_seed_data() -> None:
+    """Remove rows produced by the PKW seed so imports can run again from CSV files.
+
+    Also clears KBW mirror fact tables so a forced reseed can reload them from disk.
+    """
+    with db.get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("DELETE FROM results")
+            cur.execute("DELETE FROM sejm_aggregate_results")
+            cur.execute("DELETE FROM senate_results")
+            cur.execute("DELETE FROM sejm_candidate_ballots")
+            cur.execute("DELETE FROM elected_candidates")
+            cur.execute("DELETE FROM elections")
+            cur.execute("DELETE FROM kbw_facts")
+            cur.execute("DELETE FROM kbw_election_runs")
+
+
+def _run_seed_pipeline(*, import_kbw_facts: bool = False) -> None:
+    profile_all_csv_sources()
+    kbw_catalog.profile_mirror_if_present()
+    for year, csv_path in _dataset_candidates():
+        if csv_path.exists():
+            _import_dataset(csv_path, year)
+    _import_sejm_aggregates(2019)
+    _import_sejm_aggregates(2023)
+    _import_senate_obwody(2019)
+    votes_2019 = _extract_2019_candidate_votes_by_district()
+    if votes_2019:
+        _seed_sejm_candidate_ballots(2019, votes_2019)
+        _seed_elected_candidates(2019, votes_2019)
+    votes_2023 = _extract_2023_candidate_votes_by_district()
+    if votes_2023:
+        _seed_sejm_candidate_ballots(2023, votes_2023)
+        _seed_elected_candidates(2023, votes_2023)
+
+    if import_kbw_facts and kbw_catalog.DEFAULT_KBW_ROOT.is_dir():
+        kbw_import.import_all_kbw_csv_facts(root=kbw_catalog.DEFAULT_KBW_ROOT)
+
+
 def _import_dataset(csv_path: Path, year: int) -> None:
     with csv_path.open("r", encoding="utf-8", newline="") as file:
         reader = csv.DictReader(file, delimiter=";")
@@ -760,22 +801,18 @@ def _import_dataset(csv_path: Path, year: int) -> None:
 seed_complete = threading.Event()
 
 
-def seed_if_empty() -> None:
-    try:
-        profile_all_csv_sources()
-        for year, csv_path in _dataset_candidates():
-            if csv_path.exists():
-                _import_dataset(csv_path, year)
-        _import_sejm_aggregates(2019)
-        _import_sejm_aggregates(2023)
-        _import_senate_obwody(2019)
-        votes_2019 = _extract_2019_candidate_votes_by_district()
-        if votes_2019:
-            _seed_sejm_candidate_ballots(2019, votes_2019)
-            _seed_elected_candidates(2019, votes_2019)
-        votes_2023 = _extract_2023_candidate_votes_by_district()
-        if votes_2023:
-            _seed_sejm_candidate_ballots(2023, votes_2023)
-            _seed_elected_candidates(2023, votes_2023)
-    finally:
-        seed_complete.set()
+def seed_if_empty(*, force: bool = False) -> None:
+    with _seed_lock:
+        if force:
+            seed_complete.clear()
+        try:
+            if force:
+                clear_election_seed_data()
+            _run_seed_pipeline(import_kbw_facts=force)
+        finally:
+            seed_complete.set()
+
+
+def reseed_from_disk() -> None:
+    """Same as seed_if_empty(force=True); for explicit API/thread calls."""
+    seed_if_empty(force=True)

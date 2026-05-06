@@ -12,3 +12,14 @@ SEED_SAMPLE_CSV = os.getenv("SEED_SAMPLE_CSV", "data/sample/sejm_results_sample_
 FEEDBACK_JSONL_PATH = os.getenv("FEEDBACK_JSONL_PATH", "data/feedback/feedback.jsonl")
 # Skip semantic (embedding) hints for very short fragments to save latency / OpenAI calls.
 QUESTION_HINTS_SEMANTIC_MIN_CHARS = int(os.getenv("QUESTION_HINTS_SEMANTIC_MIN_CHARS", "6"))
+
+
+def _env_truthy(name: str) -> bool:
+    return os.getenv(name, "").strip().lower() in ("1", "true", "yes")
+
+
+# If true on API startup: wipe imported election tables and run the full seed pipeline again
+# (use after adding/replacing CSV under data/). Does not remove Postgres/OpenSearch volumes.
+FORCE_RESEED = _env_truthy("FORCE_RESEED")
+# If set, POST /reseed accepts header X-Reseed-Token: <value> to trigger the same reload without restart.
+RESEED_TOKEN = os.getenv("RESEED_TOKEN", "").strip()

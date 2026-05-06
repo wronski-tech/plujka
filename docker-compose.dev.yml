@@ -1,0 +1,24 @@
+# Development overlay: live code from host + API auto-reload.
+# Use: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# Data volumes (postgres_data, opensearch_data, ./data) stay as in base compose —
+# no rebuild needed when editing Python. Rebuild only after requirements.txt changes.
+
+services:
+  api:
+    volumes:
+      - ./api:/app/api
+    command:
+      - uvicorn
+      - api.main:app
+      - --host
+      - "0.0.0.0"
+      - --port
+      - "8000"
+      - --reload
+      - --reload-dir
+      - /app/api
+
+  streamlit:
+    volumes:
+      - ./streamlit_app:/app/streamlit_app
