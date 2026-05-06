@@ -8,6 +8,7 @@ from api.services.config import FEEDBACK_JSONL_PATH
 
 
 def append_feedback(record: dict) -> None:
+    """Append feedback."""
     path = Path(FEEDBACK_JSONL_PATH)
     path.parent.mkdir(parents=True, exist_ok=True)
     line = {

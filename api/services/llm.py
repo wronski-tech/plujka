@@ -170,6 +170,7 @@ def _question_asks_personal_candidate_votes(question: str) -> bool:
 
 
 def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
+    """Extract intent and entity."""
     lowered = question.lower()
 
     if any(
@@ -272,6 +273,7 @@ def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
 
 
 def _extract_after_keyword(text: str, keywords: list[str]) -> str | None:
+    """Extract after keyword."""
     lowered = text.lower()
     for keyword in keywords:
         pattern = rf"{keyword}\s+(.+)$"
@@ -282,6 +284,7 @@ def _extract_after_keyword(text: str, keywords: list[str]) -> str | None:
 
 
 def _committee_from_politician_name(question: str) -> str | None:
+    """Committee from politician name."""
     for pattern, committee in _POLITICIAN_COMMITTEE_PATTERNS:
         if pattern.search(question):
             return committee
@@ -289,6 +292,7 @@ def _committee_from_politician_name(question: str) -> str | None:
 
 
 def _question_asks_vote_totals(question: str) -> bool:
+    """Question asks vote totals."""
     lowered = question.lower()
     if re.search(r"\bile\b", lowered):
         return True
@@ -312,6 +316,7 @@ def _question_asks_vote_totals(question: str) -> bool:
 
 
 def _question_asks_multiple_election_years(question: str) -> bool:
+    """Question asks multiple election years."""
     lowered = question.lower()
     if len(re.findall(r"\b20\d{2}\b", lowered)) >= 2:
         return True
@@ -334,6 +339,7 @@ def _question_asks_multiple_election_years(question: str) -> bool:
 
 
 def _extract_alias_from_question(question: str) -> str | None:
+    """Extract alias from question."""
     lowered = question.lower()
     for alias, canonical in COMMITTEE_ALIASES.items():
         if re.search(rf"\b{re.escape(alias)}\b", lowered):
@@ -342,6 +348,7 @@ def _extract_alias_from_question(question: str) -> str | None:
 
 
 def _normalize_entity(entity: str | None, question: str) -> str | None:
+    """Normalize entity."""
     if entity:
         lowered = entity.lower()
         for alias, canonical in COMMITTEE_ALIASES.items():

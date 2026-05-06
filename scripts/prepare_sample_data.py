@@ -16,6 +16,7 @@ DEFAULT_ZIP_PATH = Path(
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse args."""
     parser = argparse.ArgumentParser(
         description="Extract and create deterministic sample data for the project."
     )
@@ -47,6 +48,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def _read_csv_from_zip(zip_path: Path) -> tuple[list[str], list[list[str]], str]:
+    """Read csv from zip."""
     with zipfile.ZipFile(zip_path) as archive:
         csv_names = [name for name in archive.namelist() if name.endswith(".csv")]
         if not csv_names:
@@ -66,6 +68,7 @@ def _read_csv_from_zip(zip_path: Path) -> tuple[list[str], list[list[str]], str]
 
 
 def _write_csv(path: Path, header: list[str], rows: list[list[str]]) -> None:
+    """Write csv."""
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as output:
         writer = csv.writer(output, delimiter=";")
@@ -74,6 +77,7 @@ def _write_csv(path: Path, header: list[str], rows: list[list[str]]) -> None:
 
 
 def main() -> None:
+    """Main."""
     args = parse_args()
     header, rows, csv_name = _read_csv_from_zip(args.zip_path)
 

@@ -1,0 +1,1002 @@
+[
+  {
+    "rel_path": "data/kbw_mirror/dane/2014/samorzad/2014-kand-rady.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: consuming input failed: server closed the connection unexpectedly\n\tThis probably means the server terminated abnormally\n\tbefore or while processing the request."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2014/samorzad/samo2014obwody.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2014/samorzad/samo2014-pow-lis-gm-kraj.xlsx",
+    "ext": "xlsx",
+    "error": "DiskFull: could not extend file \"base/16384/25256.2\": No space left on device\nHINT:  Check free disk space."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/obwody2015parl.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: consuming input failed: server closed the connection unexpectedly\n\tThis probably means the server terminated abnormally\n\tbefore or while processing the request."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/Parlament_2015_-_liczba_mieszkancow_wedlug_gmin.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/1/prez2015_1_tura_gm_proc.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/1/prez2015_1_tura_gm.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/1/prez2015_1_tura_pow_proc.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/1/prez2015_1_tura_pow.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/1/prezydent_2015_tura1.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/1/PZT_2015_tura_1_-_liczba_kart_wydanych_(frekwencja_12).xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/1/PZT_2015_tura_1_-_liczba_kart_wydanych_(frekwencja_17).xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/1/PZT_2015_tura_1_-_liczba_mieszkancow_wedlug_gmin.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/2/prez2015_2_tura_gm_proc.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/2/prez2015_2_tura_gm.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/2/prez2015_2_tura_pow_proc.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/2/prez2015_2_tura_pow.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/2/PZT_2015_tura_2_-_liczba_kart_wydanych_(frekwencja_12).xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/2/PZT_2015_tura_2_-_liczba_kart_wydanych_(frekwencja_17).xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/2/PZT_2015_tura_2_-_liczba_mieszkancow_wedlug_gmin.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/prezydent/prez2015_obwody_z_granicami.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/referendum/ref2015gm-proc.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/referendum/ref2015gm.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/referendum/ref2015pow-proc.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/referendum/ref2015pow.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/referendum/ref2015woj-proc.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/referendum/ref2015woj.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/2015-kand-sejm.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/01.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/02.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/03.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/04.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/05.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/06.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/07.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/08.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/09.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/10.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/11.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/12.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/13.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/14.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/15.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/16.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/17.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/18.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/19.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/20.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/21.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  could not write init file"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/22.xlsx",
+    "ext": "xlsx",
+    "error": "DiskFull: could not extend file \"base/16384/25254.27\": No space left on device\nHINT:  Check free disk space."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/23.xlsx",
+    "ext": "xlsx",
+    "error": "DiskFull: could not extend file \"base/16384/25254.27\": No space left on device\nHINT:  Check free disk space."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/24.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/25.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/26.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/27.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/28.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/29.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/30.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/31.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/32.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/33.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/34.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/35.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/36.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/37.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/38.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/39.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/40.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/sejm/wyniki_okr_sejm/41.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/2015-kand-sen.xls",
+    "ext": "xls",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/001.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/002.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/003.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/004.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/005.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/006.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/007.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/008.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/009.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/010.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/011.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/012.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/013.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/014.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/015.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/016.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/017.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/018.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/019.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/020.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/021.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/022.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/023.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/024.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/025.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/026.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/027.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/028.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/029.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/030.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/031.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/032.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/033.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/034.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/035.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/036.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/037.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/038.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/039.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/040.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/041.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/042.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/043.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/044.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/045.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/046.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/047.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/048.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/049.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/050.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/051.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/052.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/053.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/054.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/055.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/056.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/057.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/058.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/059.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/060.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/061.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/062.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/063.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/064.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/065.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/066.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/067.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/068.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/069.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/070.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/071.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/072.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/073.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/074.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/075.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/076.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/077.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/078.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/079.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/080.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/081.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/082.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/083.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/084.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/085.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/086.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/087.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/088.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/089.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/090.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/091.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/092.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/093.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/094.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/095.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/096.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/097.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: server closed the connection unexpectedly\n\tThis probably means the server terminated abnormally\n\tbefore or while processing the request."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/098.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/099.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2015/senat/wyniki_okr_senat/100.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/2018-du%c5%bce-gminy-po-obwodach.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/2018-duże-gminy-po-obwodach.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/2018-frekwencja-i-niewa%c5%bcne-w-gminach.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/2018-frekwencja-i-nieważne-w-gminach.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/2018-kand-rady.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/kandydaci_wbp.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/komitety.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/obwody_glosowania.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/okregi.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/samo2018-gminy-do-20-tys.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/sklad_okw.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/sklad_tkw.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/wbp/IItura.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/wbp/Itura.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2018/samorzad/wyniki_gl_na_kand_po_obwodach_sw_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/kandydaci_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/obwody_glosowania_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/okregi_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/pe2019-gl-lis-obw-proc.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is not yet accepting connections\nDETAIL:  Consistent recovery state has not been yet reached."
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/pe2019-gl-lis-obw.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/pe2019kand.xlsx",
+    "ext": "xlsx",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/sklad_komisji_obwodowych_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/wykaz_list_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/wyniki_gl_na_listy_po_gminach_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/wyniki_gl_na_listy_po_gminach_proc_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/wyniki_gl_na_listy_po_okregach_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/wyniki_gl_na_listy_po_okregach_proc_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/wyniki_gl_na_listy_po_powiatach_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/wyniki_gl_na_listy_po_powiatach_proc_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  },
+  {
+    "rel_path": "data/kbw_mirror/dane/2019/parlament_eu/wyniki_gl_na_listy_po_wojewodztwach_csv.zip",
+    "ext": "zip",
+    "error": "OperationalError: connection failed: connection to server at \"127.0.0.1\", port 5432 failed: FATAL:  the database system is in recovery mode"
+  }
+]

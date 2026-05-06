@@ -195,6 +195,7 @@ _VOIVODESHIP_DISTRICT_RULES_SORTED: list[tuple[str, list[str]]] = sorted(
 
 
 def districts_for_question(question: str) -> list[str] | None:
+    """Districts for question."""
     lowered = question.lower()
     for key, district in _LOCATION_RULES_SORTED:
         if key in lowered:

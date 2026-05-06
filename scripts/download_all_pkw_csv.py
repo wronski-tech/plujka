@@ -17,6 +17,7 @@ PAGE_URL = "https://sejmsenat2023.pkw.gov.pl/sejmsenat2023/pl/dane_w_arkuszach"
 
 
 def parse_args() -> argparse.Namespace:
+    """Parse args."""
     parser = argparse.ArgumentParser(description="Download PKW CSV ZIP archives.")
     parser.add_argument(
         "--out-dir",
@@ -40,6 +41,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def _election_prefix_from_page(page_url: str) -> str:
+    """Election prefix from page."""
     path_parts = [part for part in urlparse(page_url).path.split("/") if part]
     if not path_parts:
         raise RuntimeError(f"Cannot infer election prefix from URL: {page_url}")
@@ -47,6 +49,7 @@ def _election_prefix_from_page(page_url: str) -> str:
 
 
 def _load_bundle_url(page_url: str, timeout: int) -> str:
+    """Load bundle url."""
     response = requests.get(page_url, timeout=timeout)
     response.raise_for_status()
     match = re.search(r'<script src="([^"]*?/j/[^"]+\.min\.js)"', response.text)
@@ -57,6 +60,7 @@ def _load_bundle_url(page_url: str, timeout: int) -> str:
 
 def _extract_dataset_stems(bundle_text: str) -> list[str]:
     # PKW builds data-sheet links from these stem names in the frontend model.
+    """Extract dataset stems."""
     candidates = set(re.findall(r'"([a-z0-9]+(?:_[a-z0-9]+){2,})"', bundle_text))
     keywords = (
         "wyniki_",
@@ -70,6 +74,7 @@ def _extract_dataset_stems(bundle_text: str) -> list[str]:
 
 
 def _is_zip_content(content: bytes) -> bool:
+    """Is zip content."""
     return content.startswith(b"PK\x03\x04")
 
 
@@ -79,6 +84,7 @@ def _download_and_extract(
     timeout: int,
     base_data_url: str,
 ) -> tuple[bool, str]:
+    """Download and extract."""
     url = urljoin(base_data_url, f"data/csv/{stem}_csv.zip")
     response = requests.get(url, timeout=timeout)
     if response.status_code != 200:
@@ -101,6 +107,7 @@ def _download_and_extract(
 
 
 def main() -> None:
+    """Main."""
     args = parse_args()
     all_downloaded = 0
     all_skipped = 0

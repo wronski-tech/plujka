@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 def _embedding_for_knn(text: str) -> list[float]:
+    """Embedding for knn."""
     vector = embed_text(text)
     if len(vector) >= 128:
         return vector[:128]
@@ -22,10 +23,12 @@ def _embedding_for_knn(text: str) -> list[float]:
 
 
 def _client() -> OpenSearch:
+    """Client."""
     return OpenSearch(hosts=[OPENSEARCH_URL], use_ssl=False, verify_certs=False)
 
 
 def ensure_index() -> None:
+    """Ensure index."""
     client = _client()
     if client.indices.exists(INDEX_NAME):
         return
@@ -54,6 +57,7 @@ def ensure_index() -> None:
 
 
 def log_question(question: str, detected_intent: str, sql: str, params: dict) -> None:
+    """Log question."""
     client = _client()
     payload = {
         "question": question,
@@ -67,6 +71,7 @@ def log_question(question: str, detected_intent: str, sql: str, params: dict) ->
 
 
 def search_hints_text(query: str, limit: int) -> list[dict[str, str]]:
+    """Search hints text."""
     q = query.strip()
     if len(q) < 2:
         return []
@@ -104,6 +109,7 @@ def search_hints_text(query: str, limit: int) -> list[dict[str, str]]:
 
 
 def search_hints_semantic(query: str, limit: int) -> list[dict[str, Any]]:
+    """Search hints semantic."""
     q = query.strip()
     if not q:
         return []

@@ -10,6 +10,7 @@ from api.services.config import EMBEDDING_DIM, OPENAI_API_KEY, OPENAI_EMBEDDING_
 
 
 def _normalize(vector: list[float]) -> list[float]:
+    """Normalize."""
     norm = math.sqrt(sum(value * value for value in vector))
     if norm == 0:
         return vector
@@ -17,6 +18,7 @@ def _normalize(vector: list[float]) -> list[float]:
 
 
 def _deterministic_local_embedding(text: str, dim: int = EMBEDDING_DIM) -> list[float]:
+    """Deterministic local embedding."""
     vector = [0.0] * dim
     for token in text.lower().split():
         digest = hashlib.sha256(token.encode("utf-8")).digest()
@@ -28,6 +30,7 @@ def _deterministic_local_embedding(text: str, dim: int = EMBEDDING_DIM) -> list[
 
 
 def embed_text(text: str) -> List[float]:
+    """Embed text."""
     if OPENAI_API_KEY:
         client = OpenAI(api_key=OPENAI_API_KEY)
         response = client.embeddings.create(

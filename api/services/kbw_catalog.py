@@ -20,10 +20,12 @@ _YEAR_DIR = re.compile(r"^\d{4}$")
 
 
 def _posix_rel(path: Path) -> str:
+    """Posix rel."""
     return path.as_posix()
 
 
 def _parts_after_dane(rel: Path) -> list[str]:
+    """Parts after dane."""
     parts = rel.parts
     try:
         idx = parts.index("dane")
@@ -33,6 +35,7 @@ def _parts_after_dane(rel: Path) -> list[str]:
 
 
 def _dataset_key(rel: Path) -> str | None:
+    """Dataset key."""
     inner = _parts_after_dane(rel)
     if len(inner) < 2:
         return None
@@ -40,6 +43,7 @@ def _dataset_key(rel: Path) -> str | None:
 
 
 def _year_from_path(rel: Path) -> int | None:
+    """Year from path."""
     inner = _parts_after_dane(rel)
     if not inner:
         return None
@@ -51,6 +55,7 @@ def _year_from_path(rel: Path) -> int | None:
 
 
 def _guess_delimiter(line: str) -> str:
+    """Guess delimiter."""
     line = line.rstrip("\r\n")
     if not line:
         return ";"
@@ -85,6 +90,7 @@ def _read_csv_header(path: Path) -> tuple[list[str] | None, str | None, str | No
 
 
 def _file_kind(ext: str) -> str:
+    """File kind."""
     e = ext.lower().lstrip(".")
     if e == "csv":
         return "csv"
