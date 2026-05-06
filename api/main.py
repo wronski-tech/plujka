@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-import threading
 from typing import Any, Literal
 
-from fastapi import FastAPI, Header, HTTPException
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 
-from api.services import config, db, feedback_store, opensearch_store, router, seed
+from api.services import config, db, feedback_store, opensearch_store, router
 
 app = FastAPI(title="Plujka API", version="0.1.0")
 
@@ -27,44 +26,17 @@ class QuestionHintsRequest(BaseModel):
     exclude_question: str | None = None
 
 
-def _run_seed_background() -> None:
-    """Run seed background."""
-    try:
-        seed.seed_if_empty(force=config.FORCE_RESEED)
-    except Exception:
-        # Logged by uvicorn if unhandled; keep thread alive for ops
-        import logging
-
-        logging.exception("Background seed failed")
-
-
 @app.on_event("startup")
 def startup() -> None:
     """Startup."""
     db.init_database()
     opensearch_store.ensure_index()
-    threading.Thread(target=_run_seed_background, name="seed", daemon=True).start()
 
 
 @app.get("/health")
 def health() -> dict[str, str | bool]:
     """Health."""
-    return {"status": "ok", "data_ready": seed.seed_complete.is_set()}
-
-
-@app.post("/reseed")
-def reseed(x_reseed_token: str | None = Header(None, alias="X-Reseed-Token")) -> dict[str, str | bool]:
-    """Reload KBW mirror facts from data/kbw_mirror (same as FORCE_RESEED on startup). Requires RESEED_TOKEN."""
-    if not config.RESEED_TOKEN:
-        raise HTTPException(
-            status_code=503,
-            detail="Reseed is disabled. Set environment variable RESEED_TOKEN to enable.",
-        )
-    if not x_reseed_token or x_reseed_token.strip() != config.RESEED_TOKEN:
-        raise HTTPException(status_code=403, detail="Invalid or missing X-Reseed-Token header.")
-
-    threading.Thread(target=seed.reseed_from_disk, name="reseed", daemon=True).start()
-    return {"ok": True, "message": "Reseed started; poll GET /health until data_ready is true."}
+    return {"status": "ok", "data_ready": db.kbw_data_ready()}
 
 
 @app.post("/ask")

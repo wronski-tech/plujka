@@ -236,6 +236,15 @@ def init_database() -> None:
             )
 
 
+def kbw_data_ready() -> bool:
+    """Return True when at least one KBW fact row exists (import finished or in progress elsewhere)."""
+    with get_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT EXISTS (SELECT 1 FROM kbw_facts LIMIT 1)")
+            row = cur.fetchone()
+    return bool(row and row[0])
+
+
 def run_sql(sql: str, params: dict[str, Any]) -> list[dict[str, Any]]:
     """Run sql."""
     with get_connection() as conn:

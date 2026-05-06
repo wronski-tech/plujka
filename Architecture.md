@@ -90,3 +90,27 @@ SELECT id, name
 FROM candidates
 ORDER BY embedding <-> :query_embedding
 LIMIT 1;
+
+---
+
+## 🔄 Data refresh (loader container)
+
+KBW data is loaded **only** via the `loader` container (Compose `tools` profile): Parquet staging, then import into `kbw_facts` (not via the API).
+
+Run the default pipeline:
+
+```bash
+docker compose --profile tools run --rm loader
+```
+
+Optional — only re-stage selected years to Parquet:
+
+```bash
+docker compose --profile tools run --rm loader python -u scripts/kbw_stage_duckdb.py --root /app/data/kbw_mirror/dane --out /app/data/kbw_stage_parquet --years 1997,2023
+```
+
+Optional — only import into Postgres (skip staging):
+
+```bash
+docker compose --profile tools run --rm loader python -u scripts/import_kbw_facts.py --root /app/data/kbw_mirror/dane --wait-db-seconds 600 --years 1997,2023
+```

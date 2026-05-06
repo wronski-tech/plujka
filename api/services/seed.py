@@ -798,22 +798,9 @@ def _import_dataset(csv_path: Path, year: int) -> None:
                     )
 
 
-seed_complete = threading.Event()
-
-
 def seed_if_empty(*, force: bool = False) -> None:
-    """Seed if empty."""
+    """Run KBW catalog + import from disk (for manual/scripts; API does not call this on startup)."""
     with _seed_lock:
         if force:
-            seed_complete.clear()
-        try:
-            if force:
-                clear_election_seed_data()
-            _run_seed_pipeline(import_kbw_facts=True)
-        finally:
-            seed_complete.set()
-
-
-def reseed_from_disk() -> None:
-    """Same as seed_if_empty(force=True); for explicit API/thread calls."""
-    seed_if_empty(force=True)
+            clear_election_seed_data()
+        _run_seed_pipeline(import_kbw_facts=True)

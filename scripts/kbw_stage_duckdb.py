@@ -32,16 +32,24 @@ def _safe_slug(path_str: str) -> str:
     return hashlib.sha1(path_str.encode("utf-8")).hexdigest()[:16]
 
 
+def _sql_path_literal(path: Path) -> str:
+    """Single-quoted SQL string for a filesystem path (paths are trusted; apostrophes escaped)."""
+    return "'" + str(path).replace("'", "''") + "'"
+
+
 def _copy_csv_to_parquet(con: duckdb.DuckDBPyConnection, csv_path: Path, parquet_path: Path) -> int:
     """Copy csv to parquet."""
     parquet_path.parent.mkdir(parents=True, exist_ok=True)
-    sql = """
+    # COPY ... TO does not accept prepared parameters in DuckDB; use escaped literals.
+    csv_lit = _sql_path_literal(csv_path)
+    out_lit = _sql_path_literal(parquet_path)
+    sql = f"""
         COPY (
-          SELECT * FROM read_csv_auto(?, sample_size=-1, all_varchar=true, ignore_errors=true)
-        ) TO ? (FORMAT PARQUET, COMPRESSION ZSTD);
+          SELECT * FROM read_csv_auto({csv_lit}, sample_size=-1, all_varchar=true, ignore_errors=true)
+        ) TO {out_lit} (FORMAT PARQUET, COMPRESSION ZSTD);
     """
-    con.execute(sql, [str(csv_path), str(parquet_path)])
-    rows = con.execute("SELECT COUNT(*) FROM read_parquet(?)", [str(parquet_path)]).fetchone()[0]
+    con.execute(sql)
+    rows = con.execute(f"SELECT COUNT(*) FROM read_parquet({out_lit})").fetchone()[0]
     return int(rows or 0)
 
 

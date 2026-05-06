@@ -18,7 +18,7 @@ Deterministic PKW (election) analytics: natural-language questions are routed to
 | Doc | Purpose |
 | --- | ------- |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Local dev, Docker, PR expectations |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Request flow, seeding, where to edit code |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Request flow, data loading, where to edit code |
 | [docs/DATA.md](docs/DATA.md) | Sample CSVs, PKW downloads, attribution |
 | [SECURITY.md](SECURITY.md) | Reporting vulnerabilities |
 | [CHANGELOG.md](CHANGELOG.md) | Release notes |
@@ -48,7 +48,7 @@ Deterministic PKW (election) analytics: natural-language questions are routed to
    | OpenSearch  | http://localhost:9200     |
    | PostgreSQL  | localhost:5432 (`plujka` / `plujka`) |
 
-On first start the API seeds the database in a **background thread**. Until seeding finishes, `GET /health` returns `data_ready: false`; the Streamlit app shows a loading banner and then clears it when data is ready.
+The API does **not** import election data on startup. Load KBW into PostgreSQL with the **`loader` container** (`docker compose --profile tools run --rm loader`). Until `kbw_facts` has rows, `GET /health` returns `data_ready: false`; Streamlit shows a short notice until data is present.
 
 ### Configuration (compose)
 
@@ -60,7 +60,7 @@ On first start the API seeds the database in a **background thread**. Until seed
 | `OPENSEARCH_INITIAL_ADMIN_PASSWORD` | OpenSearch admin password (see `docker-compose.yml` default) |
 | `QUESTION_HINTS_SEMANTIC_MIN_CHARS` | Min length of `q` before kNN hints run (default `6`) |
 
-The API container mounts `./data` at `/app/data` (sample CSV path is set via `SEED_SAMPLE_CSV` in Compose).
+The API container mounts `./data` at `/app/data` (mirror and imports read from there).
 
 ## API
 

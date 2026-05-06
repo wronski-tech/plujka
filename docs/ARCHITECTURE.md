@@ -20,15 +20,16 @@ flowchart LR
 3. **Router** — `route_question` in `api/services/router.py` resolves year(s), location hints (districts, gminy, etc.), picks `SQL_TEMPLATES[intent]`, binds parameters, runs `db.run_sql`.
 4. **Persistence** — Results come from PostgreSQL only; OpenSearch stores question metadata and embeddings for audit/search (`api/services/opensearch_store.py`).
 
-## Startup and seeding
+## Startup and data loading
 
 On API startup (`api/main.py`):
 
 1. `db.init_database()` — schema / migrations as implemented in `api/services/db.py`.
 2. `opensearch_store.ensure_index()` — creates the `question_logs` index if missing.
-3. A **daemon thread** runs `seed.seed_if_empty()` — loads CSV data (path from `SEED_SAMPLE_CSV`, default under `data/sample/`) until the DB is populated.
 
-`GET /health` returns `data_ready: true` only after seeding completes (`seed.seed_complete`). The Streamlit app polls `/health` periodically so users see when queries are safe to run.
+KBW rows are **not** imported by the API. Run the **`loader` service** (Compose profile `tools`): it stages mirror CSVs to Parquet, then runs `scripts/import_kbw_facts.py` into `kbw_facts`.
+
+`GET /health` returns `data_ready: true` when `kbw_facts` has at least one row. Streamlit polls `/health` so users see when the database has been populated.
 
 ## Question hints (`POST /question-hints`)
 
@@ -40,7 +41,7 @@ The Streamlit UI sends thumbs-up/down after each answer. **Thumbs-down** request
 
 ## Configuration
 
-Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `OPENSEARCH_URL`, OpenAI models, `EMBEDDING_DIM`, `SEED_SAMPLE_CSV`, `FEEDBACK_JSONL_PATH`). Docker Compose wires these for containers (see `docker-compose.yml`).
+Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `OPENSEARCH_URL`, OpenAI models, `EMBEDDING_DIM`, `FEEDBACK_JSONL_PATH`). Docker Compose wires these for containers (see `docker-compose.yml`).
 
 ## Where to change behavior
 
@@ -50,6 +51,7 @@ Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `
 | Routing rules        | `api/services/router.py`          |
 | LLM prompts / parsing| `api/services/llm.py`             |
 | Embeddings           | `api/services/embeddings.py`      |
-| Ingest / seed logic  | `api/services/seed.py`            |
+| KBW import           | `api/services/kbw_import.py`, `scripts/import_kbw_facts.py`, `loader` service |
+| Legacy PKW helpers   | `api/services/seed.py`            |
 | UI                   | `streamlit_app/app.py`            |
 | Feedback JSONL       | `api/services/feedback_store.py`  |

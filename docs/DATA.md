@@ -1,12 +1,10 @@
 # Data
 
-## What the API loads by default
+## What loads KBW data into PostgreSQL
 
-In Docker Compose, `SEED_SAMPLE_CSV` points at a bundled sample CSV under `/app/data` (mounted from `./data` on the host). The seed pipeline reads PKW-style Sejm result CSVs and fills PostgreSQL.
+The **API does not import** mirror files on startup. Use the **`loader` container** (Compose profile `tools`): it writes Parquet under `data/kbw_stage_parquet` and runs `scripts/import_kbw_facts.py` into `kbw_facts` / `kbw_election_runs`.
 
-Default env value (overridable):
-
-- `SEED_SAMPLE_CSV` — defaults to `data/sample/sejm_results_sample_1000.csv` when not set (`api/services/config.py`).
+For local iteration, `SEED_SAMPLE_CSV` in `api/services/config.py` still defaults to `data/sample/sejm_results_sample_1000.csv` for legacy helpers in `api/services/seed.py` (not used by the API on startup).
 
 ## Generate sample files locally
 

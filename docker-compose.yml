@@ -48,9 +48,6 @@ services:
       OPENAI_CHAT_MODEL: ${OPENAI_CHAT_MODEL:-gpt-4o-mini}
       OPENAI_EMBEDDING_MODEL: ${OPENAI_EMBEDDING_MODEL:-text-embedding-3-small}
       EMBEDDING_DIM: "128"
-      SEED_SAMPLE_CSV: /app/data/sample/sejm_results_sample_1000.csv
-      # FORCE_RESEED: "1"          # next API start: wipe imported election rows & re-import from data/
-      RESEED_TOKEN: ${RESEED_TOKEN:-}
     ports:
       - "8000:8000"
     volumes:
@@ -68,7 +65,6 @@ services:
     container_name: plujka-streamlit
     environment:
       API_URL: http://api:8000
-      RESEED_TOKEN: ${RESEED_TOKEN:-}
     ports:
       - "8501:8501"
     depends_on:
@@ -89,13 +85,9 @@ services:
       postgres:
         condition: service_healthy
     command:
-      - python
-      - -u
-      - scripts/kbw_stage_duckdb.py
-      - --root
-      - /app/data/kbw_mirror/dane
-      - --out
-      - /app/data/kbw_stage_parquet
+      - /bin/sh
+      - -ec
+      - python -u scripts/kbw_stage_duckdb.py --root /app/data/kbw_mirror/dane --out /app/data/kbw_stage_parquet && python -u scripts/import_kbw_facts.py --root /app/data/kbw_mirror/dane --wait-db-seconds 600
     profiles:
       - tools
 
