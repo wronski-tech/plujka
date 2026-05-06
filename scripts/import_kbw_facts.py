@@ -50,7 +50,9 @@ def main() -> None:
 
     db.init_database()
     if args.clear:
+        print("[kbw-import] clearing existing kbw_facts/kbw_election_runs...", flush=True)
         kbw_import.clear_kbw_imported_facts()
+        print("[kbw-import] clear done", flush=True)
 
     stats = kbw_import.import_all_kbw_csv_facts(
         root=args.root,

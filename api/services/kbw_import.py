@@ -636,13 +636,16 @@ def import_all_kbw_csv_facts(
             break
         stats["files_seen"] += 1
         path = Path(rel_str)
+        print(f"[kbw-import] START #{stats['files_seen']} {rel_str}", flush=True)
         if not path.is_file():
             stats["skipped_missing_file"] += 1
+            print(f"[kbw-import] SKIP missing_file {rel_str}", flush=True)
             continue
 
         inferred = infer_election_run(path)
         if inferred is None:
             stats["skipped_no_year"] += 1
+            print(f"[kbw-import] SKIP no_year {rel_str}", flush=True)
             continue
 
         try:
@@ -668,9 +671,11 @@ def import_all_kbw_csv_facts(
                 stats["files_imported_xls"] += 1
             else:
                 stats["skipped_unsupported"] += 1
+                print(f"[kbw-import] SKIP unsupported ext={ext} {rel_str}", flush=True)
                 continue
             stats["facts_written"] += n
             stats["files_imported"] += 1
+            print(f"[kbw-import] OK ext={ext} facts={n} {rel_str}", flush=True)
             if progress_every > 0 and stats["files_seen"] % progress_every == 0:
                 print(
                     f"[kbw-import] seen={stats['files_seen']} imported={stats['files_imported']} "
@@ -678,6 +683,7 @@ def import_all_kbw_csv_facts(
                 )
         except Exception as exc:
             stats["errors"] += 1
+            print(f"[kbw-import] ERR {type(exc).__name__}: {exc} {rel_str}", flush=True)
             if len(error_details) < 200:
                 error_details.append(
                     {
@@ -702,5 +708,5 @@ def clear_kbw_imported_facts() -> None:
     """Remove all KBW fact rows and election runs (catalog kbw_dane_files unchanged)."""
     with db.get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("DELETE FROM kbw_facts")
-            cur.execute("DELETE FROM kbw_election_runs")
+            # TRUNCATE is much faster than DELETE for full table resets on large datasets.
+            cur.execute("TRUNCATE TABLE kbw_facts, kbw_election_runs RESTART IDENTITY CASCADE")
