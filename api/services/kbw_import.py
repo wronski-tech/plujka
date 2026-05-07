@@ -751,4 +751,9 @@ def clear_kbw_imported_facts() -> None:
     with db.get_connection() as conn:
         with conn.cursor() as cur:
             # TRUNCATE is much faster than DELETE for full table resets on large datasets.
-            cur.execute("TRUNCATE TABLE kbw_facts, kbw_election_runs RESTART IDENTITY CASCADE")
+            cur.execute("TRUNCATE TABLE kbw_person_election_fact RESTART IDENTITY")
+            cur.execute("TRUNCATE TABLE kbw_candidate_geo_votes RESTART IDENTITY")
+            cur.execute(
+                "TRUNCATE TABLE kbw_candidates, kbw_facts, kbw_election_runs "
+                "RESTART IDENTITY CASCADE"
+            )

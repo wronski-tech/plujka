@@ -22,14 +22,16 @@ flowchart LR
 
 ## Startup and data loading
 
-On API startup (`api/main.py`):
+On API startup (`lifespan` in `api/main.py`):
 
 1. `db.init_database()` — schema / migrations as implemented in `api/services/db.py`.
 2. `opensearch_store.ensure_index()` — creates the `question_logs` index if missing.
 
-KBW rows are **not** imported by the API. Run the **`loader` service** (Compose profile `tools`): it stages mirror CSVs to Parquet, then runs `scripts/import_kbw_facts.py` into `kbw_facts`.
+KBW rows are **not** imported by the API. Run the **`loader` service** (Compose profile `tools`): it stages mirror CSVs to Parquet, then runs `scripts/import_kbw_facts.py` into `kbw_facts`. That script **profiles the mirror tree into `kbw_dane_files`** first so `GET /kbw/catalog/summary` is meaningful after an import even when `kbw_facts` was empty before.
 
 `GET /health` returns `data_ready: true` when `kbw_facts` has at least one row. Streamlit polls `/health` so users see when the database has been populated.
+
+`GET /kbw/catalog/summary` returns counts from `kbw_dane_files` (mirror inventory filled by `kbw_catalog.profile_kbw_dane_files`, typically from the loader). The Streamlit UI exposes catalog rollups and `GET /health?details=1` (`kbw_stats`) in collapsible `@st.fragment` sections that refresh on an interval so full-page reruns stay cheap.
 
 ## Question hints (`POST /question-hints`)
 

@@ -48,7 +48,7 @@ Deterministic PKW (election) analytics: natural-language questions are routed to
    | OpenSearch  | http://localhost:9200     |
    | PostgreSQL  | localhost:5432 (`plujka` / `plujka`) |
 
-The API does **not** import election data on startup. Load KBW into PostgreSQL with the **`loader` container** (`docker compose --profile tools run --rm loader`). Until `kbw_facts` has rows, `GET /health` returns `data_ready: false`; Streamlit shows a short notice until data is present.
+The API does **not** import election data on startup. Load KBW into PostgreSQL with the **`loader` container** (`docker compose --profile tools run --rm loader`). Until `kbw_facts` has rows, `GET /health` returns `data_ready: false`; Streamlit shows a short notice until data is present. Above the question box, expandable panels call **`/kbw/catalog/summary`** and **`/health?details=1`** for mirror inventory and approximate table sizes (Streamlit fragments refresh on an interval).
 
 ### Configuration (compose)
 
@@ -62,12 +62,21 @@ The API does **not** import election data on startup. Load KBW into PostgreSQL w
 
 The API container mounts `./data` at `/app/data` (mirror and imports read from there).
 
+## Tests
+
+```bash
+make test
+```
+
+Uses `unittest` only (no DB). Optional Postgres-backed checks: `make test-integration` (requires `DATABASE_URL` and `PLUJKA_RUN_DB_TESTS=1`), including DB helpers, **`TestClient` HTTP smoke** (`/health`, `/kbw/catalog/summary`, stubbed `/ask`), and the KBW fixture router test. **GitHub Actions** (`.github/workflows/ci.yml`) runs the unit job first, then an **integration** job with `pgvector/pgvector:pg16` and the same env vars.
+
 ## API
 
-- **`GET /health`** — `{"status": "ok", "data_ready": true|false}`  
-- **`POST /ask`** — body `{"question": "..."}` → JSON with `result`, `intent`, `entity`, `sql`, `params`
-- **`POST /feedback`** — `{"rating": "thumbs_up"|"thumbs_down", "question": "...", "ask_response": {...}?}` — thumbs-down entries append to `data/feedback/feedback.jsonl` on the API host with `needs_fix: true` (full `ask_response` snapshot for review)
-- **`POST /question-hints`** — `{"q": "...", "limit": 8, "exclude_question": null}` → `{"text_hits": [...], "semantic_hits": [...]}` — OpenSearch full-text + kNN over logged questions (`question_logs`). Semantic branch is skipped for very short `q` (see `QUESTION_HINTS_SEMANTIC_MIN_CHARS`).
+- **`GET /health`** — `HealthResponse` w `/docs`: `status`, `data_ready`; opcjonalnie **`kbw_stats`** przy **`?details=1`** (przybliżone liczniki z `pg_stat_user_tables`).
+- **`GET /kbw/catalog/summary`** — `KbwCatalogSummaryResponse`: liczba wpisów w **`kbw_dane_files`** oraz rozbicie po roku i `file_kind` (po uruchomieniu profilowania katalogu, np. z loadera / `kbw_catalog.profile_kbw_dane_files`).
+- **`POST /ask`** — body `{"question": "..."}` → JSON (`AskResponse` in `/docs`): `result`, `intent`, `entity`, `year`, `years`, `sql`, `params`; opcjonalnie **`candidate_geo_source`**, **`mandate_extremes_source`** (meta przy wybranych intentach KBW).
+- **`POST /feedback`** — `{"rating": "thumbs_up"|"thumbs_down", "question": "...", "ask_response": {...}?}` → **`FeedbackOkResponse`** `{ "ok": true }`; thumbs-down dopisuje wpis do `data/feedback/feedback.jsonl` na hoście API (`needs_fix: true`, pełny snapshot `ask_response`).
+- **`POST /question-hints`** — `QuestionHintsRequest` → **`QuestionHintsResponse`** (`text_hits`, `semantic_hits`) — OpenSearch full-text + kNN nad zalogowanymi pytaniami. Semantyka wyłączona dla bardzo krótkiego `q` (patrz `QUESTION_HINTS_SEMANTIC_MIN_CHARS`).
 
 Docs: http://localhost:8000/docs when the API is running.
 

@@ -12,6 +12,8 @@ API_URL = os.getenv("API_URL", "http://localhost:8000")
 
 # How often the readiness fragment may refresh while data is still loading (avoid hammering /health).
 _READINESS_POLL_INTERVAL = timedelta(seconds=15)
+# Diagnostics panels (catalog + table stats): slower polling than readiness banner.
+_DIAG_POLL_INTERVAL = timedelta(seconds=30)
 
 
 def _feedback_fingerprint(question: str, data: dict) -> str:
@@ -22,6 +24,8 @@ def _feedback_fingerprint(question: str, data: dict) -> str:
             "intent": data.get("intent"),
             "sql": data.get("sql"),
             "params": data.get("params"),
+            "candidate_geo_source": data.get("candidate_geo_source"),
+            "mandate_extremes_source": data.get("mandate_extremes_source"),
         },
         sort_keys=True,
         default=str,
@@ -41,6 +45,26 @@ def _fetch_question_hints(question: str, exclude: str | None = None, *, limit: i
         return response.json()
     except requests.RequestException:
         return {"text_hits": [], "semantic_hits": []}
+
+
+def _fetch_catalog_summary() -> dict | None:
+    """KBW mirror file inventory counts from ``GET /kbw/catalog/summary``."""
+    try:
+        response = requests.get(f"{API_URL}/kbw/catalog/summary", timeout=15)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException:
+        return None
+
+
+def _fetch_health_with_kb_stats() -> dict | None:
+    """``GET /health?details=1`` — approximate row counts (`kbw_stats`)."""
+    try:
+        response = requests.get(f"{API_URL}/health", params={"details": "true"}, timeout=15)
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException:
+        return None
 
 
 def _hint_button_label(text: str, max_len: int = 52) -> str:
@@ -161,6 +185,51 @@ def _api_data_readiness_banner() -> None:
 
 _api_data_readiness_banner()
 
+
+@st.fragment(run_every=_DIAG_POLL_INTERVAL)
+def _catalog_inventory_expander() -> None:
+    """Catalog summary — refreshes on interval without full-page rerun."""
+    with st.expander("Inwentaryzacja mirror KBW (`kbw_dane_files`)", expanded=False):
+        cat = _fetch_catalog_summary()
+        if cat is None:
+            st.caption("Nie udało się pobrać `/kbw/catalog/summary` — sprawdź API.")
+        else:
+            total = int(cat.get("total_files") or 0)
+            st.metric("Pliki zapisane w katalogu", total)
+            col_y, col_k = st.columns(2)
+            with col_y:
+                st.caption("Według roku (ścieżka)")
+                st.json(cat.get("by_year") or {})
+            with col_k:
+                st.caption("Według rodzaju pliku")
+                st.json(cat.get("by_file_kind") or {})
+            st.caption(
+                "Wypełniane przy profilowaniu mirroru (`kbw_catalog`). Import faktów jest osobnym krokiem."
+            )
+
+
+@st.fragment(run_every=_DIAG_POLL_INTERVAL)
+def _kbw_table_stats_expander() -> None:
+    """Approximate KBW table sizes — refreshes on interval."""
+    with st.expander("Wiersze w tabelach KBW (przybliżenie, `pg_stat`)", expanded=False):
+        hp = _fetch_health_with_kb_stats()
+        if hp is None:
+            st.caption("Nie udało się pobrać `/health?details=1`.")
+        else:
+            st.caption(f"`data_ready`: **{hp.get('data_ready')}**")
+            stats = hp.get("kbw_stats")
+            if stats:
+                st.json(stats)
+            else:
+                st.caption(
+                    "Brak pola `kbw_stats` — uruchom ponownie API lub poczekaj na ANALYZE po imporcie."
+                )
+            st.caption("Źródło: `pg_stat_user_tables.n_live_tup` (odświeżane po DML / ANALYZE).")
+
+
+_catalog_inventory_expander()
+_kbw_table_stats_expander()
+
 with st.container(border=True):
     question = st.text_input(
         "Twoje pytanie",
@@ -225,13 +294,33 @@ if last:
         with c2:
             st.caption("Encja")
             st.write(data.get("entity") or "—")
+        geo_src = data.get("candidate_geo_source")
+        mand_src = data.get("mandate_extremes_source")
+        if geo_src is not None or mand_src is not None:
+            st.caption("Źródło danych (meta)")
+            meta_lines = []
+            if geo_src is not None:
+                meta_lines.append(f"`candidate_geo_source` → **{geo_src}**")
+            if mand_src is not None:
+                meta_lines.append(f"`mandate_extremes_source` → **{mand_src}**")
+            st.markdown(" · ".join(meta_lines))
 
     with st.expander("Szczegóły SQL (debug)", expanded=False):
         st.code(data["sql"], language="sql")
         st.caption("Parametry")
         st.json(data["params"])
 
-    st.caption("Dane: KBW · Odpowiedzi mogą być przybliżone do poziomu okręgu sejmowego, nie do gminy.")
+    _intent = data.get("intent") or ""
+    if _intent == "kbw_candidate_geo_votes_detail":
+        st.caption(
+            "Dane: KBW — głosy imienne/poziom gminy lub obwodu z plików kandydackich; "
+            "`candidate_geo_source` w sekcji „Co zrozumiał system” mówi, czy użyto indeksu "
+            "`kbw_candidate_geo_votes`, czy skanu `kbw_facts`."
+        )
+    else:
+        st.caption(
+            "Dane: KBW · Odpowiedzi mogą być przybliżone do poziomu okręgu sejmowego, nie do gminy."
+        )
 
     rk = f"rel:{fp}"
     if st.session_state.get("_related_hist_key") != rk:

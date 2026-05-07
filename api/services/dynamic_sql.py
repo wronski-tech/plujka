@@ -12,6 +12,10 @@ ALLOWED_TABLES = {
     "kbw_facts",
     "kbw_election_runs",
     "kbw_dane_files",
+    "kbw_v_sejm_district_list_agg",
+    "kbw_person_election_fact",
+    "kbw_candidates",
+    "kbw_candidate_geo_votes",
     "elections",
     "results",
     "candidates",
@@ -78,6 +82,10 @@ def _schema_hint() -> str:
 You can query only these tables:
 - kbw_election_runs(id, family, year, round, slice, variant, dataset_hint)
 - kbw_facts(id, election_run_id, geography jsonb, subject jsonb, metric, value, is_percentage, source_file_id)
+- kbw_v_sejm_district_list_agg(election_run_id, year, district, list_label, votes, has_csv_source) — aggregated Sejm list votes by district
+- kbw_person_election_fact(id, person_key, display_name, year, election_family, party_list_label, votes, elected, district, kbw_source_file_id) — cross-election persons; fill with scripts/backfill_kbw_person_facts.py after KBW import
+- kbw_candidates(id, election_run_id, person_key, district, list_label, display_name, list_position, votes) — relational slice; fill with db.sync_kbw_candidates_from_person_facts after person backfill
+- kbw_candidate_geo_votes(kbw_fact_id PK→kbw_facts.id, election_run_id, person_key, display_name, votes) — per-row candidate votes; JOIN kbw_facts ON kbw_facts.id = kbw_candidate_geo_votes.kbw_fact_id for geography jsonb
 - kbw_dane_files(id, rel_path, file_name, file_ext, file_kind, year, dataset_key, header)
 - elections(id, year, type)
 - results(id, candidate_id, election_id, votes, district, list_position)

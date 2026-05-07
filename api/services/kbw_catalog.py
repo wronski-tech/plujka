@@ -197,8 +197,9 @@ def profile_kbw_dane_files(root: Path | None = None) -> dict[str, int]:
     return stats
 
 
-def profile_mirror_if_present(root: Path | None = None) -> None:
-    """No-op when `data/kbw_mirror/dane` is missing (e.g. fresh clone)."""
+def profile_mirror_if_present(root: Path | None = None) -> dict[str, int] | None:
+    """Walk mirror and upsert ``kbw_dane_files`` when root exists; else return None."""
     root = root or DEFAULT_KBW_ROOT
     if root.is_dir():
-        profile_kbw_dane_files(root)
+        return profile_kbw_dane_files(root)
+    return None

@@ -35,6 +35,16 @@ Without `OPENAI_API_KEY`, the API uses deterministic fallbacks for intent routin
 
 See [docs/DATA.md](docs/DATA.md) for preparing sample CSVs and downloading full PKW archives.
 
+## Tests
+
+From the repo root (no Docker DB needed for the default suite):
+
+```bash
+make test
+```
+
+Integration tests against PostgreSQL: `make test-integration` with `DATABASE_URL` set and `PLUJKA_RUN_DB_TESTS=1` (see `tests/test_integration_kbw_db.py`). CI runs the same against `pgvector/pgvector:pg16` after the unit job passes.
+
 ## Pull requests
 
 - Keep changes focused and consistent with existing style (see [.github/pull_request_template.md](.github/pull_request_template.md)).

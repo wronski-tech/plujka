@@ -173,6 +173,95 @@ def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
     """Extract intent and entity."""
     lowered = question.lower()
 
+    # KBW analytics — keyword routing (fast path; avoids generic ranking / extra LLM calls).
+    if re.search(r"frekwenc", lowered) and any(
+        t in lowered
+        for t in (
+            "najwyższ",
+            "najwyzsz",
+            "najwyższa",
+            "najwyzsza",
+            "największ",
+            "najwieksz",
+            "max",
+            "maksymaln",
+        )
+    ):
+        return "kbw_max_turnout_precinct", None
+
+    if ("okręg" in lowered or "okreg" in lowered) and any(
+        r in lowered for r in ("różnic", "rozn", "różnica", "roznica", "różnice", "roznice")
+    ):
+        if "po" in lowered and "pis" in lowered:
+            return "kbw_committee_gap_by_district", None
+
+    if ("koalicyjn" in lowered or "lista koalicyjna" in lowered) and any(
+        k in lowered for k in ("kandyda", "kandydat", "razem", "łącznie", "lacznie", "suma", "głos", "glos")
+    ):
+        alias = _extract_alias_from_question(question)
+        if alias:
+            return "kbw_coalition_candidate_vote_sum", alias
+
+    if (
+        ("poseł" in lowered or "posłowie" in lowered or "poslowie" in lowered or "posła" in lowered)
+        and ("głos" in lowered or "glos" in lowered or "głosów" in lowered or "glosow" in lowered)
+        and any(
+            x in lowered
+            for x in (
+                "najmniej",
+                "najwięcej",
+                "najmniejsz",
+                "największ",
+                "ekstrem",
+                "minimum",
+                "maximum",
+            )
+        )
+        and any(
+            x in lowered
+            for x in (
+                "weszli",
+                "nie weszli",
+                "nie wszedł",
+                "nie weszła",
+                "mandat",
+                "sejm",
+            )
+        )
+    ):
+        return "kbw_sejm_mandate_vote_extremes", None
+
+    if (
+        any(t in lowered for t in ("gmina", "gminie", "gminy", "obwód", "obwod", "obwodu"))
+        and any(
+            t in lowered
+            for t in (
+                "głos",
+                "glos",
+                "wynik",
+                "zebrał",
+                "zebral",
+                "zdobył",
+                "zdobyl",
+                "ile",
+                "pokaż",
+                "pokaz",
+            )
+        )
+    ):
+        person = _elected_sejm_candidate_pattern(question)
+        if person:
+            return "kbw_candidate_geo_votes_detail", person
+        frag = person_name_fragment_from_question(question)
+        if frag and (
+            "kandyda" in lowered
+            or "kandydat" in lowered
+            or "nazwisko" in lowered
+            or "imienne" in lowered
+            or "imiennych" in lowered
+        ):
+            return "kbw_candidate_geo_votes_detail", frag
+
     if any(
         token in lowered
         for token in [
@@ -199,6 +288,9 @@ def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
             return "candidate_sejm_participation", frag
 
     committee = _committee_from_politician_name(question)
+    alias_committee = _extract_alias_from_question(question)
+    # Politician-implied committee OR short alias (PiS, KO, …) — both should route to list-level votes.
+    vote_party = committee or alias_committee
 
     if _question_asks_vote_totals(question):
         person = _elected_sejm_candidate_pattern(question)
@@ -207,7 +299,7 @@ def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
 
     if _question_asks_vote_totals(question):
         if any(t in lowered for t in ("gmina", "gminie", "gminy")):
-            ent = committee or _extract_alias_from_question(question) or _normalize_entity(None, question)
+            ent = vote_party or _normalize_entity(None, question)
             return "sejm_votes_by_gmina", ent
         if any(
             t in lowered
@@ -220,16 +312,16 @@ def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
                 "wojewodztwach",
             )
         ):
-            ent = committee or _extract_alias_from_question(question) or _normalize_entity(None, question)
+            ent = vote_party or _normalize_entity(None, question)
             return "sejm_votes_by_wojewodztwo", ent
         if "powiat" in lowered:
-            ent = committee or _extract_alias_from_question(question) or _normalize_entity(None, question)
+            ent = vote_party or _normalize_entity(None, question)
             return "sejm_votes_by_powiat", ent
 
-    if committee and _question_asks_vote_totals(question):
+    if vote_party and _question_asks_vote_totals(question):
         if _question_asks_multiple_election_years(question):
-            return "votes_for_candidate_all_years", committee
-        return "votes_for_candidate", committee
+            return "votes_for_candidate_all_years", vote_party
+        return "votes_for_candidate", vote_party
 
     if not OPENAI_API_KEY:
         if "trend" in lowered or "okręg" in lowered or "district" in lowered:
@@ -252,7 +344,9 @@ def extract_intent_and_entity(question: str) -> tuple[str, str | None]:
         "Return JSON only with keys: intent, entity. "
         "Allowed intents: total_votes_by_candidate, votes_for_candidate, votes_for_candidate_all_years, "
         "trend_by_district_for_candidate, elected_candidates_sejm, candidate_sejm_participation, "
-        "sejm_candidate_personal_votes, sejm_votes_by_powiat, sejm_votes_by_gmina, sejm_votes_by_wojewodztwo."
+        "sejm_candidate_personal_votes, sejm_votes_by_powiat, sejm_votes_by_gmina, sejm_votes_by_wojewodztwo, "
+        "kbw_max_turnout_precinct, kbw_committee_gap_by_district, kbw_coalition_candidate_vote_sum, "
+        "kbw_sejm_mandate_vote_extremes, kbw_candidate_geo_votes_detail."
     )
     response = client.chat.completions.create(
         model=OPENAI_CHAT_MODEL,

@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 
 from api.services import db
+from api.services import kbw_analytics
 from api.services.dynamic_sql import try_dynamic_query
 from api.services.embeddings import embed_text
 from api.services.llm import (
@@ -13,7 +14,29 @@ from api.services.llm import (
 from api.services.locations import districts_for_question
 from api.services.sql_templates import SQL_TEMPLATES
 
+KBW_ANALYTICS_INTENTS = frozenset(
+    {
+        "kbw_max_turnout_precinct",
+        "kbw_committee_gap_by_district",
+        "kbw_coalition_candidate_vote_sum",
+        "kbw_sejm_mandate_vote_extremes",
+        "kbw_candidate_geo_votes_detail",
+    }
+)
+
+_ROUTER_INTENTS = set(SQL_TEMPLATES) | KBW_ANALYTICS_INTENTS
+
 INTENT_TEXT = {
+    "kbw_max_turnout_precinct": "komisja obwodowa najwyższa frekwencja procent",
+    "kbw_committee_gap_by_district": "różnica głosów między dwoma partiami po okręgach sejmowych",
+    "kbw_coalition_candidate_vote_sum": "suma głosów na kandydatów na liście koalicyjnej",
+    "kbw_sejm_mandate_vote_extremes": (
+        "posełowie z najmniejszą i największą liczbą głosów weszli lub nie weszli do sejmu "
+        "(PKW elected_candidates / sejm_candidate_ballots; przy braku danych — przybliżenie z KBW)"
+    ),
+    "kbw_candidate_geo_votes_detail": (
+        "głosy na kandydata do sejmu w gminie lub obwodzie z danych KBW (tabela kbw_candidate_geo_votes)"
+    ),
     "total_votes_by_candidate": "pokaż sumę głosów dla wszystkich list",
     "votes_for_candidate": "ile głosów ma konkretna lista lub komitet",
     "votes_for_candidate_all_years": "głosy listy we wszystkich latach wyborów w bazie",
@@ -44,9 +67,9 @@ def route_question(question: str) -> dict:
     year = _extract_year(question)
     years = _extract_years(question)
     is_comparison = _is_year_comparison_question(question, years)
-    default_year = year if year is not None else db.get_latest_election_year("sejm")
+    default_year = year if year is not None else db.default_sejm_year_for_queries()
 
-    intent = llm_intent if llm_intent in SQL_TEMPLATES else _fallback_semantic_intent(question_embedding)
+    intent = llm_intent if llm_intent in _ROUTER_INTENTS else _fallback_semantic_intent(question_embedding)
     if intent == "candidate_sejm_participation":
         sql = SQL_TEMPLATES[intent]
         pattern = _sql_ilike_pattern(llm_entity) or _sql_ilike_pattern(
@@ -168,6 +191,184 @@ def route_question(question: str) -> dict:
             "result": result,
         }
 
+    if intent == "kbw_sejm_mandate_vote_extremes":
+        y = year if year is not None else default_year
+        if y is None:
+            y = db.get_latest_kbw_sejm_year()
+        if y is None:
+            return {
+                "question": question,
+                "intent": intent,
+                "entity": llm_entity,
+                "year": None,
+                "years": years,
+                "sql": "-- brak roku",
+                "params": {},
+                "result": [],
+                "mandate_extremes_source": None,
+            }
+        sql, params = kbw_analytics.sql_sejm_mandate_vote_extremes(year=y)
+        result = db.run_sql(sql, params)
+        mandate_extremes_source = "pkw"
+        if not result:
+            mandate_extremes_source = "kbw_fallback"
+            sql, params = kbw_analytics.sql_sejm_mandate_vote_extremes_from_kbw_facts(year=y)
+            result = db.run_sql(sql, params)
+        return {
+            "question": question,
+            "intent": intent,
+            "entity": llm_entity,
+            "year": y,
+            "years": years,
+            "sql": sql,
+            "params": params,
+            "result": result,
+            "mandate_extremes_source": mandate_extremes_source,
+        }
+
+    if intent == "kbw_max_turnout_precinct":
+        y = year if year is not None else default_year
+        if y is None:
+            y = db.get_latest_kbw_sejm_year()
+        if y is None:
+            return {
+                "question": question,
+                "intent": intent,
+                "entity": llm_entity,
+                "year": None,
+                "years": years,
+                "sql": "-- brak roku w kbw_election_runs",
+                "params": {},
+                "result": [],
+            }
+        sql, params = kbw_analytics.sql_max_turnout_precinct(year=y, limit=5)
+        result = db.run_sql(sql, params)
+        return {
+            "question": question,
+            "intent": intent,
+            "entity": llm_entity,
+            "year": y,
+            "years": years,
+            "sql": sql,
+            "params": params,
+            "result": result,
+        }
+
+    if intent == "kbw_committee_gap_by_district":
+        y = year if year is not None else default_year
+        if y is None:
+            y = db.get_latest_kbw_sejm_year()
+        if y is None:
+            return {
+                "question": question,
+                "intent": intent,
+                "entity": llm_entity,
+                "year": None,
+                "years": years,
+                "sql": "-- brak roku",
+                "params": {},
+                "result": [],
+            }
+        sql, params = kbw_analytics.sql_committee_gap_by_district(
+            year=y,
+            left_pattern="%KOALICJA OBYWATELSKA%",
+            right_pattern="%PRAWO I SPRAWIEDLIWOŚĆ%",
+            prefer_csv_sources=y >= 2019,
+        )
+        result = db.run_sql(sql, params)
+        return {
+            "question": question,
+            "intent": intent,
+            "entity": llm_entity,
+            "year": y,
+            "years": years,
+            "sql": sql,
+            "params": params,
+            "result": result,
+        }
+
+    if intent == "kbw_coalition_candidate_vote_sum":
+        y = year if year is not None else default_year
+        if y is None:
+            y = db.get_latest_kbw_sejm_year()
+        if y is None:
+            return {
+                "question": question,
+                "intent": intent,
+                "entity": llm_entity,
+                "year": None,
+                "years": years,
+                "sql": "-- brak roku w kbw_election_runs",
+                "params": {},
+                "result": [],
+            }
+        committee = (llm_entity or "").strip()
+        if not committee:
+            committee = "KOALICJA OBYWATELSKA"
+        sql, params = kbw_analytics.sql_coalition_candidate_vote_sum(
+            year=y,
+            committee_pattern=f"%{committee}%",
+        )
+        result = db.run_sql(sql, params)
+        return {
+            "question": question,
+            "intent": intent,
+            "entity": committee,
+            "year": y,
+            "years": years,
+            "sql": sql,
+            "params": params,
+            "result": result,
+        }
+
+    if intent == "kbw_candidate_geo_votes_detail":
+        y = year if year is not None else default_year
+        if y is None:
+            y = db.get_latest_kbw_sejm_year()
+        if y is None:
+            return {
+                "question": question,
+                "intent": intent,
+                "entity": llm_entity,
+                "year": None,
+                "years": years,
+                "sql": "-- brak roku w kbw_election_runs",
+                "params": {},
+                "result": [],
+                "candidate_geo_source": None,
+            }
+        entity = (llm_entity or "").strip() or person_name_fragment_from_question(question) or ""
+        cand_pat = _sql_ilike_pattern(entity) if entity else "%"
+        gmina_pat = _gmina_ilike_from_question(question)
+        sql, params = kbw_analytics.sql_candidate_geo_votes_detail(
+            year=y,
+            candidate_pattern=cand_pat or "%",
+            gmina_pattern=gmina_pat,
+            limit=80,
+        )
+        result = db.run_sql(sql, params)
+        candidate_geo_source = "kbw_candidate_geo_votes"
+        if not result:
+            candidate_geo_source = "kbw_facts"
+            sql, params = kbw_analytics.sql_candidate_geo_votes_detail_from_facts(
+                year=y,
+                candidate_pattern=cand_pat or "%",
+                gmina_pattern=gmina_pat,
+                limit=80,
+            )
+            result = db.run_sql(sql, params)
+        return {
+            "question": question,
+            "intent": intent,
+            "entity": entity or None,
+            "year": y,
+            "years": years,
+            "sql": sql,
+            "params": params,
+            "result": result,
+            "candidate_geo_source": candidate_geo_source,
+        }
+
     if intent in ("total_votes_by_candidate", "votes_for_candidate", "votes_for_candidate_all_years"):
         kbw_sql, kbw_params = _kbw_sejm_ranking_sql(
             year=None if intent == "votes_for_candidate_all_years" else default_year,
@@ -245,6 +446,21 @@ def route_question(question: str) -> dict:
         "params": params,
         "result": result,
     }
+
+
+def _gmina_ilike_from_question(question: str) -> str | None:
+    """Optional ILIKE pattern for gmina name mentioned next to 'gmina' / 'w gminie'."""
+    m = re.search(
+        r"(?:gmin(?:a|ie|y)|w\s+gminie)\s+([A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż0-9]"
+        r"[A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż0-9\s\.\-]{0,50})",
+        question,
+        re.IGNORECASE,
+    )
+    if m:
+        name = m.group(1).strip()
+        name = re.sub(r"\s+(?:20\d{2}|19\d{2})\s*$", "", name).strip()
+        return f"%{name}%"
+    return None
 
 
 def _sql_ilike_pattern(entity: str | None) -> str | None:

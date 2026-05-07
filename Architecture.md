@@ -95,7 +95,7 @@ LIMIT 1;
 
 ## 🔄 Data refresh (loader container)
 
-KBW data is loaded **only** via the `loader` container (Compose `tools` profile): Parquet staging, then import into `kbw_facts` (not via the API).
+KBW data is loaded **only** via the `loader` container (Compose `tools` profile): Parquet staging, then import into `kbw_facts` (not via the API). `scripts/import_kbw_facts.py` walks the mirror into **`kbw_dane_files`** before loading facts so the catalog API reflects on-disk files.
 
 Run the default pipeline:
 
@@ -114,3 +114,29 @@ Optional — only import into Postgres (skip staging):
 ```bash
 docker compose --profile tools run --rm loader python -u scripts/import_kbw_facts.py --root /app/data/kbw_mirror/dane --wait-db-seconds 600 --years 1997,2023
 ```
+
+Z jednoczesnym backfillem `kbw_person_election_fact` (po `ANALYZE`):
+
+```bash
+docker compose --profile tools run --rm loader python -u scripts/import_kbw_facts.py --root /app/data/kbw_mirror/dane --wait-db-seconds 600 --years 2023 --backfill-person-facts
+```
+
+Backfill + relacyjna tabela `kbw_candidates` (sync z person facts):
+
+```bash
+docker compose --profile tools run --rm loader python -u scripts/import_kbw_facts.py --root /app/data/kbw_mirror/dane --wait-db-seconds 600 --years 2023 --backfill-person-facts --sync-kbw-candidates
+```
+
+Pełna ścieżka z indeksem gmina/obwód (`kbw_candidate_geo_votes`) + person + `kbw_candidates` — skrót:
+
+```bash
+docker compose --profile tools run --rm loader python -u scripts/import_kbw_facts.py --root /app/data/kbw_mirror/dane --wait-db-seconds 600 --years 2023 --all-kbw-backfills
+```
+
+---
+
+## Analytics roadmap
+
+Complex NL→SQL intents, KBW view `kbw_v_sejm_district_list_agg`, person backfill, mandate KBW fallback: **`docs/ANALYTICS_ARCHITECTURE.md`**, next-phase backlog **`docs/ANALYTICS_ROADMAP_PHASE2.md`**.
+
+Observability: **`GET /health?details=1`** — przybliżone liczniki KBW (`kbw_stats`). **`GET /kbw/catalog/summary`** — zgrupowanie wpisów `kbw_dane_files`. W Streamlit — dwie zwijane sekcje pod banerem gotowości (katalog plików + `kbw_stats`).
