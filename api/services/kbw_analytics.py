@@ -227,9 +227,9 @@ def sql_sejm_mandate_vote_extremes_from_kbw_facts(*, year: int) -> tuple[str, di
             AND er.family IN ('sejm', 'sejmsenat')
             AND NOT f.is_percentage
             AND COALESCE(f.subject->>'kind', '') = 'series'
-            AND df.rel_path ILIKE '%kandydat%'
-            AND df.rel_path ILIKE '%sejm%'
-            AND df.rel_path NOT ILIKE '%proc%'
+            AND df.rel_path ILIKE '%%kandydat%%'
+            AND df.rel_path ILIKE '%%sejm%%'
+            AND df.rel_path NOT ILIKE '%%proc%%'
             AND trim(f.subject->>'column') <> ''
           GROUP BY 1
         ),
@@ -245,9 +245,9 @@ def sql_sejm_mandate_vote_extremes_from_kbw_facts(*, year: int) -> tuple[str, di
             AND er.family IN ('sejm', 'sejmsenat')
             AND NOT f.is_percentage
             AND COALESCE(f.subject->>'kind', '') = 'series'
-            AND df.rel_path ILIKE '%kandydat%'
-            AND df.rel_path ILIKE '%sejm%'
-            AND df.rel_path NOT ILIKE '%proc%'
+            AND df.rel_path ILIKE '%%kandydat%%'
+            AND df.rel_path ILIKE '%%sejm%%'
+            AND df.rel_path NOT ILIKE '%%proc%%'
             AND trim(f.subject->>'column') <> ''
           GROUP BY 1, 2
         )
@@ -380,9 +380,9 @@ def sql_candidate_geo_votes_detail_from_facts(
           AND er.family IN ('sejm', 'sejmsenat')
           AND NOT f.is_percentage
           AND COALESCE(f.subject->>'kind', '') = 'series'
-          AND df.rel_path ILIKE '%kandydat%'
-          AND df.rel_path ILIKE '%sejm%'
-          AND df.rel_path NOT ILIKE '%proc%'
+          AND df.rel_path ILIKE '%%kandydat%%'
+          AND df.rel_path ILIKE '%%sejm%%'
+          AND df.rel_path NOT ILIKE '%%proc%%'
           AND trim(f.subject->>'column') <> ''
           AND trim(f.subject->>'column') ILIKE %(candidate_pattern)s
           AND (

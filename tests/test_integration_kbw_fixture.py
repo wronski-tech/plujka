@@ -117,7 +117,7 @@ class TestKbwMinimalFixture(unittest.TestCase):
         """
         from api.services import router
 
-        q = "Ile głosów w gminie Test gmina w roku 2099?"
+        q = "Ile głosów w gminie Test gmina 2099?"
         with mock.patch("api.services.llm.OPENAI_API_KEY", ""):
             with mock.patch(
                 "api.services.router.extract_intent_and_entity",

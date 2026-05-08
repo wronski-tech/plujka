@@ -484,9 +484,9 @@ def backfill_kbw_candidate_geo_votes_from_facts(year: int | None = None) -> int:
         WHERE er.family IN ('sejm', 'sejmsenat')
           AND NOT f.is_percentage
           AND COALESCE(f.subject->>'kind', '') = 'series'
-          AND df.rel_path ILIKE '%kandydat%'
-          AND df.rel_path ILIKE '%sejm%'
-          AND df.rel_path NOT ILIKE '%proc%'
+          AND df.rel_path ILIKE '%%kandydat%%'
+          AND df.rel_path ILIKE '%%sejm%%'
+          AND df.rel_path NOT ILIKE '%%proc%%'
           AND trim(f.subject->>'column') <> ''
           {year_filter}
         ON CONFLICT (kbw_fact_id) DO UPDATE SET
@@ -582,9 +582,9 @@ def backfill_kbw_person_election_facts(year: int | None = None) -> int:
         WHERE er.family IN ('sejm', 'sejmsenat')
           AND NOT f.is_percentage
           AND COALESCE(f.subject->>'kind', '') = 'series'
-          AND df.rel_path ILIKE '%kandydat%'
-          AND df.rel_path ILIKE '%sejm%'
-          AND df.rel_path NOT ILIKE '%proc%'
+          AND df.rel_path ILIKE '%%kandydat%%'
+          AND df.rel_path ILIKE '%%sejm%%'
+          AND df.rel_path NOT ILIKE '%%proc%%'
           AND trim(f.subject->>'column') <> ''
           {year_filter}
         GROUP BY
