@@ -631,18 +631,52 @@ def _kbw_legacy_sejm_sql(
 def _kbw_geo_pattern_from_question(question: str) -> str | None:
     """Kbw geo pattern from question."""
     q = question.strip()
-    m = re.search(
-        r"\bw\s+([A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż][A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż\- ]{1,40})",
-        q,
-        re.IGNORECASE,
+    patterns = (
+        r"\b(?:w|we)\s+([A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż][A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż\- ]{1,40})",
+        r"\bna\s+([A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż][A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż\- ]{1,40})",
+        r"\bz\s+([A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż][A-Za-zĄĆĘŁŃÓŚŹŻąćęłńóśźż\- ]{1,40})",
     )
-    if not m:
+    place = ""
+    for pat in patterns:
+        m = re.search(pat, q, re.IGNORECASE)
+        if m:
+            place = m.group(1).strip()
+            break
+    if not place:
         return None
-    place = m.group(1).strip()
     place = re.split(r"\s+(?:w|z|na|roku|r\.)\b|\b(?:19|20)\d{2}\b", place, maxsplit=1)[0].strip()
     if len(place) < 3:
         return None
-    return f"%{_fold_polish_text(place)}%"
+    folded = _fold_polish_text(place)
+    stem = _kbw_geo_folded_stem(folded)
+    return f"%{stem}%"
+
+
+def _kbw_geo_folded_stem(folded: str) -> str:
+    """Strip common Polish case endings from the last token so ILIKE matches nominative DB labels.
+
+    User phrases often use locative (\"we Wrocławiu\") while KBW/PKW rows use \"Wrocław\" in geo columns.
+    """
+    parts = folded.split()
+    if not parts:
+        return folded
+    w = parts[-1]
+    if len(w) > 6 and w.endswith("owie"):
+        w = w[:-2]
+    elif len(w) > 7 and w.endswith("ach"):
+        w = w[:-3]
+    elif len(w) > 5 and w.endswith("iu"):
+        w = w[:-2]
+    elif len(w) > 5 and w.endswith("ie"):
+        w = w[:-2]
+    elif len(w) > 6 and w.endswith("sku"):
+        w = w[:-1]
+    elif len(w) > 5 and w.endswith("zu"):
+        w = w[:-1]
+    elif len(w) >= 5 and w.endswith("dzi"):
+        w = w[:-1]
+    parts[-1] = w
+    return " ".join(parts)
 
 
 def _fold_polish_text(text: str) -> str:
