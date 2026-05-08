@@ -33,20 +33,6 @@ def _feedback_fingerprint(question: str, data: dict) -> str:
     return hashlib.sha256(blob.encode()).hexdigest()[:24]
 
 
-def _fetch_question_hints(question: str, exclude: str | None = None, *, limit: int = 8) -> dict:
-    """Fetch question hints."""
-    try:
-        response = requests.post(
-            f"{API_URL}/question-hints",
-            json={"q": question, "limit": limit, "exclude_question": exclude},
-            timeout=20,
-        )
-        response.raise_for_status()
-        return response.json()
-    except requests.RequestException:
-        return {"text_hits": [], "semantic_hits": []}
-
-
 def _fetch_catalog_summary() -> dict | None:
     """KBW mirror file inventory counts from ``GET /kbw/catalog/summary``."""
     try:
@@ -67,37 +53,20 @@ def _fetch_health_with_kb_stats() -> dict | None:
         return None
 
 
-def _hint_button_label(text: str, max_len: int = 52) -> str:
-    """Hint button label."""
-    stripped = text.strip()
-    if len(stripped) <= max_len:
-        return stripped
-    return stripped[: max_len - 1] + "…"
-
-
-def _render_hint_buttons(
-    hits: list,
-    key_prefix: str,
-    *,
-    empty_caption: str | None = None,
-) -> None:
-    """Render hint buttons."""
-    if not hits:
-        if empty_caption:
-            st.caption(empty_caption)
+def _render_result_emotes(data: dict) -> None:
+    """Small visual summary for the first row in results."""
+    rows = data.get("result") or []
+    if not rows:
+        st.info("😕 Brak wyników dla tego pytania.")
         return
-    for i, hit in enumerate(hits):
-        qtext = hit.get("question") or ""
-        if not qtext.strip():
-            continue
-        if st.button(
-            _hint_button_label(qtext),
-            key=f"{key_prefix}_{i}_{hashlib.md5(qtext.encode()).hexdigest()[:12]}",
-            help=qtext,
-            use_container_width=True,
-        ):
-            st.session_state["plujka_question_input"] = qtext
-            st.rerun()
+
+    first = rows[0] if isinstance(rows[0], dict) else {}
+    candidate = first.get("candidate") or first.get("candidate_name")
+    votes = first.get("votes")
+    if candidate and votes is not None:
+        st.success(f"🥇 **Top wynik:** {candidate} — **{votes:,}** głosów")
+    else:
+        st.caption("✅ Wynik gotowy.")
 
 
 st.set_page_config(
@@ -241,25 +210,6 @@ with st.container(border=True):
 
 q_val = (question or "").strip()
 
-if len(q_val) >= 2:
-    hc_key = f"h:{q_val}"
-    if st.session_state.get("_typing_hints_key") != hc_key:
-        st.session_state["_typing_hints_key"] = hc_key
-        st.session_state["_typing_hints_val"] = _fetch_question_hints(q_val)
-    typing_hints = st.session_state.get("_typing_hints_val") or {"text_hits": [], "semantic_hits": []}
-    st.markdown("###### Podpowiedzi — podobne słowa (OpenSearch)")
-    _render_hint_buttons(
-        typing_hints.get("text_hits") or [],
-        "th_txt",
-        empty_caption="Brak dopasowań w historii zapytań — wpisz dłuższy fragment lub zadaj pierwsze pytanie.",
-    )
-    st.markdown("###### Podpowiedzi — podobne znaczeniowo (kNN)")
-    _render_hint_buttons(
-        typing_hints.get("semantic_hits") or [],
-        "th_sem",
-        empty_caption="Brak wyników kNN (krótka fraza lub mało podobnych pytań w historii).",
-    )
-
 if submitted:
     if not q_val:
         st.warning("Wpisz treść pytania.")
@@ -283,6 +233,7 @@ if last:
     fp = _feedback_fingerprint(q, data)
 
     st.markdown("##### Wynik")
+    _render_result_emotes(data)
     with st.container(border=True):
         st.dataframe(data["result"], use_container_width=True, hide_index=True)
 
@@ -322,56 +273,29 @@ if last:
             "Dane: KBW · Odpowiedzi mogą być przybliżone do poziomu okręgu sejmowego, nie do gminy."
         )
 
-    rk = f"rel:{fp}"
-    if st.session_state.get("_related_hist_key") != rk:
-        st.session_state["_related_hist_key"] = rk
-        st.session_state["_related_hist_val"] = _fetch_question_hints(q, exclude=q)
-    related_hints = st.session_state.get("_related_hist_val") or {"text_hits": [], "semantic_hits": []}
-    rel_text = related_hints.get("text_hits") or []
-    rel_sem = related_hints.get("semantic_hits") or []
-    if rel_text or rel_sem:
-        st.markdown("###### Inne z historii zapytań (OpenSearch)")
-        if rel_text:
-            st.caption("Podobne słowa — możesz kliknąć i zmienić pytanie w polu powyżej.")
-            _render_hint_buttons(rel_text, "rel_txt", empty_caption=None)
-        if rel_sem:
-            st.caption("Podobne znaczeniowo (kNN)")
-            _render_hint_buttons(rel_sem, "rel_sem", empty_caption=None)
-
-    st.markdown("###### Ocena odpowiedzi")
+    st.markdown("###### Zgłoś odpowiedź do poprawy")
     if st.session_state.get("_feedback_ack_fp") == fp:
-        st.caption("Dziękujemy za opinię.")
+        st.caption("Dziękujemy — zgłoszenie zostało zapisane do poprawy.")
     else:
-        up_c, down_c = st.columns(2)
-        with up_c:
-            if st.button("👍 Pomocna", key=f"fb_up_{fp}", use_container_width=True):
-                try:
-                    fb = requests.post(
-                        f"{API_URL}/feedback",
-                        json={"rating": "thumbs_up", "question": q},
-                        timeout=15,
-                    )
-                    fb.raise_for_status()
-                    st.session_state["_feedback_ack_fp"] = fp
-                    st.rerun()
-                except requests.RequestException as err:
-                    st.warning(f"Nie udało się zapisać opinii: {err}")
-        with down_c:
-            if st.button("👎 Nie satysfakcjonuje — zapisz do poprawy", key=f"fb_down_{fp}", use_container_width=True):
-                try:
-                    fb = requests.post(
-                        f"{API_URL}/feedback",
-                        json={
-                            "rating": "thumbs_down",
-                            "question": q,
-                            "ask_response": data,
-                        },
-                        timeout=30,
-                    )
-                    fb.raise_for_status()
-                    st.session_state["_feedback_ack_fp"] = fp
-                    st.rerun()
-                except requests.RequestException as err:
-                    st.warning(f"Nie udało się zapisać opinii: {err}")
+        st.caption(
+            "Jeśli wynik jest błędny, niepełny albo nie na temat, wyślij go do poprawy. "
+            "Zapiszemy pytanie, SQL i odpowiedź, żeby poprawić logikę systemu."
+        )
+        if st.button("⚠️ Zgłoś odpowiedź do poprawy", key=f"fb_down_{fp}", use_container_width=True):
+            try:
+                fb = requests.post(
+                    f"{API_URL}/feedback",
+                    json={
+                        "rating": "thumbs_down",
+                        "question": q,
+                        "ask_response": data,
+                    },
+                    timeout=30,
+                )
+                fb.raise_for_status()
+                st.session_state["_feedback_ack_fp"] = fp
+                st.rerun()
+            except requests.RequestException as err:
+                st.warning(f"Nie udało się zapisać zgłoszenia: {err}")
 
 st.divider()
