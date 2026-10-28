@@ -379,21 +379,24 @@ def _xlsx_shared_strings(zf: zipfile.ZipFile) -> list[str]:
     return values
 
 
-def _read_xlsx_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
-    """Read xlsx rows."""
+def read_xlsx_table(path: Path) -> list[list[str]]:
+    """Return the first worksheet of an XLSX file as rows of raw cell strings (no header handling).
+
+    Uses only the standard library. Empty rows are skipped; missing cells become "".
+    """
     with zipfile.ZipFile(path) as zf:
         sheet_name = "xl/worksheets/sheet1.xml"
         if sheet_name not in zf.namelist():
             sheets = [n for n in zf.namelist() if n.startswith("xl/worksheets/") and n.endswith(".xml")]
             if not sheets:
-                return [], []
+                return []
             sheet_name = sorted(sheets)[0]
 
         shared = _xlsx_shared_strings(zf)
         root = ET.fromstring(zf.read(sheet_name))
         sheet_data = root.find("s:sheetData", _SHEET_NS)
         if sheet_data is None:
-            return [], []
+            return []
 
         table: list[list[str]] = []
         for row_node in sheet_data.findall("s:row", _SHEET_NS):
@@ -425,7 +428,12 @@ def _read_xlsx_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
             for i, v in row_values.items():
                 dense[i] = v
             table.append(dense)
+    return table
 
+
+def _read_xlsx_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
+    """Read the first XLSX worksheet as (header, rows-as-dicts)."""
+    table = read_xlsx_table(path)
     if not table:
         return [], []
 
