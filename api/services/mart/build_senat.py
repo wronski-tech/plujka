@@ -1,0 +1,160 @@
+"""Build the Senate tables of one election year in DuckDB (loader side).
+
+Supported: the CSV layout of 2019 and 2023 (``kandydaci_senat``, ``okregi_senat`` and one wide
+``wyniki_gl_na_kand*_po_obwodach_senat`` file per district). The protocol comes from
+``protokoly_po_obwodach_senat`` (2023) or from the protocol columns of the district files (2019).
+Requires the ``precincts`` table built by ``build_sejm`` in the same DuckDB connection.
+"""
+
+from __future__ import annotations
+
+import duckdb
+
+from api.services.mart.build_common import (
+    YearSources,
+    build_wide_votes,
+    candidate_index,
+    column,
+    district_files,
+    map_candidate_columns,
+    parse_name_dash_label,
+    parse_plain_names,
+    pct_expr,
+    python_name_key,
+    run_checks,
+    sql_literal,
+)
+
+CANDIDATE_RESULTS = "**/wyniki_gl_na_kand*_po_obwodach_senat_csv/*.parquet"
+PROTOCOLS = "**/protokoly_po_obwodach_senat_csv/*.parquet"
+
+PROTOCOL_ALIASES = {
+    "eligible_voters": ("Liczba wyborców uprawnionych do głosowania",),
+    "ballots_issued": (
+        "Liczba wyborców, którym wydano karty do głosowania w lokalu wyborczym oraz w głosowaniu korespondencyjnym (łącznie)",
+        "Liczba wyborców, którym wydano karty do głosowania",
+    ),
+    "valid_ballots": ("Liczba kart ważnych",),
+    "invalid_votes": ("Liczba głosów nieważnych",),
+    "valid_votes": (
+        "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów",
+        "Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów",
+    ),
+}
+TERYT_ALIASES = ("TERYT Gminy", "Kod TERYT")
+NUMBER_ALIASES = ("Nr komisji", "Numer")
+
+
+def available(sources: YearSources) -> bool:
+    """Whether the year has staged Senate candidates and per-precinct results."""
+    return sources.has("**/kandydaci_senat_csv/*.parquet") and sources.has(CANDIDATE_RESULTS)
+
+
+def build_senat(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
+    """Build and check all Senate tables of ``sources.year``."""
+    year = sources.year
+    candidates_src = sources.load("senat_candidates", "**/kandydaci_senat_csv/*.parquet")
+    districts_src = sources.load("senat_districts", "**/okregi_senat_csv/*.parquet")
+    by_district = district_files(sources.files(CANDIDATE_RESULTS), r"(?:okreg|okr)_(\d+)_")
+
+    if column(con, candidates_src, "Nazwisko i imiona", required=False):
+        full_name = '"Nazwisko i imiona"'
+    else:
+        full_name = """("Imiona" || ' ' || "Nazwisko")"""
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE senat_candidates AS
+        SELECT {year} AS year,
+               CAST(row_number() OVER (ORDER BY int_(k."Nr okręgu"), int_(k."Pozycja na liście"), {full_name}) AS INT) AS candidate_id,
+               CAST(int_(k."Nr okręgu") AS INT) AS district_no,
+               strip_signature(k."Nazwa komitetu") AS committee_name,
+               trim(regexp_replace({full_name}, '\\s+', ' ', 'g')) AS full_name,
+               surname({full_name}) AS last_name,
+               given_names({full_name}) AS first_names,
+               gender_(k."Płeć") AS gender,
+               k."Zawód" AS occupation,
+               k."Miejsce zamieszkania" AS residence,
+               k."Przynależność do partii" AS party_membership,
+               NULLIF(trim(k."Poparcie"), '') AS party_support,
+               int_(k."Liczba głosów") AS votes,
+               {pct_expr(con, candidates_src, '"Procent głosów oddanych w okręgu"')} AS pct_of_district,
+               yes_(k."Czy przyznano mandat") AS elected
+        FROM {candidates_src} k
+        """
+    )
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE senat_districts AS
+        SELECT {year} AS year,
+               CAST(int_(d."Numer okręgu") AS INT) AS district_no,
+               d."Siedziba OKW" AS seat_city,
+               CAST(NULLIF(int_(d."Wyborcy"), 0) AS INT) AS eligible_voters,
+               regexp_replace(d."Opis granic", '\\s+', ' ', 'g') AS description
+        FROM {districts_src} d
+        """
+    )
+
+    if sources.has(PROTOCOLS):
+        protocol_sources = [sources.load("senat_protocols", PROTOCOLS)]
+    else:  # 2019: the protocol is repeated in front of the candidate columns of every district file.
+        protocol_sources = [f"read_parquet({sql_literal(path)})" for path in by_district.values()]
+    parts = []
+    for source in protocol_sources:
+        protocol = ",\n".join(f"int_({column(con, source, *aliases)}) AS {name}" for name, aliases in PROTOCOL_ALIASES.items())
+        parts.append(
+            f"SELECT pkey({column(con, source, *TERYT_ALIASES)}, {column(con, source, *NUMBER_ALIASES)}) AS pkey, {protocol} FROM {source}"
+        )
+    con.execute("CREATE OR REPLACE TABLE senat_protocols_raw AS " + " UNION ALL ".join(parts))
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE senat_precinct_protocols AS
+        SELECT {year} AS year, p.precinct_id, r.eligible_voters, r.ballots_issued, r.valid_ballots, r.invalid_votes, r.valid_votes
+        FROM senat_protocols_raw r JOIN precincts p USING (pkey)
+        -- 2019 repeats unpublished (all-empty) military precincts in every district file: keep one row.
+        QUALIFY row_number() OVER (PARTITION BY p.precinct_id ORDER BY r.valid_votes IS NULL) = 1
+        """
+    )
+
+    index = candidate_index(con, "senat_candidates", None)
+    keys_by_district: dict[int, set[str]] = {}
+    for district, name in con.execute("SELECT district_no, full_name FROM senat_candidates").fetchall():
+        keys_by_district.setdefault(district, set()).add(python_name_key(name))
+    files = map_candidate_columns(
+        con,
+        files_by_district=by_district,
+        index=index,
+        # 2019 headers are bare names, 2023 headers are 'NAME - KW SHORT'.
+        parse=lambda cols, district: parse_plain_names(cols, keys_by_district.get(district, set())) or parse_name_dash_label(cols),
+        unmapped_table="senat_candidate_columns_unmapped",
+    )
+    build_wide_votes(
+        con, year=year, target="senat_precinct_candidate_votes", key_name="candidate_id", files=files,
+        teryt_aliases=TERYT_ALIASES, number_aliases=NUMBER_ALIASES,
+    )
+    _check(con, year)
+
+
+def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
+    """Fail the build unless Senate precinct votes reproduce the official candidate totals."""
+    unpublished = "(SELECT p.senat_district_no FROM senat_precinct_protocols r JOIN precincts p USING (precinct_id) WHERE r.valid_votes IS NULL)"
+    run_checks(
+        con,
+        year,
+        {
+            "Senate districts != 100": "SELECT abs(count(*) - 100) FROM senat_districts",
+            "elected senators != 100": "SELECT abs(count(*) FILTER (WHERE elected) - 100) FROM senat_candidates",
+            "precincts with more than one published Senate protocol": """
+                SELECT count(*) FROM (SELECT pkey FROM senat_protocols_raw WHERE valid_votes IS NOT NULL GROUP BY 1 HAVING count(*) > 1)""",
+            "Senate protocol rows of unknown precincts": "SELECT count(*) FROM senat_protocols_raw WHERE pkey NOT IN (SELECT pkey FROM precincts)",
+            "Senate result rows of unknown precincts": "SELECT count(*) FROM senat_precinct_candidate_votes_raw WHERE pkey NOT IN (SELECT pkey FROM precincts)",
+            "Senate candidate columns that match no candidate": "SELECT count(*) FROM senat_candidate_columns_unmapped",
+            "Senate candidates not read from exactly one column": """
+                SELECT count(*) FROM senat_candidates k
+                WHERE (SELECT count(*) FROM senat_precinct_candidate_votes_columns m WHERE m.key = k.candidate_id) <> 1""",
+            "Senate candidates whose precinct votes differ from the official total": f"""
+                SELECT count(*) FROM senat_candidates k
+                LEFT JOIN (SELECT candidate_id, sum(votes) AS votes FROM senat_precinct_candidate_votes GROUP BY ALL) s
+                  USING (candidate_id)
+                WHERE coalesce(s.votes, 0) <> k.votes AND k.district_no NOT IN {unpublished}""",
+        },
+    )

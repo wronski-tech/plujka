@@ -43,6 +43,8 @@ services:
     container_name: plujka-api
     environment:
       DATABASE_URL: postgresql://plujka:plujka@postgres:5432/plujka
+      # Read-only role created by scripts/build_mart.py; used for LLM-generated SQL.
+      MART_DATABASE_URL: postgresql://plujka_mart_reader:plujka_mart_reader@postgres:5432/plujka
       OPENSEARCH_URL: http://opensearch:9200
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_CHAT_MODEL: ${OPENAI_CHAT_MODEL:-gpt-4o-mini}
@@ -77,6 +79,7 @@ services:
     container_name: plujka-loader
     environment:
       DATABASE_URL: postgresql://plujka:plujka@postgres:5432/plujka
+      MART_DATABASE_URL: postgresql://plujka_mart_reader:plujka_mart_reader@postgres:5432/plujka
       OPENSEARCH_URL: http://opensearch:9200
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
     volumes:
@@ -87,7 +90,11 @@ services:
     command:
       - /bin/sh
       - -ec
-      - python -u scripts/kbw_stage_duckdb.py --root /app/data/kbw_mirror/dane --out /app/data/kbw_stage_parquet && python -u scripts/import_kbw_facts.py --root /app/data/kbw_mirror/dane --wait-db-seconds 600
+      - >-
+        python -u scripts/kbw_stage_duckdb.py --root /app/data/kbw_mirror/dane --out /app/data/kbw_stage_parquet &&
+        for d in /app/data/pkw_all/sejmsenat*/zip; do python -u scripts/kbw_stage_duckdb.py --root "$$d" --out /app/data/pkw_stage_parquet; done &&
+        python -u scripts/import_kbw_facts.py --root /app/data/kbw_mirror/dane --wait-db-seconds 600 &&
+        python -u scripts/build_mart.py --parquet-root /app/data/kbw_stage_parquet --pkw-parquet-root /app/data/pkw_stage_parquet --wait-db-seconds 600
     profiles:
       - tools
 

@@ -20,6 +20,8 @@ Deterministic PKW (election) analytics: natural-language questions are routed to
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Local dev, Docker, PR expectations |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | Request flow, data loading, where to edit code |
 | [docs/DATA.md](docs/DATA.md) | Sample CSVs, PKW downloads, attribution |
+| [docs/MART.md](docs/MART.md) | Relational election model (`mart`), build, checks, guarded LLM SQL |
+| [AGENTS.md](AGENTS.md) | Rules and commands for AI coding agents |
 | [SECURITY.md](SECURITY.md) | Reporting vulnerabilities |
 | [CHANGELOG.md](CHANGELOG.md) | Release notes |
 

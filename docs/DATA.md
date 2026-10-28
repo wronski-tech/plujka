@@ -4,6 +4,10 @@
 
 The **API does not import** mirror files on startup. Use the **`loader` container** (Compose profile `tools`): it writes Parquet under `data/kbw_stage_parquet` and runs `scripts/import_kbw_facts.py` into `kbw_facts` / `kbw_election_runs`.
 
+As its last step the loader runs `scripts/build_mart.py`, which builds the relational model in the PostgreSQL schema **`mart`** (Sejm 2015, 2019, 2023; Senate 2019, 2023). It reads the staged KBW mirror plus the staged PKW bundles (`data/pkw_stage_parquet`, preferred per dataset) and refuses to load a year whose precinct votes do not add up to the official totals. Tables, sources, checks and known gaps in the official files are described in [MART.md](MART.md).
+
+Staging (`scripts/kbw_stage_duckdb.py`) is strict: the delimiter is detected from the header, CP1250 files are transcoded, and a file fails instead of silently dropping malformed rows. XLS/XLSX tables (2015) are staged too.
+
 For local iteration, `SEED_SAMPLE_CSV` in `api/services/config.py` still defaults to `data/sample/sejm_results_sample_1000.csv` for legacy helpers in `api/services/seed.py` (not used by the API on startup).
 
 ## Generate sample files locally

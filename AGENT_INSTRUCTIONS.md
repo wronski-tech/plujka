@@ -5,6 +5,8 @@
 
 # Agent Instructions
 
+> Current, detailed rules for coding agents are in [`AGENTS.md`](AGENTS.md). This brief keeps the original principles.
+
 You are building a deterministic analytics system over election data.
 
 ## DO
@@ -15,7 +17,8 @@ You are building a deterministic analytics system over election data.
   - intent classification
   - entity matching
 - Keep logic simple and explicit
-- Prefer hardcoded SQL templates over dynamic generation
+- LLM-written SQL is allowed only over the `mart` schema, and only through `safe_sql.validate_mart_sql`
+  and the read-only role (`safe_sql.run_readonly`); see `docs/MART.md`
 
 ## DO NOT
 

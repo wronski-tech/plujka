@@ -1,6 +1,6 @@
 # Architecture
 
-Plujka answers Polish election (PKW-style) questions by mapping natural language to **fixed SQL templates** and executing them against **PostgreSQL**. Optional **OpenAI** improves intent extraction and embeddings; without it, the stack uses deterministic fallbacks.
+Plujka answers Polish election (PKW-style) questions with SQL against **PostgreSQL**: first **fixed SQL templates**, then, as a fallback, **LLM-written SQL over the relational `mart` schema** behind a parser guard and a read-only role ([MART.md](MART.md)). Optional **OpenAI** improves intent extraction and embeddings; without it, the stack uses deterministic fallbacks.
 
 ## Request path (`POST /ask`)
 
@@ -12,12 +12,14 @@ flowchart LR
   L --> R
   R --> T[SQL template + params]
   T --> DB[(PostgreSQL)]
+  R -->|no rows / broad question| D[dynamic_sql: entities + LLM SQL]
+  D --> G[sqlglot guard] --> RO[read-only role] --> M[(mart schema)]
   R --> OS[OpenSearch log]
 ```
 
 1. **Embedding** — `embed_text(question)` for semantic fallback routing (and OpenSearch logging).
 2. **LLM** — `extract_intent_and_entity(question)` proposes an intent and entity when OpenAI is configured; unknown intents fall back to semantic matching against predefined intent phrases.
-3. **Router** — `route_question` in `api/services/router.py` resolves year(s), location hints (districts, gminy, etc.), picks `SQL_TEMPLATES[intent]`, binds parameters, runs `db.run_sql`.
+3. **Router** — `route_question` in `api/services/router.py` resolves year(s), location hints (districts, gminy, etc.), picks `SQL_TEMPLATES[intent]`, binds parameters, runs `db.run_sql`. When the template returns nothing (or the question is outside the templates), `dynamic_sql.try_dynamic_query` resolves entities against `mart.entity_lexicon`, asks the LLM for one SELECT over `mart`, validates it with sqlglot and runs it as `plujka_mart_reader` (one repair attempt on error). Telemetry is in `params._dynamic_sql_meta`.
 4. **Persistence** — Results come from PostgreSQL only; OpenSearch stores question metadata and embeddings for audit/search (`api/services/opensearch_store.py`).
 
 ## Startup and data loading
@@ -27,7 +29,7 @@ On API startup (`lifespan` in `api/main.py`):
 1. `db.init_database()` — schema / migrations as implemented in `api/services/db.py`.
 2. `opensearch_store.ensure_index()` — creates the `question_logs` index if missing.
 
-KBW rows are **not** imported by the API. Run the **`loader` service** (Compose profile `tools`): it stages mirror CSVs to Parquet, then runs `scripts/import_kbw_facts.py` into `kbw_facts`. That script **profiles the mirror tree into `kbw_dane_files`** first so `GET /kbw/catalog/summary` is meaningful after an import even when `kbw_facts` was empty before.
+KBW rows are **not** imported by the API. Run the **`loader` service** (Compose profile `tools`): it stages mirror CSVs and the PKW bundles to Parquet, runs `scripts/import_kbw_facts.py` into `kbw_facts`, and finally `scripts/build_mart.py`, which builds the checked relational `mart` schema. That script **profiles the mirror tree into `kbw_dane_files`** first so `GET /kbw/catalog/summary` is meaningful after an import even when `kbw_facts` was empty before.
 
 `GET /health` returns `data_ready: true` when `kbw_facts` has at least one row. Streamlit polls `/health` so users see when the database has been populated.
 
@@ -43,7 +45,7 @@ The Streamlit UI sends thumbs-up/down after each answer. **Thumbs-down** request
 
 ## Configuration
 
-Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `OPENSEARCH_URL`, OpenAI models, `EMBEDDING_DIM`, `FEEDBACK_JSONL_PATH`). Docker Compose wires these for containers (see `docker-compose.yml`).
+Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `MART_DATABASE_URL`, `MART_STATEMENT_TIMEOUT_MS`, `MART_MAX_ROWS`, `OPENSEARCH_URL`, OpenAI models, `EMBEDDING_DIM`, `FEEDBACK_JSONL_PATH`). Docker Compose wires these for containers (see `docker-compose.yml`).
 
 ## Where to change behavior
 
@@ -51,6 +53,8 @@ Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `
 | -------------------- | --------------------------------- |
 | Intents / SQL shapes | `api/services/sql_templates.py`   |
 | Routing rules        | `api/services/router.py`          |
+| LLM SQL over `mart`  | `api/services/dynamic_sql.py`, `api/services/mart/safe_sql.py`, `api/services/mart/entities.py` |
+| `mart` schema / build| `api/services/mart/`, `scripts/build_mart.py` |
 | LLM prompts / parsing| `api/services/llm.py`             |
 | Embeddings           | `api/services/embeddings.py`      |
 | KBW import           | `api/services/kbw_import.py`, `scripts/import_kbw_facts.py`, `loader` service |

@@ -1,250 +1,146 @@
+"""LLM-generated SQL over the relational ``mart`` schema (fallback path of ``router.route_question``).
+
+Flow for one question:
+1. ``entities.resolve_entities`` maps inflected names in the question to exact keys (TERYT, person_id,
+   committee name) found in ``mart.entity_lexicon``.
+2. The prompt carries the mart schema description (table/column ``COMMENT``s read from PostgreSQL),
+   the loaded years with their committees, the entity matches and the SQL rules.
+3. The model returns one SELECT; ``safe_sql.validate_mart_sql`` checks it with sqlglot and caps LIMIT.
+4. ``safe_sql.run_readonly`` runs it as the read-only mart role. On a database error the model gets
+   one repair attempt with the failing SQL and the error message.
+
+Answers therefore always come from SQL over official data; the LLM only writes the query.
+"""
+
 from __future__ import annotations
 
 import json
-import re
+import logging
+from functools import lru_cache
+from typing import Any
 
+import psycopg
 from openai import OpenAI
 
-from api.services import db
-from api.services.config import OPENAI_API_KEY, OPENAI_CHAT_MODEL
+from api.services.config import MART_DATABASE_URL, MART_MAX_ROWS, OPENAI_API_KEY, OPENAI_CHAT_MODEL
+from api.services.mart import entities, safe_sql
 
-ALLOWED_TABLES = {
-    "kbw_facts",
-    "kbw_election_runs",
-    "kbw_dane_files",
-    "kbw_v_sejm_district_list_agg",
-    "kbw_person_election_fact",
-    "kbw_candidates",
-    "kbw_candidate_geo_votes",
-    "elections",
-    "results",
-    "candidates",
-    "elected_candidates",
-    "sejm_aggregate_results",
-    "sejm_candidate_ballots",
-    "senate_results",
-}
+log = logging.getLogger(__name__)
 
-BLOCKED_SQL_PATTERNS = (
-    r"\binsert\b",
-    r"\bupdate\b",
-    r"\bdelete\b",
-    r"\bdrop\b",
-    r"\balter\b",
-    r"\btruncate\b",
-    r"\bcreate\b",
-    r"\bgrant\b",
-    r"\brevoke\b",
-    r";",
-    r"--",
-    r"/\*",
-)
+SQL_RULES = f"""Rules:
+- Write exactly one PostgreSQL SELECT (WITH ... SELECT allowed). No other statements.
+- Use only relations of schema mart listed below; qualify them as mart.<name>.
+- Prefer the views: v_sejm_national_results (national results, thresholds, seats), v_sejm_list_results
+  (list support per country/wojewodztwo/powiat/gmina/sejm_district), v_sejm_turnout (turnout per unit),
+  v_person_history (all candidacies of a person).
+- Always filter by year; when the question gives no year, use the latest loaded year.
+- Use the matched entities' keys (teryt_gmina, person_id, committee name) instead of guessing names.
+  Committees: filter with '<alias>' = ANY(aliases). Names in questions are inflected Polish forms.
+- Percentages in the mart are already 0-100. Order results deterministically.
+- Include LIMIT {MART_MAX_ROWS} or less.
+Return JSON: {{"sql": "..."}}"""
 
 
-def _looks_like_select(sql: str) -> bool:
-    """Looks like select."""
-    s = sql.strip().lower()
-    return s.startswith("select") or s.startswith("with")
-
-
-def _tables_referenced(sql: str) -> set[str]:
-    """Tables referenced."""
-    tables: set[str] = set()
-    for pat in (r"\bfrom\s+([a-zA-Z_][\w\.]*)", r"\bjoin\s+([a-zA-Z_][\w\.]*)"):
-        for match in re.finditer(pat, sql, flags=re.IGNORECASE):
-            ref = match.group(1).split(".")[-1].strip('"')
-            tables.add(ref)
-    return tables
-
-
-def validate_safe_sql(sql: str) -> tuple[bool, str | None]:
-    """Validate safe sql."""
-    if not sql or not _looks_like_select(sql):
-        return False, "Only SELECT/CTE queries are allowed."
-    lowered = sql.lower()
-    for pat in BLOCKED_SQL_PATTERNS:
-        if re.search(pat, lowered, flags=re.IGNORECASE):
-            return False, f"Blocked token/pattern detected: {pat}"
-    refs = _tables_referenced(sql)
-    if not refs:
-        return False, "No table reference detected."
-    unknown = refs - ALLOWED_TABLES
-    if unknown:
-        return False, f"Unknown/forbidden tables: {', '.join(sorted(unknown))}"
-    if "limit" not in lowered:
-        return False, "Query must include LIMIT."
-    return True, None
-
-
-def _schema_hint() -> str:
-    """Schema hint."""
-    return """
-You can query only these tables:
-- kbw_election_runs(id, family, year, round, slice, variant, dataset_hint)
-- kbw_facts(id, election_run_id, geography jsonb, subject jsonb, metric, value, is_percentage, source_file_id)
-- kbw_v_sejm_district_list_agg(election_run_id, year, district, list_label, votes, has_csv_source) — aggregated Sejm list votes by district
-- kbw_person_election_fact(id, person_key, display_name, year, election_family, party_list_label, votes, elected, district, kbw_source_file_id) — cross-election persons; fill with scripts/backfill_kbw_person_facts.py after KBW import
-- kbw_candidates(id, election_run_id, person_key, district, list_label, display_name, list_position, votes) — relational slice; fill with db.sync_kbw_candidates_from_person_facts after person backfill
-- kbw_candidate_geo_votes(kbw_fact_id PK→kbw_facts.id, election_run_id, person_key, display_name, votes) — per-row candidate votes; JOIN kbw_facts ON kbw_facts.id = kbw_candidate_geo_votes.kbw_fact_id for geography jsonb
-- kbw_dane_files(id, rel_path, file_name, file_ext, file_kind, year, dataset_key, header)
-- elections(id, year, type)
-- results(id, candidate_id, election_id, votes, district, list_position)
-- candidates(id, name)
-- elected_candidates(year, district, committee_name, candidate_name, candidate_votes, list_position)
-- sejm_aggregate_results(election_id, geography_level, sejm_district, teryt, gmina, powiat, wojewodztwo, committee_name, metric_value, is_percentage)
-- sejm_candidate_ballots(year, district, committee_name, candidate_name, list_position, total_votes)
-- senate_results(election_id, senate_district, symbol_kontrolny, teryt, numer_obwodu, gmina, powiat, wojewodztwo, candidate_name, votes)
-
-For kbw_facts:
-- geography and subject are JSONB; use ->> to extract keys, e.g. geography->>'Gmina', subject->>'label'
-- election run context is in kbw_election_runs joined by kbw_facts.election_run_id
-
-Rules:
-- Produce a single PostgreSQL SELECT (or WITH...SELECT) query.
-- Never use DDL/DML.
-- Include LIMIT <= 500.
-- Prefer explicit ORDER BY for deterministic results.
-"""
-
-
-def _data_context_hint() -> str:
-    """Small runtime context to reduce wrong key/table guesses."""
-    try:
-        families = db.run_sql(
+@lru_cache(maxsize=1)
+def schema_description() -> str:
+    """Mart relations with their table/column comments, as plain text for the prompt (cached)."""
+    with psycopg.connect(MART_DATABASE_URL) as conn:
+        rows = conn.execute(
             """
-            SELECT family, COUNT(*)::int AS runs
-            FROM kbw_election_runs
-            GROUP BY family
-            ORDER BY runs DESC
-            LIMIT 12
-            """,
-            {},
-        )
-        metrics = db.run_sql(
+            SELECT c.relname, obj_description(c.oid, 'pg_class'), a.attname,
+                   format_type(a.atttypid, a.atttypmod), col_description(c.oid, a.attnum)
+            FROM pg_class c
+            JOIN pg_namespace n ON n.oid = c.relnamespace
+            JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum > 0 AND NOT a.attisdropped
+            WHERE n.nspname = 'mart' AND c.relkind IN ('r', 'v', 'm') AND c.relname <> 'entity_lexicon'
+            ORDER BY c.relname, a.attnum
             """
-            SELECT metric, COUNT(*)::int AS cnt
-            FROM kbw_facts
-            GROUP BY metric
-            ORDER BY cnt DESC
-            LIMIT 20
-            """,
-            {},
-        )
-        geo_keys = db.run_sql(
-            """
-            SELECT key, COUNT(*)::int AS cnt
-            FROM (
-                SELECT jsonb_object_keys(geography) AS key
-                FROM kbw_facts
-                LIMIT 200000
-            ) t
-            GROUP BY key
-            ORDER BY cnt DESC
-            LIMIT 20
-            """,
-            {},
-        )
-        subject_keys = db.run_sql(
-            """
-            SELECT key, COUNT(*)::int AS cnt
-            FROM (
-                SELECT jsonb_object_keys(subject) AS key
-                FROM kbw_facts
-                LIMIT 200000
-            ) t
-            GROUP BY key
-            ORDER BY cnt DESC
-            LIMIT 20
-            """,
-            {},
-        )
-    except Exception:  # noqa: BLE001
-        return ""
-
-    return (
-        "Runtime data samples:\n"
-        f"- families in kbw_election_runs: {json.dumps(families, ensure_ascii=False)}\n"
-        f"- common kbw_facts.metric values: {json.dumps(metrics, ensure_ascii=False)}\n"
-        f"- common geography JSON keys: {json.dumps(geo_keys, ensure_ascii=False)}\n"
-        f"- common subject JSON keys: {json.dumps(subject_keys, ensure_ascii=False)}\n"
-    )
+        ).fetchall()
+    relations: dict[str, tuple[str, list[str]]] = {}
+    for relation, table_doc, column, col_type, column_doc in rows:
+        doc, columns = relations.setdefault(relation, (table_doc or "", []))
+        columns.append(f"  {column} {col_type}" + (f" -- {column_doc}" if column_doc else ""))
+    return "\n\n".join(f"mart.{name} -- {doc}\n" + "\n".join(cols) for name, (doc, cols) in relations.items())
 
 
-def _llm_generate_sql(question: str, *, previous_sql: str | None = None, previous_error: str | None = None) -> tuple[str | None, str | None]:
-    """Llm generate sql."""
+def data_context() -> str:
+    """Loaded years and the main committees of each year (small, fetched per question)."""
+    with psycopg.connect(MART_DATABASE_URL) as conn:
+        committees = conn.execute(
+            """
+            SELECT year, string_agg(coalesce(aliases[1], committee_name) || ' (seats ' || seats || ')', ', ' ORDER BY votes DESC)
+            FROM mart.v_sejm_national_results WHERE pct >= 1 GROUP BY year ORDER BY year
+            """
+        ).fetchall()
+    lines = [f"- {year}: {names}" for year, names in committees]
+    return "Loaded Sejm elections and main committees:\n" + "\n".join(lines)
+
+
+def _llm_sql(question: str, context: str, previous_sql: str | None = None, previous_error: str | None = None) -> str:
+    """Ask the chat model for one SQL query; raise ValueError on an unusable answer."""
     if not OPENAI_API_KEY:
-        return None, "OPENAI_API_KEY is missing."
-    client = OpenAI(api_key=OPENAI_API_KEY)
-    prompt = (
-        "You generate safe PostgreSQL SELECT queries for a Polish election analytics app. "
-        "Return JSON with exactly one key: sql."
-    )
-    repair_note = ""
-    if previous_sql or previous_error:
-        repair_note = (
-            "\nPrevious attempt failed. Fix the query using the error details.\n"
-            f"Previous SQL: {previous_sql or ''}\n"
-            f"PostgreSQL error: {previous_error or ''}\n"
-        )
-    response = client.chat.completions.create(
+        raise ValueError("OPENAI_API_KEY is missing.")
+    repair = ""
+    if previous_sql:
+        repair = f"\nThe previous query failed. Fix it.\nPrevious SQL: {previous_sql}\nError: {previous_error}\n"
+    response = OpenAI(api_key=OPENAI_API_KEY).chat.completions.create(
         model=OPENAI_CHAT_MODEL,
         temperature=0,
+        response_format={"type": "json_object"},
         messages=[
-            {"role": "system", "content": prompt + "\n" + _schema_hint() + "\n" + _data_context_hint() + repair_note},
+            {
+                "role": "system",
+                "content": "You write SQL for a Polish election analytics database. Facts come only from the database.\n"
+                f"{SQL_RULES}\n\n{context}{repair}",
+            },
             {"role": "user", "content": question},
         ],
-        response_format={"type": "json_object"},
     )
-    content = response.choices[0].message.content or "{}"
     try:
-        payload = json.loads(content)
-    except json.JSONDecodeError:
-        return None, "Model response was not valid JSON."
-    sql = (payload.get("sql") or "").strip()
-    ok, err = validate_safe_sql(sql)
-    if not ok:
-        return None, err
-    return sql, None
+        sql = (json.loads(response.choices[0].message.content or "{}").get("sql") or "").strip()
+    except json.JSONDecodeError as exc:
+        raise ValueError("Model response was not valid JSON.") from exc
+    if not sql:
+        raise ValueError("Model returned no SQL.")
+    return sql
 
 
-def generate_dynamic_sql(question: str) -> tuple[str | None, str | None]:
-    """Generate dynamic sql."""
-    return _llm_generate_sql(question)
+def build_context(question: str) -> tuple[str, list[dict[str, Any]]]:
+    """Prompt context (schema, data, entity matches) and the matches as dicts for telemetry."""
+    matches = entities.resolve_entities(question)
+    hints = entities.format_entity_hints(matches) or "- none"
+    context = f"Schema:\n{schema_description()}\n\n{data_context()}\n\nEntities matched in the question:\n{hints}"
+    return context, [m.__dict__ for m in matches]
 
 
 def try_dynamic_query(question: str) -> tuple[list[dict], str | None, str | None, dict]:
-    """Try dynamic query."""
-    sql, err = generate_dynamic_sql(question)
-    if not sql:
-        return [], None, err, {"status": "skipped", "phase": "generation", "error": err}
+    """Generate, validate and run SQL for ``question``.
+
+    Returns ``(rows, sql, error, meta)``; ``meta["status"]`` is one of skipped / rejected / failed /
+    first_pass / repaired, and ``meta["entities"]`` lists the entity matches used in the prompt.
+    """
     try:
-        rows = db.run_sql(sql, {})
-    except Exception as exc:  # noqa: BLE001
-        # One repair attempt with SQL + exact DB error.
-        repaired_sql, repair_err = _llm_generate_sql(
-            question,
-            previous_sql=sql,
-            previous_error=str(exc),
-        )
-        if not repaired_sql:
-            return [], sql, repair_err or str(exc), {
-                "status": "failed",
-                "phase": "repair_generation",
-                "first_sql_error": str(exc),
-                "error": repair_err or str(exc),
-            }
+        context, matched = build_context(question)
+    except psycopg.Error as exc:
+        log.warning("dynamic SQL skipped: mart not reachable (%s)", exc)
+        return [], None, str(exc), {"status": "skipped", "phase": "context", "error": str(exc)}
+    meta: dict[str, Any] = {"entities": matched}
+
+    sql: str | None = None
+    error: str | None = None
+    for attempt in ("first_pass", "repaired"):
         try:
-            repaired_rows = db.run_sql(repaired_sql, {})
-        except Exception as exc2:  # noqa: BLE001
-            return [], repaired_sql, str(exc2), {
-                "status": "failed",
-                "phase": "repair_execution",
-                "first_sql_error": str(exc),
-                "error": str(exc2),
-            }
-        return repaired_rows, repaired_sql, None, {
-            "status": "repaired",
-            "phase": "repair_execution",
-            "first_sql_error": str(exc),
-        }
-    return rows, sql, None, {"status": "first_pass", "phase": "execution"}
+            raw = _llm_sql(question, context, previous_sql=sql, previous_error=error)
+            sql = safe_sql.validate_mart_sql(raw)
+        except safe_sql.UnsafeSqlError as exc:
+            log.warning("dynamic SQL rejected: %s", exc)
+            return [], None, str(exc), {**meta, "status": "rejected", "phase": attempt, "error": str(exc)}
+        except ValueError as exc:
+            return [], sql, str(exc), {**meta, "status": "skipped", "phase": attempt, "error": str(exc)}
+        try:
+            rows = safe_sql.run_readonly(sql)
+            return rows, sql, None, {**meta, "status": attempt}
+        except psycopg.Error as exc:
+            error = str(exc).splitlines()[0]
+            log.info("dynamic SQL failed on attempt %s: %s", attempt, error)
+    return [], sql, error, {**meta, "status": "failed", "error": error}
