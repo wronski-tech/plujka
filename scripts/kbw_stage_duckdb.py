@@ -295,12 +295,13 @@ def fold_unit_row(header: list[str], units: list[str]) -> list[str]:
 def _write_sheet(table: list[list[str]], parquet_path: Path) -> int:
     """Write one worksheet (header in row 1) to Parquet; return the number of data rows.
 
-    Title rows above the header (at most one non-empty cell, 2011 per-precinct workbooks) are
-    skipped, a group-header row is folded into the header as in ``strip_preamble``, and a unit row
+    Title rows above the header (empty, or text in the first column only; 2011 per-precinct
+    workbooks) are skipped, a group-header row is folded into the header as in ``strip_preamble``
+    (also one naming a single list: first cell empty, one label further right), and a unit row
     below the header (2005: ``'liczba'`` / ``'%'``) is folded into it with ``fold_unit_row``.
     """
-    filled = [sum(1 for cell in row if cell.strip()) for row in table[:5]]
-    start = next((i for i, n in enumerate(filled) if n > 1), 0)  # single-column sheets keep row 1
+    is_title = [not any(cell.strip() for cell in row[1:]) for row in table[:5]]
+    start = next((i for i, title in enumerate(is_title) if not title), 0)  # single-column sheets keep row 1
     header = table[start]
     if start > 0 and not header[0].strip() and start + 1 < len(table):
         group, header = table[start], table[start + 1]
