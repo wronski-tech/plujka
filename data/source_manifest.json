@@ -153,6 +153,13 @@
   "sha256": "c4f3b097859154c831fdb4b78dfbd05a195603cffb9befc3f3183975ab2cfc88",
   "url": "https://danewyborcze.kbw.gov.pl/dane/1997/sejm/kandsejm1997pop.xls"
  },
+ "1997/sejm/listy-kandydaci.zip": {
+  "bytes": 104009,
+  "etag": "\"61e6a4c9-19649\"",
+  "last_modified": "Tue, 18 Jan 2022 11:30:17 GMT",
+  "sha256": "6928beef8ce59f50c46aad27ff4c2c6b55801287cb9db57e664aff6e1f38143e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/sejm/listy-kandydaci.zip"
+ },
  "1997/sejm/sejm1997obw.xls": {
   "bytes": 8088064,
   "etag": "\"58de225f-7b6a00\"",
