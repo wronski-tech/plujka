@@ -57,7 +57,9 @@ INTENT_TEXT = {
 # mart finds nothing for such a question, the router returns that instead of a Sejm template answer.
 _MART_ONLY_ELECTION_RE = re.compile(
     r"prezydent|referend|sejmik|samorz[aą]d|w[oó]jt|burmistrz|europarlament|parlament\w* europejsk|"
-    r"europos[lł]|senat|radn|rad[ayz]i? (gmin|powiat|miasta|dzielnic)",
+    r"europos[lł]|senat|radn|rad[ayz]i? (gmin|powiat|miasta|dzielnic)|"
+    # GUS statistics (population, unemployment, salaries): the Sejm templates cannot answer them either.
+    r"\bgus\b|ludno[sś][cć]|mieszka[nń]c|bezrob|wynagrodz|zarob|pensj|g[eę]sto[sś][cć]|zaludn|wiejsk",
     re.IGNORECASE,
 )
 

@@ -12,14 +12,14 @@ small, documented schema, and guards keep that SQL read-only and inside `mart` (
 
 | Election (`mart.elections.election`) | Years | Detail |
 | ------------------------------------ | ----- | ------ |
-| `sejm` | 2001, 2005, 2007, 2011, 2015, 2019, 2023 | precinct: lists, candidates, protocols (2001, 2005: no per-precinct candidate votes) |
-| `senat` | 2001, 2005, 2007, 2011, 2015, 2019, 2023 | precinct: candidates, protocols (2005: candidates with totals only, results published per powiat) |
-| `prezydent` (both rounds; 2000 one round) | 2000, 2005, 2010, 2015, 2020, 2025 | precinct: candidates, protocols |
+| `sejm` | 1991, 1993, 1997, 2001, 2005, 2007, 2011, 2015, 2019, 2023 | precinct: lists, candidates, protocols (1991–2005: no per-precinct candidate votes; 1991–1997: 69 national-list seats as district 0, pre-1999 geography) |
+| `senat` | 1991, 1993, 1997, 2001, 2005, 2007, 2011, 2015, 2019, 2023 | precinct: candidates, protocols (1991: candidates only; 1991–1997: 49 voivodeship districts; 2005: candidates with totals only, results published per powiat) |
+| `prezydent` (both rounds; 2000 one round) | 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025 | precinct: candidates, protocols |
 | `pe` (European Parliament) | 2004, 2009, 2014, 2019, 2024 | precinct: lists, candidates, protocols (2004, 2009: gmina rows, no candidate votes below district) |
-| `referendum` | 2003, 2015, 2023 | precinct: answers per question |
-| `sejmik` (voivodeship assembly) | 2002, 2006, 2010, 2014, 2018, 2024 | gmina: list votes, protocols; candidates with totals |
+| `referendum` | 1996 (5 questions, two ballots), 1997, 2003, 2015, 2023 | precinct: answers per question |
+| `sejmik` (voivodeship assembly) | 1998, 2002, 2006, 2010, 2014, 2018, 2024 | gmina: list votes, protocols; candidates with totals |
 | `wbp` (wójt / burmistrz / prezydent miasta, both rounds) | 2002, 2006, 2010, 2014, 2018, 2024 | gmina: candidates, protocols |
-| `rada` (councils: rada gminy / miasta, rada powiatu, rady dzielnic Warszawy) | 2002, 2006, 2010, 2014, 2018, 2024 | district: candidates with totals, lists (2006: list blocs), seats |
+| `rada` (councils: rada gminy / miasta, rada powiatu, rady dzielnic Warszawy; 1998: Rada m.st. Warszawy and the Warszawa-Centrum districts) | 1998, 2002, 2006, 2010, 2014, 2018, 2024 | district: candidates with totals, lists (2006: list blocs), seats |
 
 Councils are loaded at district level only (no per-precinct council results); list totals are the
 sum of their candidates' votes (see [Known gaps](#known-gaps-in-the-source-data)).
@@ -31,20 +31,42 @@ The build output matches the official results. Examples (from the built mart):
 | Check | Result |
 | ----- | ------ |
 | Sejm: PiS votes / seats | 2011: 4,295,016 / 157 · 2015: 5,711,687 / 235 · 2019: 8,051,935 / 235 · 2023: 7,640,854 / 194 |
+| Sejm 1991 / 1993 / 1997 | 1991: UD 1,382,051 / 62, SLD 60, WAK 49, PSL 48, KPN 46, POC 44, KLD 37, PL 28, Solidarność 27, PPPP 16, MN 7; turnout 43.20% · 1993: SLD 2,815,169 / 171, PSL 132, UD 74, UP 41, KPN 22, BBWR 16, MN 4; 52.08% (mart 52.13%, see gaps) · 1997: AWS 4,427,373 / 201, SLD 164, UW 60, PSL 27, ROP 6, MN 2; 47.93% |
+| Senate seats 1991–1997 | 1991: UD 21, Solidarność 11, WAK 9, POC 9, PSL 7, KLD 6, PL 5, KPN 4, SLD 4 · 1993: SLD 37, PSL 36, Solidarność 9, UD 4 · 1997: AWS 51, SLD 28, UW 8, ROP 5, PSL 3 |
 | Sejm 2001 | SLD-UP 5,342,519 (41.04%, 216), PO 65, Samoobrona 53, PiS 44, PSL 42, LPR 38, MN 2; AWSP 5.60% and UW 3.10% below the threshold; turnout 46.29% |
 | Sejm 2005 / 2007 | 2005: PiS 3,185,714 (26.99%, 155), PO 133, Samoobrona 56, SLD 55, LPR 34, PSL 25, MN 2 · 2007: PO 6,701,010 (41.51%, 209), PiS 166, LiD 53, PSL 31, MN 1 |
 | Sejm 2011 | PO 5,629,773 (39.18%, 207), RP 40, PSL 28, SLD 27, MN 1 |
 | Sejm turnout | 2005: 40.57% · 2007: 53.88% · 2011: 48.92% · 2015: 50.92% · 2019: 61.74% · 2023: 74.38% |
 | Senate seats | 2001: SLD-UP 75, Blok Senat 2001 15, PSL 4, LPR 2, Samoobrona 2, voters' committees 2 · 2005: PiS 49, PO 34, LPR 7, Samoobrona 3, PSL 2, voters' committees 5 · 2007: PO 60, PiS 39, Cimoszewicz 1 · 2011: PO 63, PiS 31, PSL 2, independents 4 · 2015: PiS 61, PO 34 · 2019: PiS 48, KO 43 |
 | President | 2000: Kwaśniewski 53.90%, elected in round 1, turnout 61.12% |
+| President 1990 / 1995 | 1990: round 1 Wałęsa 6,569,889, Tymiński 3,797,605, Mazowiecki 2,973,264; round 2 Wałęsa 10,622,696, Tymiński 3,683,098 · 1995: round 1 Kwaśniewski 6,275,670, Wałęsa 5,917,328; round 2 Kwaśniewski 9,704,439, Wałęsa 9,058,176 |
 | President, round 2 | 2005: Kaczyński 54.04% · 2010: Komorowski 53.01% · 2015: Duda 51.55% · 2020: Duda 51.03% (turnout 68.18%) · 2025: Nawrocki 50.89% (turnout 71.63%) |
 | European Parliament | 2004: PO 24.10% / 15, LPR 15.92% / 10, 54 seats, turnout 20.87% · 2009: PO 44.43% / 25, PiS 27.40% / 15, 50 seats, turnout 24.53% · 2014: PO 32.13% / 19, PiS 31.78% / 19, 51 seats · 2019: PiS 45.38% / 27 seats, KE 38.47% / 22 · 2024: KO 37.06% / 21, PiS 36.16% / 20 |
-| Referendum | 2003 (EU accession): "yes" 77.45%, turnout 58.85% · 2015: JOW "yes" 78.75%, turnout 7.80% · 2023: "no" 94.61–96.79%, turnout 40.91% |
+| Referendum | 1996: question 1 (uwłaszczenie) turnout 32.40%, yes 8,580,129 · 1997 (constitution): yes 6,396,641, no 5,570,493 · 2003 (EU accession): "yes" 77.45%, turnout 58.85% · 2015: JOW "yes" 78.75%, turnout 7.80% · 2023: "no" 94.61–96.79%, turnout 40.91% |
 | Sejmiki | 2018: PiS 34.13% / 254, KO 26.97% / 194, PSL 70 · 2024: PiS 34.27% / 239, KO 30.59% / 210, TD 80 (552 seats each) |
+| Sejmiki 1998 | AWS 342, SLD 329, PS (PSL-UP-KPEiR) 89, UW 76, MN 13 (855 seats in 127 districts), turnout 45.35% |
 | Sejmiki 2002 / 2006 | 2002: SLD-UP 189, Samoobrona 101, LPR 92, POPiS 79, PSL 58, PiS 10, MN 7 (561 seats), turnout 44.23% · 2006: PO 186, PiS 170, PSL 83, LiD 66, Samoobrona 37, LPR 11, MN 7 (561 seats), turnout 45.91% |
 | Sejmiki 2010 / 2014 | 2010: PO 222, PiS 141, PSL 93, SLD 85 (561 seats), turnout 47.26% · 2014: PO 179, PiS 171, PSL 157, SLD 28, MN 7 (555 seats), turnout 47.21% |
 | Mayors | 2002: 2,478 gminas, 1,202 run-offs · 2006: 2,477 gminas, 843 run-offs (827 + 16 on 10 December) · 2010: 2,479 gminas, 738 run-offs (728 on 5 December + 10 on 19 December) · 2014: 2,477 gminas, 890 run-offs · 2018: 2,477 gminas, 649 run-offs · 2024: 2,477 gminas, 748 run-offs |
 | Councils, seats | 2002: ≤20k 32,205, >20k 5,629, cities incl. Warsaw 1,745, powiat 6,294, Warsaw districts 399 · 2006: ≤20k 32,265, >20k 5,566, cities 1,707, powiat 6,284, Warsaw districts 407 · 2010: ≤20k 32,280, >20k 5,568, cities 1,701, powiat 6,290, Warsaw districts 409 · 2014: gmina 37,842 + cities 1,694, powiat 6,276, Warsaw districts 423 · 2018: ≤20k 32,175, >20k 7,351, powiat 6,244, Warsaw districts 425 · 2024: ≤20k 32,370, >20k 7,046, powiat 6,170, Warsaw districts 420 |
+
+### GUS context statistics (`gus` family)
+
+Not an election. `scripts/fetch_gus_bdl.py` downloads official GUS statistics from the Local Data
+Bank (BDL) API into `data/gus/bdl_values.parquet` (committed, 1.7 MB) and `data/gus/bdl_variables.csv`;
+`build_gus.py` loads them per year 1995–2024 into `mart.gus_units` (unit name, voivodeship, powiat,
+`gmina_type` from the 7th TERYT digit: miejska / wiejska / miejsko-wiejska / dzielnica Warszawy) and
+`mart.gus_indicators` (long format: population, urban/rural population, area in ha, density,
+registered unemployed and their share of the working-age population, the unemployment rate and the
+average gross salary at powiat level and above); `v_gus_units` is the wide form. Units join elections
+by TERYT or by `unit_key` (as in `v_party_results`); statistics refer to 31 December, so compare an
+election with the closest GUS year (October 2023 → 2023, June 2025 → 2024). The family writes no
+`mart.elections` rows and is built after the election families (its TERYT check reads their tables).
+Checks: unique keys; every TERYT appears in the election tables or `build_gus.NOT_IN_ELECTIONS`; gminas
+add up to their powiat, powiats to their voivodeship, voivodeships to Poland and Warsaw's districts to
+the city; urban + rural = population. GUS words in a question add the GUS relations to the prompt but
+do not narrow it (`dynamic_sql.ADD_ONLY_PREFIXES`), and such questions never fall back to the Sejm
+templates.
 
 ## Data model
 
@@ -62,6 +84,7 @@ protocol table. Sejm and Senate share `precincts`.
 | Mayors | `wbp_gmina_protocols` (office, per round), `wbp_candidates` (votes, `votes_against` for single candidates, `age`) |
 | Councils | `rada_committees`, `rada_districts` (`council_level` gmina/powiat/dzielnica, `voting_system`, seats, valid votes), `rada_district_lists`, `rada_candidates` (`age`) |
 | Shared | `elections`, `persons`, `entity_lexicon` |
+| GUS statistics (not elections) | `gus_units`, `gus_indicators` |
 
 Committees carry `aliases` (`{PiS,Zjednoczona Prawica}`, `{KO,PO,Platforma Obywatelska}`), assigned
 by `COMMITTEE_ALIASES` in `build_common.py` (first matching needle wins; needles are specific, e.g.
@@ -89,7 +112,8 @@ count only in `country`.
 | `v_party_results` | party families across Sejm, EP and sejmik per level (`unit_key` joins elections) |
 | `v_party_change` | change against the previous election of the same kind, with a `comparable` flag |
 | `v_gmina_continuity` | which gmina TERYT codes appear in which elections |
-| `v_person_history` | every candidacy of a person |
+| `v_person_history` | every candidacy of a person (materialized, indexed by `person_id` and by `full_name` trigrams) |
+| `v_gus_units` | GUS statistics per unit and year in wide form: population, urban share, area, density, unemployment, salary |
 | `v_seat_methods` | Sejm and sejmik seats per committee under D'Hondt, Sainte-Laguë and modified Sainte-Laguë, with the official thresholds |
 | `party_families` (table) | lead alias → party family, with a Polish note on the lineage |
 
@@ -212,7 +236,7 @@ with `TABLES`, `FAMILY`, `available(sources)` and `build_<family>(con, sources) 
 - **PKW "dane w arkuszach" bundles** (`data/pkw_all/sejmsenat<year>/zip`): read first, per dataset.
   KBW's 2023 Senate per-precinct candidate file has empty vote columns; the PKW copy has the votes.
 
-The staged Parquet is committed (`data/kbw_stage_parquet` about 185 MB, `data/pkw_stage_parquet` about 40 MB; CI builds the mart from it); the raw
+The staged Parquet is committed (`data/kbw_stage_parquet` about 230 MB, `data/pkw_stage_parquet` about 40 MB, `data/gus` 2 MB; CI builds the mart from it); the raw
 mirror is not.
 
 ### Consistency checks
@@ -223,24 +247,68 @@ A family-year is not loaded if any check fails. Among them:
 - every precinct in a result file exists in the precinct register or protocol file;
 - every result column maps to exactly one registered candidate or committee;
 - precinct (or gmina) votes add up to the official candidate, list, district and territorial totals;
-- president: precinct sums match the official per-gmina file; referendum: answers match territorial
-  totals and yes + no = valid votes;
+- president: precinct sums match the official per-gmina file (1990, 1995, 2000: also PKW's
+  announced national figures); referendum: answers match territorial totals and yes + no = valid votes;
+- president 2000: every Warszawa-Centrum precinct is matched to the 2001 precinct with the same number
+  and address (`build_prezydent.CentrumMatchError` otherwise), so no row keeps code 143104;
 - mayors: candidate votes add up to valid votes; with a single candidate, votes for + against do;
   no gmina has two elected mayors; round 2 only where round 1 took place;
 - seats (`derived.check_seat_allocation`, after every load): official seats of every Sejm district
   (lists in seat allocation), sejmik district and contested proportional council district (councils
   with unknown list totals skipped) are recomputed with `mart.allocate_seats`: D'Hondt
   (`SEAT_METHODS`: modified Sainte-Laguë for Sejm 2001) among lists with 5% of the voivodeship's /
-  council's valid votes (2002: no threshold in gmina councils outside cities with powiat rights and
-  in Warsaw district councils) and 2006 list blocs (`list_group`) with 15% (sejmik) / 10% (councils);
-  inside a bloc Sainte-Laguë among its lists that passed 5%. A difference is allowed only for an
+  council's valid votes (1998 and 2002: no threshold in gmina councils outside cities with powiat
+  rights and in Warsaw district councils; 1998 also none in Rada m.st. Warszawy) and 2006 list blocs (`list_group`) with 15% (sejmik) / 10% (councils);
+  inside a bloc Sainte-Laguë among its lists that passed 5%. Sejm 1993/1997: D'Hondt in districts
+  among committees with 5% (coalitions 8%, minorities exempt) nationally, and for the 69 national-list
+  seats (district 0, its own contender set) among committees with 7%; Sejm 1991: Hare-Niemeyer in
+  districts without a threshold, list blocs (`sejm_district_lists.list_group`) first as one contender
+  and then split by Hare-Niemeyer, and modified Sainte-Laguë for the national list (5% or seats in
+  five linked districts, or a minority list). European Parliament: D'Hondt over the
+  national votes of committees with 5% of the country's valid votes, then each committee's seats
+  split between its district lists by largest remainders (`hare_niemeyer`). A difference is allowed only for an
   exact tie in list votes for the last seat, which the Electoral Code decides by data not loaded
-  (precincts won); these districts are logged (five so far).
+  (precincts won); these districts are logged (seven so far).
 
 ### Known gaps in the source data
 
 These are properties of the official files, not build errors. Each check names its exception.
 
+- **Sejm and Senate 1991–1997.** Sejm 1991: PKW announced 22,341 precinct commissions, KBW's files
+  have 22,340 (all votes reconcile). Sejm and Senate 1993: KBW's files give 21,807 fewer eligible
+  voters than PKW (district 21 Kraków −9,000, district 32 Piła −12,807), votes are equal, so turnout
+  from the mart is 52.13% (official 52.08%; answers carry a caveat). Sejm 1991: national lists
+  counted only linked district lists, and the linkage is not published; seats on unlinked lists are
+  in `build_sejm.UNLINKED_SEAT_DISTRICTS_1991`. List blocs split their seats by unpublished
+  declarations: the seat check compares the 1991 national blocs and the KPN blocs in districts 21,
+  33, 34, 36 and 37 by bloc total only. Senate 1991: candidates with totals only, no precinct
+  results. Senate 1993: skierniewickie (38) has candidate votes per precinct but no protocol
+  columns, so its precinct protocols are NULL (its ballots exist per gmina only); zielonogórskie (49)
+  is published twice and the register-only copy is checked against the results file. The 1991 Sejm
+  file mostly gives only the first given name, so some 1991 candidates (e.g. "Donald TUSK") are not
+  linked to their later candidacies under the full name. `v_seat_methods` covers the Sejm from 2001
+  (single-tier allocation). PKW computed turnout of all six elections from votes cast.
+- **GUS statistics.** No unemployment rate below powiat level; no unemployment figures for Warsaw's
+  districts (only the city; BDL's zeros are dropped, `build_gus.NOT_PUBLISHED_FOR_DISTRICTS`); no
+  district area or density in 2006–2007; Jastrzębie-Zdrój salary withheld in 2022–2023. Before 2002
+  Warsaw is powiat 1431 with gminas 1431xx, while the 2000/2001 elections use the districts 1465xx.
+  The town and rural parts of urban-rural gminas are not loaded.
+- **Local elections 1998.** No mayors (elected by councils then). The KBW sejmik files exceed PKW's
+  announcement (Dz.U. 1998 nr 131 poz. 861) by 1,608 eligible voters, 1,402 valid ballots, 1,382
+  valid votes and 20 invalid ballots; seats are unaffected and the cause is not in the published
+  files. Ballots issued are not published (NULL); turnout is valid ballots / eligible, PKW's basis.
+  Seats per committee are not in PKW's announcement; the sejmik seats match the voivodeship results
+  (AWS 342, SLD 329, …). KBW marks 1,651 small-gmina districts uncontested (PKW: 1,647) and has 4
+  more candidates and 40 fewer lists there than PKW; the difference cannot be located. Śniadowo
+  district 12 had no list (1 seat added), nobody voted in Margonin district 14 (seat empty),
+  Sochaczew district 5 lacks 77 votes of a list missing from the file. A committee's lists in
+  proportional councils share one number (art. 109, 141 of the 1998 act), so spelling variants with
+  a shared number are one committee (`build_rady._uniform_committees_1998`, named exceptions
+  `SEPARATE_LIST_NUMBERS` / `UNIFORM_LIST_NUMBERS`); variants above the highest shared number may
+  remain separate. Warsaw: Rada m.st. Warszawy (KBW code 149900) is loaded as 146501, the seven
+  Warszawa-Centrum district councils as their later districts (`build_rady.WARSAW_COUNCILS_1998`),
+  the other Warsaw gmina councils keep their 1431xx codes; in the sejmik data Warszawa-Centrum is
+  gmina 143104 (powiat 1431) and the other Warsaw gminas carry their later district codes.
 - **Local elections 2002/2006.** No district register: seats are the elected candidates, checked
   against PKW's national counts. 2002 eligible voters in the KBW files are 29,572,213 for sejmiki
   (PKW: 29,572,225 in the announcement, 29,572,221 on its web pages) and for mayors round 1 (PKW web:
@@ -255,8 +323,22 @@ These are properties of the official files, not build errors. Each check names i
   2002 (e.g. Wschowa 080411 → 081203, Lesko 180104 → 182103), Wałbrzych is 026301, ships
   229997/329997. Warsaw (powiat 1431 until 2002) is mapped to its districts 1465xx
   (`build_precincts.WARSAW_GMINAS_2001`; 2001 splits Warszawa-Centrum by a letter), except president
-  2000, where Warszawa-Centrum (143104, seven of today's districts) is not split. Wesoła was a gmina
-  of powiat miński (141203).
+  2000, where the 451 Warszawa-Centrum precincts are assigned to districts through the 2001 precinct
+  with the same number and address (one reviewed by hand, `build_prezydent.CENTRUM_2000_REVIEWED`).
+  Wesoła was a gmina of powiat miński (141203).
+- **Before 1999** (Sejm and Senate 1991/1993/1997, president 1990/1995, referendums 1996/1997): 49 voivodeships and no powiats; no
+  official key maps their gmina codes to TERYT. Rows keep `teryt_gmina` / `powiat` NULL, the 5-digit
+  code in `teryt_gmina_pre1999` and the historical voivodeship in `wojewodztwo`
+  (`build_precincts.VOIVODESHIPS_1975`); 1990 uses KBW's gminas in the 1993 division. Result and
+  turnout views have only country rows for these years, because old voivodeship names (łódzkie,
+  lubelskie, …) covered other territory than today's. The 1990/1995 presidential and 1996 referendum
+  files publish no ballots issued; turnout is valid ballots / eligible, PKW's basis. Referendum 1996
+  had two ballot papers (question 1, questions 2–5) with their own ballots and turnout, in
+  `referendum_precinct_answers.valid_ballots`; `v_turnout` has no 1996 row. Referendum 1997 omits the
+  3 precincts annulled by the Supreme Court, as does PKW's corrected result; Żuromin precinct 8 has NO
+  published as 13101, corrected to 11 (`build_referendum.CORRECTIONS_PRE1999`), which reproduces PKW's
+  national total. 1990: two empty ship precincts are dropped and two hospital precincts did not vote
+  in round 2 (named in `build_prezydent`).
 - **Sejm 2001** publishes no per-precinct candidate votes (no 2001 rows in
   `sejm_precinct_candidate_votes`); candidate totals are checked against list totals. Seats were
   allocated by modified Sainte-Laguë (`derived.SEAT_METHODS`).
@@ -433,7 +515,8 @@ would answer it from Sejm data.
    `dynamic_sql.FAMILY_KEYWORDS` maps words naming an election kind ("prezydenckie", "sejmik",
    "radnych", "europejskiego", ...) to relation prefixes; the prompt then describes those relations
    plus `SHARED_RELATIONS` (elections, persons, cross-election views). A question that names no
-   kind gets the whole schema. `params._dynamic_sql_meta` reports `schema_relations` and
+   kind gets every relation, base tables in compact form (table comment and column names, no column
+   comments; `schema_description(compact=True)`), views in full: about 31k instead of 46k characters. `params._dynamic_sql_meta` reports `schema_relations` and
    `prompt_chars`. When adding a relation group, add its prefix to `FAMILY_KEYWORDS`.
 5. **Validation** (`mart/safe_sql.py`). sqlglot parses the query. Only one SELECT (CTEs and UNION
    allowed) over mart relations is accepted. DML, DDL, `SET`, `SELECT INTO`, `pg_*` functions and

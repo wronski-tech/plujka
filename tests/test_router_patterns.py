@@ -43,6 +43,13 @@ class TestMartOnlyElections(unittest.TestCase):
         self.assertEqual((response["intent"], response["result"]), ("dynamic_sql", rows))
         dyn.assert_called_once()
 
+    def test_gus_question_without_rows_skips_sejm_templates(self) -> None:
+        empty = ([], "SELECT 1 WHERE false", None, {"status": "first_pass"})
+        with patch.object(router, "try_dynamic_query", return_value=empty), \
+                patch.object(router, "_route_templates", side_effect=AssertionError("template routing used")):
+            response = router.route_question("Bezrobocie a wynik PiS w powiatach w 2023")
+        self.assertEqual(response["intent"], "dynamic_sql")
+
 
 class TestTemplateFallback(unittest.TestCase):
     SKIPPED = ([], None, "OPENAI_API_KEY is not set", {"status": "skipped"})

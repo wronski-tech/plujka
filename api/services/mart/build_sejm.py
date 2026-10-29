@@ -11,6 +11,9 @@ Three source layouts are supported:
 - 2001/2005/2007 layout: one precinct file with list votes, the candidate register with official votes,
   the district table and, in 2007 only, one candidate file per district and list (see
   ``_build_2005_layout``). 2001 and 2005 have no per-precinct candidate results.
+- 1991/1993/1997 layout: one precinct file with list votes, the candidate register with official votes
+  and seat type (district or national list), the district table and, in 1991, the list table with
+  list blocs. 69 seats came from national lists (district 0, see ``_build_1990s_layout``).
 
 All produce the same DuckDB tables, named like the PostgreSQL mart tables (``precincts`` keeps an
 extra ``pkey`` column used to join the per-precinct files).
@@ -51,6 +54,7 @@ from api.services.mart.build_precincts import (
     COMBINED_PRECINCTS,
     PRECINCT_TYPES_2001,
     PRECINCT_TYPES_2005,
+    create_voivodeships_1975,
     create_warsaw_districts,
     create_warsaw_gminas_2001,
     rows_without_number,
@@ -110,8 +114,69 @@ AREA_TYPES_2011 = {
 }
 
 
+# 1991-1997 sources per year: precinct results with list votes, candidates (with official votes, seat type
+# and national-list position), district results and, in 1991, the district lists with their blocs.
+SOURCES_1990S = {
+    1991: {"results": "**/sejm/1991-listy-obwody.parquet", "candidates": "**/sejm/kandsejm1991kom.parquet",
+           "districts": "**/sejm/okreg1991sejm.parquet", "lists": "**/sejm/sejm1991/listyokr1991__*.parquet"},
+    1993: {"results": "**/sejm/1993-listy-obw/*.parquet", "candidates": "**/sejm/kandsejm1993kom.parquet",
+           "districts": "**/sejm/okregi1993.parquet"},
+    1997: {"results": "**/sejm/sejm1997obw.parquet", "candidates": "**/sejm/kandsejm1997pop.parquet",
+           "districts": "**/sejm/sejm1997okregi.parquet"},
+}
+# Sejm districts per year where not 41: 1991 37, 1993/1997 52, each plus district 0 (national list).
+SEJM_DISTRICTS = {1991: 38, 1993: 53, 1997: 53}
+# Seats elected from national lists (lista ogólnopolska) 1991-1997; stored as district 0.
+NATIONAL_LIST_SEATS = 69
+# National figures and national-list seats per list number from PKW's announcements: M.P. 1991 nr 41
+# poz. 288, M.P. 1993 nr 50 poz. 470, M.P. 1997 nr 64 poz. 620 ("głosy oddane" = valid + invalid votes).
+# Known gaps between the KBW files and the announcements, named in the checks:
+# - 1991: the announcement counts 22,341 precinct commissions; every KBW file (precincts, gminas,
+#   districts) has 22,340 precincts, and all their votes add up to the announced figures.
+# - 1993: KBW's precinct and district files give 9,000 fewer eligible voters in district 21 (Kraków:
+#   900,774, announced 909,774) and 12,807 fewer in district 32 (Piła: 337,497, announced 350,304); the
+#   announced district turnouts (52.41%, 56.74%) confirm the announced figures. Votes are equal.
+OFFICIAL_1990S = {
+    1991: {"precincts": 22341, "precincts_without_results": 1, "eligible_voters": 27517280, "votes_cast": 11887949,
+           "invalid_votes": 669347, "valid_votes": 11218602,
+           "national_list_seats": {2: 7, 12: 7, 13: 5, 17: 7, 30: 4, 32: 6, 54: 11, 60: 10, 63: 3, 20: 1, 41: 8}},
+    1993: {"precincts": 22482, "eligible_voters": 27677302, "eligible_voters_missing": {21: 9000, 32: 12807},
+           "votes_cast": 14415586, "invalid_votes": 619359, "valid_votes": 13796227,
+           "national_list_seats": {5: 26, 6: 20, 9: 14, 11: 9}},
+    1997: {"precincts": 23074, "eligible_voters": 28409054, "votes_cast": 13616378, "invalid_votes": 528147,
+           "valid_votes": 13088231, "national_list_seats": {4: 11, 5: 29, 6: 23, 7: 6}},
+}
+# Coalition committees (8% national threshold, art. 3 ust. 2 of the 1993 electoral law; 1991 had no
+# threshold): SLD, named as a coalition in the 1993 and 1997 announcements, and the Catholic Electoral
+# Committee "Ojczyzna" (1993 list 2), which won 6.37% and no seat, which only a coalition could.
+COALITION_LISTS_1990S = {1993: {2, 5}, 1997: {6}}
+# National-minority lists exempt from the threshold, as (list number, district or None for all districts),
+# from the announcements: 1991 the minority national lists (art. 100 ust. 4 of the 1991 law), 1993 and
+# 1997 the district lists exempt from the 5% threshold (art. 5 of the 1993 law). The Olsztyn German minority
+# list of 1993 (list 25, district 29) did not claim the exemption and is not one.
+MINORITY_LISTS_1990S = {
+    1991: {(20, None), (48, None), (55, None)},
+    1993: {(16, None), (25, 4), (25, 9), (25, 16), (25, 30)},
+    1997: {(14, None), (15, 4), (15, 9), (15, 10), (15, 16), (15, 29), (15, 30)},
+}
+# 1991 national lists joined in blocs (art. 77 ust. 3 of the 1991 law), from the announcement; the bloc is
+# stored as list_group (its first list number) on the national-list rows. District blocs are in the data.
+NATIONAL_BLOCS_1991 = ((20, 48), (41, 49, 58, 62))
+# 1991: national lists counted only the district lists linked to them (art. 100 ust. 2 of the 1991 law), and
+# the linkage is not in the data files. Districts where a committee won a seat with a list not linked to its
+# national list, from the announcement's table (columns 3 and 4): Christian Democracy (list 7) won seats in
+# 5 districts but only 4 linked ones, so its national list did not qualify. National vote shares use all
+# district lists (the linked sums are 0-4% lower, which changes neither qualification nor seats).
+UNLINKED_SEAT_DISTRICTS_1991 = {7: 1, 12: 2, 13: 1, 17: 1, 63: 1}
+# 1991 precincts abroad: Warszawa-Śródmieście (01009) precincts numbered from 1001; the file has no
+# precinct type.
+ABROAD_1991 = ("01009", 1001)
+
+
 def available_layout(sources: YearSources) -> str | None:
-    """'csv', 'excel', '2011', '2005' or None when the year has no staged Sejm precinct results."""
+    """'csv', 'excel', '2011', '2005', '1990s' or None when the year has no staged Sejm precinct results."""
+    if sources.year in SOURCES_1990S:
+        return "1990s" if sources.has(SOURCES_1990S[sources.year]["results"]) else None
     if sources.has(CSV_LIST_RESULTS):
         return "csv"
     if sources.has(EXCEL_DISTRICT_RESULTS):
@@ -138,8 +203,15 @@ def build_sejm(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
         _build_excel_layout(con, sources)
     elif layout == "2011":
         _build_2011_layout(con, sources)
+    elif layout == "1990s":
+        _build_1990s_layout(con, sources)
     else:
         _build_2005_layout(con, sources)
+    # Columns that only the 1991-1997 layout fills (pre-1999 gmina code, list blocs, national lists).
+    con.execute("ALTER TABLE precincts ADD COLUMN IF NOT EXISTS teryt_gmina_pre1999 VARCHAR")
+    con.execute("ALTER TABLE sejm_district_lists ADD COLUMN IF NOT EXISTS list_group INT")
+    con.execute("ALTER TABLE sejm_candidates ADD COLUMN IF NOT EXISTS national_list_position INT")
+    con.execute("ALTER TABLE sejm_candidates ADD COLUMN IF NOT EXISTS national_list_seat BOOLEAN DEFAULT false")
     con.execute(
         """
         CREATE OR REPLACE TABLE sejm_combined_candidate_votes AS
@@ -150,8 +222,9 @@ def build_sejm(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
         GROUP BY ALL
         """
     )
-    # 2001 and 2005 publish no per-precinct candidate results.
-    _check(con, sources.year, candidate_precincts=not (sources.has(LIST_RESULTS_2005) or sources.has(LIST_RESULTS_2001)))
+    # 2001, 2005 and 1991-1997 publish no per-precinct candidate results.
+    _check(con, sources.year, candidate_precincts=not (
+        sources.has(LIST_RESULTS_2005) or sources.has(LIST_RESULTS_2001) or layout == "1990s"))
 
 
 def _protocol_select(con: duckdb.DuckDBPyConnection, table: str) -> str:
@@ -891,6 +964,382 @@ def _build_2005_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> 
     )
 
 
+def _build_1990s_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
+    """1991, 1993 and 1997 KBW workbooks (SOURCES_1990S).
+
+    Precincts use the pre-1999 geography (as president 1990/1995 and the 1996/1997 referendums):
+    teryt_gmina and powiat stay NULL, the 5-digit gmina code goes to teryt_gmina_pre1999 and the
+    1975-1998 voivodeship to wojewodztwo (NULL abroad and on ships). The Senate district of a precinct is
+    its voivodeship ('Nr woj.'). 1993 publishes per precinct only eligible voters, votes cast and valid
+    votes: ballots_issued is NULL and invalid votes are cast minus valid.
+
+    Candidates carry the seat type ('Mandat': O district list, K national list) and their position on
+    their committee's national list ('Nr na liście oglnp.'); every national-list candidate also ran on a
+    district list. The 69 national-list seats are district 0: one sejm_district_lists row per committee
+    with a national list, votes 0 (the national list had no votes of its own; seats went by the
+    committee's district votes nationwide), seats from the K mandates. Thresholds follow the electoral
+    laws: none in 1991 districts; 1993/1997 districts 5% nationally (coalitions 8%, exempt minority lists,
+    COALITION_LISTS_1990S, MINORITY_LISTS_1990S); national lists 7% (1993/1997) or, in 1991, 5% or seats in
+    at least 5 districts or a minority list, with blocs (NATIONAL_BLOCS_1991) counted together. 1991
+    district blocs ('Blok') are list_group; list numbers 66-70 (1991), 25-26 (1993) and 15 (1997) belong to
+    a different local committee in each district, so lists are matched per (district, list number).
+    """
+    year = sources.year
+    spec = SOURCES_1990S[year]
+    results = sources.load("sejm_results", spec["results"])
+    candidates_src = sources.load("sejm_candidates", spec["candidates"])
+    districts_src = sources.load("districts", spec["districts"])
+    create_voivodeships_1975(con)
+
+    # Precinct rows with unified column names; list-vote columns keep their headers.
+    if year == 1991:
+        code, number = '"Kod gminy (cyfry 1-5)"', '"Numer obwodu"'
+        ptype = f"CASE WHEN trim({code}) = {sql_literal(ABROAD_1991[0])} AND int_({number}) >= {ABROAD_1991[1]} THEN 'Z' END"
+        area, issued, invalid = "CAST(NULL AS VARCHAR)", 'int_("Karty wydane")', 'int_("Głosy nieważne")'
+        list_header = r"^(\d+)$"
+    elif year == 1993:
+        code, number, ptype, area = '"Kod gm."', '"Nr obw."', 'trim("Typ")', 'trim("Teren")'
+        issued, invalid = "NULL", 'int_("Odd.") - int_("Ważne")'
+        list_header = r"^Lista nr (\d+)$"
+    else:
+        code, number, ptype, area = '"TERYT gminy"', '"Nr obw."', 'trim("Typ obw.")', "CAST(NULL AS VARCHAR)"
+        issued, invalid = 'int_("Karty wydane")', 'int_("Głosy nieważne")'
+        list_header = r"^(\d+) - "
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE src_sejm_precincts AS
+        SELECT r.*, CAST(int_({column(con, results, "Numer okręgu", "Nr okr.")}) AS INT) AS district_no_,
+               CAST(int_({column(con, results, "Numer województwa", "Nr woj.")}) AS INT) AS voivodeship_no_,
+               trim({code}) AS code_, CAST(int_({number}) AS INT) AS precinct_no_, pkey({code}, {number}) AS pkey,
+               {column(con, results, "Nazwa gminy", "Nazwa gm.", "Gmina")} AS gmina_,
+               {column(con, results, "Adres komisji obwodowej", "Adres")} AS address_,
+               {ptype} AS ptype_, {area} AS area_,
+               int_({column(con, results, "Liczba uprawnionych", "Upr.", "Uprawnieni do głosowania")}) AS eligible_voters,
+               {issued} AS ballots_issued,
+               int_({column(con, results, "Głosy oddane", "Odd.", "Głosy oddane (frekwencja)")}) AS valid_ballots,
+               {invalid} AS invalid_votes,
+               int_({column(con, results, "Głosy ważne", "Ważne")}) AS valid_votes
+        FROM {results} r
+        """
+    )
+    type_cases = " ".join(f"WHEN {sql_literal(c)} THEN {sql_literal(n)}" for c, n in PRECINCT_TYPES_2001.items())
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE precincts AS
+        SELECT {year} AS year,
+               CAST(row_number() OVER (ORDER BY r.code_, r.precinct_no_) AS INT) AS precinct_id,
+               r.pkey,
+               CAST(NULL AS VARCHAR) AS teryt_gmina,
+               CASE r.ptype_ WHEN 'Z' THEN 'zagranica' WHEN 'S' THEN 'statki' ELSE r.gmina_ END AS gmina,
+               CAST(NULL AS VARCHAR) AS powiat,
+               CASE WHEN coalesce(r.ptype_, '') NOT IN ('Z', 'S') THEN v.name END AS wojewodztwo,
+               r.district_no_ AS sejm_district_no,
+               r.voivodeship_no_ AS senat_district_no,
+               r.precinct_no_ AS precinct_no,
+               r.address_ AS address,
+               CASE r.ptype_ {type_cases} END AS precinct_type,
+               CASE r.area_ WHEN 'M' THEN 'miasto' WHEN 'W' THEN 'wieś' END AS area_type,
+               CAST(NULL AS INT) AS residents,
+               true AS in_register,
+               CASE WHEN coalesce(r.ptype_, '') NOT IN ('Z', 'S') THEN r.code_ END AS teryt_gmina_pre1999
+        FROM src_sejm_precincts r LEFT JOIN voivodeships_1975 v ON v.code = left(r.code_, 2)
+        """
+    )
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE sejm_precinct_protocols AS
+        SELECT {year} AS year, p.precinct_id, CAST(r.eligible_voters AS INT) AS eligible_voters,
+               CAST(r.ballots_issued AS INT) AS ballots_issued, CAST(r.valid_ballots AS INT) AS valid_ballots,
+               CAST(r.invalid_votes AS INT) AS invalid_votes, CAST(r.valid_votes AS INT) AS valid_votes
+        FROM src_sejm_precincts r JOIN precincts p USING (pkey)
+        """
+    )
+
+    k_district = column(con, candidates_src, "Nr okr.", "Okręg")
+    k_list = column(con, candidates_src, "Nr listy")
+    k_committee = column(con, candidates_src, "Komitet wyborczy")
+    k_position = column(con, candidates_src, "Nr kand.", "Nr na liście", "Lp")
+    k_mandate = column(con, candidates_src, "Mandat")
+    # 1991 'Umiona' (sic); 1997 publishes the first and the second given name in two columns.
+    if given := column(con, candidates_src, "Imiona", "Umiona", required=False):
+        first_names = f"trim(k.{given})"
+    else:
+        first_names = """concat_ws(' ', NULLIF(trim(k."1. imię"), ''), NULLIF(trim(k."2. Imię"), ''))"""
+    k_votes = column(con, candidates_src, "L. głosów", "L. gł.", "Głosy")
+    k_list_total = column(con, candidates_src, "Gł. na listę", "Głosy na listę")
+    k_district_total = column(con, candidates_src, "Gł. ważne w okręgu", "Gł. w okr.", "Głosy w okręgu")
+    k_support = column(
+        con, candidates_src, "Nazwa partii/organizacji popierającej kandydata", "Nazwa partii.organizacji popierającej kandydata",
+        "Poparcie",
+    )
+    _committee_table(
+        con, year, f"SELECT strip_signature({k_committee}) AS committee_name, min(int_({k_list})) AS min_list FROM {candidates_src} GROUP BY 1"
+    )
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE sejm_candidates AS
+        SELECT {year} AS year,
+               CAST(row_number() OVER (ORDER BY int_(k.{k_district}), int_(k.{k_list}), int_(k.{k_position})) AS INT) AS candidate_id,
+               CAST(int_(k.{k_district}) AS INT) AS district_no,
+               c.committee_id,
+               CAST(int_(k.{k_list}) AS INT) AS list_no,
+               CAST(int_(k.{k_position}) AS INT) AS list_position,
+               {first_names} || ' ' || upper(trim(k."Nazwisko")) AS full_name,
+               upper(trim(k."Nazwisko")) AS last_name,
+               {first_names} AS first_names,
+               gender_(k."Płeć") AS gender,
+               NULLIF(trim(k."Zawód"), '') AS occupation,
+               NULLIF(trim(k.{column(con, candidates_src, "Miejsce zamieszkania", "Miejscowość")}), '') AS residence,
+               CAST(NULL AS VARCHAR) AS residence_teryt,
+               CAST(NULL AS VARCHAR) AS party_membership,
+               NULLIF(trim(k.{k_support}), '') AS party_support,
+               int_(k.{k_votes}) AS votes,
+               CAST(round(100.0 * int_(k.{k_votes}) / NULLIF(int_(k.{k_list_total}), 0), 2) AS DECIMAL(6, 2)) AS pct_of_list,
+               CAST(round(100.0 * int_(k.{k_votes}) / NULLIF(int_(k.{k_district_total}), 0), 2) AS DECIMAL(6, 2)) AS pct_of_district,
+               coalesce(trim(k.{k_mandate}), '') IN ('O', 'K') AS elected,
+               CAST(int_(k."Nr na liście oglnp.") AS INT) AS national_list_position,
+               coalesce(trim(k.{k_mandate}), '') = 'K' AS national_list_seat
+        FROM {candidates_src} k JOIN sejm_committees c ON c.committee_name = strip_signature(k.{k_committee})
+        """
+    )
+    # Coalitions and exempt minority lists from the announcements (a committee with a local list number
+    # ran in one district).
+    coalitions = ", ".join(str(n) for n in COALITION_LISTS_1990S.get(year, ())) or "NULL"
+    minority = " OR ".join(
+        f"(k.list_no = {n}" + (f" AND k.district_no = {d})" if d else ")") for n, d in sorted(MINORITY_LISTS_1990S[year], key=str)
+    )
+    con.execute(
+        f"""
+        UPDATE sejm_committees c SET
+          is_coalition = c.committee_id IN (SELECT committee_id FROM sejm_candidates WHERE list_no IN ({coalitions})),
+          is_minority = c.committee_id IN (SELECT committee_id FROM sejm_candidates k WHERE {minority})
+        """
+    )
+
+    # Official list totals per district: the candidates' 'Gł. na listę'; 1991 also the list table.
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE official_list_votes AS
+        SELECT CAST(int_(k.{k_district}) AS INT) AS district_no, c.committee_id, any_value(int_(k.{k_list_total})) AS votes,
+               count(DISTINCT int_(k.{k_list_total})) AS totals
+        FROM {candidates_src} k JOIN sejm_committees c ON c.committee_name = strip_signature(k.{k_committee})
+        GROUP BY ALL
+        """
+    )
+    total = "(SELECT sum(votes) FROM official_list_votes)"
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE committee_national_votes AS
+        SELECT committee_id, sum(votes) AS votes, 100.0 * sum(votes) / {total} AS pct
+        FROM official_list_votes GROUP BY 1
+        """
+    )
+    if year == 1991:
+        lists_src = sources.load("sejm_lists", spec["lists"])
+        list_group = "CAST(int_(l.\"Blok\") AS INT)"
+        lists_join = f"""LEFT JOIN {lists_src} l ON int_(l."Nr okr.") = c.district_no AND int_(l."Nr listy") = c.list_no"""
+        in_allocation = "true"  # 1991: no threshold in districts
+    else:
+        list_group, lists_join = "CAST(NULL AS INT)", ""
+        in_allocation = "m.is_minority OR n.pct >= CASE WHEN m.is_coalition THEN 8 ELSE 5 END"
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE sejm_district_lists AS
+        WITH cand AS (
+          SELECT district_no, committee_id, any_value(list_no) AS list_no, count(*) AS candidates_count,
+                 count(*) FILTER (WHERE elected AND NOT national_list_seat) AS seats
+          FROM sejm_candidates GROUP BY ALL
+        )
+        SELECT {year} AS year, c.district_no, c.committee_id, c.list_no, CAST(c.candidates_count AS INT) AS candidates_count,
+               CAST(o.votes AS BIGINT) AS votes,
+               CAST(round(100.0 * o.votes / sum(o.votes) OVER (PARTITION BY c.district_no), 2) AS DECIMAL(6, 2)) AS pct_of_district,
+               {in_allocation} AS in_seat_allocation,
+               CAST(c.seats AS INT) AS seats,
+               {list_group} AS list_group
+        FROM cand c
+        JOIN official_list_votes o USING (district_no, committee_id)
+        JOIN sejm_committees m USING (committee_id)
+        JOIN committee_national_votes n USING (committee_id)
+        {lists_join}
+        """
+    )
+    # National lists (district 0): committees with national-list candidates; 1991 blocs as list_group.
+    bloc_of = {n: bloc[0] for bloc in (NATIONAL_BLOCS_1991 if year == 1991 else ()) for n in bloc}
+    bloc_cases = " ".join(f"WHEN {n} THEN {b}" for n, b in bloc_of.items())
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE national_lists AS
+        SELECT k.committee_id, any_value(k.list_no) AS list_no, count(*) FILTER (WHERE k.national_list_position IS NOT NULL) AS candidates_count,
+               count(*) FILTER (WHERE k.national_list_seat) AS seats,
+               {f"CASE any_value(k.list_no) {bloc_cases} END" if bloc_cases else "CAST(NULL AS INT)"} AS list_group
+        FROM sejm_candidates k GROUP BY 1 HAVING count(k.national_list_position) > 0
+        """
+    )
+    if year == 1991:
+        # 5% nationally, or district seats in at least 5 (linked) districts, or a minority list (art. 100 ust. 2
+        # and 4 of the 1991 law); a bloc qualifies together.
+        unlinked = " ".join(f"WHEN {n} THEN {d}" for n, d in UNLINKED_SEAT_DISTRICTS_1991.items())
+        con.execute(
+            f"""
+            CREATE OR REPLACE TABLE national_list_seat_districts AS
+            SELECT k.committee_id, count(DISTINCT k.district_no) - coalesce(CASE any_value(k.list_no) {unlinked} END, 0) AS districts
+            FROM sejm_candidates k WHERE k.elected AND NOT k.national_list_seat GROUP BY 1
+            """
+        )
+        con.execute(
+            """
+            CREATE OR REPLACE TABLE national_list_qualified AS
+            SELECT l.committee_id,
+                   bool_or(m.is_minority) OVER w OR sum(n.pct) OVER w >= 5 OR sum(coalesce(d.districts, 0)) OVER w >= 5 AS qualified
+            FROM national_lists l JOIN sejm_committees m USING (committee_id) JOIN committee_national_votes n USING (committee_id)
+            LEFT JOIN national_list_seat_districts d USING (committee_id)
+            WINDOW w AS (PARTITION BY coalesce(l.list_group, -l.committee_id))
+            """
+        )
+    else:  # 7% of the valid votes nationally (art. 4 of the 1993 law)
+        con.execute(
+            """CREATE OR REPLACE TABLE national_list_qualified AS
+               SELECT committee_id, n.pct >= 7 AS qualified FROM national_lists JOIN committee_national_votes n USING (committee_id)"""
+        )
+    con.execute(
+        f"""
+        INSERT INTO sejm_district_lists
+        SELECT {year}, 0, l.committee_id, l.list_no, CAST(l.candidates_count AS INT), 0, NULL, q.qualified, CAST(l.seats AS INT), l.list_group
+        FROM national_lists l JOIN national_list_qualified q USING (committee_id)
+        """
+    )
+
+    d_number = column(con, districts_src, "Nr", "Nr okr", "column0")
+    d_seats = column(con, districts_src, "L. mand.", "Liczba")
+    d_eligible = column(con, districts_src, "L. upr.", "Uprawnieni")
+    d_description = column(con, districts_src, "Granice (województwo)", "Obszar", "column2")
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE sejm_district_totals AS
+        SELECT CAST(int_(d.{d_number}) AS INT) AS district_no,
+               int_(d.{column(con, districts_src, "L. obw.", "column15")}) AS precincts,
+               int_(d.{d_eligible}) AS eligible_voters,
+               int_(d.{column(con, districts_src, "Gł. odd.", "Głosy oddane")}) AS valid_ballots,
+               int_(d.{column(con, districts_src, "Gł. niew.", "Gł niew.", "Głosy nieważne")}) AS invalid_votes,
+               int_(d.{column(con, districts_src, "Gł. ważne", "Głosy ważne")}) AS valid_votes
+        FROM {districts_src} d WHERE int_(d.{d_number}) IS NOT NULL
+        """
+    )
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE sejm_districts AS
+        SELECT {year} AS year, CAST(int_(d.{d_number}) AS INT) AS district_no,
+               trim(d.{column(con, districts_src, "Siedziba OKW", "column1")}) AS seat_city, w.wojewodztwo,
+               CAST(int_(d.{d_seats}) AS INT) AS seats, CAST(int_(d.{d_eligible}) AS INT) AS eligible_voters,
+               regexp_replace(trim(d.{d_description}), '\\s+', ' ', 'g') AS description
+        FROM {districts_src} d
+        LEFT JOIN {_districts_wojewodztwo(con)} w ON w.sejm_district_no = int_(d.{d_number})
+        WHERE int_(d.{d_number}) IS NOT NULL
+        UNION ALL
+        SELECT {year}, 0, NULL, NULL, {NATIONAL_LIST_SEATS}, NULL, NULL
+        """
+    )
+
+    # List votes: list-number columns, mapped by the precinct's district and the list number.
+    list_columns = {col: int(m[1]) for col in columns_of(con, results) if (m := re.match(list_header, col))}
+    con.execute("CREATE OR REPLACE TABLE sejm_list_columns (header VARCHAR, list_no INT)")
+    con.executemany("INSERT INTO sejm_list_columns VALUES (?, ?)", list(list_columns.items()))
+    cols = ", ".join(quote_ident(c) for c in list_columns)
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE sejm_precinct_list_votes_raw AS
+        SELECT district_no, pkey, header, votes
+        FROM (UNPIVOT (SELECT district_no_ AS district_no, pkey, {cols} FROM src_sejm_precincts)
+              ON {cols} INTO NAME header VALUE votes)
+        """
+    )
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE sejm_precinct_list_votes AS
+        SELECT {year} AS year, p.precinct_id, l.committee_id, CAST(sum(coalesce(int_(r.votes), 0)) AS INT) AS votes
+        FROM sejm_precinct_list_votes_raw r
+        JOIN sejm_list_columns m USING (header)
+        JOIN sejm_district_lists l ON l.district_no = r.district_no AND l.list_no = m.list_no
+        JOIN precincts p USING (pkey)
+        GROUP BY ALL
+        """
+    )
+    # No per-precinct candidate results: empty candidate-vote tables for the shared checks.
+    con.execute("CREATE OR REPLACE TABLE sejm_candidate_columns_unmapped (district_no INT, header VARCHAR, list_no INT, position INT)")
+    build_wide_votes(
+        con, year=year, target="sejm_precinct_candidate_votes", key_name="candidate_id", files=[],
+        teryt_aliases=(), number_aliases=(),
+    )
+
+    official = OFFICIAL_1990S[year]
+    without_results = official.get("precincts_without_results", 0)
+    eligible_missing = official.get("eligible_voters_missing", {})
+    checks = {
+        f"precincts other than in PKW's announcement ({official['precincts']}, of them {without_results} without results)": f"""
+            SELECT abs(count(*) + {without_results} - {official['precincts']}) FROM precincts""",
+        f"eligible voters differ from PKW's announcement (except {sum(eligible_missing.values())} missing in districts {sorted(eligible_missing)})": f"""
+            SELECT abs(sum(eligible_voters) + {sum(eligible_missing.values())} - {official['eligible_voters']}) FROM sejm_precinct_protocols""",
+        "votes cast differ from PKW's announcement": f"SELECT abs(sum(valid_ballots) - {official['votes_cast']}) FROM sejm_precinct_protocols",
+        "invalid votes differ from PKW's announcement": f"SELECT abs(sum(invalid_votes) - {official['invalid_votes']}) FROM sejm_precinct_protocols",
+        "valid votes differ from PKW's announcement": f"SELECT abs(sum(valid_votes) - {official['valid_votes']}) FROM sejm_precinct_protocols",
+        "precincts with votes cast != valid + invalid": """
+            SELECT count(*) FROM sejm_precinct_protocols WHERE valid_ballots <> valid_votes + invalid_votes""",
+        "districts whose precinct protocols differ from the district results": """
+            SELECT count(*) FROM sejm_district_totals d
+            LEFT JOIN (SELECT p.sejm_district_no AS district_no, count(*) AS precincts, sum(r.eligible_voters) AS eligible_voters,
+                              sum(r.valid_ballots) AS valid_ballots, sum(r.invalid_votes) AS invalid_votes, sum(r.valid_votes) AS valid_votes
+                       FROM sejm_precinct_protocols r JOIN precincts p USING (precinct_id) GROUP BY 1) s USING (district_no)
+            WHERE (s.precincts, s.eligible_voters, s.valid_ballots, s.invalid_votes, s.valid_votes)
+                  IS DISTINCT FROM (d.precincts, d.eligible_voters, d.valid_ballots, d.invalid_votes, d.valid_votes)""",
+        "domestic precincts without a 1975-1998 voivodeship": """
+            SELECT count(*) FROM precincts WHERE teryt_gmina_pre1999 IS NOT NULL AND wojewodztwo IS NULL""",
+        "precincts abroad outside Warsaw's Sejm district and voivodeship": """
+            SELECT count(*) FROM precincts WHERE precinct_type = 'zagranica' AND (sejm_district_no <> 1 OR senat_district_no <> 1)""",
+        "candidates of one district list with different list totals": "SELECT count(*) FROM official_list_votes WHERE totals <> 1",
+        "candidates whose district valid votes differ from the district results": f"""
+            SELECT count(*) FROM {candidates_src} k JOIN sejm_district_totals d ON d.district_no = int_(k.{k_district})
+            WHERE int_(k.{k_district_total}) <> d.valid_votes""",
+        "candidates with an unknown seat type": f"""
+            SELECT count(*) FROM {candidates_src} WHERE coalesce(trim({k_mandate}), '') NOT IN ('', 'O', 'K')""",
+        "national-list seats of candidates not on their national list": """
+            SELECT count(*) FROM sejm_candidates WHERE national_list_seat AND national_list_position IS NULL""",
+        "list numbers shared by committees in one district": """
+            SELECT count(*) FROM (SELECT district_no, list_no FROM sejm_district_lists GROUP BY ALL HAVING count(*) > 1)""",
+        "list votes in a column whose list number did not run in the precinct's district": """
+            SELECT count(*) FROM sejm_precinct_list_votes_raw r JOIN sejm_list_columns m USING (header)
+            WHERE coalesce(int_(r.votes), 0) <> 0 AND NOT EXISTS (
+                SELECT 1 FROM sejm_district_lists l WHERE l.district_no = r.district_no AND l.list_no = m.list_no)""",
+        "precincts with votes in two columns of one list number": """
+            SELECT count(*) FROM (SELECT r.pkey, m.list_no FROM sejm_precinct_list_votes_raw r JOIN sejm_list_columns m USING (header)
+                                  WHERE NULLIF(trim(r.votes), '') IS NOT NULL GROUP BY ALL HAVING count(*) > 1)""",
+        "precincts whose list votes differ from their valid votes": """
+            SELECT count(*) FROM sejm_precinct_protocols r
+            LEFT JOIN (SELECT precinct_id, sum(votes) AS votes FROM sejm_precinct_list_votes GROUP BY 1) v USING (precinct_id)
+            WHERE coalesce(v.votes, 0) <> r.valid_votes""",
+        "district lists whose candidates' votes differ from the list total": """
+            SELECT count(*) FROM sejm_district_lists d
+            JOIN (SELECT district_no, committee_id, sum(votes) AS votes FROM sejm_candidates GROUP BY ALL) k USING (district_no, committee_id)
+            WHERE k.votes <> d.votes""",
+        "lists with seats outside the seat allocation (thresholds)": "SELECT count(*) FROM sejm_district_lists WHERE seats > 0 AND NOT in_seat_allocation",
+        "district seats in districts != 391": "SELECT abs(sum(seats) - 391) FROM sejm_districts WHERE district_no > 0",
+        "national-list seats per list differ from PKW's announcement": f"""
+            SELECT count(*) FROM (SELECT list_no, seats FROM sejm_district_lists WHERE district_no = 0 AND seats > 0) l
+            FULL JOIN (VALUES {", ".join(f"({n}, {s})" for n, s in official["national_list_seats"].items())}) o(list_no, seats) USING (list_no)
+            WHERE l.seats IS DISTINCT FROM o.seats""",
+    }
+    if year == 1991:
+        checks |= {
+            "district lists whose votes, seats or candidates differ from the list table": f"""
+                SELECT count(*) FROM sejm_district_lists d
+                FULL JOIN (SELECT int_("Nr okr.") AS district_no, int_("Nr listy") AS list_no, int_("L. glosow") AS votes,
+                                  int_("L. mand.") AS seats, int_("L. kand.") AS candidates_count FROM {lists_src}) l
+                  ON l.district_no = d.district_no AND l.list_no = d.list_no
+                WHERE coalesce(d.district_no, 1) > 0
+                  AND (d.votes, d.seats, d.candidates_count) IS DISTINCT FROM (l.votes, l.seats, l.candidates_count)""",
+        }
+    run_checks(con, year, checks)
+
+
 def _district_lists_from_candidates(con: duckdb.DuckDBPyConnection, year: int) -> None:
     """``sejm_district_lists`` from the candidates and ``official_list_votes`` (layouts without a list
     register): seats are elected candidates, and a committee took part in seat allocation iff it won
@@ -948,14 +1397,18 @@ def _check(con: duckdb.DuckDBPyConnection, year: int, candidate_precincts: bool 
         )
     unpublished_precincts = "(SELECT precinct_id FROM sejm_precinct_protocols WHERE valid_votes IS NULL)"
     unpublished = "(SELECT p.sejm_district_no FROM sejm_precinct_protocols r JOIN precincts p USING (precinct_id) WHERE r.valid_votes IS NULL)"
+    districts = SEJM_DISTRICTS.get(year, 41)
     checks = {
-        "Sejm districts != 41": "SELECT abs(count(*) - 41) FROM sejm_districts",
+        f"Sejm districts != {districts}": f"SELECT abs(count(*) - {districts}) FROM sejm_districts",
         "district lists without an official vote total": "SELECT count(*) FROM sejm_district_lists WHERE votes IS NULL",
         "Sejm seats in districts != 460": "SELECT abs(sum(seats) - 460) FROM sejm_districts",
         "elected Sejm candidates != 460": "SELECT abs(count(*) FILTER (WHERE elected) - 460) FROM sejm_candidates",
+        # 1991-1997: national-list seats (district 0) went to candidates of district lists.
         "districts whose elected candidates differ from their seats": """
             SELECT count(*) FROM sejm_districts d
-            WHERE d.seats <> (SELECT count(*) FILTER (WHERE elected) FROM sejm_candidates k WHERE k.district_no = d.district_no)""",
+            WHERE d.seats <> (SELECT count(*) FROM sejm_candidates k
+                              WHERE k.elected AND CASE WHEN d.district_no = 0 THEN k.national_list_seat
+                                                       ELSE k.district_no = d.district_no AND NOT k.national_list_seat END)""",
         "precincts missing from the precinct register": f"""
             SELECT count(*) FROM precincts WHERE NOT in_register AND precinct_id NOT IN {unpublished_precincts}""",
         "duplicate precinct keys": "SELECT count(*) - count(DISTINCT pkey) FROM precincts",

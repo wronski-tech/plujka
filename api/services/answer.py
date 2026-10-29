@@ -141,6 +141,13 @@ CAVEATS: tuple[tuple[str, Any], ...] = (
         lambda rows, sql: _about(rows, sql, "pe", 2014) and ("turnout_pct" in sql.lower() or bool(_values(rows, "turnout_pct"))),
     ),
     (
+        "Frekwencja w wyborach do Sejmu i Senatu 1993 liczona z bazy jest nieznacznie wyższa od oficjalnej: "
+        "pliki KBW podają w dwóch okręgach mniej uprawnionych niż PKW, a w wyborach do Senatu województwo "
+        "skierniewickie nie ma protokołów obwodowych.",
+        lambda rows, sql: (_about(rows, sql, "sejm", 1993) or _about(rows, sql, "senat", 1993))
+        and ("turnout_pct" in sql.lower() or bool(_values(rows, "turnout_pct"))),
+    ),
+    (
         "Wyniki kandydatów na prezydenta są sumą wyników obwodów; kilka obwodów za granicą nie opublikowało "
         "wyników, więc sumy krajowe mogą być nieco niższe od oficjalnych (oficjalne są w prezydent_candidates).",
         lambda rows, sql: "v_prezydent_results" in sql.lower() and "country" in _values(rows, "level"),

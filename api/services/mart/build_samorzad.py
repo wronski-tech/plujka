@@ -3,6 +3,16 @@
 councils of gminas, powiats and Warsaw districts.
 
 Sources (KBW mirror):
+- 1998 sejmik (no mayors: wójts were elected by the councils until 2002): ``1998-kand-rady``
+  (candidates of every council; ``Szczebel = 'województwo'``, ``Mand.`` W = elected by votes, P = by
+  precedence and L = by lot in a tie, B = without voting, N = not elected; the list's district total
+  ``Gł. na listę`` and the district's valid votes ``Gł. ważne``) and the per-precinct list results
+  ``sejmik_listy_98`` (columns are list numbers, which name a committee per voivodeship and district),
+  summed to gminas and districts and checked against the gmina file ``sejmik-gminy-98``. Ballots issued
+  are not published per gmina; PKW computed the 1998 turnout from valid ballots ('oddało karty
+  ważne'). There is no district register; the 855 seats are checked against the PKW total. Codes are
+  the 1999 TERYT register; Warsaw gminas (powiat 1431) are mapped to their post-2002 districts as in
+  2000/2001, except Warszawa-Centrum (143104, seven districts), as for the 2000 presidential election.
 - 2002 sejmik: ``2002-kand-rady`` (candidates of every council; ``Szczebel = 'województwo'``, ``Mandat``
   G = elected by votes, L = by lot, B = without voting) and the per-precinct committee results
   ``samo2002-sej-kom-obw``, summed to gminas (Warsaw is one gmina there, 146501, split between three
@@ -71,7 +81,7 @@ from api.services.mart.build_common import (
     sql_literal,
 )
 from api.services.mart import build_rady
-from api.services.mart.build_precincts import GEO_ALIASES, NOT_VOTE_COLUMNS, PROTOCOL_ALIASES
+from api.services.mart.build_precincts import GEO_ALIASES, NOT_VOTE_COLUMNS, PROTOCOL_ALIASES, create_warsaw_gminas_2001
 from api.services.mart.schema import RADA_TABLES, SEJMIK_TABLES, WBP_TABLES
 
 log = logging.getLogger("mart")
@@ -79,8 +89,9 @@ log = logging.getLogger("mart")
 TABLES = SEJMIK_TABLES + WBP_TABLES + RADA_TABLES
 FAMILY = ("sejmik", "wbp", "rada")
 
-# 2006 and 2010: some run-offs took place two weeks later (see LATE_RUNOFFS).
+# 2006 and 2010: some run-offs took place two weeks later (see LATE_RUNOFFS). 1998 had no mayor elections.
 DATES = {
+    1998: ("1998-10-11", None),
     2002: ("2002-10-27", "2002-11-10"),
     2006: ("2006-11-12", "2006-11-26"),
     2010: ("2010-11-21", "2010-12-05"),
@@ -89,6 +100,11 @@ DATES = {
     2024: ("2024-04-07", "2024-04-21"),
 }
 SOURCES = {
+    1998: {
+        "sejmik_candidates": "**/samorzad/1998-kand-rady.parquet",
+        "sejmik_precincts": "**/samorzad/sejmik/1998/sejmik_listy_98__*.parquet",
+        "sejmik_gminas": "**/samorzad/sejmik/1998/sejmik-gminy-98__*.parquet",
+    },
     2002: {
         "sejmik_candidates": "**/samorzad/2002-kand-rady.parquet",
         "sejmik_precincts": "**/samorzad/sejmik/samo2002-sej-kom-obw.parquet",
@@ -159,13 +175,36 @@ LOCAL_PROTOCOL_ALIASES = {
 # 2002, 2010 and 2014 have no sejmik district register: PKW totals of seats ("Wybory samorządowe 2014 -
 # statystyki", pkw.gov.pl: 555 radnych województw; wybory2010.pkw.gov.pl/geo/pl/000000.html: 561
 # radnych in 87 districts; PKW announcement of 8 November 2002, Dz. U. Nr 187, poz. 1568: 561 radnych
-# in 88 districts).
-SEJMIK_SEATS = {2002: 561, 2010: 561, 2014: 555}
+# in 88 districts; PKW announcement of 23 October 1998, Dz. U. Nr 131, poz. 861: 855 radnych in 127
+# districts).
+SEJMIK_SEATS = {1998: 855, 2002: 561, 2010: 561, 2014: 555}
 # Gminas split between sejmik districts (one gmina-file row per district) -> number of districts:
 # Łódź 2002, 2006 and 2010 (districts 1 and 2, PKW "Zbiorcze informacje o okręgach" of łódzkie);
 # Warsaw 2002, published as one gmina in three districts (the 2002 precinct file has no district
-# TERYT).
-SEJMIK_SPLIT_GMINAS = {2002: {"106101": 2, "146501": 3}, 2006: {"106101": 2}, 2010: {"106101": 2}}
+# TERYT). 1998: the district of every precinct is published; Wrocław, Łódź, Kraków and Gdańsk lie in
+# two districts each, gmina Warszawa-Centrum in four.
+SEJMIK_SPLIT_GMINAS = {
+    1998: {"026401": 2, "106101": 2, "126101": 2, "143104": 4, "226101": 2},
+    2002: {"106101": 2, "146501": 3}, 2006: {"106101": 2}, 2010: {"106101": 2},
+}
+# 1998 sejmik committees spelled differently in some districts of one voivodeship (strip_signature
+# form): variant -> name used in the other districts. Each pair has the same list number in the same
+# voivodeship, and the KBW list register (wykaz-list) names one committee for that number there.
+SEJMIK_NAME_VARIANTS = {
+    1998: {
+        "PRZYMIERZE SPOŁECZNE PSL-UP-KPEIR": "KRAJOWY KOMITET WYBORCZY PRZYMIERZE SPOŁECZNE: PSL-UP-KPEIR",  # mazowieckie 13
+        "PRZYMIERZE SPOŁECZNE: PSL-UP-KPEIR": "KRAJOWY KOMITET WYBORCZY PRZYMIERZE SPOŁECZNE: PSL-UP-KPEIR",  # świętokrzyskie 6
+        "RADA GŁÓWNA KONSERWATYWNO - LIBERALNEJ PARTII UNIA POLITYKI REALNEJ":
+            "RADA GŁÓWNA KONSERWATYWNO-LIBERALNEJ PARTII UNIA POLITYKI REALNEJ",  # łódzkie 5
+        "RADA GŁÓWNA KONSERWATYWNO-LIBERALNA PARTII UNII POLITYKI REALNEJ":
+            "RADA GŁÓWNA KONSERWATYWNO-LIBERALNEJ PARTII UNIA POLITYKI REALNEJ",  # łódzkie 2, 4
+        '"SAMORZĄD OBYWATELSKI"': 'KOMITET WYBORCZY "SAMORZĄD OBYWATELSKI"',  # mazowieckie 4 (other: 6)
+        "KOMITET WYBORCZY POROZUMIENIA WARSZAWSKIEJ RADY GOSPODARCZEJ":
+            "POROZUMIENIE WARSZAWSKIEJ RADY GOSPODARCZEJ",  # mazowieckie 2
+        "ZARZĄD GŁÓWNY CHRZEŚCIJAŃSKIEJ DEMOKRACJI III RZECZYPOSPOLITEJ POLSKIEJ":
+            "ZARZĄD GŁÓWNY CHRZEŚCIJAŃSKIEJ DEMOKRACJI III RZECZYPOSPOLITEJ",  # pomorskie 3, 8
+    },
+}
 # Sejmik districts whose eligible voters in the district register differ from the sum of their gmina
 # rows (2006: dolnośląskie 1 register 502,072 vs gminas 502,060; lubelskie 1 276,406 vs 276,409; all
 # other protocol figures agree). The gmina rows are loaded, so national eligible voters are 30,241,176
@@ -190,11 +229,18 @@ OFFICES = {"W": "wójt", "B": "burmistrz", "P": "prezydent miasta"}
 _AGAINST = re.compile(r"^Głosy przeciw wyborowi kandydata - (.+?) zarejestrowanego przez ")
 
 
+def _has_mayors(year: int) -> bool:
+    """Whether mayors were elected directly in ``year`` (since 2002)."""
+    return DATES[year][1] is not None
+
+
 def available(sources: YearSources) -> bool:
-    """Whether the year has staged sejmik candidates and mayor candidates."""
+    """Whether the year has staged sejmik candidates and, in years with mayor elections, mayor candidates."""
     spec = SOURCES.get(sources.year)
     if not spec:
         return False
+    if not _has_mayors(sources.year):
+        return sources.has(spec["sejmik_candidates"])
     wbp = spec.get("wbp_candidates") or spec["wbp_candidates_1"]
     return sources.has(spec["sejmik_candidates"]) and sources.has(wbp)
 
@@ -214,14 +260,16 @@ def build_samorzad(con: duckdb.DuckDBPyConnection, sources: YearSources) -> list
         _stats_2002(con, sources)
     _build_sejmik(con, sources)
     build_rady.add_list_groups(con, year, "sejmik")
-    _build_wbp(con, sources)
+    if _has_mayors(year):
+        _build_wbp(con, sources)
     _check(con, year)
     first, second = DATES[year]
-    elections = [
-        Election("sejmik", year, 1, first, f"Voivodeship assembly (sejmik) elections {year}"),
-        Election("wbp", year, 1, first, f"Mayor (wójt/burmistrz/prezydent miasta) elections {year}, round 1"),
-        Election("wbp", year, 2, second, f"Mayor (wójt/burmistrz/prezydent miasta) elections {year}, round 2"),
-    ]
+    elections = [Election("sejmik", year, 1, first, f"Voivodeship assembly (sejmik) elections {year}")]
+    if _has_mayors(year):
+        elections += [
+            Election("wbp", year, 1, first, f"Mayor (wójt/burmistrz/prezydent miasta) elections {year}, round 1"),
+            Election("wbp", year, 2, second, f"Mayor (wójt/burmistrz/prezydent miasta) elections {year}, round 2"),
+        ]
     if build_rady.available(sources):
         build_rady.build_rady(con, sources)
         elections.append(Election("rada", year, 1, first, f"Gmina, powiat and Warsaw district council elections {year}"))
@@ -239,7 +287,21 @@ def _build_sejmik(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     spec = SOURCES[year]
     create_committee_aliases(con, sources.year)
     raw = sources.load("sejmik_cand", spec["sejmik_candidates"])
-    if year == 2002:
+    if year == 1998:
+        # Mand.: W elected by votes, P by precedence and L by lot in a tie, B without voting, N not elected.
+        variants = " ".join(f"WHEN {sql_literal(v)} THEN {sql_literal(c)}" for v, c in SEJMIK_NAME_VARIANTS[1998].items())
+        con.execute(
+            f"""CREATE OR REPLACE TABLE sejmik_cand AS
+                SELECT * REPLACE (CASE strip_signature("Komitet") {variants} ELSE "Komitet" END AS "Komitet"),
+                       CASE WHEN "Mand." IN ('W', 'P', 'L', 'B') THEN 'T' ELSE 'N' END AS elected_
+                FROM {raw} WHERE "Szczebel" = 'województwo'"""
+        )
+        f = {
+            "woj": '"Jednostka"', "district": '"Nr okr."', "list_no": '"Nr listy"', "position": '"Poz."',
+            "name": """concat_ws(' ', capw_("Imiona"), upper("Nazwisko"))""", "committee": '"Komitet"',
+            "residence": '"Miejsce zam."', "elected": "elected_", "votes": '"Gł. kand."',
+        }
+    elif year == 2002:
         # Mandat: G elected by votes, L by lot (tie), B without voting, N not elected.
         con.execute(
             f"""CREATE OR REPLACE TABLE sejmik_cand AS SELECT *, CASE WHEN "Mandat" IN ('G', 'L', 'B') THEN 'T' ELSE 'N' END AS elected_
@@ -318,7 +380,12 @@ def _build_sejmik(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
         mandates = column(con, seats, "Liczba mandatów", "L. mand.")
         con.execute(f"CREATE OR REPLACE TABLE sejmik_seats AS SELECT sum(int_({mandates})) AS seats FROM {seats} {seat_filter}")
 
-    gminas = _sejmik_gminas_2002(con, sources) if year == 2002 else sources.load("sejmik_gminas", spec["sejmik_gminas"])
+    if year == 1998:
+        gminas = _sejmik_gminas_1998(con, sources)
+    elif year == 2002:
+        gminas = _sejmik_gminas_2002(con, sources)
+    else:
+        gminas = sources.load("sejmik_gminas", spec["sejmik_gminas"])
     # 2010/2014 name gminas 'Bolesławiec, m.' (Warsaw districts without suffix); later years 'm. Bolesławiec'.
     gmina_name = (
         f"""regexp_replace({column(con, gminas, "Gmina/dzielnica", "Gmina (dzielnica)")}, '^(.*), (m\\. st\\.|m\\.|gm\\.)$', '\\2 \\1')"""
@@ -543,6 +610,60 @@ def _sejmik_gminas_2002(con: duckdb.DuckDBPyConnection, sources: YearSources) ->
             [c],
         )
     return "sejmik_gminas_2002"
+
+
+def _sejmik_gminas_1998(con: duckdb.DuckDBPyConnection, sources: YearSources) -> str:
+    """1998 sejmik results per gmina and district (``sejmik_gminas_1998``), summed from the precinct file.
+
+    The result has the headers of a gmina file: protocol columns, then one column per committee. The
+    precinct file has one column per list number; a number names a committee per voivodeship and
+    district (``sejmik_list_names_1998``, from the candidates). Ballots issued are not published
+    ("Wydane karty" stays NULL); "Frekwencja" is the votes cast (valid ballots). Warsaw gminas get the
+    code of their post-2002 district (WARSAW_GMINAS_2001), except Warszawa-Centrum (143104).
+    """
+    prec = sources.load("sejmik_prec", SOURCES[1998]["sejmik_precincts"])
+    sources.load("sejmik_gminas_file", SOURCES[1998]["sejmik_gminas"])  # for the checks
+    create_warsaw_gminas_2001(con)
+    con.execute(
+        f"""CREATE OR REPLACE TABLE sejmik_prec_1998 AS
+            SELECT p.*, coalesce(w.teryt, clean_teryt(p."Kod gminy")) AS teryt, coalesce(w.gmina, p."Gmina") AS gmina,
+                   CAST(int_(p."Nr okr.") AS INT) AS district_no
+            FROM {prec} p LEFT JOIN warsaw_gminas_2001 w ON w.letter IS NULL AND w.old_teryt = clean_teryt(p."Kod gminy")"""
+    )
+    cols = ", ".join(quote_ident(c) for c in columns_of(con, prec) if c.isdigit())
+    con.execute(
+        f"""CREATE OR REPLACE TABLE sejmik_votes_1998 AS
+            SELECT teryt, district_no, CAST(list_no AS INT) AS list_no, sum(int_(votes)) AS votes
+            FROM (UNPIVOT (SELECT teryt, district_no, {cols} FROM sejmik_prec_1998) ON {cols} INTO NAME list_no VALUE votes)
+            WHERE int_(votes) IS NOT NULL
+            GROUP BY ALL"""
+    )
+    con.execute(
+        """CREATE OR REPLACE TABLE sejmik_list_names_1998 AS
+           SELECT DISTINCT k.wojewodztwo, k.district_no, k.list_no, c.committee_name
+           FROM sejmik_candidates k JOIN sejmik_committees c USING (committee_id)"""
+    )
+    names = [r[0] for r in con.execute("SELECT DISTINCT committee_name FROM sejmik_list_names_1998 ORDER BY 1").fetchall()]
+    sums = ", ".join(
+        f"CAST(sum(v.votes) FILTER (WHERE n.committee_name = {sql_literal(name)}) AS VARCHAR) AS {quote_ident(name)}" for name in names
+    )
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE sejmik_gminas_1998 AS
+        WITH prot AS (
+            SELECT teryt, district_no, any_value(gmina) AS gmina, any_value("Powiat") AS powiat, sum(int_("Upr.")) AS eligible,
+                   sum(int_("Frekwencja")) AS ballots, sum(int_("Nieważne")) AS invalid, sum(int_("Ważne")) AS valid
+            FROM sejmik_prec_1998 GROUP BY ALL)
+        SELECT p.teryt AS "TERYT gminy", CAST(p.district_no AS VARCHAR) AS "Nr okr.", p.gmina AS "Gmina", p.powiat AS "Powiat",
+               CAST(p.eligible AS VARCHAR) AS "Upr.", CAST(NULL AS VARCHAR) AS "Wydane karty", CAST(p.ballots AS VARCHAR) AS "Odd.",
+               CAST(p.invalid AS VARCHAR) AS "Niew.", CAST(p.valid AS VARCHAR) AS "Ważne", {sums}
+        FROM prot p
+        LEFT JOIN sejmik_votes_1998 v USING (teryt, district_no)
+        LEFT JOIN sejmik_list_names_1998 n ON n.wojewodztwo = voivodeship(v.teryt) AND n.district_no = v.district_no AND n.list_no = v.list_no
+        GROUP BY p.teryt, p.district_no, p.gmina, p.powiat, p.eligible, p.ballots, p.invalid, p.valid
+        """
+    )
+    return "sejmik_gminas_1998"
 
 
 # --- Mayors -----------------------------------------------------------------------------------
@@ -1007,6 +1128,14 @@ def _wbp_protocols_2024(con: duckdb.DuckDBPyConnection, sources: YearSources) ->
 # drops them, so those lists are named here. Verified against the 2018 per-precinct candidate files
 # (the struck-off candidate's column is empty). Documented in docs/MART.md under "Known gaps".
 STRUCK_OFF = {
+    # 1998: lists whose published district total ('Gł. na listę', equal to the precinct results)
+    # exceeds the sum of their candidates' votes. The two UW lists have a missing list position (a
+    # struck-off candidate dropped from the register); the SLD list (*, 21 votes) has none.
+    1998: [
+        ("małopolskie", 2, "KRAJOWY KOMITET WYBORCZY SOJUSZU LEWICY DEMOKRATYCZNEJ"),  # *
+        ("śląskie", 11, "ZARZĄD UNII WOLNOŚCI"),
+        ("warmińsko-mazurskie", 2, "ZARZĄD UNII WOLNOŚCI"),
+    ],
     # 2002: lists whose total in the per-precinct committee results exceeds the sum of their candidates'
     # votes. The per-precinct candidate files (2002sejmiki-kand-obw) give the same list totals and
     # candidate votes for all 1,122 lists, so the gap is in the published data. Eighteen have a missing
@@ -1121,6 +1250,38 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
             SELECT count(*) FROM wbp_gmina_protocols p WHERE round = 2
               AND NOT EXISTS (SELECT 1 FROM wbp_gmina_protocols q WHERE q.round = 1 AND q.teryt_gmina = p.teryt_gmina)""",
     }
+    if not _has_mayors(year):
+        checks = {name: sql for name, sql in checks.items() if not name.startswith("wbp:")}
+    if year == 1998:
+        lists = [c for c in columns_of(con, "src_sejmik_prec") if c.isdigit()]
+        gminas = "src_sejmik_gminas_file"
+        # The gmina file has 0 where the precinct file leaves a list number empty.
+        compared = ["Upr.", "Frekwencja", "Nieważne", "Ważne", *lists]
+        sums = ", ".join(f"coalesce(sum(int_({quote_ident(c)})), 0) AS {quote_ident(c)}" for c in compared)
+        checks["sejmik: 1998 list numbers naming several committees in one district"] = """
+            SELECT count(*) - count(DISTINCT (wojewodztwo, district_no, list_no)) FROM sejmik_list_names_1998"""
+        checks["sejmik: 1998 precinct list votes without a committee of that number in the district"] = """
+            SELECT count(*) FROM sejmik_votes_1998 v
+            WHERE v.votes > 0 AND NOT EXISTS (SELECT 1 FROM sejmik_list_names_1998 n WHERE n.wojewodztwo = voivodeship(v.teryt)
+                                              AND n.district_no = v.district_no AND n.list_no = v.list_no)"""
+        checks["sejmik: 1998 precincts whose votes cast != invalid + valid votes"] = """
+            SELECT count(*) FROM src_sejmik_prec WHERE int_("Frekwencja") <> int_("Nieważne") + int_("Ważne")"""
+        checks["sejmik: 1998 gmina sums of the precinct file != gmina file (sejmik-gminy-98)"] = f"""
+            SELECT count(*) FROM (SELECT clean_teryt("Kod gminy") AS t, {sums} FROM src_sejmik_prec GROUP BY 1) p
+            FULL JOIN (SELECT clean_teryt("Kod gminy") AS t, {sums} FROM {gminas} WHERE "Kod gminy" IS NOT NULL GROUP BY 1) g USING (t)
+            WHERE {' OR '.join(f'p.{quote_ident(c)} IS DISTINCT FROM g.{quote_ident(c)}' for c in compared)}"""
+        checks["sejmik: 1998 district list votes != list totals of the candidate file"] = """
+            SELECT count(*) FROM sejmik_district_lists l JOIN sejmik_committees c USING (committee_id)
+            FULL JOIN (SELECT lower("Jednostka") AS wojewodztwo, CAST(int_("Nr okr.") AS INT) AS district_no,
+                              strip_signature("Komitet") AS committee_name, min(int_("Gł. na listę")) AS lo, max(int_("Gł. na listę")) AS hi
+                       FROM sejmik_cand GROUP BY ALL) k USING (wojewodztwo, district_no, committee_name)
+            WHERE l.votes IS DISTINCT FROM k.lo OR k.lo <> k.hi"""
+        checks["sejmik: 1998 district valid votes != 'Gł. ważne' of the candidate file"] = """
+            SELECT count(*) FROM (SELECT wojewodztwo, district_no, sum(votes) AS votes FROM sejmik_district_lists GROUP BY ALL) l
+            FULL JOIN (SELECT lower("Jednostka") AS wojewodztwo, CAST(int_("Nr okr.") AS INT) AS district_no,
+                              min(int_("Gł. ważne")) AS lo, max(int_("Gł. ważne")) AS hi FROM sejmik_cand GROUP BY ALL) k
+              USING (wojewodztwo, district_no)
+            WHERE l.votes IS DISTINCT FROM k.lo OR k.lo <> k.hi"""
     if year == 2002:
         # Precinct sums against the official gmina statistics (Warsaw districts added up to 146501).
         checks["sejmik: 2002 gmina sums of the precinct file != official gmina statistics"] = f"""
@@ -1155,5 +1316,5 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
             WHERE {' OR '.join(f'g.{x} IS DISTINCT FROM r.{x}' for x in PROTOCOL if x != 'eligible_voters')}
                OR (g.eligible_voters IS DISTINCT FROM r.eligible_voters AND (wojewodztwo, district_no) NOT IN ({gaps}))"""
     run_checks(con, year, checks)
-    if con.execute("SELECT count(*) FROM wbp_gmina_protocols WHERE office IS NULL").fetchone()[0]:
+    if _has_mayors(year) and con.execute("SELECT count(*) FROM wbp_gmina_protocols WHERE office IS NULL").fetchone()[0]:
         raise BuildError(f"year {year}: mayor protocols without an office")

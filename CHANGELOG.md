@@ -9,6 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Mart: Sejm and Senate 1991, 1993 and 1997 (precinct level; Senate 1991 candidates only), reconciled with PKW, with the national lists as district 0, list blocs, pre-1999 geography and seat checks (Hare-Niemeyer and modified Sainte-Laguë 1991, D'Hondt 1993/1997); party families for UD/KLD (UW/PD), POC/PC, NSZZ Solidarność (AWS), WAK/Ojczyzna.
+- Mart: president 1990 and 1995 (both rounds) and referendums 1996 and 1997 at precinct level, reconciled with PKW; pre-1999 gminas keep their old code (`teryt_gmina_pre1999`) and voivodeship, views show them at country level. President 2000: Warszawa-Centrum precincts split into today's districts through the 2001 precinct addresses.
+- Mart: local elections 1998 (sejmiki, gmina and powiat councils, Rada m.st. Warszawy and the Warszawa-Centrum districts), reconciled with PKW's announcement; seat check with the 1998 thresholds; party families AWS (with AWSP), Przymierze Społeczne (PSL family), RPO, Rodzina Polska. UI maps cover 1998 codes.
+- GUS context statistics per gmina, powiat and voivodeship, 1995–2024 (population, urban/rural, area, density, registered unemployment, salary) as the `gus` mart family (`gus_units`, `gus_indicators`, `v_gus_units`), fetched from the GUS Local Data Bank by `scripts/fetch_gus_bdl.py`; answers that read them show the CC BY 4.0 attribution.
+- Seat check for the European Parliament 2004–2024: D'Hondt nationally among committees with 5%, then largest remainders between a committee's district lists (`mart.allocate_seats(..., 'hare_niemeyer')`).
+- Weekly source workflow opens a pull request with re-staged parquet and manifest when KBW republishes files, after building the whole mart with every check (draft when a check fails).
+- Person timeline: `GET /persons/{person_id}` and `GET /persons?name=` (read-only mart role, fixed SQL); the UI shows every candidacy of a person from an answer with how candidacies were linked; "Pobierz CSV" under every result table (`;`, decimal comma, UTF-8 BOM).
+- Smaller prompt for questions naming no election kind: base tables are described by their comment and column names only (46k → 31k characters).
+
 - Mart: local elections 2002 and 2006 (sejmiki, mayors, councils), reconciled with PKW; 2006 list blocs (`list_group`, scraped from PKW's results pages into `data/pkw_html/list_groups_2006.csv`). The seat check allocates in two stages (lists and blocs, then inside a bloc) and covers 2002's thresholds.
 - Mart: Sejm and Senate 2001, president 2000 and the 2003 EU accession referendum, reconciled with PKW (turnout from ballots issued for 2000/2001). Staging keeps a group row that names a single list (Excel). Committee aliases for AWS(P) and the 2001 Samoobrona spelling.
 - UI maps: old TERYT codes are mapped to current units (`streamlit_app/geo/teryt_changes.json`: Wałbrzych 2004–2012, Rejowiec 2004–2005, gmina Zielona Góra 2004–2014); votes are summed where old units merged, percentages are skipped with a caption. Warsaw is drawn as 18 districts, or as one unit when a result only has 146501. Szczawa and Grabówka (2025) are added, with their parent gminas' pre-2025 outlines for older results. District and 2025 polygons © OpenStreetMap contributors (ODbL).
@@ -51,6 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `v_person_history` is a materialized view with indexes on `person_id` and `full_name` (trigram): person questions take milliseconds instead of 1.4 s.
 - SQL guard also rejects quoted system functions (`"pg_read_file"(...)`) and sequence functions (`nextval`, `setval`, ...).
 
 - `Razem` and `Bezpartyjni` aliases match only the party and the Bezpartyjni Samorządowcy movement (local committees such as "ZAWSZE RAZEM" no longer count as Razem in `v_party_results`).

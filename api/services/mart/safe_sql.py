@@ -100,13 +100,19 @@ def validate_mart_sql(sql: str, max_rows: int = MART_MAX_ROWS) -> str:
     return tree.sql(dialect="postgres")
 
 
-def run_readonly(sql: str, timeout_ms: int = MART_STATEMENT_TIMEOUT_MS) -> list[dict[str, Any]]:
-    """Execute validated SQL as the read-only mart role and return rows as dicts."""
+def run_readonly(
+    sql: str, timeout_ms: int = MART_STATEMENT_TIMEOUT_MS, params: dict[str, Any] | None = None
+) -> list[dict[str, Any]]:
+    """Execute validated SQL as the read-only mart role and return rows as dicts.
+
+    ``params`` binds ``%(name)s`` placeholders of fixed API queries; LLM SQL is run without params, so
+    a literal ``%`` in it is not read as a placeholder.
+    """
     with psycopg.connect(MART_DATABASE_URL, autocommit=False) as conn:
         conn.read_only = True
         with conn.cursor() as cur:
             cur.execute(f"SET LOCAL statement_timeout = {int(timeout_ms)}")
-            cur.execute(sql)
+            cur.execute(sql, params)
             columns = [desc.name for desc in cur.description or []]
             rows = cur.fetchall()
         conn.rollback()

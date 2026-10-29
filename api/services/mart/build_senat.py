@@ -66,8 +66,9 @@ DISTRICTS_2005 = "**/senat/*okr*.parquet"
 RESULTS_2007 = "**/senat/parl*-sen-gl_kand_obw/*.parquet"
 RESULTS_2001 = "**/senat/parl*OBWSEN/*.parquet"
 POWIAT_RESULTS_2005 = "**/senat/*-sen-gl_kan_pow/*.parquet"
-# Senate districts per year where not 100 single-member districts (2001-2007: 40 districts, 2-4 seats).
-DISTRICTS = {2001: 40, 2005: 40, 2007: 40}
+# Senate districts per year where not 100 single-member districts (2001-2007: 40 districts, 2-4 seats;
+# 1991-1997: the 49 voivodeships, 2-3 seats).
+DISTRICTS = {1991: 49, 1993: 49, 1997: 49, 2001: 40, 2005: 40, 2007: 40}
 
 PROTOCOL_ALIASES = {
     "eligible_voters": ("Liczba wyborców uprawnionych do głosowania", "Senat - Liczba wyborców uprawnionych do głosowania"),
@@ -104,9 +105,42 @@ SHIFTED_ROWS_2001 = {(6, "061003", 6)}
 TERYT_ALIASES = ("TERYT Gminy", "Kod TERYT", "TERYT gminy", "Kod terytorialny gminy", "TERYT", "Kod gminy")
 NUMBER_ALIASES = ("Nr komisji", "Numer", "Numer obwodu", "Nr obwodu głosowania", "Nr obwodu", "Nr obw.")
 
+# 1991-1997: the 49 voivodeships (1975-1998) were the Senate districts, numbered as 'Nr woj.' in every
+# file. Sources per year: candidates with official votes ('Mandat' T = elected), per-precinct files
+# (1993, 1997; protocol and 'Surname Given' candidate columns), the gmina turnout file (1993) and the
+# district table (1997). 1991 publishes candidates only.
+SOURCES_1990S = {
+    1991: {"candidates": "**/senat/KANSEN1991.parquet"},
+    1993: {"candidates": "**/senat/KANSEN1993.parquet", "results": "**/senat/senat1993/sen1993obw*.parquet",
+           "gminas": "**/senat/1993-frekw-gm.parquet"},
+    1997: {"candidates": "**/senat/ksenat1997pop.parquet", "results": "**/senat/obwsenat97/OBWSEN*.parquet",
+           "districts": "**/senat/senat1997okr.parquet"},
+}
+# Two senators per voivodeship and three in warszawskie (1) and katowickie (14): the
+# Senate electoral law of 10 May 1991 (Dz.U. 1991 nr 58 poz. 246, art. 2 ust. 3).
+SENATE_SEATS_1990S = {1: 3, 14: 3}
+# National figures from PKW's announcements on the Senate results: M.P. 1991 nr 41 poz. 287, M.P. 1993
+# nr 50 poz. 471, M.P. 1997 nr 64 poz. 621 ('głosy oddane' = valid + invalid ballots; 'ważne' counts
+# ballots, each voter had as many votes as the voivodeship had seats). 1993 has the Sejm's eligible-voter
+# gap (OFFICIAL_1990S in build_sejm: 21,807 missing in two Sejm districts in KBW's files).
+OFFICIAL_SENAT_1990S = {
+    1991: {"eligible_voters": 27517280, "votes_cast": 11887865, "invalid_votes": 413019, "valid_votes": 11474846},
+    1993: {"eligible_voters": 27677302, "eligible_voters_missing": 21807, "votes_cast": 14408367, "invalid_votes": 422832,
+           "valid_votes": 13985535},
+    1997: {"eligible_voters": 28409054, "votes_cast": 13614101, "invalid_votes": 296149, "valid_votes": 13317952},
+}
+# 1993 per-precinct files: skierniewickie (38) has candidate columns but no protocol columns ('Odd.',
+# 'Ważne'); its precincts get an empty Senate protocol and its protocol figures exist per gmina only
+# (1993-frekw-gm). Zielonogórskie (49) is published twice: 'sen1993obw49.XLS' (precinct register with
+# eligible voters only) and 'sen1993obw49.xlsx' (results); the register copy must match the results file.
+SENATE_NO_PROTOCOL_1993 = {38}
+SENATE_REGISTER_COPY_1993 = {49}
+
 
 def available(sources: YearSources) -> bool:
-    """Whether the year has staged Senate candidates and per-precinct results."""
+    """Whether the year has staged Senate candidates and per-precinct results (1991: candidates only)."""
+    if sources.year in SOURCES_1990S:
+        return sources.has(SOURCES_1990S[sources.year]["candidates"])
     csv = sources.has("**/kandydaci_senat_csv/*.parquet") and sources.has(CANDIDATE_RESULTS)
     layout_2011 = sources.has(CANDIDATES_2011) and sources.has(RESULTS_2011)
     layout_2005 = (sources.has(CANDIDATES_2005) or sources.has(CANDIDATES_2001)) and (
@@ -355,6 +389,9 @@ def _realign_2001(
 def build_senat(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     """Build and check all Senate tables of ``sources.year``."""
     year = sources.year
+    if year in SOURCES_1990S:
+        _build_1990s(con, sources)
+        return
     if sources.has(CANDIDATES_2005) or sources.has(CANDIDATES_2001):
         _build_2005_registers(con, year, sources)
         if sources.has(RESULTS_2001):
@@ -459,6 +496,249 @@ def build_senat(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
         """
     )
     _check(con, year)
+
+
+def _build_1990s(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
+    """1991, 1993 and 1997 (SOURCES_1990S): 49 voivodeship districts electing 2 or 3 senators each.
+
+    1991 publishes only the candidates with their official votes: the Senate precinct tables stay empty.
+    1993 and 1997 publish one file per voivodeship with the protocol ('Upr.', 'Odd.' = votes cast, 1997
+    'Niew.', 'Ważne' = valid ballots) and one 'Surname Given' column per candidate; ballots issued are not
+    published (NULL), 1993 invalid votes are cast minus valid. See SENATE_NO_PROTOCOL_1993 and
+    SENATE_REGISTER_COPY_1993 for the two irregular 1993 files. Requires the 1990s ``precincts`` of
+    ``build_sejm`` (5-digit gmina code and precinct number as ``pkey``).
+    """
+    year = sources.year
+    spec = SOURCES_1990S[year]
+    src = sources.load("senat_candidates", spec["candidates"])
+    if year == 1997:
+        first_names = """concat_ws(' ', NULLIF(trim(k."1. imię"), ''), NULLIF(trim(k."2. imię"), ''))"""
+        position, committee, votes, residence = '"Poz."', '"Komitet"', '"Głosy"', '"Miejscowość"'
+        pct = 'CAST(round(100.0 * int_(k."Głosy") / NULLIF(int_(k."Ważne w woj."), 0), 2) AS DECIMAL(6, 2))'
+    else:
+        first_names = 'trim(k."Imiona")'
+        position, committee, votes, residence = '"Pozycja"', '"Komitet wyborczy"', '"Liczba głosów"', '"Miejsce zamieszkania"'
+        pct = pct_expr(con, src, '"%"')
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE senat_candidates AS
+        SELECT {year} AS year,
+               CAST(row_number() OVER (ORDER BY int_(k."Nr woj."), int_(k.{position})) AS INT) AS candidate_id,
+               CAST(int_(k."Nr woj.") AS INT) AS district_no,
+               strip_signature(k.{committee}) AS committee_name,
+               {first_names} || ' ' || upper(trim(k."Nazwisko")) AS full_name,
+               upper(trim(k."Nazwisko")) AS last_name, {first_names} AS first_names,
+               gender_(k."Płeć") AS gender, NULLIF(trim(k."Zawód"), '') AS occupation,
+               NULLIF(trim(k.{residence}), '') AS residence, CAST(NULL AS VARCHAR) AS residence_teryt,
+               CAST(NULL AS VARCHAR) AS party_membership, NULLIF(trim(k."Poparcie"), '') AS party_support,
+               int_(k.{votes}) AS votes, {pct} AS pct_of_district, yes_(k."Mandat") AS elected
+        FROM {src} k
+        """
+    )
+    seat_cases = " ".join(f"WHEN {d} THEN {n}" for d, n in SENATE_SEATS_1990S.items())
+    con.execute(
+        f"""CREATE OR REPLACE TABLE senat_district_seats AS
+            SELECT DISTINCT district_no, CASE district_no {seat_cases} ELSE 2 END AS seats FROM senat_candidates"""
+    )
+    if year == 1997:
+        districts_src = sources.load("senat_district_table", spec["districts"])
+        con.execute(
+            f"""
+            CREATE OR REPLACE TABLE senat_district_totals AS
+            SELECT CAST(int_("Nr woj.") AS INT) AS district_no, trim("Miasto woj.") AS seat_city, trim("Nazwa woj.") AS name,
+                   int_("L. mand.") AS seats, int_("L. obw.") AS precincts, int_("L. upr.") AS eligible_voters,
+                   int_("Odd.") AS valid_ballots, int_("Niew.") AS invalid_votes, int_("Ważne") AS valid_votes
+            FROM {districts_src} WHERE int_("Nr woj.") IS NOT NULL
+            """
+        )
+        seat_city, eligible, districts_join = "t.seat_city", "CAST(t.eligible_voters AS INT)", "LEFT JOIN senat_district_totals t USING (district_no)"
+    else:
+        seat_city = "k.seat_city" if year == 1991 else "CAST(NULL AS VARCHAR)"
+        eligible, districts_join = "CAST(NULL AS INT)", ""
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE senat_districts AS
+        SELECT {year} AS year, district_no, {seat_city} AS seat_city, {eligible} AS eligible_voters,
+               'województwo ' || k.name AS description
+        FROM (SELECT CAST(int_("Nr woj.") AS INT) AS district_no, any_value(trim("Województwo")) AS name,
+                     {'any_value(trim("Siedziba"))' if year == 1991 else "NULL"} AS seat_city
+              FROM {src} GROUP BY 1) k
+        {districts_join}
+        """
+    )
+    official = OFFICIAL_SENAT_1990S[year]
+    if "results" not in spec:
+        con.execute("CREATE OR REPLACE TABLE senat_precinct_protocols (year INT, precinct_id INT, eligible_voters INT, "
+                    "ballots_issued INT, valid_ballots INT, invalid_votes INT, valid_votes INT)")
+        con.execute("CREATE OR REPLACE TABLE senat_precinct_candidate_votes (year INT, precinct_id INT, candidate_id INT, votes INT)")
+        _check(con, year, precinct_results=False)
+        return
+
+    # Sort the per-voivodeship files: results with protocol, results without protocol, register copies.
+    keys_by_district: dict[int, set[str]] = {}
+    for district, name in con.execute("SELECT district_no, full_name FROM senat_candidates").fetchall():
+        keys_by_district.setdefault(district, set()).add(python_name_key(name))
+    register_columns = {"Nr okr.", "Nr woj.", "Kod gm.", "Kod gminy", "Nazwa gm.", "Gmina", "Nr obw.", "Kod obw.", "Adres",
+                        "Adres komisji obwodowej", "Typ", "Upr.", "Odd.", "Niew.", "Ważne", "year"}
+    results, register_copies, without_protocol = {}, {}, set()
+    con.execute("CREATE OR REPLACE TABLE senat_unknown_columns (district_no INT, header VARCHAR)")
+    for district, paths in _files_by_district(sources.files(spec["results"]), r"^(?:sen1993obw|OBWSEN)(\d+)__").items():
+        for path in paths:
+            cols = columns_of(con, f"read_parquet({sql_literal(path)})")
+            candidates = parse_plain_names(cols, keys_by_district.get(district, set()))
+            if not candidates:
+                if year != 1993 or district not in SENATE_REGISTER_COPY_1993 or district in register_copies:
+                    raise BuildError(f"year {year}: Senate file {path} has no candidate columns")
+                register_copies[district] = path
+                continue
+            if district in results:
+                raise BuildError(f"year {year}: two Senate result files for district {district}")
+            results[district] = path
+            if "Ważne" not in cols:
+                without_protocol.add(district)
+            for header in (c for c in cols if c not in register_columns and c not in candidates):
+                con.execute("INSERT INTO senat_unknown_columns VALUES (?, ?)", [district, header])
+    if without_protocol != (SENATE_NO_PROTOCOL_1993 if year == 1993 else set()):
+        raise BuildError(f"year {year}: Senate files without protocol columns: {sorted(without_protocol)}")
+    if set(register_copies) != (SENATE_REGISTER_COPY_1993 if year == 1993 else set()):
+        raise BuildError(f"year {year}: Senate register copies: {sorted(register_copies)}")
+
+    parts = []
+    for district, path in results.items():
+        source = f"read_parquet({sql_literal(path)})"
+        code = column(con, source, "Kod gm.", "Kod gminy")
+        if district in without_protocol:
+            protocol = "NULL, NULL, NULL, NULL, NULL"
+        else:
+            invalid = 'int_("Niew.")' if column(con, source, "Niew.", required=False) else 'int_("Odd.") - int_("Ważne")'
+            protocol = f'int_("Upr."), NULL, int_("Odd."), {invalid}, int_("Ważne")'
+        parts.append(f"""SELECT {district} AS district_no, CAST(int_("Nr woj.") AS INT) AS file_district, pkey({code}, "Nr obw.") AS pkey,
+                                trim({code}) AS code, int_("Upr.") AS register_eligible, {protocol} FROM {source}""")
+    con.execute(
+        "CREATE OR REPLACE TABLE senat_protocols_raw (district_no INT, file_district INT, pkey VARCHAR, code VARCHAR, "
+        "register_eligible BIGINT, eligible_voters BIGINT, ballots_issued BIGINT, valid_ballots BIGINT, invalid_votes BIGINT, "
+        "valid_votes BIGINT)"
+    )
+    con.execute("INSERT INTO senat_protocols_raw " + " UNION ALL ".join(parts))
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE senat_precinct_protocols AS
+        SELECT {year} AS year, p.precinct_id, CAST(r.eligible_voters AS INT) AS eligible_voters,
+               CAST(r.ballots_issued AS INT) AS ballots_issued, CAST(r.valid_ballots AS INT) AS valid_ballots,
+               CAST(r.invalid_votes AS INT) AS invalid_votes, CAST(r.valid_votes AS INT) AS valid_votes
+        FROM senat_protocols_raw r JOIN precincts p USING (pkey)
+        """
+    )
+    files = map_candidate_columns(
+        con, files_by_district=results, index=candidate_index(con, "senat_candidates", None),
+        parse=lambda cols, district: parse_plain_names(cols, keys_by_district.get(district, set())),
+        unmapped_table="senat_candidate_columns_unmapped",
+    )
+    build_wide_votes(
+        con, year=year, target="senat_precinct_candidate_votes", key_name="candidate_id", files=files,
+        teryt_aliases=("Kod gm.", "Kod gminy"), number_aliases=("Nr obw.",),
+    )
+
+    def total(name: str) -> str:
+        return f"(SELECT coalesce(sum({name}), 0) FROM senat_precinct_protocols)"
+
+    missing = official.get("eligible_voters_missing", 0)
+    checks = {
+        **_register_checks(con, year),
+        "precincts with more than one Senate protocol": "SELECT count(*) - count(DISTINCT pkey) FROM senat_protocols_raw",
+        "Senate protocol rows of unknown precincts": "SELECT count(*) FROM senat_protocols_raw WHERE pkey NOT IN (SELECT pkey FROM precincts)",
+        "precincts without a Senate protocol row": """
+            SELECT count(*) FROM precincts WHERE precinct_id NOT IN (SELECT precinct_id FROM senat_precinct_protocols)""",
+        "Senate rows whose voivodeship differs from their file or from the precinct's Senate district": """
+            SELECT count(*) FROM senat_protocols_raw r JOIN precincts p USING (pkey)
+            WHERE r.file_district <> r.district_no OR p.senat_district_no <> r.district_no""",
+        "Senate result rows of unknown precincts": "SELECT count(*) FROM senat_precinct_candidate_votes_raw WHERE pkey NOT IN (SELECT pkey FROM precincts)",
+        "Senate file columns that are neither protocol nor a candidate of the district": "SELECT count(*) FROM senat_unknown_columns",
+        "Senate candidate columns that match no candidate": "SELECT count(*) FROM senat_candidate_columns_unmapped",
+        "Senate candidates not read from exactly one column": """
+            SELECT count(*) FROM senat_candidates k
+            WHERE (SELECT count(*) FROM senat_precinct_candidate_votes_columns m WHERE m.key = k.candidate_id) <> 1""",
+        "Senate candidates whose precinct votes differ from the official total (all districts)": """
+            SELECT count(*) FROM senat_candidates k
+            LEFT JOIN (SELECT candidate_id, sum(votes) AS votes FROM senat_precinct_candidate_votes GROUP BY ALL) s USING (candidate_id)
+            WHERE coalesce(s.votes, 0) <> k.votes""",
+        "Senate precincts with votes cast != valid + invalid": """
+            SELECT count(*) FROM senat_precinct_protocols WHERE valid_ballots <> valid_votes + invalid_votes""",
+        f"Senate precincts without a protocol outside districts {sorted(without_protocol)}": f"""
+            SELECT count(*) FROM senat_protocols_raw
+            WHERE valid_votes IS NULL AND district_no NOT IN ({", ".join(map(str, without_protocol)) or "NULL"})""",
+    }
+    if year == 1997:
+        checks |= {
+            "Senate eligible voters differ from PKW's announcement": f"SELECT abs({total('eligible_voters')} - {official['eligible_voters']})",
+            "Senate votes cast differ from PKW's announcement": f"SELECT abs({total('valid_ballots')} - {official['votes_cast']})",
+            "Senate invalid votes differ from PKW's announcement": f"SELECT abs({total('invalid_votes')} - {official['invalid_votes']})",
+            "Senate valid ballots differ from PKW's announcement": f"SELECT abs({total('valid_votes')} - {official['valid_votes']})",
+            "Senate districts whose precinct protocols differ from the district table": """
+                SELECT count(*) FROM senat_district_totals d
+                LEFT JOIN (SELECT p.senat_district_no AS district_no, count(*) AS precincts, sum(r.eligible_voters) AS eligible_voters,
+                                  sum(r.valid_ballots) AS valid_ballots, sum(r.invalid_votes) AS invalid_votes, sum(r.valid_votes) AS valid_votes
+                           FROM senat_precinct_protocols r JOIN precincts p USING (precinct_id) GROUP BY 1) s USING (district_no)
+                WHERE (s.precincts, s.eligible_voters, s.valid_ballots, s.invalid_votes, s.valid_votes)
+                      IS DISTINCT FROM (d.precincts, d.eligible_voters, d.valid_ballots, d.invalid_votes, d.valid_votes)""",
+            "Senate districts whose seats differ from the district table": """
+                SELECT count(*) FROM senat_district_seats s FULL JOIN senat_district_totals d USING (district_no)
+                WHERE s.seats IS DISTINCT FROM d.seats""",
+            "Senate candidates whose district valid ballots differ from the district table": f"""
+                SELECT count(*) FROM {src} k JOIN senat_district_totals d ON d.district_no = int_(k."Nr woj.")
+                WHERE int_(k."Ważne w woj.") <> d.valid_votes""",
+        }
+    else:
+        # 1993: protocol figures of SENATE_NO_PROTOCOL_1993 come from the gmina file (Senate columns).
+        gminas_src = sources.load("senat_gminas", spec["gminas"])
+        con.execute(
+            f"""
+            CREATE OR REPLACE TABLE senat_gmina_totals AS
+            SELECT left(trim("TERYT"), 5) AS code, CAST(int_("Nr woj..") AS INT) AS district_no,
+                   int_("Liczba uprawnionych") AS eligible_voters, int_("Głosy oddane - Senat") AS valid_ballots,
+                   int_("Głosy nieważne - Senat") AS invalid_votes, int_("Głosy ważne - Senat") AS valid_votes
+            FROM {gminas_src} WHERE int_("Id") IS NOT NULL
+            """
+        )
+        gap = f"(SELECT sum({{0}}) FROM senat_gmina_totals WHERE district_no IN ({', '.join(map(str, without_protocol))}))"
+        checks |= {
+            f"Senate eligible voters differ from PKW's announcement (except {missing} missing as in the Sejm files, "
+            f"districts {sorted(without_protocol)} from the gmina file)": f"""
+                SELECT abs({total('eligible_voters')} + {gap.format('eligible_voters')} + {missing} - {official['eligible_voters']})""",
+            **{
+                f"Senate {label} differ from PKW's announcement (districts {sorted(without_protocol)} from the gmina file)": f"""
+                    SELECT abs({total(name)} + {gap.format(name)} - {official[key]})"""
+                for label, name, key in (("votes cast", "valid_ballots", "votes_cast"), ("invalid votes", "invalid_votes", "invalid_votes"),
+                                         ("valid ballots", "valid_votes", "valid_votes"))
+            },
+            "gminas whose Senate precinct protocols differ from the gmina file": """
+                SELECT count(*) FROM senat_gmina_totals g
+                FULL JOIN (SELECT code, any_value(district_no) AS district_no, sum(register_eligible) AS register_eligible,
+                                  sum(eligible_voters) AS eligible_voters, sum(valid_ballots) AS valid_ballots,
+                                  sum(invalid_votes) AS invalid_votes, sum(valid_votes) AS valid_votes
+                           FROM senat_protocols_raw GROUP BY 1) s USING (code)
+                WHERE g.eligible_voters IS DISTINCT FROM s.register_eligible
+                   OR (s.valid_votes IS NOT NULL AND (g.eligible_voters, g.valid_ballots, g.invalid_votes, g.valid_votes)
+                       IS DISTINCT FROM (s.eligible_voters, s.valid_ballots, s.invalid_votes, s.valid_votes))""",
+        }
+        for district, path in register_copies.items():
+            source = f"read_parquet({sql_literal(path)})"
+            checks[f"Senate district {district} register copy rows that differ from its results file"] = f"""
+                SELECT count(*) FROM (SELECT pkey("Kod gm.", "Nr obw.") AS pkey, int_("Upr.") AS eligible FROM {source}) c
+                FULL JOIN (SELECT pkey, register_eligible AS eligible FROM senat_protocols_raw WHERE district_no = {district}) r USING (pkey)
+                WHERE c.eligible IS DISTINCT FROM r.eligible"""
+    run_checks(con, year, checks)
+
+
+def _files_by_district(paths: list[str], pattern: str) -> dict[int, list[str]]:
+    """Like ``district_files``, but keeps every file of a district (1993: a district published twice)."""
+    out: dict[int, list[str]] = {}
+    for path in sorted(paths):
+        match = re.search(pattern, Path(path).name)
+        if not match:
+            raise BuildError(f"cannot read the district number from {path}")
+        out.setdefault(int(match.group(1)), []).append(path)
+    return out
 
 
 def _check(con: duckdb.DuckDBPyConnection, year: int, precinct_results: bool = True) -> None:

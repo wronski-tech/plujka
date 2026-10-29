@@ -1,5 +1,7 @@
 # Weekly check whether KBW republished any source file of the mart (HEAD requests only, no download).
-# A failed run means files changed or disappeared; run scripts/check_sources.py --update locally.
+# When files changed, a second job downloads them, re-stages them, rebuilds the whole mart with every
+# consistency check, and opens a pull request with the new parquet and manifest (a draft when the
+# build or the curated examples fail). Files that disappeared fail the run; they need a human.
 name: Source files
 
 on:
@@ -7,9 +9,14 @@ on:
     - cron: "17 5 * * 1"
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
+    outputs:
+      stale: ${{ steps.check.outputs.stale }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -22,12 +29,132 @@ jobs:
         with:
           python-version: "3.12"
 
+      # check_sources.py exits 1 when files changed or disappeared.
       - name: Compare server headers with data/source_manifest.json
+        id: check
         run: |
-          set -o pipefail
-          python scripts/check_sources.py | tee check.txt
+          set +e
+          python scripts/check_sources.py > check.txt
+          status=$?
+          set -e
+          cat check.txt
+          case "$status" in
+            0) echo "stale=false" >> "$GITHUB_OUTPUT" ;;
+            1) echo "stale=true" >> "$GITHUB_OUTPUT" ;;
+            *) exit "$status" ;;
+          esac
 
       - name: Summary
         if: always()
         run: |
           { echo '### KBW source files'; echo '```'; cat check.txt 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+  update:
+    needs: check
+    if: needs.check.outputs.stale == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: plujka
+          POSTGRES_PASSWORD: plujka
+          POSTGRES_DB: plujka
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U plujka -d plujka"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      DATABASE_URL: postgresql://plujka:plujka@localhost:5432/plujka
+      MART_DATABASE_URL: postgresql://plujka_mart_reader:plujka_mart_reader@localhost:5432/plujka
+      PYTHONPATH: .
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            api/requirements.txt
+            loader/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r api/requirements.txt -r loader/requirements.txt
+
+      # The mirror is not committed: --update downloads only the changed files into it, and staging
+      # rewrites only their parquet. Staging reports bad files without failing, so check its log.
+      - name: Download and re-stage changed files
+        run: |
+          set -o pipefail
+          python -u scripts/check_sources.py --update | tee update.txt
+          if grep -q '^\[stage\] ERROR' update.txt; then
+            echo "::error::staging failed for a republished file"
+            exit 1
+          fi
+
+      # The whole mart, so that derived views and cross-election checks see the new data too.
+      - name: Build the mart with every consistency check
+        id: build
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python -u scripts/build_mart.py 2>&1 | tee build.txt
+
+      - name: Check curated SQL examples
+        id: examples
+        if: steps.build.outcome == 'success'
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          python scripts/add_sql_example.py --check 2>&1 | tee examples.txt
+
+      - name: Pull request body
+        run: |
+          {
+            echo 'KBW republished source files of the mart. This PR updates their staged parquet and `data/source_manifest.json`.'
+            echo
+            echo '```'
+            grep -E '^(changed|missing|unreachable|checked|rebuild|downloaded):' update.txt
+            echo '```'
+            echo
+            echo "- Mart build: ${{ steps.build.outcome }}"
+            echo "- Curated SQL examples: ${{ steps.examples.outcome || 'skipped' }}"
+            echo
+            echo 'Compare the national results of the affected elections with the official PKW pages before merging.'
+            if [ "${{ steps.build.outcome }}" != success ]; then
+              echo; echo 'Build log (tail):'; echo '```'; tail -n 40 build.txt; echo '```'
+            fi
+          } > pr-body.md
+
+      - name: Open pull request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: sources/kbw-refresh
+          delete-branch: true
+          add-paths: |
+            data/source_manifest.json
+            data/kbw_stage_parquet
+          commit-message: "Refresh KBW source files republished by PKW"
+          title: "Refresh KBW source files republished by PKW"
+          body-path: pr-body.md
+          draft: ${{ steps.build.outcome != 'success' || steps.examples.outcome != 'success' }}
+
+      - name: Fail when the build or examples failed, or files disappeared
+        run: |
+          status=0
+          if [ "${{ steps.build.outcome }}" != success ] || [ "${{ steps.examples.outcome }}" != success ]; then
+            echo "::error::the mart build or the curated examples failed on the refreshed files"
+            status=1
+          fi
+          if grep -q '^missing:' update.txt; then
+            echo "::error::files disappeared from KBW; check the KBW page by hand"
+            status=1
+          fi
+          exit "$status"

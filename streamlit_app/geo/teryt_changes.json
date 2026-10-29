@@ -1,5 +1,5 @@
 {
-  "note": "Old TERYT codes in the mart (2000-2025) that are not in the boundary files, mapped to the current unit that covers the old one. Candidates: distinct teryt_gmina/teryt_powiat in mart tables and v_gmina_continuity missing from gminy.json/powiaty.json. Each entry matched by name within the voivodeship (the powiat differs in every case) and checked against the cited act. Codes in 'unmapped' stay uncoloured on purpose.",
+  "note": "Old TERYT codes in the mart (1998-2025) that are not in the boundary files, mapped to the current unit that covers the old one. Candidates: distinct teryt_gmina/teryt_powiat in mart tables and v_gmina_continuity missing from gminy.json/powiaty.json. Each entry matched by name within the voivodeship (the powiat differs in every case) and checked against the cited act. Codes in 'unmapped' stay uncoloured on purpose.",
   "gminy": {
     "022109": {
       "current": "026501",
@@ -267,6 +267,77 @@
       "change": "Moved from powiat jasielski (podkarpackie) to powiat tarnowski (małopolskie) on 2003-01-01; same area.",
       "source": "Dz.U. 2002 nr 93 poz. 821, § 2 (powiat tarnowski includes Szerzyny from 2003-01-01)"
     }
+,
+    "143101": {
+      "current": "146502",
+      "name": "Warszawa-Bemowo",
+      "years": "1998",
+      "change": "Gmina of powiat warszawski (council elected in 1998) that became the Warsaw district Bemowo in 2002; same area (the mart maps 2001 precincts the same way, build_precincts.WARSAW_GMINAS_2001).",
+      "source": "Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361)"
+    },
+    "143102": {
+      "current": "146503",
+      "name": "Warszawa-Białołęka",
+      "years": "1998",
+      "change": "Gmina of powiat warszawski (council elected in 1998) that became the Warsaw district Białołęka in 2002; same area (the mart maps 2001 precincts the same way, build_precincts.WARSAW_GMINAS_2001).",
+      "source": "Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361)"
+    },
+    "143103": {
+      "current": "146504",
+      "name": "Warszawa-Bielany",
+      "years": "1998",
+      "change": "Gmina of powiat warszawski (council elected in 1998) that became the Warsaw district Bielany in 2002; same area (the mart maps 2001 precincts the same way, build_precincts.WARSAW_GMINAS_2001).",
+      "source": "Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361)"
+    },
+    "143112": {
+      "current": "146509",
+      "name": "Warszawa-Rembertów",
+      "years": "1998",
+      "change": "Gmina of powiat warszawski (council elected in 1998) that became the Warsaw district Rembertów in 2002; same area (the mart maps 2001 precincts the same way, build_precincts.WARSAW_GMINAS_2001).",
+      "source": "Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361)"
+    },
+    "143113": {
+      "current": "146511",
+      "name": "Warszawa-Targówek",
+      "years": "1998",
+      "change": "Gmina of powiat warszawski (council elected in 1998) that became the Warsaw district Targówek in 2002; same area (the mart maps 2001 precincts the same way, build_precincts.WARSAW_GMINAS_2001).",
+      "source": "Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361)"
+    },
+    "143114": {
+      "current": "146512",
+      "name": "Warszawa-Ursus",
+      "years": "1998",
+      "change": "Gmina of powiat warszawski (council elected in 1998) that became the Warsaw district Ursus in 2002; same area (the mart maps 2001 precincts the same way, build_precincts.WARSAW_GMINAS_2001).",
+      "source": "Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361)"
+    },
+    "143115": {
+      "current": "146513",
+      "name": "Warszawa-Ursynów",
+      "years": "1998",
+      "change": "Gmina of powiat warszawski (council elected in 1998) that became the Warsaw district Ursynów in 2002; same area (the mart maps 2001 precincts the same way, build_precincts.WARSAW_GMINAS_2001).",
+      "source": "Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361)"
+    },
+    "143116": {
+      "current": "146514",
+      "name": "Warszawa-Wawer",
+      "years": "1998",
+      "change": "Gmina of powiat warszawski (council elected in 1998) that became the Warsaw district Wawer in 2002; same area (the mart maps 2001 precincts the same way, build_precincts.WARSAW_GMINAS_2001).",
+      "source": "Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361)"
+    },
+    "143117": {
+      "current": "146516",
+      "name": "Warszawa-Wilanów",
+      "years": "1998",
+      "change": "Gmina of powiat warszawski (council elected in 1998) that became the Warsaw district Wilanów in 2002; same area (the mart maps 2001 precincts the same way, build_precincts.WARSAW_GMINAS_2001).",
+      "source": "Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361)"
+    },
+    "143118": {
+      "current": "146517",
+      "name": "Warszawa-Włochy",
+      "years": "1998",
+      "change": "Gmina of powiat warszawski (council elected in 1998) that became the Warsaw district Włochy in 2002; same area (the mart maps 2001 precincts the same way, build_precincts.WARSAW_GMINAS_2001).",
+      "source": "Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361)"
+    }
   },
   "powiaty": {
     "0263": {
@@ -293,12 +364,12 @@
   "former_extents": {
     "note": "Documentation of the features with 'parts' in gminy.json/powiaty.json (not read by the code). Powiat extents are unions of current gmina polygons in the powiat's composition of the time, taken from the mart data (gmina codes under the powiat code of that year) and the gmina entries above.",
     "gminy 146501": "Warszawa as one unit (rows with 146501 and no district codes, e.g. EP 2004).",
-    "gminy 143104": "Gmina Warszawa-Centrum (president 2000) = districts Mokotów, Ochota, Praga-Południe, Praga-Północ, Śródmieście, Wola, Żoliborz; Ustawa z dnia 15 marca 2002 r. o ustroju m.st. Warszawy (Dz.U. 2002 nr 41 poz. 361), art. 14.",
-    "gminy 120705 / 200209": "Kamienica and Supraśl before Szczawa and Grabówka were split off on 2025-01-01 (Dz.U. 2024 poz. 1453, 1454); years 2000-2024.",
-    "powiaty 0804 1006 1801 2209 2806 2813 3204 3205 3214": "Powiats that lost gminas to the powiats created on 2002-01-01 (Dz.U. 2001 nr 62 poz. 631); years 2000-2001.",
+    "gminy 143104": "Gmina Warszawa-Centrum (sejmik 1998; gmina council 1998) = districts Mokotów, Ochota, Praga-Południe, Praga-Północ, Śródmieście, Wola, Żoliborz; Ustawa z dnia 15 marca 2002 r. o ustroju m.st. Warszawy (Dz.U. 2002 nr 41 poz. 361), art. 14.",
+    "gminy 120705 / 200209": "Kamienica and Supraśl before Szczawa and Grabówka were split off on 2025-01-01 (Dz.U. 2024 poz. 1453, 1454); years 1998-2024.",
+    "powiaty 0804 1006 1801 2209 2806 2813 3204 3205 3214": "Powiats that lost gminas to the powiats created on 2002-01-01 (Dz.U. 2001 nr 62 poz. 631); years 1998-2001 (the 1998 files already use the 1999 powiats).",
     "powiaty 1212 / 2401": "Olkuski with Sławków and będziński without it, until 2001 (Dz.U. 2001 nr 62 poz. 630).",
     "powiaty 1406 / 1418, 1805 / 1216": "Grójecki with Tarczyn and piaseczyński without it; jasielski with Szerzyny and tarnowski without it; until 2002 (Dz.U. 2002 nr 93 poz. 821).",
-    "powiaty 1431 / 1465 / 1412": "Powiat warszawski in 2000 as published (1431 = Warszawa-Centrum, 1465 = the other Warsaw gminas), Warsaw without Wesoła in 2000-2001, miński with Wesoła until 2001 (Dz.U. 2002 nr 41 poz. 361).",
+    "powiaty 1431 / 1465 / 1412": "Powiat warszawski in the 1998 sejmik data (1431 = Warszawa-Centrum, 1465 = the other Warsaw gminas), Warsaw without Wesoła in 1999-2001, miński with Wesoła until 2001 (Dz.U. 2002 nr 41 poz. 361).",
     "powiaty 0221": "Wałbrzyski including the city of Wałbrzych, 2003-2011 (Dz.U. 2002 nr 93 poz. 821; Dz.U. 2012 poz. 853).",
     "powiaty 0603 / 0606": "Chełmski without Rejowiec and krasnostawski with it, until 2005 (Dz.U. 2005 nr 141 poz. 1187)."
   }

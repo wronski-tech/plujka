@@ -87,6 +87,28 @@ PRECINCT_TYPES_2001 = {
 }
 
 
+# The 49 voivodeships of the 1975-1998 division in PKW's order (Senate registers 1993/1997 'Nr woj.'). Gmina
+# codes of pre-1999 files start with 2 * number - 1 (01 warszawskie ... 97 zielonogórskie). No official key
+# maps these gmina codes to post-1999 TERYT, so pre-1999 rows keep teryt_gmina NULL, the code in
+# teryt_gmina_pre1999 and the historical voivodeship in wojewodztwo.
+VOIVODESHIPS_1975 = (
+    "warszawskie", "bialskopodlaskie", "białostockie", "bielskie", "bydgoskie", "chełmskie", "ciechanowskie",
+    "częstochowskie", "elbląskie", "gdańskie", "gorzowskie", "jeleniogórskie", "kaliskie", "katowickie", "kieleckie",
+    "konińskie", "koszalińskie", "krakowskie", "krośnieńskie", "legnickie", "leszczyńskie", "lubelskie", "łomżyńskie",
+    "łódzkie", "nowosądeckie", "olsztyńskie", "opolskie", "ostrołęckie", "pilskie", "piotrkowskie", "płockie",
+    "poznańskie", "przemyskie", "radomskie", "rzeszowskie", "siedleckie", "sieradzkie", "skierniewickie", "słupskie",
+    "suwalskie", "szczecińskie", "tarnobrzeskie", "tarnowskie", "toruńskie", "wałbrzyskie", "włocławskie",
+    "wrocławskie", "zamojskie", "zielonogórskie",
+)
+
+
+def create_voivodeships_1975(con: duckdb.DuckDBPyConnection) -> None:
+    """Create ``voivodeships_1975(code, voivodeship_no, name)``: the 2-digit gmina code prefix of each
+    1975-1998 voivodeship (VOIVODESHIPS_1975)."""
+    rows = ", ".join(f"('{2 * n - 1:02d}', {n}, {sql_literal(name)})" for n, name in enumerate(VOIVODESHIPS_1975, start=1))
+    con.execute(f"CREATE OR REPLACE TABLE voivodeships_1975 AS SELECT * FROM (VALUES {rows}) t(code, voivodeship_no, name)")
+
+
 def create_warsaw_districts(con: duckdb.DuckDBPyConnection) -> None:
     """Create ``warsaw_districts_2005(letter, teryt, gmina)`` from WARSAW_DISTRICTS_2005."""
     rows = ", ".join(f"({sql_literal(k)}, {sql_literal(t)}, {sql_literal(n)})" for k, (t, n) in WARSAW_DISTRICTS_2005.items())

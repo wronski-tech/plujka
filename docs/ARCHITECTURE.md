@@ -15,7 +15,7 @@ flowchart LR
   A --> OS[OpenSearch log + telemetry]
 ```
 
-1. **Access** — when `API_KEYS` is set, `POST /ask` and `POST /feedback` require an `X-API-Key` header (401 otherwise). `POST /ask` is rate-limited per API key or client IP (`ASK_RATE_LIMIT_PER_MINUTE`, HTTP 429); with `REDIS_URL` the limit is shared by all workers.
+1. **Access** — when `API_KEYS` is set, `POST /ask`, `POST /feedback` and `GET /persons*` require an `X-API-Key` header (401 otherwise). `POST /ask` is rate-limited per API key or client IP (`ASK_RATE_LIMIT_PER_MINUTE`, HTTP 429); with `REDIS_URL` the limit is shared by all workers.
 2. **Dynamic SQL first** — `route_question` in `api/services/router.py` calls `dynamic_sql.try_dynamic_query` for every question. It resolves entities against `mart.entity_lexicon` (returning `intent = "clarification"` with options when several people or same-name gminas match), describes only the mart relations of the election kinds the question names, adds similar verified examples, asks the LLM for one SELECT over `mart`, validates it with sqlglot and runs it as `plujka_mart_reader` (one repair attempt on error; validated SQL is cached per mart load). Telemetry is in `params._dynamic_sql_meta`.
 3. **Follow-ups** — a request may carry `previous: {question, sql, entity_refs}`. Entity kinds the new question does not name (person, place, committee) are inherited from the previous question, and the previous question and SQL go into the prompt, so "A w 2019?" after "Frekwencja w Krakowie w 2023?" asks about Kraków in 2019.
 4. **Template fallback** — only when dynamic SQL returned no rows (no OpenAI key, failed or empty query), and the request is not a clarification answer, not a follow-up and does not name an election only the mart covers, the legacy path runs: `extract_intent_and_entity` and embeddings pick one of `SQL_TEMPLATES` (Sejm data in `kbw_facts`).
@@ -46,6 +46,23 @@ The Streamlit app calls this while the user types (≥ 2 characters) and after a
 
 The Streamlit UI sends thumbs-up/down after each answer. A thumbs-up on a `dynamic_sql` answer also stores the question and its validated SQL as a few-shot example (`mart/examples.py`). **Thumbs-down** requests append one JSON line per event to `FEEDBACK_JSONL_PATH` (default `data/feedback/feedback.jsonl`) via `api/services/feedback_store.py`, including `needs_fix: true` and the full **`ask_response`** payload (question routing snapshot: `result`, `intent`, `sql`, `params`, etc.) for offline review. Thumbs-up lines omit `ask_response` and set `needs_fix: false`. In Docker, `./data` is mounted into the API container so logs land on the host under `data/feedback/`.
 
+## Person timeline (`GET /persons/{person_id}`, `GET /persons?name=`)
+
+`GET /persons/{person_id}` returns `{person, candidacies}`: the `mart.persons` row (with `match_rule`, how
+candidacies were linked, plus `first_year`, `last_year`, `elected_count`) and every candidacy from
+`mart.v_person_history` (election, year, round, district, area, committee, list position, votes,
+elected, age where published) ordered by the election date in `mart.elections`; 404 for an unknown id
+(`person_id` changes on every mart load). `GET /persons?name=…&limit=20` (max 50) is a prefix search
+over persons in `mart.entity_lexicon` (national persons, elected mayors and sejmik councillors): every
+word must start a word of the name and one must start the surname; case and diacritics are ignored.
+Both run fixed, parameterized SQL as `plujka_mart_reader` through `safe_sql.run_readonly(sql, params=…)`
+(read-only transaction, `MART_STATEMENT_TIMEOUT_MS`); a database error, e.g. while the mart is rebuilt,
+returns 503. They require `X-API-Key` when `API_KEYS` is set but do not count against
+`ASK_RATE_LIMIT_PER_MINUTE` or the token budget (no LLM). The Streamlit UI offers "Zobacz wszystkie
+kandydatury" when an answer's rows carry `person_id` or its entities or clarification options are
+persons, and shows the timeline with the linking rule and the namesake caveat. Every result table has
+a "Pobierz CSV" button (`;` separator, decimal comma, UTF-8 with BOM for Excel in Polish locale).
+
 ## Configuration
 
 Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `MART_DATABASE_URL`, `MART_STATEMENT_TIMEOUT_MS`, `MART_MAX_ROWS`, `SQL_CACHE_*`, `SQL_EXAMPLES_*`, `ANSWER_SUMMARY_ENABLED`, `ASK_RATE_LIMIT_PER_MINUTE`, `REDIS_URL`, `API_KEYS`, `PLUJKA_ENV`, `OPENSEARCH_URL`, OpenAI models, `EMBEDDING_DIM`, `FEEDBACK_JSONL_PATH`). See the table in [MART.md](MART.md#configuration). Docker Compose wires these for containers (see `docker-compose.yml`).
@@ -66,3 +83,4 @@ Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `
 | Legacy PKW helpers   | `api/services/seed.py`            |
 | UI (charts, map, follow-ups) | `streamlit_app/app.py`, `streamlit_app/map_units.py`, `streamlit_app/geo/` |
 | Feedback JSONL       | `api/services/feedback_store.py`  |
+| Person timeline / CSV | `/persons*` in `api/main.py`, `streamlit_app/app.py` |

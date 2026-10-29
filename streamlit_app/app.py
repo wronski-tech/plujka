@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import csv
 import hashlib
+import io
 import json
 import math
 import os
-from datetime import timedelta
+import re
+import unicodedata
+from datetime import date, timedelta
 
 import altair as alt
 import pandas as pd
@@ -22,6 +26,25 @@ API_HEADERS = {"X-API-Key": API_KEY} if API_KEY else {}
 MAP_LEVELS = (("teryt_gmina", "gminy"), ("teryt_powiat", "powiaty"), ("wojewodztwo", "wojewodztwa"))
 # Charts and maps are drawn only for results that fit on screen.
 MAX_CHART_ROWS = 40
+# Persons offered for the timeline view (rows of a long result may name many people).
+MAX_PERSON_OPTIONS = 50
+# Polish names of v_person_history.chamber values.
+CHAMBER_LABELS = {
+    "sejm": "Sejm",
+    "senat": "Senat",
+    "prezydent": "Prezydent RP",
+    "pe": "Parlament Europejski",
+    "sejmik": "Sejmik województwa",
+    "wbp": "Wójt / burmistrz / prezydent miasta",
+    "rada_gminy": "Rada gminy",
+    "rada_powiatu": "Rada powiatu",
+    "rada_dzielnicy": "Rada dzielnicy (Warszawa)",
+}
+# Same wording as the person caveat in api/services/answer.py (CAVEATS).
+PERSON_CAVEAT = (
+    "PKW nie publikuje identyfikatorów osób: kandydatury łączone są po imieniu, nazwisku, płci "
+    "(i roku urodzenia w wyborach samorządowych), więc imiennicy mogą być połączeni lub rozdzieleni błędnie."
+)
 
 # How often the readiness fragment may refresh while data is still loading (avoid hammering /health).
 _READINESS_POLL_INTERVAL = timedelta(seconds=15)
@@ -107,6 +130,7 @@ def _remember(question: str, data: dict, entity_refs: list[dict] | None, previou
         "previous": {"question": context[-600:], "sql": data.get("sql") or None, "entity_refs": entity_refs},
     }
     st.session_state.pop("_feedback_ack_fp", None)
+    st.session_state.pop("person_view", None)
 
 
 def _numeric_columns(rows: list[dict]) -> list[str]:
@@ -300,6 +324,196 @@ def _render_result_emotes(data: dict) -> None:
         st.caption("✅ Wynik gotowy.")
 
 
+def _csv_cell(value: object) -> object:
+    """CSV text of one value: decimal comma for fractions (Polish Excel), lists joined, None empty."""
+    if value is None:
+        return ""
+    if isinstance(value, float):
+        return repr(value).replace(".", ",")
+    if isinstance(value, list):
+        return ", ".join(str(v) for v in value)
+    if isinstance(value, dict):
+        return json.dumps(value, ensure_ascii=False)
+    return value
+
+
+def _csv_bytes(rows: list[dict]) -> bytes:
+    """Rows as CSV for Excel in Polish locale: ';' separator, decimal comma, UTF-8 with BOM."""
+    buffer = io.StringIO()
+    columns = list(dict.fromkeys(name for row in rows for name in row))
+    writer = csv.writer(buffer, delimiter=";", lineterminator="\r\n")
+    writer.writerow(columns)
+    for row in rows:
+        writer.writerow([_csv_cell(row.get(name)) for name in columns])
+    return buffer.getvalue().encode("utf-8-sig")
+
+
+def _csv_file_name(text: str) -> str:
+    """File name from the question (ASCII, no diacritics) and today's date."""
+    folded = unicodedata.normalize("NFKD", text.lower().replace("ł", "l")).encode("ascii", "ignore").decode()
+    slug = re.sub(r"[^a-z0-9]+", "-", folded).strip("-")[:60].rstrip("-") or "wynik"
+    return f"plujka-{slug}-{date.today().isoformat()}.csv"
+
+
+def _csv_download(rows: list[dict], name: str, key: str) -> None:
+    """"Pobierz CSV" button exporting exactly these rows."""
+    if rows:
+        st.download_button(
+            "Pobierz CSV", data=_csv_bytes(rows), file_name=_csv_file_name(name), mime="text/csv", key=key,
+            help="Separator „;” i przecinek dziesiętny — plik otwiera się poprawnie w polskim Excelu.",
+        )
+
+
+def _persons_in_answer(data: dict, entity_refs: list[dict] | None) -> list[tuple[int, str]]:
+    """Persons an answer refers to: clarification options, matched or chosen entities, person_id rows."""
+    found: dict[int, str] = {}
+
+    def add(ref: object, label: str | None) -> None:
+        """Remember a person id (first label wins)."""
+        try:
+            person_id = int(ref)
+        except (TypeError, ValueError):
+            return
+        found.setdefault(person_id, label or f"Osoba nr {person_id}")
+
+    for option in (data.get("clarification") or {}).get("options") or []:
+        if option.get("kind") == "person":
+            add(option.get("ref"), option.get("label"))
+    for entity in ((data.get("params") or {}).get("_dynamic_sql_meta") or {}).get("entities") or []:
+        if entity.get("kind") == "person":
+            add(entity.get("ref"), entity.get("name"))
+    for ref in entity_refs or []:
+        if ref.get("kind") == "person":
+            add(ref.get("ref"), None)
+    for row in data.get("result") or []:
+        if isinstance(row, dict) and row.get("person_id") is not None:
+            add(row["person_id"], row.get("full_name") or row.get("candidate") or row.get("candidate_name"))
+    return list(found.items())[:MAX_PERSON_OPTIONS]
+
+
+def _match_note(rule: str) -> str:
+    """Polish explanation of mart.persons.match_rule."""
+    if rule == "name+gender":
+        return (
+            "Kandydatury w wyborach ogólnokrajowych połączone po imieniu, nazwisku i płci. Kandydatury samorządowe "
+            "dołączone, gdy imię i nazwisko są jednoznaczne, a lata urodzenia się zgadzają."
+        )
+    if rule == "name+gender+residence":
+        return (
+            "Kandydatury w wyborach ogólnokrajowych połączone po imieniu, nazwisku, płci i miejscu zamieszkania — "
+            "w jednych wyborach startowało kilka osób o tym imieniu i nazwisku."
+        )
+    if rule.startswith("local:"):
+        area = "województwie" if rule.endswith("voivodeship") else "powiecie"
+        return (
+            "Osoba lokalna (bez startu w wyborach ogólnokrajowych): kandydatury samorządowe połączone po imieniu, "
+            f"nazwisku, płci, roku urodzenia (wiek w dniu wyborów, ±1 rok) i {area}."
+        )
+    if rule == "manual":
+        return "Połączenie ustalone ręcznie (korekta w danych, np. po zmianie nazwiska lub rozdzieleniu imienników)."
+    return f"Reguła łączenia: {rule}."
+
+
+def _fetch_person(person_id: int) -> dict | None:
+    """``GET /persons/{id}``; shows a message and returns None on failure."""
+    try:
+        response = requests.get(f"{API_URL}/persons/{person_id}", headers=API_HEADERS, timeout=30)
+    except requests.RequestException as error:
+        st.error(f"Coś poszło nie tak z API: {error}")
+        return None
+    if response.status_code == 404:
+        st.warning("Nie ma już tej osoby w bazie (baza mogła zostać przebudowana). Zadaj pytanie ponownie.")
+        return None
+    if response.status_code == 401:
+        st.error("API wymaga klucza (ustaw PLUJKA_API_KEY dla interfejsu).")
+        return None
+    if response.status_code == 503:
+        st.warning("Baza wyników jest chwilowo niedostępna. Spróbuj ponownie za chwilę.")
+        return None
+    if not response.ok:
+        st.error(f"Coś poszło nie tak z API: HTTP {response.status_code}")
+        return None
+    return response.json()
+
+
+def _render_person_timeline(person_id: int) -> None:
+    """Every candidacy of one person, ordered by date, with how the candidacies were linked."""
+    payload = _fetch_person(person_id)
+    if payload is None:
+        return
+    person, candidacies = payload["person"], payload["candidacies"]
+    with st.container(border=True):
+        head, close = st.columns([5, 1])
+        head.markdown(f"#### 🗂️ {person['full_name']}")
+        if close.button("Zamknij", key=f"person_close_{person_id}", use_container_width=True):
+            st.session_state.pop("person_view", None)
+            st.rerun()
+        first, last = person.get("first_year"), person.get("last_year")
+        c1, c2, c3 = st.columns(3)
+        c1.metric("Kandydatury", person["candidacies"])
+        c2.metric("Lata aktywności", "—" if first is None else (f"{first}–{last}" if first != last else str(first)))
+        c3.metric("Razy wybrany(a)", person.get("elected_count", 0))
+        st.info(f"{_match_note(person['match_rule'])}\n\n{PERSON_CAVEAT}", icon="🔗")
+        rows = [
+            {
+                "Data": c["election_date"] or str(c["year"]),
+                "Wybory": CHAMBER_LABELS.get(c["chamber"], c["chamber"]),
+                "Tura": c["round"] if c["chamber"] in ("prezydent", "wbp") else None,
+                "Okręg": c["district_no"],
+                "Obszar": c["area"],
+                "Komitet": c["committee_name"],
+                "Miejsce na liście": c["list_position"],
+                "Głosy": c["votes"],
+                "Wybrany": None if c["elected"] is None else ("tak" if c["elected"] else "nie"),
+                "Wiek": c["age"],
+            }
+            for c in candidacies
+        ]
+        if rows:
+            chart = (
+                alt.Chart(pd.DataFrame(rows))
+                .mark_point(filled=True, size=140, opacity=0.9)
+                .encode(
+                    x=alt.X(
+                        "Data:T", title=None, axis=alt.Axis(format="%Y", tickCount="year"), scale=alt.Scale(padding=16)
+                    ),
+                    y=alt.Y(
+                        "Wybory:N", title=None, sort=list(dict.fromkeys(r["Wybory"] for r in rows)),
+                        axis=alt.Axis(labelLimit=260),
+                    ),
+                    color=alt.Color(
+                        "Wybrany:N", title="Wybrany", scale=alt.Scale(domain=["tak", "nie"], range=["#16a34a", "#94a3b8"]),
+                        legend=alt.Legend(orient="bottom"),
+                    ),
+                    tooltip=["Data", "Wybory", "Tura", "Obszar", "Okręg", "Komitet", "Głosy", "Wybrany"],
+                )
+                .properties(height=alt.Step(40))
+            )
+            st.altair_chart(chart, use_container_width=True)
+        st.dataframe(rows, use_container_width=True, hide_index=True)
+        _csv_download(rows, f"kandydatury {person['full_name']}", key=f"csv_person_{person_id}")
+
+
+def _render_person_links(data: dict, entity_refs: list[dict] | None, key: str) -> None:
+    """"Zobacz wszystkie kandydatury" for persons the answer refers to, then the chosen person's timeline."""
+    persons = _persons_in_answer(data, entity_refs)
+    if persons:
+        labels = dict(persons)
+        with st.container(border=True):
+            st.markdown("###### Osoby w odpowiedzi")
+            if len(persons) == 1:
+                chosen = persons[0][0]
+                st.caption(labels[chosen])
+            else:
+                chosen = st.selectbox(
+                    "Osoba", [p for p, _ in persons], format_func=labels.get, key=f"person_pick_{key}"
+                )
+            if st.button("Zobacz wszystkie kandydatury", key=f"person_open_{key}", use_container_width=True):
+                st.session_state["person_view"] = chosen
+    if st.session_state.get("person_view"):
+        _render_person_timeline(st.session_state["person_view"])
+
+
 st.set_page_config(
     page_title="Plujka KBW",
     page_icon="🗳️",
@@ -468,8 +682,10 @@ if last:
     fp = _feedback_fingerprint(q, data)
 
     st.markdown("##### Wynik")
+    entity_refs = last["previous"].get("entity_refs")
     if data.get("clarification"):
         _render_clarification(q, data)
+        _render_person_links(data, entity_refs, fp)
         st.stop()
     _render_answer(data)
     _render_result_emotes(data)
@@ -477,6 +693,8 @@ if last:
         st.dataframe(
             data["result"], use_container_width=True, hide_index=True, column_config=_code_columns(data["result"])
         )
+        _csv_download(data["result"], q, key=f"csv_{fp}")
+    _render_person_links(data, entity_refs, fp)
     if data.get("result"):
         _render_chart(data["result"])
         _render_map(data["result"])
@@ -507,12 +725,19 @@ if last:
             "Źródło: oficjalne wyniki [PKW](https://wybory.gov.pl) i "
             "[KBW — dane wyborcze](https://danewyborcze.kbw.gov.pl), wczytane do bazy bez zmian."
         )
+        if "gus_" in (data.get("sql") or "").lower():
+            # GUS Local Data Bank is CC BY 4.0: attribute whenever an answer reads it.
+            st.markdown(
+                "Dane statystyczne: [GUS, Bank Danych Lokalnych](https://bdl.stat.gov.pl) "
+                "(licencja [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.pl))."
+            )
         st.caption("Parametry (diagnostyka)")
         st.json(data["params"])
 
     _intent = data.get("intent") or ""
     if _intent == "dynamic_sql":
-        st.caption("Dane: PKW/KBW · zapytanie SQL napisane do pytania i sprawdzone przed uruchomieniem (tylko odczyt).")
+        _gus = " · statystyki: GUS BDL (CC BY 4.0)" if "gus_" in (data.get("sql") or "").lower() else ""
+        st.caption(f"Dane: PKW/KBW{_gus} · zapytanie SQL napisane do pytania i sprawdzone przed uruchomieniem (tylko odczyt).")
     elif _intent == "kbw_candidate_geo_votes_detail":
         st.caption(
             "Dane: KBW — głosy imienne/poziom gminy lub obwodu z plików kandydackich; "

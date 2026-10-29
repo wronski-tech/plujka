@@ -159,13 +159,13 @@ class TestYears2000To2003(unittest.TestCase):
         self.assertEqual(set(values), {"229997", "329997"})
         self.assertFalse(set(values) & {teryt for teryt, _ in drawn_codes(set(values))})
 
-    def test_warszawa_centrum_2000_uses_its_outline(self) -> None:
+    def test_warszawa_centrum_1998_uses_its_outline(self) -> None:
         centrum = {"146505", "146506", "146507", "146508", "146510", "146518", "146519"}
         others = {"146502", "146503", "146504", "146509", "146511", "146512", "146513", "146514", "146516", "146517"}
-        drawn = drawn_codes({"143104", "146515"} | others, years={2000})
+        drawn = drawn_codes({"143104", "141203"} | others, years={1998})
         self.assertIn(("143104", True), drawn)
         plain = {teryt for teryt, former in drawn if not former}
-        self.assertTrue(others | {"146515"} <= plain)
+        self.assertTrue(others <= plain)
         self.assertFalse(centrum & plain)
         self.assertNotIn("146501", {teryt for teryt, _ in drawn})
 
@@ -196,16 +196,22 @@ class TestYears2000To2003(unittest.TestCase):
             drawn = drawn_codes({"1406", "1418"}, "powiaty", years)
             self.assertEqual({former for teryt, former in drawn if teryt in ("1406", "1418")}, {False})
 
-    def test_warsaw_powiats_2000(self) -> None:
-        drawn = drawn_codes({"1431", "1465", "1412"}, "powiaty", {2000})
+    def test_warsaw_powiats_1998_to_2001(self) -> None:
+        # Sejmik 1998 keeps Warszawa-Centrum (1431) apart from the other Warsaw gminas (1465xx).
+        drawn = drawn_codes({"1431", "1465", "1412"}, "powiaty", {1998})
         former = {teryt for teryt, is_former in drawn if is_former}
         self.assertTrue({"1431", "1465", "1412"} <= former)
         self.assertFalse({"1465", "1412"} & {teryt for teryt, is_former in drawn if not is_former})
-        # In 2001 Warszawa-Centrum is already split into districts coded 1465xx.
-        drawn = drawn_codes({"1465", "1412"}, "powiaty", {2001})
-        self.assertIn(("1465", True), drawn)
-        self.assertNotIn("1431", {teryt for teryt, _ in drawn})
+        # From 2000 Warsaw is one powiat 1465 (president 2000 is split into districts too); Wesoła is in 1412.
+        for year in (2000, 2001):
+            drawn = drawn_codes({"1465", "1412"}, "powiaty", {year})
+            self.assertTrue({("1465", True), ("1412", True)} <= set(drawn), year)
+            self.assertNotIn("1431", {teryt for teryt, _ in drawn})
 
+    def test_1998_warsaw_gmina_councils_map_to_districts(self) -> None:
+        rows = [{"year": 1998, "teryt_gmina": "143101", "votes": 5}, {"year": 1998, "teryt_gmina": "143118", "votes": 7}]
+        values, _, _ = unit_values(rows, "teryt_gmina", "votes", "gminy")
+        self.assertEqual(values, {"146502": 5, "146517": 7})
 
 if __name__ == "__main__":
     unittest.main()

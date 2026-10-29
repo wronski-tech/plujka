@@ -13,8 +13,9 @@ Examples:
                                                       # the manifest, print the build_mart command
   python3 scripts/check_sources.py --update --rebuild # ... and run build_mart.py (needs DATABASE_URL)
 
-The weekly workflow ``.github/workflows/sources.yml`` runs ``--check`` with the committed manifest;
-it needs no mirror. ``--record`` and ``--update`` need the mirror in ``data/kbw_mirror/dane``.
+The weekly workflow ``.github/workflows/sources.yml`` runs the check with the committed manifest (no
+mirror needed); when files changed it runs ``--update`` with an empty mirror, which downloads only the
+changed files, and opens a pull request. ``--record`` needs the whole mirror in ``data/kbw_mirror/dane``.
 """
 
 from __future__ import annotations
@@ -55,10 +56,13 @@ def family_year(rel_path: str) -> tuple[str, int]:
     return family, year
 
 
-# Mirror prefixes that differ from the server path: the server keeps the 2002, 2006 and 2010
+# Mirror prefixes that differ from the server path: the server keeps the 1998, 2002, 2006 and 2010
 # local-election files directly under /dane/<year>/, the mirror under <year>/samorzad/ (apart from the
-# 2010 presidential files).
-SERVER_PREFIX = {"2002/samorzad/": "2002/", "2006/samorzad/": "2006/", "2010/samorzad/": "2010/"}
+# 2010 presidential files). The 1996 referendum files are directly under /dane/1996/ too.
+SERVER_PREFIX = {
+    "1998/samorzad/": "1998/", "2002/samorzad/": "2002/", "2006/samorzad/": "2006/", "2010/samorzad/": "2010/",
+    "1996/referendum/": "1996/",
+}
 
 
 def file_url(rel_path: str) -> str:

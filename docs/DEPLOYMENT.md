@@ -117,8 +117,15 @@ missing).
 
 `data/source_manifest.json` records every file of the KBW mirror (URL, size, SHA-256, ETag,
 Last-Modified). `.github/workflows/sources.yml` runs `scripts/check_sources.py` every Monday: HEAD
-requests only, compared with the manifest. A failed run lists changed or missing files and the
-family-years to rebuild. With the mirror locally:
+requests only, compared with the manifest. When files changed, a second job downloads only those
+files (the mirror is not in Git), re-stages them, builds the whole mart on PostgreSQL 16 with every
+check, runs the curated examples, and opens the pull request `sources/kbw-refresh` with the new
+parquet and manifest. The pull request is a draft and the run fails when the build or the examples
+fail; the run also fails when files disappeared. Pull requests opened with `GITHUB_TOKEN` do not
+start the CI workflow, so the job runs the build itself; enable *Settings → Actions → General →
+Allow GitHub Actions to create and approve pull requests* once. A republished ZIP whose member files
+were renamed leaves the old members' parquet behind; remove it in the pull request. With the
+mirror locally:
 
 ```bash
 python3 scripts/check_sources.py --update             # download changed files, re-stage, update manifest
@@ -131,7 +138,7 @@ changed parquet and manifest. Files that disappeared are kept; check the KBW pag
 
 ## Staged data in Git
 
-The staged parquet (`data/kbw_stage_parquet`, `data/pkw_stage_parquet`, about 260 MB) is committed
+The staged parquet (`data/kbw_stage_parquet`, `data/pkw_stage_parquet`, about 270 MB) is committed
 as plain Git files, not Git LFS. CI checks out the repository and builds the whole mart from these
 files on every push, and GitHub's free LFS bandwidth (1 GB per month) would be used up by those
 checkouts within days. No parquet file is near GitHub's 100 MB file limit. If the data grows past a

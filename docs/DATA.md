@@ -8,7 +8,7 @@ As its last step the loader runs `scripts/build_mart.py`, which builds the relat
 
 Staging (`scripts/kbw_stage_duckdb.py`) is strict: the delimiter is detected from the header, CP1250 files are transcoded, and a file fails instead of silently dropping malformed rows. XLS/XLSX tables are staged too; a workbook with several sheets becomes one Parquet file per sheet (`<stem>__sheetNN_<hash>.parquet`). ZIP member names in CP437/CP852 are decoded, and `__MACOSX/` entries are skipped.
 
-The KBW files used by the mart (per election under `data/kbw_mirror/dane/<year>/`) come from danewyborcze.kbw.gov.pl. The raw mirror is not committed; the staged Parquet in `data/kbw_stage_parquet` is (about 140 MB), so the mart can be built without downloading.
+The KBW files used by the mart (per election under `data/kbw_mirror/dane/<year>/`) come from danewyborcze.kbw.gov.pl. The raw mirror is not committed; the staged Parquet in `data/kbw_stage_parquet` is (about 230 MB), so the mart can be built without downloading.
 
 For local iteration, `SEED_SAMPLE_CSV` in `api/services/config.py` still defaults to `data/sample/sejm_results_sample_1000.csv` for legacy helpers in `api/services/seed.py` (not used by the API on startup).
 
@@ -51,6 +51,16 @@ One dataset is not in any KBW file: the 2006 list blocs (*grupy list*), publishe
 wybory2006.pkw.gov.pl results pages. `scripts/scrape_list_groups_2006.py` reads them (about 1,400
 pages, ~50 minutes with its default delay) into `data/pkw_html/list_groups_2006.csv`, one row per list
 with its source URL; the file is committed and read by the mart build (`build_rady.add_list_groups`).
+
+## GUS statistics
+
+`scripts/fetch_gus_bdl.py` downloads selected variables of the GUS Bank Danych Lokalnych
+(https://bdl.stat.gov.pl/api/v1/) into `data/gus/` (committed). The API works without a key at 5
+requests/s, 100 per 15 min, 1,000 per 12 h and 10,000 per 7 days; a free key (`BDL_API_KEY`, header
+`X-ClientId`) raises this to 10 / 500 / 5,000 / 50,000. A full run is about 366 requests (about an
+hour without a key); pages are cached under `.tmp/gus_bdl` so an interrupted run resumes. GUS
+publishes BDL data under Creative Commons Attribution 4.0 (CC BY 4.0); cite "Źródło: GUS, Bank Danych
+Lokalnych". Data fetched on 2026-10-29; 2025 values are not included yet.
 
 ## PKW data and attribution
 

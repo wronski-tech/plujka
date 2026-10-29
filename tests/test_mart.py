@@ -14,7 +14,7 @@ import unittest
 import zipfile
 from decimal import Decimal
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import duckdb
 import psycopg
@@ -29,6 +29,8 @@ from api.services.mart.build_common import (
     parse_numbered_names,
     python_name_key,
 )
+from api.services.mart.build_gus import bdl_unit_teryt
+from api.services.mart.build_prezydent import _header_surname, _same_building
 from api.services.mart.build_referendum import answer_columns
 from api.services.mart.safe_sql import UnsafeSqlError, validate_mart_sql
 from api.services.rate_limit import RedisWindowLimiter, SlidingWindowLimiter, TokenBudget
@@ -401,6 +403,23 @@ def _xlsx(path: Path, sheets: list[tuple[str, str, list[list[str]]]]) -> None:
             zf.writestr(f"xl/worksheets/{file_name}", f"<worksheet {ns}><sheetData>{body}</sheetData></worksheet>")
 
 
+class TestPrezydentPre2001Helpers(unittest.TestCase):
+    def test_warszawa_centrum_same_building(self) -> None:
+        # 2000 vs 2001 seats of one precinct number: renamed school, spelling variant, same institution.
+        self.assertTrue(_same_building("Szkoła Podstawowa nr 41, ul. Drewniana 8", "Zespół Szkół nr 9 ul.Drewniana 8"))
+        self.assertTrue(_same_building("Szkoła Podstawowa, ul. Sonat 6a", "Szkoła Podstawowa ul.Sonaty 6"))
+        self.assertTrue(_same_building("Szkoła Podstawowa nr 50, ul. Jagiellońska 3/5",
+                                       "Szkoła Podstawowa nr 50, ul. Jagiellońska 7"))
+        self.assertFalse(_same_building("Szkoła Podstawowa nr 1, ul. Promyka 5", "Gimnazjum nr 2 ul. Rybińskiego 2"))
+        self.assertFalse(_same_building("Szkoła Podstawowa nr 1, ul. Smolna 30", "Gimnazjum nr 44 ul.Smolna 31"))
+
+    def test_pre1999_header_surnames(self) -> None:
+        self.assertEqual(_header_surname("Hanna Gronkiewicz- -Waltz"), "GRONKIEWICZ-WALTZ")
+        self.assertEqual(_header_surname("Lech Wałęsa_1"), "WAŁĘSA")
+        self.assertEqual(_header_surname("Bartoszcze"), "BARTOSZCZE")
+        self.assertEqual(_header_surname("AK"), "KWAŚNIEWSKI")
+
+
 class TestMultiSheetStaging(unittest.TestCase):
     def test_one_parquet_per_sheet_in_workbook_order(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -489,6 +508,9 @@ class TestAnswerNumbers(unittest.TestCase):
         pe2014 = [{"election": "pe", "year": 2014, "round": 1, "turnout_pct": 23.82}]
         p2010 = [{"election": "prezydent", "year": 2010, "round": 1, "turnout_pct": 54.94}]
         self.assertIn("2014", " ".join(answer.caveats(pe2014, turnout)))
+        sejm1993 = [{"election": "sejm", "year": 1993, "round": 1, "turnout_pct": 52.13}]
+        self.assertIn("1993", " ".join(answer.caveats(sejm1993, turnout)))
+        self.assertEqual(answer.caveats([{"election": "sejm", "year": 1997, "round": 1, "turnout_pct": 47.93}], turnout), [])
         # Turnout computed as PKW did (turnout_basis) needs no caveat.
         self.assertEqual(answer.caveats(p2010, turnout), [])
         # Year and election only in the SQL (rows without those columns).
@@ -709,6 +731,37 @@ class TestDynamicQueryFlow(unittest.TestCase):
         self.assertEqual((first[3]["status"], other[3]["status"]), ("first_pass", "first_pass"))
 
 
+class TestGusUnitTeryt(unittest.TestCase):
+    def test_bdl_unit_ids_map_to_teryt(self) -> None:
+        cases = [
+            ("000000000000", 0, ""),  # Poland
+            ("011200000000", 2, "12"),  # małopolskie
+            ("011212001000", 5, "1201"),  # powiat bocheński
+            ("071412865000", 5, "1465"),  # powiat m.st. Warszawa
+            ("011212001011", 6, "1201011"),  # Bochnia, urban gmina
+            ("011212001022", 6, "1201022"),  # Bochnia, rural gmina
+            ("011212001063", 6, "1201063"),  # Nowy Wiśnicz, urban-rural gmina
+            ("011212001064", 6, "1201064"),  # its town part
+            ("071412865011", 6, "1465011"),  # m.st. Warszawa (city, gmina 146501)
+            ("071412865028", 6, "1465028"),  # Warsaw district Bemowo
+            ("071412831041", 6, "1431041"),  # Warszawa-Centrum, a gmina until 2001
+        ]
+        for unit_id, level, teryt in cases:
+            with self.subTest(unit_id=unit_id):
+                self.assertEqual(bdl_unit_teryt(unit_id, level), teryt)
+
+    def test_ids_of_other_levels_or_shapes_are_rejected(self) -> None:
+        for unit_id, level in [
+            ("011210000000", 2),  # a NUTS region, not a voivodeship
+            ("011212000000", 5),  # a subregion, not a powiat
+            ("011212001000", 6),  # a powiat asked as a gmina
+            ("011212001011", 5),  # a gmina asked as a powiat
+            ("11212001011", 6),  # 11 digits
+        ]:
+            with self.subTest(unit_id=unit_id, level=level), self.assertRaises(ValueError):
+                bdl_unit_teryt(unit_id, level)
+
+
 class TestPromptRelations(unittest.TestCase):
     AVAILABLE = [
         "elections", "persons", "v_turnout", "precincts", "sejm_lists", "senat_candidates",
@@ -733,6 +786,55 @@ class TestPromptRelations(unittest.TestCase):
         self.assertIn("v_seat_methods", relations)
         self.assertNotIn("pe_lists", relations)
         self.assertNotIn("v_seat_methods", dynamic_sql.relevant_relations("Kto wygrał wybory prezydenckie w 2020?", self.AVAILABLE))
+
+    def test_compact_schema_keeps_columns_of_base_tables_and_full_views(self) -> None:
+        rows = [
+            ("sejm_candidates", "Sejm candidates.", "year", "integer", "Election year."),
+            ("sejm_candidates", "Sejm candidates.", "full_name", "text", "Given names and SURNAME."),
+            ("v_turnout", "Turnout.", "turnout_pct", "numeric", "Official turnout in percent."),
+        ]
+        conn = MagicMock()
+        conn.__enter__.return_value.execute.return_value.fetchall.return_value = rows
+        dynamic_sql.schema_description.cache_clear()
+        try:
+            with patch.object(dynamic_sql.psycopg, "connect", return_value=conn):
+                compact = dynamic_sql.schema_description("test", compact=True)
+        finally:
+            dynamic_sql.schema_description.cache_clear()
+        self.assertIn("columns: year, full_name", compact["sejm_candidates"])
+        self.assertNotIn("Given names", compact["sejm_candidates"])
+        self.assertIn("turnout_pct numeric -- Official turnout in percent.", compact["v_turnout"])
+
+    def test_gus_statistics_keywords(self) -> None:
+        available = self.AVAILABLE + ["gus_units", "gus_indicators"]
+        for question in (
+            "Poparcie PiS a bezrobocie w powiatach 2023",
+            "Frekwencja w gminach powyżej 100 tys. mieszkańców",
+            "Jak głosowały gminy wiejskie?",
+            "Wynik KO w gminach miejskich a średnie wynagrodzenie",
+            "Gęstość zaludnienia i frekwencja w wyborach do Sejmu",
+            "Ludność powiatu tatrzańskiego według GUS",
+        ):
+            with self.subTest(question=question):
+                self.assertIn("gus_indicators", dynamic_sql.relevant_relations(question, available))
+        # GUS words alone do not narrow: the election they are compared with is not named.
+        self.assertEqual(dynamic_sql.relevant_relations("Jak głosowały gminy wiejskie?", available), available)
+        # Election keywords still narrow the rest of the schema.
+        relations = dynamic_sql.relevant_relations("Frekwencja w wyborach do Sejmu w gminach wiejskich", available)
+        self.assertIn("precincts", relations)
+        self.assertNotIn("pe_lists", relations)
+
+    def test_gus_false_friends(self) -> None:
+        # "Rada Miejska" is a council, "mieszka" a candidate's residence, "Ludowe" a party name.
+        available = self.AVAILABLE + ["gus_units", "gus_indicators"]
+        for question in (
+            "Ilu radnych liczy Rada Miejska w Krakowie?",
+            "Gdzie mieszka posłanka Nowak?",
+            "Wynik Polskiego Stronnictwa Ludowego w wyborach do Sejmu 2019",
+            "Kto został prezydentem miasta Gdańska?",
+        ):
+            with self.subTest(question=question):
+                self.assertNotIn("gus_indicators", dynamic_sql.relevant_relations(question, available))
 
     def test_no_kind_or_false_friend_sends_everything(self) -> None:
         # "Radom" is not "rada"; "województwie" is not the sejmik.

@@ -252,6 +252,68 @@ YEAR_COMMITTEE_ALIASES: dict[int, list[tuple[str, list[str]]]] = {
     # Local elections 2002: the joint PO-PiS sejmik committee (not PiS alone, which "PRAWO I
     # SPRAWIEDLIWOŚĆ" would give it).
     2002: [("PLATFORMA OBYWATELSKA - PRAWO I SPRAWIEDLIWOŚĆ", ["POPiS", "PO", "PiS"])],
+    # Local elections 1998: AWS itself (the generic rule leads with AWSP, its 2001 successor), SLD and
+    # the PSL-UP-KPEiR alliance named in the genitive or without a party name the rules below match,
+    # and two nationwide sejmik committees without a rule.
+    1998: [
+        ("KOMITET WYBORCZY AKCJA WYBORCZA SOLIDARNOŚĆ", ["AWS", "Akcja Wyborcza Solidarność"]),
+        ("KOMITET WYBORCZY SOJUSZU LEWICY DEMOKRATYCZNEJ", ["Lewica", "SLD"]),
+        ("PRZYMIERZE SPOŁECZNE: PSL-UP-KPEIR", ["PS", "Przymierze Społeczne", "PSL"]),
+        ("RUCH PATRIOTYCZNY OJCZYZNA", ["RPO", "Ruch Patriotyczny Ojczyzna"]),
+        # No "RP" alias: in questions it means the country (w RP), not this committee.
+        ('STOWARZYSZENIA "RODZINA POLSKA"', ["Rodzina Polska"]),
+    ],
+    # Sejm 1991: committees of the parties of the 1990s, and the employers' confederation, which the generic
+    # "KONFEDERACJA" rule would label Konfederacja. No bare "Solidarność" alias: AWS shares the word, and
+    # the "Solidarność 80" lists are other committees.
+    1991: [
+        ("POLSKIE STRONNICTWO LUDOWE SOJUSZ PROGRAMOWY", ["PSL", "PSL-SP"]),
+        ("POROZUMIENIE OBYWATELSKIE CENTRUM", ["POC", "PC", "Porozumienie Centrum"]),
+        ("WYBORCZA AKCJA KATOLICKA", ["WAK", "Wyborcza Akcja Katolicka"]),
+        ("KONGRES LIBERALNO-DEMOKRATYCZNY", ["KLD", "Kongres Liberalno-Demokratyczny"]),
+        ("UNIA DEMOKRATYCZNA", ["UD", "Unia Demokratyczna"]),
+        ("POROZUMIENIE LUDOWE", ["PL", "Porozumienie Ludowe"]),
+        ('"SOLIDARNOŚĆ" 80', []),
+        ('NSZZ "SOLIDARNOŚĆ"', ["NSZZ Solidarność"]),
+        ("POLSKA PARTIA PRZYJACIÓŁ PIWA", ["PPPP", "Polska Partia Przyjaciół Piwa"]),
+        ("CHRZEŚCIJAŃSKA DEMOKRACJA", ["ChD", "Chrześcijańska Demokracja"]),
+        ("PARTIA CHRZEŚCIJAŃSKICH DEMOKRATÓW", ["PChD", "Partia Chrześcijańskich Demokratów"]),
+        ("SOLIDARNOŚĆ PRACY", ["Solidarność Pracy"]),
+        ("STRONNICTWO DEMOKRATYCZNE", ["SD", "Stronnictwo Demokratyczne"]),
+        ("KONFEDERACJA PRACODAWCÓW", []),
+        ('"POJEDNANIE I PRZYSZŁOŚĆ"', ["MN", "Mniejszość Niemiecka"]),
+    ],
+    # Sejm 1993: PSL-PL is not PSL and PSL is not yet Koalicja Polska (the generic rule would say so);
+    # German minority committees not named "Mniejszość Niemiecka".
+    1993: [
+        ("POLSKIE STRONNICTWO LUDOWE - POROZUMIENIE LUDOWE", ["PSL-PL", "PSL-Porozumienie Ludowe"]),
+        ("POLSKIE STRONNICTWO LUDOWE", ["PSL"]),
+        ("POLSKA PARTIA PRZYJACIÓŁ PIWA", ["PPPP", "Polska Partia Przyjaciół Piwa"]),
+        ("POROZUMIENIE CENTRUM", ["PC", "Porozumienie Centrum"]),
+        ('KATOLICKI KOMITET WYBORCZY "OJCZYZNA"', ["KKW Ojczyzna", "Ojczyzna"]),
+        ("KONGRES LIBERALNO-DEMOKRATYCZNY", ["KLD", "Kongres Liberalno-Demokratyczny"]),
+        ('KOMISJA KRAJOWA NSZZ "SOLIDARNOŚĆ"', ["NSZZ Solidarność"]),
+        ("UNIA DEMOKRATYCZNA", ["UD", "Unia Demokratyczna"]),
+        ("BEZPARTYJNY BLOK WSPIERANIA REFORM", ["BBWR", "Bezpartyjny Blok Wspierania Reform"]),
+        ("UNIA PRACY", ["UP", "Unia Pracy"]),
+        ("SAMOOBRONA - LEPPERA", ["Samoobrona"]),
+        ("SPOŁECZNO-KULTURALNE NIEMCÓW", ["MN", "Mniejszość Niemiecka"]),
+        ("NIEMIECKA WSPÓLNOTA POJEDNANIE I PRZYSZŁOŚĆ", ["MN", "Mniejszość Niemiecka"]),
+    ],
+    # Sejm 1997: committees named after their proposing party organ, in the genitive ("Zarząd Główny Ruchu
+    # Odbudowy Polski"); AWS itself (the generic rule leads with AWSP, its 2001 successor).
+    1997: [
+        ("KOMITET WYBORCZY AKCJA WYBORCZA SOLIDARNOŚĆ", ["AWS", "Akcja Wyborcza Solidarność"]),
+        ("KOMITET WYBORCZY SOJUSZU LEWICY DEMOKRATYCZNEJ", ["Lewica", "SLD"]),
+        ("RUCHU ODBUDOWY POLSKI", ["ROP", "Ruch Odbudowy Polski"]),
+        ("KOMITET WYKONAWCZY UNII PRACY", ["UP", "Unia Pracy"]),
+        ("UNIA PRAWICY RZECZYPOSPOLITEJ", ["UPR", "Unia Prawicy Rzeczypospolitej"]),
+        ("RADA KRAJOWA PRZYMIERZE SAMOOBRONA", ["Samoobrona"]),
+        ("BLOK DLA POLSKI", ["Blok dla Polski"]),
+        ("KULTURALNEGO NIEMCÓW", ["MN", "Mniejszość Niemiecka"]),
+        ("MNIEJSZOŚCI NIEMIECKIEJ", ["MN", "Mniejszość Niemiecka"]),
+        ('"POJEDNANIE I PRZYSZŁOŚĆ"', ["MN", "Mniejszość Niemiecka"]),
+    ],
 }
 
 

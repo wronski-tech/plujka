@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import secrets
 import time
 from contextlib import asynccontextmanager
@@ -8,12 +9,14 @@ from datetime import date, datetime
 from decimal import Decimal
 from typing import Any, Literal
 
-from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
+import psycopg
+from fastapi import Depends, FastAPI, Header, HTTPException, Path, Query, Request
 from psycopg.conninfo import conninfo_to_dict
 from pydantic import BaseModel, ConfigDict, Field
 
 from api.services import answer, config, db, feedback_store, opensearch_store, router
 from api.services.mart import examples as sql_examples
+from api.services.mart import safe_sql
 from api.services.mart import schema as mart_schema
 from api.services.rate_limit import make_limiter, make_token_budget
 
@@ -28,7 +31,42 @@ OPENAPI_TAGS: list[dict[str, str]] = [
     {"name": "ask", "description": "Natural language → routed intent + SQL + rows"},
     {"name": "feedback", "description": "Thumbs up/down for answer quality"},
     {"name": "hints", "description": "OpenSearch suggestions over logged questions"},
+    {"name": "persons", "description": "Person timeline: every linked candidacy of one person (fixed read-only SQL over mart)"},
 ]
+
+# Fixed, parameterized queries for the person endpoints, run as the read-only mart role.
+PERSON_SQL = """
+SELECT person_id, full_name, last_name, first_names, gender, match_rule, candidacies
+FROM mart.persons WHERE person_id = %(person_id)s
+"""
+# Councils are one election ('rada') in mart.elections; the date orders rounds and same-year elections.
+PERSON_CANDIDACIES_SQL = """
+SELECT h.year, e.election_date, h.chamber, h.round, h.district_no, h.area, h.committee_name, h.list_no,
+       h.list_position, h.votes, h.elected, h.age
+FROM mart.v_person_history h
+LEFT JOIN mart.elections e
+  ON e.election = CASE WHEN left(h.chamber, 5) = 'rada_' THEN 'rada' ELSE h.chamber END
+ AND e.year = h.year AND e.round = h.round
+WHERE h.person_id = %(person_id)s
+ORDER BY e.election_date NULLS LAST, h.year, h.chamber, h.round, h.district_no, h.area
+"""
+# Every word of the query must start a word of the name, and one of them must start the surname.
+# Searches entity_lexicon: national persons plus elected mayors and sejmik councillors among local persons.
+PERSON_SEARCH_SQL = """
+WITH q AS (SELECT array_agg(mart.fold_name(t)) AS toks FROM unnest(%(tokens)s::text[]) AS t)
+SELECT p.person_id, p.full_name, p.gender, p.match_rule, p.candidacies, l.detail, l.years
+FROM mart.entity_lexicon l
+CROSS JOIN q
+JOIN mart.persons p ON p.person_id = l.ref::int
+WHERE l.kind = 'person'
+  AND EXISTS (SELECT 1 FROM unnest(q.toks) AS t WHERE l.folded LIKE t || '%%')
+  AND NOT EXISTS (SELECT 1 FROM unnest(q.toks) AS t WHERE ' ' || mart.fold_name(l.name) NOT LIKE '%% ' || t || '%%')
+ORDER BY l.folded = ANY(q.toks) DESC, p.candidacies DESC, l.name, p.person_id
+LIMIT %(limit)s
+"""
+PERSON_SEARCH_MAX_ROWS = 50
+# Letters only (hyphenated and apostrophe surnames kept), so LIKE wildcards never reach the query.
+_NAME_TOKEN_RE = re.compile(r"[^\W\d_]+(?:[-'][^\W\d_]+)*")
 
 
 def production_problems() -> list[str]:
@@ -169,6 +207,67 @@ class KbwCatalogSummaryResponse(BaseModel):
     by_file_kind: dict[str, int]
 
 
+class PersonSummary(BaseModel):
+    """One row of ``mart.persons`` plus the years active, derived from its candidacies."""
+
+    person_id: int = Field(description="mart.persons.person_id; rebuilt on every mart load (not stable across loads)")
+    full_name: str = Field(description="Given names and SURNAME as published by PKW")
+    last_name: str
+    first_names: str
+    gender: str | None = None
+    match_rule: str = Field(
+        description="How candidacies were linked: 'name+gender', 'name+gender+residence' (national; PKW publishes "
+        "no person ids), 'local:...' (local person: name, gender, birth year and powiat or voivodeship) or 'manual' "
+        "(person_overrides.csv). Namesakes may still be merged or split."
+    )
+    candidacies: int = Field(description="Number of candidacies (one per election round) in all loaded elections")
+    first_year: int | None = Field(default=None, description="Year of the first candidacy")
+    last_year: int | None = Field(default=None, description="Year of the latest candidacy")
+    elected_count: int = Field(default=0, description="Number of candidacies with elected = true")
+
+
+class PersonCandidacy(BaseModel):
+    """One row of ``mart.v_person_history`` (one candidacy and round), with the election date."""
+
+    year: int
+    election_date: str | None = Field(default=None, description="ISO date of the election round (mart.elections)")
+    chamber: str = Field(description="sejm, senat, prezydent, pe, sejmik, wbp (mayor), rada_gminy, rada_powiatu, rada_dzielnicy")
+    round: int
+    district_no: int | None = None
+    area: str | None = Field(default=None, description="sejmik: voivodeship; wbp: gmina; councils: council name")
+    committee_name: str | None = None
+    list_no: int | None = None
+    list_position: int | None = None
+    votes: int | None = None
+    elected: bool | None = None
+    age: int | None = Field(default=None, description="Age on election day; only local registers publish it")
+
+
+class PersonResponse(BaseModel):
+    """``GET /persons/{person_id}``: the person and every candidacy ordered by election date."""
+
+    person: PersonSummary
+    candidacies: list[PersonCandidacy]
+
+
+class PersonSearchHit(BaseModel):
+    """A person whose name matches the search, as listed in ``mart.entity_lexicon``."""
+
+    person_id: int
+    full_name: str
+    gender: str | None = None
+    match_rule: str
+    candidacies: int
+    detail: str | None = Field(default=None, description="Short list of candidacies (election year, district, area)")
+    years: list[int] = Field(default_factory=list, description="Years with a candidacy")
+
+
+class PersonSearchResponse(BaseModel):
+    """``GET /persons?name=...``: at most ``limit`` matches, exact surnames first, then by candidacies."""
+
+    persons: list[PersonSearchHit]
+
+
 @app.get(
     "/health",
     response_model=HealthResponse,
@@ -224,6 +323,66 @@ def _json_value(value: Any) -> Any:
     if isinstance(value, (date, datetime)):
         return value.isoformat()
     return value
+
+
+def _mart_rows(sql: str, params: dict[str, Any]) -> list[dict[str, Any]]:
+    """Run a fixed person query as the read-only mart role; JSON-friendly values; 503 when the mart fails."""
+    try:
+        rows = safe_sql.run_readonly(sql, params=params)
+    except psycopg.Error as exc:
+        log.warning("person query failed: %s", exc)
+        raise HTTPException(status_code=503, detail="Election database is unavailable; try again later.") from exc
+    return [{k: _json_value(v) for k, v in row.items()} for row in rows]
+
+
+@app.get(
+    "/persons",
+    response_model=PersonSearchResponse,
+    tags=["persons"],
+    dependencies=[Depends(require_api_key)],
+    summary="Find persons by name",
+)
+def search_persons(
+    name: str = Query(min_length=2, max_length=100, description="Name or its beginning, e.g. 'Hołownia' or 'Szymon Hołow'"),
+    limit: int = Query(20, ge=1, le=PERSON_SEARCH_MAX_ROWS, description="Maximum number of persons returned"),
+) -> PersonSearchResponse:
+    """Prefix search over persons in ``mart.entity_lexicon`` (national persons, elected mayors and sejmik
+    councillors among local persons). Every word must start a word of the name and one must start the
+    surname; case and Polish diacritics are ignored. Requires ``X-API-Key`` when ``API_KEYS`` is set; not
+    counted against the ``/ask`` rate limit (fixed SQL, no LLM).
+    """
+    tokens = _NAME_TOKEN_RE.findall(name)[:5]
+    if not tokens:
+        return PersonSearchResponse(persons=[])
+    rows = _mart_rows(PERSON_SEARCH_SQL, {"tokens": tokens, "limit": limit})
+    return PersonSearchResponse.model_validate({"persons": rows[:limit]})
+
+
+@app.get(
+    "/persons/{person_id}",
+    response_model=PersonResponse,
+    tags=["persons"],
+    dependencies=[Depends(require_api_key)],
+    summary="Every candidacy of one person",
+    responses={404: {"description": "No person with this id in the current mart load"}},
+)
+def get_person(person_id: int = Path(ge=1, description="person_id from an answer row, entity or search")) -> PersonResponse:
+    """The person (``mart.persons``, with ``match_rule`` telling how candidacies were linked) and every
+    candidacy from ``mart.v_person_history`` ordered by election date. ``person_id`` changes when the mart
+    is rebuilt. Requires ``X-API-Key`` when ``API_KEYS`` is set; not counted against the ``/ask`` rate limit.
+    """
+    people = _mart_rows(PERSON_SQL, {"person_id": person_id})
+    if not people:
+        raise HTTPException(status_code=404, detail="Person not found.")
+    candidacies = _mart_rows(PERSON_CANDIDACIES_SQL, {"person_id": person_id})
+    years = [row["year"] for row in candidacies]
+    person = {
+        **people[0],
+        "first_year": min(years, default=None),
+        "last_year": max(years, default=None),
+        "elected_count": sum(1 for row in candidacies if row["elected"]),
+    }
+    return PersonResponse.model_validate({"person": person, "candidacies": candidacies})
 
 
 @app.post("/ask", response_model=AskResponse, tags=["ask"])

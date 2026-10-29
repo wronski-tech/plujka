@@ -103,9 +103,11 @@ SQL_CACHE = _SqlCache(SQL_CACHE_MAX_ENTRIES, SQL_CACHE_TTL_SECONDS)
 
 
 @lru_cache(maxsize=2)
-def schema_description(version: str = "") -> dict[str, str]:
+def schema_description(version: str = "", compact: bool = False) -> dict[str, str]:
     """Prompt text per mart relation: table/column comments read from PostgreSQL.
 
+    With ``compact``, base tables (not v_* views, not SHARED_RELATIONS) list only their comment and
+    column names; used when the question names no election kind and the whole schema is sent.
     Cached per mart load ``version`` (from ``data_context``), so a rebuilt mart is picked up
     without restarting the API.
     """
@@ -125,7 +127,15 @@ def schema_description(version: str = "") -> dict[str, str]:
     for relation, table_doc, column, col_type, column_doc in rows:
         doc, columns = relations.setdefault(relation, (table_doc or "", []))
         columns.append(f"  {column} {col_type}" + (f" -- {column_doc}" if column_doc else ""))
-    return {name: f"mart.{name} -- {doc}\n" + "\n".join(cols) for name, (doc, cols) in relations.items()}
+    if not compact:
+        return {name: f"mart.{name} -- {doc}\n" + "\n".join(cols) for name, (doc, cols) in relations.items()}
+    return {
+        name: f"mart.{name} -- {doc}\n" + (
+            "\n".join(cols) if name.startswith("v_") or name in SHARED_RELATIONS
+            else "  columns: " + ", ".join(c.split()[0] for c in cols)
+        )
+        for name, (doc, cols) in relations.items()
+    }
 
 
 # Words that name an election kind (folded, no diacritics) -> relation name prefixes of that kind.
@@ -142,7 +152,13 @@ FAMILY_KEYWORDS: dict[str, tuple[str, ...]] = {
     r"wojt|burmistrz|mayor": ("wbp_",),
     r"\brad(a|y|e|zie|ach|ami)\b|radn": ("rada_", "v_rada_"),
     r"hondt|sainte|lague|metod|podzial\w* mandat|gdyby": ("v_seat_", "sejm_district", "sejmik_district", "rada_district"),
+    # GUS statistics, not an election. Not "mieszka" (candidates' residence), not "miejsk" alone ("rada miejska").
+    r"\bgus\b|ludnosc|mieszkanc|bezrobo|wynagrodz|zarob|pensj|gestosc|zaludn|powierzchn|wiejsk|\bwsi\b"
+    r"|gmin\w* miejsk|miejsk\w* gmin|\bw miastach\b": ("gus_", "v_gus_"),
 }
+# Groups that only add relations: GUS statistics are compared with some election, so a question
+# naming no election kind besides them ("Nawrocki w gminach wiejskich") still gets the whole schema.
+ADD_ONLY_PREFIXES = ("gus_", "v_gus_")
 SHARED_RELATIONS = (
     "elections", "persons", "v_person_history", "v_turnout", "v_party_results", "v_party_change", "v_gmina_continuity",
     "party_families",
@@ -153,13 +169,13 @@ def relevant_relations(question: str, available: list[str]) -> list[str]:
     """Relations to describe in the prompt for ``question`` (all of them when no kind is named)."""
     folded = entities.fold(question)
     prefixes = [p for pattern, group in FAMILY_KEYWORDS.items() if re.search(pattern, folded) for p in group]
-    if not prefixes:
+    if not set(prefixes) - set(ADD_ONLY_PREFIXES):
         return list(available)
     return [r for r in available if r in SHARED_RELATIONS or r.startswith(tuple(prefixes))]
 
 
 def data_context() -> tuple[str, str]:
-    """Loaded elections and the main Sejm committees, plus a version string of the last mart load."""
+    """Loaded elections, GUS years and the main Sejm committees, plus a version string of the last mart load."""
     with psycopg.connect(MART_DATABASE_URL) as conn:
         elections = conn.execute(
             "SELECT election, year, round, description, loaded_at FROM mart.elections ORDER BY election, year, round"
@@ -170,10 +186,17 @@ def data_context() -> tuple[str, str]:
             FROM mart.v_sejm_national_results WHERE pct >= 1 GROUP BY year ORDER BY year
             """
         ).fetchall()
-    version = max((str(e[4]) for e in elections), default="")
+        # GUS statistics write no mart.elections row; their years (primary-key index, no scan) join the version.
+        gus = None
+        if conn.execute("SELECT to_regclass('mart.gus_indicators')").fetchone()[0]:
+            gus = conn.execute("SELECT min(year), max(year) FROM mart.gus_indicators").fetchone()
+    has_gus = bool(gus and gus[0])
+    version = max((str(e[4]) for e in elections), default="") + (f"|gus {gus[0]}-{gus[1]}" if has_gus else "")
     lines = [f"- {e[0]} {e[1]}" + (f" round {e[2]}" if e[2] else "") + f": {e[3]}" for e in elections]
     sejm = [f"- {year}: {names}" for year, names in committees]
     text = "Loaded elections (election, year, round):\n" + "\n".join(lines)
+    if has_gus:
+        text += f"\n\nGUS statistics (not elections, mart.gus_* / mart.v_gus_units): years {gus[0]}-{gus[1]}"
     text += "\n\nMain Sejm committees per year:\n" + "\n".join(sejm)
     return text, version
 
@@ -245,6 +268,8 @@ def build_context(
     described = schema_description(version)
     scope = f"{previous['question']} {question}" if previous else question
     relations = relevant_relations(scope, list(described))
+    if len(relations) == len(described):  # no election kind named: whole schema, base tables compact
+        described = schema_description(version, compact=True)
     similar = examples.similar_examples(question)
     context = (
         "Schema:\n" + "\n\n".join(described[r] for r in relations)

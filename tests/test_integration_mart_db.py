@@ -46,6 +46,38 @@ class TestMartReaderRole(unittest.TestCase):
 
 
 @unittest.skipUnless(_RUN, "Set PLUJKA_RUN_DB_TESTS=1 to run DB integration tests")
+class TestPersonEndpointsDb(unittest.TestCase):
+    """``GET /persons`` and ``GET /persons/{id}`` run their fixed queries as the reader on a built mart."""
+
+    def test_timeline_matches_person_history(self) -> None:
+        from fastapi.testclient import TestClient
+
+        from api.main import app
+        from api.services.mart.safe_sql import run_readonly
+
+        found = run_readonly(
+            "SELECT p.person_id, p.last_name, p.candidacies FROM mart.entity_lexicon l"
+            " JOIN mart.persons p ON p.person_id = l.ref::int WHERE l.kind = 'person'"
+            " ORDER BY p.candidacies DESC, p.person_id LIMIT 1"
+        )
+        if not found:
+            self.skipTest("mart has no persons; build it first")
+        person = found[0]
+        client = TestClient(app)
+        body = client.get(f"/persons/{person['person_id']}").json()
+        self.assertEqual(body["person"]["candidacies"], person["candidacies"])
+        self.assertEqual(len(body["candidacies"]), person["candidacies"])
+        dates = [c["election_date"] for c in body["candidacies"]]
+        self.assertNotIn(None, dates)
+        self.assertEqual(dates, sorted(dates))
+        hits = client.get("/persons", params={"name": person["last_name"].lower(), "limit": 50}).json()["persons"]
+        self.assertLessEqual(len(hits), 50)
+        self.assertIn(person["person_id"], [h["person_id"] for h in hits])
+        missing = run_readonly("SELECT coalesce(max(person_id), 0) + 1 AS n FROM mart.persons")[0]["n"]
+        self.assertEqual(client.get(f"/persons/{missing}").status_code, 404)
+
+
+@unittest.skipUnless(_RUN, "Set PLUJKA_RUN_DB_TESTS=1 to run DB integration tests")
 class TestPersonLinking(unittest.TestCase):
     CANDIDATE_TABLES = ("sejm_candidates", "senat_candidates", "prezydent_candidates", "pe_candidates",
                         "sejmik_candidates", "wbp_candidates", "rada_candidates")

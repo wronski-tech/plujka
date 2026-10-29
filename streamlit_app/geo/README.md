@@ -8,7 +8,7 @@ matching rules in `map_units.py`).
 | `gminy.json` | 2474 gminas, 3 former extents (Warsaw `146501`, Kamienica and Supraśl before 2025) | 6-digit gmina TERYT (without the type digit) | `teryt_gmina` | public domain |
 | `gminy_osm.json` | 18 Warsaw districts, Szczawa, Grabówka, Kamienica and Supraśl since 2025, Warszawa-Centrum `143104` | as above | `teryt_gmina` | ODbL 1.0 |
 | `powiaty.json` | 380 powiats, 18 former extents | 4-digit powiat TERYT | `teryt_powiat` | public domain |
-| `powiaty_osm.json` | 4 former extents built from Warsaw districts (`1431`, `1465` in 2000 and 2001, `1412` with Wesoła) | as above | `teryt_powiat` | ODbL 1.0 |
+| `powiaty_osm.json` | 4 former extents built from Warsaw districts (`1431` and `1465` in 1998, `1465` without Wesoła 1999–2001, `1412` with Wesoła) | as above | `teryt_powiat` | ODbL 1.0 |
 | `wojewodztwa.json` | 16 voivodeships | 2-digit TERYT; matched by `name` | `wojewodztwo` (name) | public domain |
 | `teryt_changes.json` | old code → current code | | applied to `teryt_gmina` / `teryt_powiat` before matching | |
 
@@ -37,13 +37,14 @@ Sources and licences:
   drawn in grey instead.
 
 Former extents: a feature with `properties.parts` is the area of a unit at an earlier time: Warsaw
-`146501` as one unit, gmina Warszawa-Centrum `143104` (president 2000), Kamienica and Supraśl before
+`146501` as one unit, gmina Warszawa-Centrum `143104` (sejmik 1998), Kamienica and Supraśl before
 2025, and powiats before gminas moved in or out (the 2002 powiats, Sławków 2002, Tarczyn and Szerzyny
 2003, Warsaw and Wesoła 2002, Wałbrzych 2003-2012, Rejowiec 2006). It replaces the current units in
 `parts` when the result has its own code and none of the other part codes. With `properties.years`
 ([first, last]) it is drawn only when every `year` in the result falls in that period; a result
 without a `year` column uses it only when its own code no longer exists or a part code created later
-is absent. So EP 2004 still colours Warsaw as one unit, and a 2001 powiat map shows powiat nowosolski
+is absent. Extents of 1999–2001 also cover 1998, whose files already use the 1999 codes; the
+1998 Warsaw gminas (`1431xx`, councils) map to their districts. So EP 2004 still colours Warsaw as one unit, and a 2001 powiat map shows powiat nowosolski
 with Wschowa. Powiat extents are unions of the current gmina polygons in the powiat's composition of
 the time, taken from the mart data; `teryt_changes.json` (`former_extents`) lists them with sources.
 
