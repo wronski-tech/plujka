@@ -62,8 +62,10 @@ protocol table. Sejm and Senate share `precincts`.
 
 Committees carry `aliases` (`{PiS,Zjednoczona Prawica}`, `{KO,PO,Platforma Obywatelska}`), assigned
 by `COMMITTEE_ALIASES` in `build_common.py` (first matching needle wins; needles are specific, e.g.
-`PARTIA RAZEM`, not `RAZEM`, so local committees such as "ZAWSZE RAZEM" get no alias). Compare
-parties across years by alias, not by name.
+`PARTIA RAZEM`, not `RAZEM`, so local committees such as "ZAWSZE RAZEM" get no alias). Rules for one
+year (`YEAR_COMMITTEE_ALIASES`) come first; they separate committees with the same name, e.g. the 2010
+sejmik committee "KOALICYJNY KOMITET WYBORCZY LEWICA" (`KKW Lewica`, not SLD) from the 2024 Lewica
+committee (`Lewica`). Compare parties across years by alias, not by name.
 
 ### Views
 

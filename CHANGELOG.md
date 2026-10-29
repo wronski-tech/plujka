@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Year-specific committee alias rules (`YEAR_COMMITTEE_ALIASES`): the 2010 sejmik and council committee "KOALICYJNY KOMITET WYBORCZY LEWICA" is `KKW Lewica`, no longer counted with SLD in the Lewica family.
 - Mart: Sejm and Senate 2005/2007, president 2005 (both rounds) and European Parliament 2004/2009 (gmina level), reconciled with PKW; `residence_teryt` for national candidates (published from 2019), used to link local candidacies to one of several national namesakes living in the same powiat; committee aliases for LiD, Samoobrona, LPR, SDPL, PD, UW, UPR, OKO, KROB and the 2010 German minority (TSKN); the `SKUTECZNI` needle narrowed to `SKUTECZNI PIOTRA`.
 - Local persons: mayors, councillors and sejmik candidates without a national candidacy are linked across elections by name, gender, birth year and powiat (or voivodeship); runs containing one national person join that person.
 - Answer caveats (`answer.caveats`): fixed notes about data gaps (non-comparable party changes, approximate council list totals, president 2010, Sejm 2005/2007, president 2005 and EP 2014 turnout, presidential precinct sums, person linking), shown under the answer.

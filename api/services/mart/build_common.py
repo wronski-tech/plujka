@@ -235,13 +235,23 @@ def open_duckdb() -> duckdb.DuckDBPyConnection:
     return con
 
 
-def create_committee_aliases(con: duckdb.DuckDBPyConnection) -> None:
-    """Create ``committee_alias_rules(priority, needle, aliases_pg)`` from COMMITTEE_ALIASES.
+# Rules for one election year, checked before COMMITTEE_ALIASES: committees whose name equals a later
+# committee's name but which are a different formation.
+YEAR_COMMITTEE_ALIASES: dict[int, list[tuple[str, list[str]]]] = {
+    # Local elections 2010: not SLD (which ran as its own committee) and not the 2024 Lewica committee
+    # of the same name.
+    2010: [("KOALICYJNY KOMITET WYBORCZY LEWICA", ["KKW Lewica"])],
+}
 
+
+def create_committee_aliases(con: duckdb.DuckDBPyConnection, year: int) -> None:
+    """Create ``committee_alias_rules(priority, needle, aliases_pg)`` for ``year``.
+
+    Rules of YEAR_COMMITTEE_ALIASES for that year come first, then COMMITTEE_ALIASES.
     ``aliases_pg`` is already a PostgreSQL array literal so it can be COPYed into TEXT[].
     """
     rows = []
-    for priority, (needle, aliases) in enumerate(COMMITTEE_ALIASES):
+    for priority, (needle, aliases) in enumerate(YEAR_COMMITTEE_ALIASES.get(year, []) + COMMITTEE_ALIASES):
         pg_array = "{" + ",".join('"' + a.replace('"', '\\"') + '"' for a in aliases) + "}"
         rows.append(f"({priority}, {sql_literal(needle)}, {sql_literal(pg_array)})")
     con.execute(

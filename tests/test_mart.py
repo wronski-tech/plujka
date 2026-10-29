@@ -22,6 +22,7 @@ import psycopg
 from api.services import answer, dynamic_sql
 from api.services.mart import entities, examples
 from api.services.mart.build_common import (
+    create_committee_aliases,
     parse_blocks_2015,
     parse_list_blocks,
     parse_list_position,
@@ -306,6 +307,20 @@ class TestHeaderParsers(unittest.TestCase):
         )
         self.assertEqual((refs["Anna NOWAK - nr na liście 3"].list_no, refs["Anna NOWAK - nr na liście 3"].position), (4, 3))
         self.assertEqual(len(refs), 2)
+
+    def test_year_alias_rule_wins_only_in_its_year(self) -> None:
+        con = duckdb.connect()
+
+        def aliases(year: int, name: str) -> str:
+            create_committee_aliases(con, year)
+            return con.execute(
+                "SELECT aliases_pg FROM committee_alias_rules WHERE ? LIKE '%' || needle || '%' ORDER BY priority LIMIT 1",
+                [name],
+            ).fetchone()[0]
+
+        self.assertEqual(aliases(2010, "KOALICYJNY KOMITET WYBORCZY LEWICA"), '{"KKW Lewica"}')
+        self.assertEqual(aliases(2024, "KOALICYJNY KOMITET WYBORCZY LEWICA"), '{"Lewica"}')
+        self.assertEqual(aliases(2010, "KOMITET WYBORCZY SOJUSZ LEWICY DEMOKRATYCZNEJ"), '{"Lewica","SLD"}')
 
     def test_2015_blocks_assigned_by_name_overlap(self) -> None:
         # Block order differs from list numbers on purpose; assignment must follow candidate names.

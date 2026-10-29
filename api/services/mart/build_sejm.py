@@ -119,7 +119,7 @@ def build_sejm(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     layout = available_layout(sources)
     if layout is None:
         raise BuildError(f"year {sources.year}: no staged Sejm precinct results")
-    create_committee_aliases(con)
+    create_committee_aliases(con, sources.year)
     # Rows of candidate files without a precinct number (2011: combined military precincts, see
     # ``rows_without_number``) and their votes per candidate; empty for other layouts.
     con.execute("CREATE OR REPLACE TABLE sejm_rows_without_number (district_no INT, address VARCHAR)")

@@ -70,7 +70,8 @@ SQL safety), `docs/DATA.md` (sources), `docs/DEPLOYMENT.md` (API keys, Redis lim
 - **Person corrections go to `person_overrides.csv`,** never into SQL special cases; every row needs a
   `note`, and a row that matches nothing fails the build.
 - **Committee alias needles must be specific.** `COMMITTEE_ALIASES` matches by substring, first rule
-  wins; check every loaded committee's aliases before and after a change (local committees are named
+  wins (`YEAR_COMMITTEE_ALIASES` for one year come first, for committees sharing a later committee's
+  name); check every loaded committee's aliases before and after a change (local committees are named
   freely, e.g. "ZAWSZE RAZEM").
 - **Prefer PKW bundles over the KBW mirror per dataset.** KBW's 2023 Senate precinct file has empty votes.
 - PostgreSQL in CI is 16 and local images may be 15: avoid `any_value` and other 16-only functions in

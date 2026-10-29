@@ -102,7 +102,7 @@ def available(sources: YearSources) -> bool:
 def build_pe(con: duckdb.DuckDBPyConnection, sources: YearSources) -> list[Election]:
     """Build and check all EP tables of ``sources.year``; return the loaded election."""
     year = sources.year
-    create_committee_aliases(con)
+    create_committee_aliases(con, sources.year)
     if year in GMINA_LAYOUT:
         _build_gmina_layout(con, year, sources)
         _assemble(con, year)

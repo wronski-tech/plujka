@@ -176,7 +176,7 @@ def _build_sejmik(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     """Sejmik committees, candidates, district lists, gmina protocols and gmina list votes."""
     year = sources.year
     spec = SOURCES[year]
-    create_committee_aliases(con)
+    create_committee_aliases(con, sources.year)
     raw = sources.load("sejmik_cand", spec["sejmik_candidates"])
     if year == 2010:
         con.execute(f"CREATE OR REPLACE TABLE sejmik_cand AS SELECT * FROM {raw} WHERE \"Szczebel\" = 'sejmik'")
