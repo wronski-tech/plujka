@@ -37,7 +37,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from api.services.kbw_import import read_xlsx_table  # noqa: E402
+from api.services.kbw_import import read_xlsx_sheets  # noqa: E402
 
 try:
     import xlrd  # type: ignore[import-not-found]
@@ -45,6 +45,8 @@ except ImportError:  # pragma: no cover - optional at runtime
     xlrd = None
 
 TABLE_SUFFIXES = (".csv", ".xls", ".xlsx")
+# Boundary descriptions ("Opis granic") can be very long; the csv module's default 128 KiB cap is too low.
+csv.field_size_limit(sys.maxsize)
 CANDIDATE_DELIMITERS = (";", ",", "\t")
 
 
@@ -61,6 +63,23 @@ def year_from_path(path: Path) -> int | None:
 def _slug(text: str) -> str:
     """Short stable hash used to keep Parquet names of ZIP members unique."""
     return hashlib.sha1(text.encode("utf-8")).hexdigest()[:16]
+
+
+def _member_display_name(info: zipfile.ZipInfo) -> str:
+    """ZIP member name with Polish letters restored.
+
+    Members without the UTF-8 flag are decoded by ``zipfile`` as CP437, which turns names written
+    as UTF-8 or CP852 into mojibake ("nieważne" -> "niewa╛ne"). Used for output file names only.
+    """
+    if info.flag_bits & 0x800:
+        return info.filename
+    raw = info.filename.encode("cp437")
+    for encoding in ("utf-8", "cp852"):
+        try:
+            return raw.decode(encoding)
+        except UnicodeDecodeError:
+            continue
+    return info.filename
 
 
 def _sql_literal(value: str) -> str:
@@ -137,20 +156,20 @@ def _excel_cell(value: object) -> str:
     return "" if value is None else str(value)
 
 
-def read_excel_table(path: Path) -> list[list[str]]:
-    """First worksheet of an XLS or XLSX file as rows of strings."""
+def read_excel_sheets(path: Path) -> list[tuple[str, list[list[str]]]]:
+    """Every worksheet of an XLS or XLSX file as (sheet title, rows of strings)."""
     if path.suffix.lower() == ".xlsx":
-        return read_xlsx_table(path)
+        return read_xlsx_sheets(path)
     if xlrd is None:
         raise StagingError("xlrd is required to stage .xls files")
     try:
         book = xlrd.open_workbook(path.as_posix(), on_demand=True)
     except xlrd.XLRDError as exc:
         raise StagingError(f"not a readable XLS file: {exc}") from exc
-    if book.nsheets == 0:
-        return []
-    sheet = book.sheet_by_index(0)
-    return [[_excel_cell(v) for v in sheet.row_values(i)] for i in range(sheet.nrows)]
+    return [
+        (sheet.name, [[_excel_cell(v) for v in sheet.row_values(i)] for i in range(sheet.nrows)])
+        for sheet in (book.sheet_by_index(n) for n in range(book.nsheets))
+    ]
 
 
 def unique_headers(raw_headers: list[str]) -> list[str]:
@@ -171,11 +190,8 @@ def unique_headers(raw_headers: list[str]) -> list[str]:
     return out
 
 
-def excel_to_parquet(path: Path, parquet_path: Path) -> int:
-    """Stage the first worksheet of an Excel file (header in row 1) into Parquet; return row count."""
-    table = read_excel_table(path)
-    if not table:
-        raise StagingError("empty worksheet")
+def _write_sheet(table: list[list[str]], parquet_path: Path) -> int:
+    """Write one worksheet (header in row 1) to Parquet; return the number of data rows."""
     headers = unique_headers(table[0])
     rows = [row for row in table[1:] if any(cell.strip() for cell in row)]
     columns = {
@@ -185,6 +201,24 @@ def excel_to_parquet(path: Path, parquet_path: Path) -> int:
     parquet_path.parent.mkdir(parents=True, exist_ok=True)
     pq.write_table(pa.table(columns), parquet_path, compression="zstd")
     return len(rows)
+
+
+def excel_to_parquet(path: Path, parquet_path: Path) -> int:
+    """Stage an Excel file into Parquet; return the total row count.
+
+    A single non-empty worksheet goes to ``parquet_path``. Workbooks with several non-empty sheets
+    (e.g. one sheet per district) get one file per sheet: ``<stem>__sheetNN_<title>.parquet``.
+    """
+    sheets = [(title, table) for title, table in read_excel_sheets(path) if table]
+    if not sheets:
+        raise StagingError("empty workbook")
+    if len(sheets) == 1:
+        return _write_sheet(sheets[0][1], parquet_path)
+    total = 0
+    for index, (title, table) in enumerate(sheets, start=1):
+        target = parquet_path.with_name(f"{parquet_path.stem}__sheet{index:02d}_{_slug(title)[:8]}.parquet")
+        total += _write_sheet(table, target)
+    return total
 
 
 def stage_table(con: duckdb.DuckDBPyConnection, name: str, data: bytes, parquet_path: Path) -> int:
@@ -226,13 +260,17 @@ def stage_to_parquet(root: Path, out_dir: Path, years: set[int] | None = None) -
                 continue
             members = [
                 (
-                    f"{rel}::{member}",
-                    member,
-                    (lambda m=member, a=archive: a.read(m)),
-                    year_dir / Path(rel).with_suffix("").as_posix() / f"{Path(member).stem}__{_slug(f'{rel}::{member}')}.parquet",
+                    f"{rel}::{_member_display_name(info)}",
+                    info.filename,
+                    (lambda m=info.filename, a=archive: a.read(m)),
+                    year_dir
+                    / Path(rel).with_suffix("").as_posix()
+                    / f"{Path(_member_display_name(info)).stem}__{_slug(f'{rel}::{info.filename}')}.parquet",
                 )
-                for member in archive.namelist()
-                if Path(member).suffix.lower() in TABLE_SUFFIXES and not member.endswith("/")
+                for info in archive.infolist()
+                if Path(info.filename).suffix.lower() in TABLE_SUFFIXES
+                and not info.filename.endswith("/")
+                and not info.filename.startswith("__MACOSX/")  # macOS resource forks, not tables
             ]
 
         for label, name, read_bytes, parquet_path in members:

@@ -379,56 +379,83 @@ def _xlsx_shared_strings(zf: zipfile.ZipFile) -> list[str]:
     return values
 
 
+def _xlsx_sheet_paths(zf: zipfile.ZipFile) -> list[tuple[str, str]]:
+    """(sheet title, worksheet XML path) in workbook order; falls back to sorted worksheet files."""
+    try:
+        workbook = ET.fromstring(zf.read("xl/workbook.xml"))
+        rels = ET.fromstring(zf.read("xl/_rels/workbook.xml.rels"))
+    except KeyError:
+        workbook = rels = None
+    if workbook is not None and rels is not None:
+        targets = {r.attrib["Id"]: r.attrib["Target"] for r in rels}
+        rel_attr = "{http://schemas.openxmlformats.org/officeDocument/2006/relationships}id"
+        out = []
+        for sheet in workbook.iter("{%s}sheet" % _SHEET_NS["s"]):
+            target = targets.get(sheet.attrib.get(rel_attr, ""), "")
+            path = target.lstrip("/") if target.startswith("/") else f"xl/{target}"
+            if path in zf.namelist():
+                out.append((sheet.attrib.get("name", ""), path))
+        if out:
+            return out
+    sheets = [n for n in zf.namelist() if n.startswith("xl/worksheets/") and n.endswith(".xml")]
+    return [(Path(n).stem, n) for n in sorted(sheets, key=lambda n: (len(n), n))]
+
+
+def _xlsx_sheet_rows(zf: zipfile.ZipFile, sheet_name: str, shared: list[str]) -> list[list[str]]:
+    """Rows of one worksheet as raw cell strings (empty rows skipped, missing cells "")."""
+    root = ET.fromstring(zf.read(sheet_name))
+    sheet_data = root.find("s:sheetData", _SHEET_NS)
+    if sheet_data is None:
+        return []
+
+    table: list[list[str]] = []
+    for row_node in sheet_data.findall("s:row", _SHEET_NS):
+        row_values: dict[int, str] = {}
+        max_idx = -1
+        for c in row_node.findall("s:c", _SHEET_NS):
+            ref = c.attrib.get("r", "")
+            col_idx = _xlsx_col_to_idx(ref) if ref else (max_idx + 1)
+            max_idx = max(max_idx, col_idx)
+            c_type = c.attrib.get("t", "")
+            text_val = ""
+            if c_type == "inlineStr":
+                inline_t = c.find("s:is/s:t", _SHEET_NS)
+                text_val = inline_t.text or "" if inline_t is not None else ""
+            else:
+                v = c.find("s:v", _SHEET_NS)
+                raw = v.text if v is not None and v.text is not None else ""
+                if c_type == "s":
+                    try:
+                        text_val = shared[int(raw)]
+                    except (ValueError, IndexError):
+                        text_val = raw
+                else:
+                    text_val = raw
+            row_values[col_idx] = text_val
+        if max_idx < 0:
+            continue
+        dense = [""] * (max_idx + 1)
+        for i, v in row_values.items():
+            dense[i] = v
+        table.append(dense)
+    return table
+
+
+def read_xlsx_sheets(path: Path) -> list[tuple[str, list[list[str]]]]:
+    """Every worksheet of an XLSX file as (sheet title, rows of raw cell strings), in workbook order."""
+    with zipfile.ZipFile(path) as zf:
+        shared = _xlsx_shared_strings(zf)
+        return [(title, _xlsx_sheet_rows(zf, sheet, shared)) for title, sheet in _xlsx_sheet_paths(zf)]
+
+
 def read_xlsx_table(path: Path) -> list[list[str]]:
     """Return the first worksheet of an XLSX file as rows of raw cell strings (no header handling).
 
     Uses only the standard library. Empty rows are skipped; missing cells become "".
     """
     with zipfile.ZipFile(path) as zf:
-        sheet_name = "xl/worksheets/sheet1.xml"
-        if sheet_name not in zf.namelist():
-            sheets = [n for n in zf.namelist() if n.startswith("xl/worksheets/") and n.endswith(".xml")]
-            if not sheets:
-                return []
-            sheet_name = sorted(sheets)[0]
-
-        shared = _xlsx_shared_strings(zf)
-        root = ET.fromstring(zf.read(sheet_name))
-        sheet_data = root.find("s:sheetData", _SHEET_NS)
-        if sheet_data is None:
-            return []
-
-        table: list[list[str]] = []
-        for row_node in sheet_data.findall("s:row", _SHEET_NS):
-            row_values: dict[int, str] = {}
-            max_idx = -1
-            for c in row_node.findall("s:c", _SHEET_NS):
-                ref = c.attrib.get("r", "")
-                col_idx = _xlsx_col_to_idx(ref) if ref else (max_idx + 1)
-                max_idx = max(max_idx, col_idx)
-                c_type = c.attrib.get("t", "")
-                text_val = ""
-                if c_type == "inlineStr":
-                    inline_t = c.find("s:is/s:t", _SHEET_NS)
-                    text_val = inline_t.text or "" if inline_t is not None else ""
-                else:
-                    v = c.find("s:v", _SHEET_NS)
-                    raw = v.text if v is not None and v.text is not None else ""
-                    if c_type == "s":
-                        try:
-                            text_val = shared[int(raw)]
-                        except (ValueError, IndexError):
-                            text_val = raw
-                    else:
-                        text_val = raw
-                row_values[col_idx] = text_val
-            if max_idx < 0:
-                continue
-            dense = [""] * (max_idx + 1)
-            for i, v in row_values.items():
-                dense[i] = v
-            table.append(dense)
-    return table
+        sheets = _xlsx_sheet_paths(zf)
+        return _xlsx_sheet_rows(zf, sheets[0][1], _xlsx_shared_strings(zf)) if sheets else []
 
 
 def _read_xlsx_rows(path: Path) -> tuple[list[str], list[dict[str, str]]]:
