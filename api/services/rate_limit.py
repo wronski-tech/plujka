@@ -1,4 +1,4 @@
-"""Rate limit for expensive endpoints (``POST /ask`` calls the LLM).
+"""Rate limit and daily token budget for expensive endpoints (``POST /ask`` calls the LLM).
 
 The limit is per client key (API key or IP address). Without ``REDIS_URL`` each API process counts
 on its own (sliding window in memory), so N workers allow up to N times the limit. With
@@ -72,11 +72,74 @@ class RedisWindowLimiter:
         return int(count) <= self.limit
 
 
+class TokenBudget:
+    """LLM tokens (prompt + completion) per client key and UTC day, capped at ``limit`` (0: unlimited).
+
+    With a Redis ``client`` the counters are shared by all API processes (``plujka:tokens:<key>:<day>``,
+    kept for two days); without it, or when Redis fails, each process counts on its own.
+    """
+
+    def __init__(self, limit: int, client: Any = None, prefix: str = "plujka:tokens") -> None:
+        self.limit = limit
+        self.client = client
+        self.prefix = prefix
+        self._local: dict[tuple[str, int], int] = {}
+        self._lock = threading.Lock()
+
+    @staticmethod
+    def _day(now: float | None) -> int:
+        return int((time.time() if now is None else now) // 86400)
+
+    def used(self, key: str, now: float | None = None) -> int:
+        """Tokens ``key`` used today."""
+        day = self._day(now)
+        if self.client is not None:
+            try:
+                return int(self.client.get(f"{self.prefix}:{key}:{day}") or 0)
+            except Exception as exc:
+                log.warning("redis token budget unavailable, using the in-process count: %s", exc)
+        with self._lock:
+            return self._local.get((key, day), 0)
+
+    def exceeded(self, key: str, now: float | None = None) -> bool:
+        """Whether ``key`` has used up today's budget."""
+        return self.limit > 0 and self.used(key, now) >= self.limit
+
+    def add(self, key: str, tokens: int, now: float | None = None) -> None:
+        """Count ``tokens`` for ``key`` today."""
+        if self.limit <= 0 or tokens <= 0:
+            return
+        day = self._day(now)
+        if self.client is not None:
+            try:
+                pipe = self.client.pipeline()
+                pipe.incrby(f"{self.prefix}:{key}:{day}", tokens)
+                pipe.expire(f"{self.prefix}:{key}:{day}", 2 * 86400)
+                pipe.execute()
+                return
+            except Exception as exc:
+                log.warning("redis token budget unavailable, using the in-process count: %s", exc)
+        with self._lock:
+            self._local[(key, day)] = self._local.get((key, day), 0) + tokens
+            for old in [k for k in self._local if k[1] < day]:  # keep only today
+                del self._local[old]
+
+
+def _redis_client(redis_url: str) -> Any:
+    """Redis client with short timeouts, so a slow Redis cannot stall requests."""
+    import redis  # imported only when REDIS_URL is set
+
+    return redis.Redis.from_url(redis_url, socket_timeout=0.5, socket_connect_timeout=0.5)
+
+
 def make_limiter(limit: int, redis_url: str = "") -> SlidingWindowLimiter | RedisWindowLimiter:
     """Redis-backed limiter when ``redis_url`` is set, in-process otherwise."""
     if not redis_url:
         return SlidingWindowLimiter(limit)
-    import redis  # imported only when REDIS_URL is set
-
     log.info("rate limit shared through redis")
-    return RedisWindowLimiter(redis.Redis.from_url(redis_url, socket_timeout=0.5, socket_connect_timeout=0.5), limit)
+    return RedisWindowLimiter(_redis_client(redis_url), limit)
+
+
+def make_token_budget(limit: int, redis_url: str = "") -> TokenBudget:
+    """Daily token budget, shared through Redis when ``redis_url`` is set."""
+    return TokenBudget(limit, _redis_client(redis_url) if redis_url and limit > 0 else None)

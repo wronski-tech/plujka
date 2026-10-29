@@ -1,0 +1,33 @@
+# Release on a version tag (v1.2.3): build the images as a check, then publish a GitHub release whose
+# notes are the CHANGELOG section of that version. See CONTRIBUTING.md ("Releasing").
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build images
+        run: docker compose --profile tools build
+
+      - name: Release notes from CHANGELOG.md
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v v="$version" '
+            /^## \[/ { if (found) exit; if (index($0, "[" v "]")) { found = 1; next } }
+            found { print }
+          ' CHANGELOG.md > notes.md
+          if [ ! -s notes.md ]; then echo "CHANGELOG.md has no section [$version]" >&2; exit 1; fi
+
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --title "$GITHUB_REF_NAME" --notes-file notes.md

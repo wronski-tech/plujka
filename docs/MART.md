@@ -12,14 +12,14 @@ small, documented schema, and guards keep that SQL read-only and inside `mart` (
 
 | Election (`mart.elections.election`) | Years | Detail |
 | ------------------------------------ | ----- | ------ |
-| `sejm` | 2011, 2015, 2019, 2023 | precinct: lists, candidates, protocols |
-| `senat` | 2011, 2015, 2019, 2023 | precinct: candidates, protocols |
-| `prezydent` (both rounds) | 2010, 2015, 2020, 2025 | precinct: candidates, protocols |
-| `pe` (European Parliament) | 2014, 2019, 2024 | precinct: lists, candidates, protocols |
+| `sejm` | 2005, 2007, 2011, 2015, 2019, 2023 | precinct: lists, candidates, protocols (2005: no per-precinct candidate votes) |
+| `senat` | 2005, 2007, 2011, 2015, 2019, 2023 | precinct: candidates, protocols (2005: candidates with totals only, results published per powiat) |
+| `prezydent` (both rounds) | 2005, 2010, 2015, 2020, 2025 | precinct: candidates, protocols |
+| `pe` (European Parliament) | 2004, 2009, 2014, 2019, 2024 | precinct: lists, candidates, protocols (2004, 2009: gmina rows, no candidate votes below district) |
 | `referendum` | 2015, 2023 | precinct: answers per question |
-| `sejmik` (voivodeship assembly) | 2014, 2018, 2024 | gmina: list votes, protocols; candidates with totals |
-| `wbp` (wójt / burmistrz / prezydent miasta, both rounds) | 2014, 2018, 2024 | gmina: candidates, protocols |
-| `rada` (councils: rada gminy / miasta, rada powiatu, rady dzielnic Warszawy) | 2014, 2018, 2024 | district: candidates with totals, lists, seats |
+| `sejmik` (voivodeship assembly) | 2010, 2014, 2018, 2024 | gmina: list votes, protocols; candidates with totals |
+| `wbp` (wójt / burmistrz / prezydent miasta, both rounds) | 2010, 2014, 2018, 2024 | gmina: candidates, protocols |
+| `rada` (councils: rada gminy / miasta, rada powiatu, rady dzielnic Warszawy) | 2010, 2014, 2018, 2024 | district: candidates with totals, lists, seats |
 
 Councils are loaded at district level only (no per-precinct council results); list totals are the
 sum of their candidates' votes (see [Known gaps](#known-gaps-in-the-source-data)).
@@ -31,16 +31,17 @@ The build output matches the official results. Examples (from the built mart):
 | Check | Result |
 | ----- | ------ |
 | Sejm: PiS votes / seats | 2011: 4,295,016 / 157 · 2015: 5,711,687 / 235 · 2019: 8,051,935 / 235 · 2023: 7,640,854 / 194 |
+| Sejm 2005 / 2007 | 2005: PiS 3,185,714 (26.99%, 155), PO 133, Samoobrona 56, SLD 55, LPR 34, PSL 25, MN 2 · 2007: PO 6,701,010 (41.51%, 209), PiS 166, LiD 53, PSL 31, MN 1 |
 | Sejm 2011 | PO 5,629,773 (39.18%, 207), RP 40, PSL 28, SLD 27, MN 1 |
-| Sejm turnout | 2011: 48.92% · 2015: 50.92% · 2019: 61.74% · 2023: 74.38% |
-| Senate seats | 2011: PO 63, PiS 31, PSL 2, independents 4 · 2015: PiS 61, PO 34 · 2019: PiS 48, KO 43 |
-| President, round 2 | 2010: Komorowski 53.01% · 2015: Duda 51.55% · 2020: Duda 51.03% (turnout 68.18%) · 2025: Nawrocki 50.89% (turnout 71.63%) |
-| European Parliament | 2014: PO 32.13% / 19, PiS 31.78% / 19, 51 seats · 2019: PiS 45.38% / 27 seats, KE 38.47% / 22 · 2024: KO 37.06% / 21, PiS 36.16% / 20 |
+| Sejm turnout | 2005: 40.51% (PKW 40.57%) · 2007: 53.82% (PKW 53.88%) · 2011: 48.92% · 2015: 50.92% · 2019: 61.74% · 2023: 74.38% |
+| Senate seats | 2005: PiS 49, PO 34, LPR 7, Samoobrona 3, PSL 2, voters' committees 5 · 2007: PO 60, PiS 39, Cimoszewicz 1 · 2011: PO 63, PiS 31, PSL 2, independents 4 · 2015: PiS 61, PO 34 · 2019: PiS 48, KO 43 |
+| President, round 2 | 2005: Kaczyński 54.04% · 2010: Komorowski 53.01% · 2015: Duda 51.55% · 2020: Duda 51.03% (turnout 68.18%) · 2025: Nawrocki 50.89% (turnout 71.63%) |
+| European Parliament | 2004: PO 24.10% / 15, LPR 15.92% / 10, 54 seats, turnout 20.87% · 2009: PO 44.43% / 25, PiS 27.40% / 15, 50 seats, turnout 24.53% · 2014: PO 32.13% / 19, PiS 31.78% / 19, 51 seats · 2019: PiS 45.38% / 27 seats, KE 38.47% / 22 · 2024: KO 37.06% / 21, PiS 36.16% / 20 |
 | Referendum | 2015: JOW "yes" 78.75%, turnout 7.80% · 2023: "no" 94.61–96.79%, turnout 40.91% |
 | Sejmiki | 2018: PiS 34.13% / 254, KO 26.97% / 194, PSL 70 · 2024: PiS 34.27% / 239, KO 30.59% / 210, TD 80 (552 seats each) |
-| Sejmiki 2014 | PO 179, PiS 171, PSL 157, SLD 28, MN 7 (555 seats); turnout 47.21% |
-| Mayors | 2014: 2,477 gminas, 890 run-offs · 2018: 2,477 gminas, 649 run-offs · 2024: 2,477 gminas, 748 run-offs |
-| Councils, seats | 2014: gmina 37,842 + cities 1,694, powiat 6,276, Warsaw districts 423 · 2018: ≤20k 32,175, >20k 7,351, powiat 6,244, Warsaw districts 425 · 2024: ≤20k 32,370, >20k 7,046, powiat 6,170, Warsaw districts 420 |
+| Sejmiki 2010 / 2014 | 2010: PO 222, PiS 141, PSL 93, SLD 85 (561 seats), turnout 47.26% · 2014: PO 179, PiS 171, PSL 157, SLD 28, MN 7 (555 seats), turnout 47.21% |
+| Mayors | 2010: 2,479 gminas, 738 run-offs (728 on 5 December + 10 on 19 December) · 2014: 2,477 gminas, 890 run-offs · 2018: 2,477 gminas, 649 run-offs · 2024: 2,477 gminas, 748 run-offs |
+| Councils, seats | 2010: ≤20k 32,280, >20k 5,568, cities 1,701, powiat 6,290, Warsaw districts 409 · 2014: gmina 37,842 + cities 1,694, powiat 6,276, Warsaw districts 423 · 2018: ≤20k 32,175, >20k 7,351, powiat 6,244, Warsaw districts 425 · 2024: ≤20k 32,370, >20k 7,046, powiat 6,170, Warsaw districts 420 |
 
 ## Data model
 
@@ -110,12 +111,28 @@ several candidates within one election event (Sejm+Senate of a year, a president
 election), residence must match too. A missing gender (2015 presidential files) is taken from other
 candidacies with the same name when they agree. `persons.match_rule` records the rule.
 
-Local candidates (sejmik, mayors, councils) never create persons. They get a `person_id` only when
-exactly one national person has that name and gender and the name occurs once in that local
-election (once among all council candidates of the year). Local registers also publish the age on
+Local candidates (sejmik, mayors, councils) join a national person only when exactly one national
+person has that name and gender and the name occurs once in that local election (once among all
+council candidates of the year). When several national persons share the name, a local candidacy
+joins the one whose published residence (`residence_teryt`, national registers from 2019) lies in
+the same powiat (sejmik: voivodeship), if exactly one does and the name occurs once in that powiat
+(voivodeship) in that local election. Before 2019 national registers give residence as text only,
+so these rules cannot use it. Local registers also publish the age on
 election day (`age`), national registers do not. All local candidacies linked to one person must
 agree on the birth year (year − age, at most 1 apart); otherwise the name belongs to several people
 and none of that person's local candidacies is linked. `v_person_history.age` shows the age.
+
+**Local persons.** Local candidacies still unlinked are grouped by name, gender and powiat (TERYT of
+the gmina, powiat or Warsaw district, first four digits) into runs of birth years at most 1 apart.
+A run that contains candidacies of exactly one national person joins that person; a run without
+one becomes a local person (`match_rule = 'local:name+gender+birth year+powiat'`); a run with
+several national persons stays unlinked. Sejmik candidacies (voivodeship-wide) join the single
+matching run in their voivodeship, or form runs of their own (`'local:...+voivodeship'`). So a wójt
+who was a councillor in 2014 and mayor in 2018 and 2024 is one person in `v_person_history` without
+any national candidacy. Two namesakes in one powiat born within a year of each other are merged.
+Only elected mayors and sejmik councillors among local persons are in `entity_lexicon` (hundreds of
+thousands of council candidates would make every surname ambiguous); others are found by SQL on
+`full_name`.
 
 **Manual corrections** live in `api/services/mart/person_overrides.csv`:
 
@@ -136,9 +153,9 @@ the build. Overrides win over every automatic rule.
 Limits: national namesakes can still be merged (no age in national registers), and a person who
 changed surname is linked only by an override.
 
-Current build: 23,937 persons; 5,886 sejmik, 3,766 mayor and 17,934 council candidacies linked to
-them. The birth-year check kept 2,165 local candidacies (740 names) unlinked that the name rule
-alone would have linked.
+Current build: 39,013 national and 582,457 local persons; the residence rule links 97 local
+candidacies to one of several national namesakes; every local candidacy with an age belongs to a person
+except 84 sejmik candidacies.
 
 ## Building it
 
@@ -151,7 +168,7 @@ for d in data/pkw_all/sejmsenat*/zip; do
   python3 scripts/kbw_stage_duckdb.py --root "$d" --out data/pkw_stage_parquet
 done
 
-# 2. Build the mart (about 3 minutes for everything).
+# 2. Build the mart (about 5 minutes for everything, of which about 2 for views and persons).
 DATABASE_URL=postgresql://plujka:plujka@localhost:5432/plujka python3 scripts/build_mart.py
 python3 scripts/build_mart.py --years 2023                  # every family of one year
 python3 scripts/build_mart.py --elections prezydent,pe      # some families, all years
@@ -201,6 +218,34 @@ A family-year is not loaded if any check fails. Among them:
 ### Known gaps in the source data
 
 These are properties of the official files, not build errors. Each check names its exception.
+
+- **Turnout 2005/2007.** PKW computed turnout for Sejm 2005 and 2007 and president 2005 from ballots
+  issued; `v_turnout` uses valid ballots from the ballot box, 0.01–0.06 points lower (Sejm 2005:
+  40.51 vs 40.57; Sejm 2007: 53.82 vs 53.88; president 2005: 49.72 / 50.98 vs 49.74 / 50.99).
+- **Sejm 2005 and 2007 candidate votes.** 2005 has no per-precinct candidate votes
+  (`sejm_precinct_candidate_votes` has no 2005 rows); candidate totals are checked against the list
+  totals. 2007 candidate votes come from separate district × list files; invalid votes are votes cast
+  minus valid votes, because the column is not published.
+- **Shared list numbers.** Sejm 2005 list 19 belonged to four committees in different districts, EP
+  2004 list 20 to two; lists are matched per (district, list number).
+- **Struck-off candidates 2004–2009** (gaps in ballot positions), named in the checks: Sejm 2005: 16
+  lists; Sejm 2007: 5 lists; EP 2004: district 8 list 3; EP 2009: district 4 list 3, district 6 list 4,
+  district 10 list 8.
+- **Senate 2005/2007.** 40 multi-member districts electing 2–4 senators; voters picked several
+  candidates, so `pct_of_district` is a share of valid ballots and does not add up to 100. Senate
+  2005 results are published per powiat only: no 2005 rows in the Senate precinct tables and no
+  2005 Senate turnout row; totals are checked against the official results (the files' 'Suma' row is
+  ignored, 24 of 40 powiat files carry zeros there).
+- **European Parliament 2004/2009.** Published per gmina only: `pe_precinct_*` hold one row per gmina
+  with `precinct_no` 0, `pe_precinct_candidate_votes` is empty. EP 2004 publishes Warsaw as one unit
+  (146501); abroad is 149901, ships 229901 and 329901. One 2004 register row has district 'P'; the
+  builder takes district 7 from the commission seat and logs it. The 2009 PSL committee carries the
+  alias "Koalicja Polska" because its name matches the 2019 rule.
+- **Warsaw 2005.** Sejm and president round 1 identify Warsaw districts by letter
+  (`build_precincts.WARSAW_DISTRICTS_2005`); president round 2 precincts are matched to round 1 by
+  number.
+- **`residence_teryt`** is published from 2019 only (Sejm/Senate 2019, 2023; EP 2019, 2024; president
+  2020, 2025); earlier registers give residence as text and the column is NULL.
 
 - **Unpublished precincts.** A few military precincts abroad have no published results: Sejm/Senate
   2023: 2, 2019: 6 (in 2019 they appear, empty, in all 100 Senate files); president 2020: 4,
@@ -266,6 +311,23 @@ These are properties of the official files, not build errors. Each check names i
   PiS 26.89%.
 - **Mayors 2014.** No vote in Zielona Góra (city and gmina merged on 1 January 2015); no mayor elected
   in Sosnówka (round 1) and Moskorzew (round 2).
+- **Local elections 2010, no district registers.** Sejmik seats (561) and council seats are the
+  elected candidates; councillors, districts and councils per council type are checked against PKW
+  (`build_samorzad.SEJMIK_SEATS`, `build_rady.OFFICIAL_2010`). `council_name` is NULL in 2010. A vote
+  marked only next to a struck-off candidate was invalid in 2010, so list totals equal the
+  candidates' votes everywhere.
+- **Councils 2010, multi-member majoritarian districts.** Gminas up to 20,000 inhabitants elected
+  their councils in districts of 1–5 seats, and every voter had as many votes as seats.
+  `rada_districts.valid_votes` there is the votes cast for all candidates (more than the number of
+  voters). Valid ballots are recovered from the candidates' percentages and checked against the
+  official gmina statistics.
+- **Sejmik 2010, Łódź** is split between sejmik districts 1 and 2 (`build_samorzad.SEJMIK_SPLIT_GMINAS`);
+  `sejmik_gmina_protocols` adds the two rows up.
+- **Mayors 2010, run-offs on 19 December.** In ten gminas (`build_samorzad.LATE_RUNOFFS`) a run-off
+  candidate withdrew and the run-off moved from 5 to 19 December (Ostróda: for/against vote). The
+  withdrawn candidate has no round-2 row. Round-2 figures include these ten gminas (738 run-offs,
+  turnout 35.30%; PKW's 728 and 35.31% cover 5 December only). `valid_ballots` is "głosy oddane" as
+  published in the 2010 protocols.
 - **Mayors 2024, withdrawn candidates.** A candidate who withdrew or was struck off after the ballots
   were printed keeps a row with NULL votes: two in Kraków (round 1) and one in each of the run-offs of
   Kuźnia Raciborska and Obrzycko, where the remaining candidate then faced a for/against vote.
@@ -321,7 +383,12 @@ would answer it from Sejm data.
    `prompt_chars`. When adding a relation group, add its prefix to `FAMILY_KEYWORDS`.
 5. **Validation** (`mart/safe_sql.py`). sqlglot parses the query. Only one SELECT (CTEs and UNION
    allowed) over mart relations is accepted. DML, DDL, `SET`, `SELECT INTO`, `pg_*` functions and
-   functions such as `set_config` or `dblink` are rejected. `LIMIT` is capped at `MART_MAX_ROWS`.
+   functions such as `set_config`, `dblink` or `nextval` are rejected, also when quoted
+   (`"pg_read_file"(...)`). `LIMIT` is capped at `MART_MAX_ROWS`. Expensive but harmless queries are
+   bounded by the statement timeout and the row cap. `tests/test_mart.py` has a list of attacks and a
+   seeded fuzzer that wraps safe queries in injection fragments and checks every accepted output
+   independently (one SELECT, mart relations only, no system functions, capped LIMIT); a follow-up's
+   previous SQL is only shown to the model, never executed.
 6. **Execution** as `plujka_mart_reader` (`MART_DATABASE_URL`): read-only transactions, `mart` only,
    statement timeout `MART_STATEMENT_TIMEOUT_MS`. On a database error the model gets one repair
    attempt with the error message.
@@ -341,6 +408,10 @@ match; without OpenSearch the curated file is searched by word overlap.
 in its text must appear in the rows (rounding and Polish formatting allowed) or in the question.
 Otherwise, or without an OpenAI key, the answer is a deterministic summary of the rows.
 `answer.source` is `llm` or `fallback`; `rejected_numbers` lists numbers that failed the check.
+`answer.caveats` holds fixed Polish notes about data gaps that apply to the rows and SQL
+(`answer.CAVEATS`: `comparable = false`, `votes_exact = false`, president 2010, Sejm 2005/2007, president 2005 and EP 2014 turnout,
+presidential precinct sums, person linking); the UI shows them under the answer. They contain no
+numbers of their own. When you document a new known gap that changes how a result reads, add a rule.
 
 ## Observability
 
@@ -363,7 +434,8 @@ the matched entities, examples used, `schema_relations`, `prompt_chars` and per-
 | `SQL_EXAMPLES_INDEX` / `SQL_EXAMPLES_K` | `sql_examples` / `4` | Few-shot examples |
 | `ANSWER_SUMMARY_ENABLED` | `1` | LLM answer text (numbers are always checked) |
 | `ASK_RATE_LIMIT_PER_MINUTE` | `30` | `POST /ask` per API key or client IP (429 above); 0 disables |
-| `REDIS_URL` | empty | Shares the rate limit across workers and replicas (fixed one-minute window); empty: per process |
+| `REDIS_URL` | empty | Shares the rate limit and token budget across workers and replicas; empty: per process |
+| `DAILY_TOKEN_LIMIT_PER_CLIENT` | `0` | LLM tokens per API key or client IP and UTC day for `/ask` (429 above); 0 disables |
 | `API_KEYS` | empty | Comma-separated keys; when set, `/ask` and `/feedback` require `X-API-Key` |
 | `PLUJKA_ENV` | `development` | `production` refuses to start with default passwords or no rate limit |
 

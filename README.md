@@ -63,7 +63,8 @@ The API does **not** import election data on startup. Load KBW into PostgreSQL w
 | `OPENSEARCH_INITIAL_ADMIN_PASSWORD` | OpenSearch admin password (see `docker-compose.yml` default) |
 | `QUESTION_HINTS_SEMANTIC_MIN_CHARS` | Min length of `q` before kNN hints run (default `6`) |
 | `API_KEYS` / `PLUJKA_API_KEY` | Optional keys required by `/ask` and `/feedback` / the key the UI sends |
-| `REDIS_URL` | Optional shared rate limit (`docker compose --profile redis up -d`) |
+| `REDIS_URL` | Optional shared rate limit and token budget (`docker compose --profile redis up -d`) |
+| `DAILY_TOKEN_LIMIT_PER_CLIENT` | Optional OpenAI tokens per API key or IP and day for `/ask` |
 
 Optional Compose profiles: `tools` (loader), `redis` (shared rate limit), `observability` (OpenSearch Dashboards on http://localhost:5601). See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md).
 

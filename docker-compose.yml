@@ -50,6 +50,7 @@ services:
       ASK_RATE_LIMIT_PER_MINUTE: ${ASK_RATE_LIMIT_PER_MINUTE:-30}
       # Shared rate limit across workers/replicas, e.g. redis://redis:6379/0 with the "redis" profile.
       REDIS_URL: ${REDIS_URL:-}
+      DAILY_TOKEN_LIMIT_PER_CLIENT: ${DAILY_TOKEN_LIMIT_PER_CLIENT:-0}
       # Comma-separated keys; when set, POST /ask and /feedback require the X-API-Key header.
       API_KEYS: ${API_KEYS:-}
       OPENSEARCH_URL: http://opensearch:9200

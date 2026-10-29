@@ -12,6 +12,11 @@ Sources (CSV unless noted):
   regional commission, list blocks as in the 2011 Sejm files).
 - 2024: ``protokoly_po_obwodach`` (precincts, protocol, and columns
   ``Okreg D - Głosy na listę nr L - ...`` / ``Okreg D - Głosy na kandydata nr P na liście nr L - NAME``).
+- 2004, 2009: results were published per gmina only. ``pe2004-kand`` / ``kandpe2009`` (candidates
+  with official votes and mandates) and ``pe2004-lis-gm`` / ``pe2009-lis-gm`` (protocol and list votes
+  per gmina; columns are committee names in 2004, ``'<list no> - <committee>'`` in 2009). Each gmina
+  is loaded as one row of the precinct tables (``precinct_no`` 0) and there are no per-precinct
+  candidate votes; see ``_build_gmina_layout``.
 
 Checks: 13 districts, elected candidates equal seats, precinct list votes equal official list votes
 per district, precinct candidate votes equal official candidate votes, every candidate read from
@@ -54,9 +59,9 @@ TABLES = (
     "pe_precinct_candidate_votes",
 )
 FAMILY = ("pe",)
-DATES = {2014: "2014-05-25", 2019: "2019-05-26", 2024: "2024-06-09"}
-# Seats of Poland where the files themselves give no independent count (2014: seats come from candidates).
-EXPECTED_SEATS = {2014: 51}
+DATES = {2004: "2004-06-13", 2009: "2009-06-07", 2014: "2014-05-25", 2019: "2019-05-26", 2024: "2024-06-09"}
+# Seats of Poland where the files themselves give no independent count (seats come from candidates).
+EXPECTED_SEATS = {2004: 54, 2009: 50, 2014: 51}
 
 CANDIDATES = "**/parlament_eu/kandydaci_csv/*.parquet"
 LISTS = "**/parlament_eu/wykaz_list_csv/*.parquet"
@@ -69,6 +74,16 @@ LISTS_2014 = "**/parlament_eu/pe2014-gl-lis-okr/*.parquet"
 PRECINCT_LISTS_2014 = "**/parlament_eu/pe2014-gl-lis-obw/*.parquet"
 PRECINCT_CANDIDATES_2014 = "**/parlament_eu/pe2014-kand-obw/*.parquet"
 REGISTER_2014 = "**/parlament_eu/obwody-*/*.parquet"
+# Lists (district, list number) of the gmina years with a candidate struck off after the ballots were
+# printed: the register skips that position, and votes marked for the candidate count for the list
+# only, so the list has more votes than its registered candidates.
+STRUCK_OFF = {2004: {(8, 3)}, 2009: {(4, 3), (6, 4), (10, 8)}}
+# (candidates, gmina list votes, powiat list votes) of the years published per gmina.
+GMINA_LAYOUT = {
+    2004: ("**/parlament_eu/pe2004-kand.parquet", "**/parlament_eu/pe2004-lis-gm.parquet", "**/parlament_eu/pe2004-lis-pow.parquet"),
+    2009: ("**/parlament_eu/kandpe2009.parquet", "**/parlament_eu/pe2009/pe2009-lis-gm__*.parquet",
+           "**/parlament_eu/pe2009/pe2009-lis-pow__*.parquet"),
+}
 
 _LIST_2024 = re.compile(r"^Okreg (\d+) - Głosy na listę nr (\d+) - ")
 _CANDIDATE_2024 = re.compile(r"^Okreg (\d+) - Głosy na kandydata nr (\d+) na liście nr (\d+) - (.+)$")
@@ -80,13 +95,19 @@ def available(sources: YearSources) -> bool:
     """Whether the year has staged EP candidates, lists and per-precinct results."""
     precinct = sources.has(PROTOCOLS_2024) or (sources.has(PRECINCT_LISTS_2019) and sources.has(PRECINCT_CANDIDATES_2019))
     layout_2014 = all(sources.has(p) for p in (CANDIDATES_2014, LISTS_2014, PRECINCT_LISTS_2014, PRECINCT_CANDIDATES_2014))
-    return (sources.has(CANDIDATES) and sources.has(LISTS) and precinct) or layout_2014
+    layout_gmina = sources.year in GMINA_LAYOUT and all(sources.has(p) for p in GMINA_LAYOUT[sources.year])
+    return (sources.has(CANDIDATES) and sources.has(LISTS) and precinct) or layout_2014 or layout_gmina
 
 
 def build_pe(con: duckdb.DuckDBPyConnection, sources: YearSources) -> list[Election]:
     """Build and check all EP tables of ``sources.year``; return the loaded election."""
     year = sources.year
     create_committee_aliases(con)
+    if year in GMINA_LAYOUT:
+        _build_gmina_layout(con, year, sources)
+        _assemble(con, year)
+        _check(con, year, candidate_precincts=False)
+        return [Election("pe", year, 1, DATES.get(year), f"European Parliament election {year}")]
     if sources.has(CANDIDATES_2014):
         _build_registers_2014(con, year, sources.load("pe_candidates", CANDIDATES_2014), sources.load("pe_lists", LISTS_2014))
     else:
@@ -204,6 +225,8 @@ def _build_registers(con: duckdb.DuckDBPyConnection, year: int, lists: str, cand
     cand_list = column(con, candidates, "Numer listy", "Nr listy")
     position = column(con, candidates, "Numer na liście", "Pozycja na liście")
     residence = column(con, candidates, "Miejsce zamieszkania", "Miejscowość zamieszkania")
+    # 2024 'TERYT m. z.'; 2019 'Kod TERYT' (next to 'Gmina miejsca zamieszkania').
+    residence_teryt = column(con, candidates, "TERYT m. z.", "Kod TERYT", required=False)
     con.execute(
         f"""
         CREATE OR REPLACE TABLE pe_candidates AS
@@ -213,7 +236,9 @@ def _build_registers(con: duckdb.DuckDBPyConnection, year: int, lists: str, cand
                CAST(int_(k.{cand_list}) AS INT) AS list_no, CAST(int_(k.{position}) AS INT) AS list_position,
                display_name({full}) AS full_name, surname({full}) AS last_name,
                given_names({full}) AS first_names, gender_(k."Płeć") AS gender, k."Zawód" AS occupation,
-               k.{residence} AS residence, k."Przynależność do partii" AS party_membership,
+               k.{residence} AS residence,
+               {f"clean_teryt(k.{residence_teryt})" if residence_teryt else "CAST(NULL AS VARCHAR)"} AS residence_teryt,
+               k."Przynależność do partii" AS party_membership,
                int_(k."Liczba głosów") AS votes,
                {pct_expr(con, candidates, '"Procent głosów oddanych na listę"')} AS pct_of_list,
                yes_({column(con, candidates, 'Czy przyznano mandat', 'Czy uzyskał mandat')}) AS elected
@@ -286,7 +311,8 @@ def _build_registers_2014(con: duckdb.DuckDBPyConnection, year: int, candidates:
                CAST(int_(k."Nr listy") AS INT) AS list_no, CAST(int_(k."Poz.") AS INT) AS list_position,
                trim(k."Imiona") || ' ' || upper(trim(k."Nazwisko")) AS full_name, upper(trim(k."Nazwisko")) AS last_name,
                trim(k."Imiona") AS first_names, gender_(k."Płeć") AS gender, k."Zawód" AS occupation,
-               k."Miejsce zamieszkania" AS residence, NULLIF(trim(k."Partia"), '') AS party_membership,
+               k."Miejsce zamieszkania" AS residence, CAST(NULL AS VARCHAR) AS residence_teryt,
+               NULLIF(trim(k."Partia"), '') AS party_membership,
                int_(k."Gł. na kand.") AS votes,
                CAST(round(100.0 * int_(k."Gł. na kand.") / NULLIF(int_(k."Gł. na listę"), 0), 2) AS DECIMAL(6, 2)) AS pct_of_list,
                yes_(k."Mandat") AS elected
@@ -304,6 +330,185 @@ def _build_registers_2014(con: duckdb.DuckDBPyConnection, year: int, candidates:
         FROM {lists} d
         """
     )
+
+
+def _build_gmina_layout(con: duckdb.DuckDBPyConnection, year: int, sources: YearSources) -> None:
+    """2004/2009: registers from the candidate file, protocol and list votes from the gmina table.
+
+    Each gmina (Warsaw districts in 2009, Warsaw as a whole in 2004, abroad and the two ship gminas)
+    becomes one ``prot`` row with ``precinct_no`` 0. A district list exists where it has candidates;
+    its votes are the sum over the gminas of its district, its seats the elected candidates, and a
+    committee took part in seat allocation iff it won any seat. Checked in ``_check`` against the
+    candidates' votes and the powiat table.
+    """
+    candidates_pattern, gmina_pattern, powiat_pattern = GMINA_LAYOUT[year]
+    raw_candidates = sources.load("pe_candidates", candidates_pattern)
+    gminas = sources.load("pe_gminas", gmina_pattern)
+    powiats = sources.load("pe_powiats", powiat_pattern)
+    raw_district = column(con, raw_candidates, "Nr okr.", "Okręg")
+    # 2004: one row (Joanna Paul, Poznań list 14) has 'P' as its district number; the OKW seat
+    # ('Siedziba OKW') identifies the district, so such rows take the district of their OKW.
+    seat = column(con, raw_candidates, "Siedziba OKW", required=False)
+    fixed = (
+        f"""coalesce(int_(k.{raw_district}), (SELECT any_value(int_(o.{raw_district})) FROM {raw_candidates} o
+                                              WHERE o.{seat} = k.{seat} AND int_(o.{raw_district}) IS NOT NULL))"""
+        if seat else f"int_(k.{raw_district})"
+    )
+    # Kept as text like every staged column (the code below parses it with int_).
+    con.execute(f"CREATE OR REPLACE TABLE pe_candidates_src AS SELECT k.*, CAST({fixed} AS VARCHAR) AS district_no FROM {raw_candidates} k")
+    for name, published, district in con.execute(
+        f'SELECT "Imiona" || \' \' || {column(con, raw_candidates, "Nazwisko", "Nawisko")}, {raw_district}, district_no '
+        f"FROM pe_candidates_src WHERE int_({raw_district}) IS NULL"
+    ).fetchall():
+        log.warning("year %s: candidate %s has district number %r; district %s taken from the OKW seat", year, name, published, district)
+    candidates = "pe_candidates_src"
+    k_district = '"district_no"'
+    k_list = column(con, candidates, "Lista", "Nr listy")
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE pe_committees AS
+        WITH names AS (SELECT DISTINCT strip_signature("Komitet") AS committee_name FROM {candidates})
+        SELECT {year} AS year, CAST(row_number() OVER (ORDER BY committee_name) AS INT) AS committee_id, committee_name,
+               coalesce((SELECT r.aliases_pg FROM committee_alias_rules r WHERE committee_name LIKE '%' || r.needle || '%'
+                         ORDER BY r.priority LIMIT 1), '{{}}') AS aliases,
+               committee_name LIKE 'KOALICYJNY%' AS is_coalition
+        FROM names
+        """
+    )
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE pe_cand_lists AS
+        SELECT DISTINCT CAST(int_(k.{k_district}) AS INT) AS district_no, CAST(int_(k.{k_list}) AS INT) AS list_no, c.committee_id
+        FROM {candidates} k JOIN pe_committees c ON c.committee_name = strip_signature(k."Komitet")
+        """
+    )
+    # Vote columns: committee names (2004; list numbers repeat across districts) or '<list no> - <name>'
+    # (2009; national list numbers).
+    by_name = dict(con.execute("SELECT committee_name, committee_id FROM pe_committees").fetchall())
+    # A list number shared by several committees (2004: 20) cannot identify a '<list no> - ' column.
+    by_list = dict(con.execute(
+        "SELECT list_no, any_value(committee_id) FROM pe_cand_lists GROUP BY 1 HAVING count(DISTINCT committee_id) = 1"
+    ).fetchall())
+
+    def committee_of(header: str) -> int | None:
+        if m := re.match(r"^(\d+) - ", header):
+            return by_list.get(int(m[1]))
+        return by_name.get(con.execute("SELECT strip_signature(?)", [header]).fetchone()[0])
+
+    def list_map_of(source: str) -> dict[str, int]:
+        valid = column(con, source, "Liczba głosów ważnych", "Głosy ważne").strip('"')
+        headers = [h for h in columns_of(con, source)[columns_of(con, source).index(valid) + 1:] if h != "year"]
+        mapping = {h: cid for h in headers if (cid := committee_of(h))}
+        unmapped.extend(f"{source}: {h}" for h in headers if h not in mapping)
+        return mapping
+
+    unmapped: list[str] = []
+    teryt = column(con, gminas, "TERYT gminy", "TERYT")
+    district = column(con, gminas, "Nr okr.", "Okręg")
+    valid_ballots = column(con, gminas, "Liczba kart ważnych", "Głosy oddane")
+    valid_votes = column(con, gminas, "Liczba głosów ważnych", "Głosy ważne")
+    # 2009 writes gmina names as 'Bolesławiec, m.' / 'Bolesławiec, gm.'; other years 'm. Bolesławiec'.
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE prot AS
+        SELECT pkey({teryt}, '0') AS pkey, clean_teryt({teryt}) AS teryt_gmina, 0 AS precinct_no,
+               regexp_replace(trim("Gmina"), '^(.*), (m\\.|gm\\.)$', '\\2 \\1') AS gmina,
+               CASE WHEN clean_teryt({teryt}) IS NOT NULL THEN "Powiat" END AS powiat,
+               CAST(NULL AS VARCHAR) AS address, voivodeship(clean_teryt({teryt})) AS wojewodztwo,
+               CAST(int_({column(con, gminas, "Liczba uprawnionych do głosowania", "Upr.")}) AS INT) AS eligible_voters,
+               CAST(int_({column(con, gminas, "Liczba kart wydanych", "Wydane karty")}) AS INT) AS ballots_issued,
+               CAST(int_({valid_ballots}) AS INT) AS valid_ballots,
+               CAST(int_({valid_ballots}) - int_({valid_votes}) AS INT) AS invalid_votes,
+               CAST(int_({valid_votes}) AS INT) AS valid_votes,
+               CAST(int_({district}) AS INT) AS district_no
+        FROM {gminas}
+        """
+    )
+    con.execute(
+        f"CREATE OR REPLACE TEMP TABLE gmina_pkeys AS SELECT pkey({teryt}, '0') AS pkey, CAST(int_({district}) AS INT) AS district_no FROM {gminas}"
+    )
+    # Precinct number 0 stands for the whole gmina (pkey '<teryt>/0', as in ``prot``).
+    unpivot_votes(con, f"""(SELECT *, '0' AS "Nr obwodu" FROM {gminas})""", list_map_of(gminas), "list_votes_all", "committee_id")
+    # '×' marks a committee without a list in the district; it parses as NULL and is dropped here.
+    con.execute(
+        """
+        CREATE OR REPLACE TABLE list_votes AS
+        SELECT v.* FROM list_votes_all v JOIN gmina_pkeys g USING (pkey)
+        JOIN pe_cand_lists l ON l.district_no = g.district_no AND l.committee_id = v.committee_id
+        """
+    )
+    con.execute(
+        """
+        CREATE OR REPLACE TABLE pe_list_votes_outside_lists AS
+        SELECT v.* FROM list_votes_all v JOIN gmina_pkeys g USING (pkey)
+        WHERE v.votes <> 0 AND NOT EXISTS (
+            SELECT 1 FROM pe_cand_lists l WHERE l.district_no = g.district_no AND l.committee_id = v.committee_id)
+        """
+    )
+    # Powiat table, summed per district and committee, for the check.
+    p_district = column(con, powiats, "Nr okr.", "Okręg")
+    selects = [
+        f"SELECT CAST(int_({p_district}) AS INT) AS district_no, {cid} AS committee_id, sum(int_({quote_ident(h)})) AS votes FROM {powiats} GROUP BY 1"
+        for h, cid in list_map_of(powiats).items()
+    ]
+    con.execute("CREATE OR REPLACE TABLE pe_powiat_list_votes AS " + " UNION ALL ".join(selects))
+
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE pe_district_lists AS
+        WITH cand AS (
+          SELECT l.district_no, l.list_no, l.committee_id, count(*) FILTER (WHERE yes_(k."Mandat")) AS seats
+          FROM pe_cand_lists l
+          JOIN {candidates} k ON int_(k.{k_district}) = l.district_no AND int_(k.{k_list}) = l.list_no
+          GROUP BY ALL
+        ), votes AS (
+          SELECT p.district_no, v.committee_id, sum(v.votes) AS votes FROM list_votes v JOIN prot p USING (pkey) GROUP BY ALL
+        ), district_valid AS (SELECT district_no, sum(valid_votes) AS valid_votes FROM prot GROUP BY ALL)
+        SELECT {year} AS year, c.district_no, c.committee_id, c.list_no, CAST(v.votes AS BIGINT) AS votes,
+               CAST(round(100.0 * v.votes / d.valid_votes, 2) AS DECIMAL(6, 2)) AS pct_of_district,
+               sum(c.seats) OVER (PARTITION BY c.committee_id) > 0 AS in_seat_allocation,
+               CAST(c.seats AS INT) AS seats
+        FROM cand c LEFT JOIN votes v USING (district_no, committee_id) LEFT JOIN district_valid d USING (district_no)
+        """
+    )
+    surname = column(con, candidates, "Nazwisko", "Nawisko")  # 2009 header typo
+    position = column(con, candidates, "Nr")
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE pe_candidates AS
+        SELECT {year} AS year,
+               CAST(row_number() OVER (ORDER BY int_(k.{k_district}), int_(k.{k_list}), int_(k.{position})) AS INT) AS candidate_id,
+               CAST(int_(k.{k_district}) AS INT) AS district_no, l.committee_id,
+               CAST(int_(k.{k_list}) AS INT) AS list_no, CAST(int_(k.{position}) AS INT) AS list_position,
+               trim(k."Imiona") || ' ' || upper(trim(k.{surname})) AS full_name, upper(trim(k.{surname})) AS last_name,
+               trim(k."Imiona") AS first_names, gender_(k."Płeć") AS gender, k."Zawód" AS occupation,
+               k.{column(con, candidates, "Miejsce zamieszkania", "Miejce zam.")} AS residence,  -- 2004 header typo
+               CAST(NULL AS VARCHAR) AS residence_teryt,
+               NULLIF(trim(k.{column(con, candidates, "Partia", "Członek")}), '') AS party_membership,
+               int_(k."Głosy") AS votes,
+               {pct_expr(con, candidates, column(con, candidates, "% głosów na listę", "%"))} AS pct_of_list,
+               yes_(k."Mandat") AS elected
+        FROM {candidates} k
+        JOIN pe_district_lists l ON l.district_no = int_(k.{k_district}) AND l.list_no = int_(k.{k_list})
+        """
+    )
+    seat_city = column(con, candidates, "Siedziba OKW", required=False)
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE pe_districts AS
+        SELECT {year} AS year, p.district_no,
+               {f"(SELECT any_value(k.{seat_city}) FROM {candidates} k WHERE int_(k.{k_district}) = p.district_no)" if seat_city else "CAST(NULL AS VARCHAR)"}
+                 AS seat_city,
+               CAST((SELECT coalesce(sum(seats), 0) FROM pe_district_lists l WHERE l.district_no = p.district_no) AS INT) AS seats,
+               CAST(sum(p.eligible_voters) AS INT) AS eligible_voters,
+               CAST(NULL AS VARCHAR) AS description
+        FROM prot p GROUP BY p.district_no
+        """
+    )
+    con.execute("CREATE OR REPLACE TABLE cand_votes (pkey VARCHAR, candidate_id INT, votes INT)")
+    con.execute("CREATE OR REPLACE TABLE pe_unmapped AS SELECT unnest(?::VARCHAR[]) AS header", [unmapped])
+    con.execute("CREATE OR REPLACE TABLE pe_cand_columns (candidate_id INT, part INT)")
+    con.execute("CREATE OR REPLACE TABLE pe_result_parts (part INT, district_no INT)")
 
 
 def _candidate_votes_2014(
@@ -401,42 +606,67 @@ def _assemble(con: duckdb.DuckDBPyConnection, year: int) -> None:
         )
 
 
-def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
-    """Fail the build unless precinct data reproduce the official EP results."""
+def _check(con: duckdb.DuckDBPyConnection, year: int, candidate_precincts: bool = True) -> None:
+    """Fail the build unless precinct data reproduce the official EP results.
+
+    Years published per gmina (``candidate_precincts`` false) have no candidate votes per unit; their
+    list votes are checked against the candidates' votes and the powiat table instead.
+    """
     unpublished = "(SELECT DISTINCT district_no FROM pe_precinct_protocols WHERE valid_votes IS NULL)"
-    run_checks(
-        con,
-        year,
-        {
-            "EP districts != 13": "SELECT abs(count(*) - 13) FROM pe_districts",
-            **({f"elected MEPs != {EXPECTED_SEATS[year]}": f"""
-                SELECT abs(count(*) FILTER (WHERE elected) - {EXPECTED_SEATS[year]}) FROM pe_candidates"""} if year in EXPECTED_SEATS else {}),
-            "district lists without an official vote total": "SELECT count(*) FROM pe_district_lists WHERE votes IS NULL",
-            "elected MEPs != seats in district lists": """
-                SELECT abs((SELECT count(*) FILTER (WHERE elected) FROM pe_candidates) - (SELECT sum(seats) FROM pe_district_lists))""",
-            "candidates without a district list": "SELECT count(*) FROM pe_candidates WHERE committee_id IS NULL",
-            "duplicate precincts": "SELECT count(*) - count(DISTINCT pkey) FROM prot",
-            "vote rows of unknown precincts": "SELECT count(*) FROM (SELECT pkey FROM list_votes UNION ALL SELECT pkey FROM cand_votes) WHERE pkey NOT IN (SELECT pkey FROM prot)",
-            "vote columns that match no list or candidate": "SELECT count(*) FROM pe_unmapped",
-            # 2014 has several result files per district (one per regional commission).
-            "candidates not read from exactly one column of every result file of their district": """
-                SELECT count(*) FROM pe_candidates k,
-                     LATERAL (SELECT count(*) AS n FROM pe_result_parts p WHERE coalesce(p.district_no, k.district_no) = k.district_no) f,
-                     LATERAL (SELECT count(*) AS n, count(DISTINCT part) AS parts FROM pe_cand_columns m WHERE m.candidate_id = k.candidate_id) c
-                WHERE c.n <> f.n OR c.parts <> f.n""",
-            "district lists whose precinct votes differ from the official total": f"""
+    checks = {
+        "EP districts != 13": "SELECT abs(count(*) - 13) FROM pe_districts",
+        **({f"elected MEPs != {EXPECTED_SEATS[year]}": f"""
+            SELECT abs(count(*) FILTER (WHERE elected) - {EXPECTED_SEATS[year]}) FROM pe_candidates"""} if year in EXPECTED_SEATS else {}),
+        "district lists without an official vote total": "SELECT count(*) FROM pe_district_lists WHERE votes IS NULL",
+        "elected MEPs != seats in district lists": """
+            SELECT abs((SELECT count(*) FILTER (WHERE elected) FROM pe_candidates) - (SELECT sum(seats) FROM pe_district_lists))""",
+        "candidates without a district list": "SELECT count(*) FROM pe_candidates WHERE committee_id IS NULL",
+        "duplicate precincts": "SELECT count(*) - count(DISTINCT pkey) FROM prot",
+        "vote rows of unknown precincts": "SELECT count(*) FROM (SELECT pkey FROM list_votes UNION ALL SELECT pkey FROM cand_votes) WHERE pkey NOT IN (SELECT pkey FROM prot)",
+        "vote columns that match no list or candidate": "SELECT count(*) FROM pe_unmapped",
+        # 2014 has several result files per district (one per regional commission).
+        "candidates not read from exactly one column of every result file of their district": """
+            SELECT count(*) FROM pe_candidates k,
+                 LATERAL (SELECT count(*) AS n FROM pe_result_parts p WHERE coalesce(p.district_no, k.district_no) = k.district_no) f,
+                 LATERAL (SELECT count(*) AS n, count(DISTINCT part) AS parts FROM pe_cand_columns m WHERE m.candidate_id = k.candidate_id) c
+            WHERE c.n <> f.n OR c.parts <> f.n""",
+        "district lists whose precinct votes differ from the official total": f"""
+            SELECT count(*) FROM pe_district_lists d
+            LEFT JOIN (SELECT p.district_no, v.committee_id, sum(v.votes) AS votes
+                       FROM pe_precinct_list_votes v JOIN pe_precinct_protocols p USING (precinct_id) GROUP BY ALL) s
+              USING (district_no, committee_id)
+            WHERE coalesce(s.votes, 0) <> d.votes AND d.district_no NOT IN {unpublished}""",
+        "candidates whose precinct votes differ from the official total": f"""
+            SELECT count(*) FROM pe_candidates k
+            LEFT JOIN (SELECT candidate_id, sum(votes) AS votes FROM pe_precinct_candidate_votes GROUP BY ALL) s USING (candidate_id)
+            WHERE coalesce(s.votes, 0) <> k.votes AND k.district_no NOT IN {unpublished}""",
+        "precincts whose valid votes differ from their list votes": """
+            SELECT count(*) FROM pe_precinct_protocols p
+            LEFT JOIN (SELECT precinct_id, sum(votes) AS votes FROM pe_precinct_list_votes GROUP BY ALL) v USING (precinct_id)
+            WHERE p.valid_votes IS NOT NULL AND p.valid_votes <> coalesce(v.votes, 0)""",
+    }
+    if not candidate_precincts:
+        struck_off = ", ".join(f"({d}, {n})" for d, n in sorted(STRUCK_OFF.get(year, ()))) or "(NULL, NULL)"
+        for label in ("candidates not read from exactly one column of every result file of their district",
+                      "candidates whose precinct votes differ from the official total"):
+            del checks[label]
+        checks.update({
+            "gmina list votes for a committee without a list in the district": "SELECT count(*) FROM pe_list_votes_outside_lists",
+            # Every EP vote is a vote for a candidate, so a list's votes are its candidates' votes.
+            "district lists whose candidates' votes differ from the gmina votes, other than STRUCK_OFF lists": f"""
                 SELECT count(*) FROM pe_district_lists d
-                LEFT JOIN (SELECT p.district_no, v.committee_id, sum(v.votes) AS votes
-                           FROM pe_precinct_list_votes v JOIN pe_precinct_protocols p USING (precinct_id) GROUP BY ALL) s
+                JOIN (SELECT district_no, committee_id, sum(votes) AS votes FROM pe_candidates GROUP BY ALL) k
                   USING (district_no, committee_id)
-                WHERE coalesce(s.votes, 0) <> d.votes AND d.district_no NOT IN {unpublished}""",
-            "candidates whose precinct votes differ from the official total": f"""
-                SELECT count(*) FROM pe_candidates k
-                LEFT JOIN (SELECT candidate_id, sum(votes) AS votes FROM pe_precinct_candidate_votes GROUP BY ALL) s USING (candidate_id)
-                WHERE coalesce(s.votes, 0) <> k.votes AND k.district_no NOT IN {unpublished}""",
-            "precincts whose valid votes differ from their list votes": """
-                SELECT count(*) FROM pe_precinct_protocols p
-                LEFT JOIN (SELECT precinct_id, sum(votes) AS votes FROM pe_precinct_list_votes GROUP BY ALL) v USING (precinct_id)
-                WHERE p.valid_votes IS NOT NULL AND p.valid_votes <> coalesce(v.votes, 0)""",
-        },
-    )
+                WHERE k.votes <> d.votes AND (d.district_no, d.list_no) NOT IN ({struck_off})""",
+            "STRUCK_OFF lists without a skipped position or with no more votes than their candidates": f"""
+                SELECT count(*) FROM pe_district_lists d
+                JOIN (SELECT district_no, list_no, sum(votes) AS votes, count(*) AS n, max(list_position) AS last
+                      FROM pe_candidates GROUP BY ALL) k USING (district_no, list_no)
+                WHERE (d.district_no, d.list_no) IN ({struck_off}) AND (k.n = k.last OR k.votes >= d.votes)""",
+            "district lists whose gmina votes differ from the powiat table": """
+                SELECT count(*) FROM pe_district_lists d
+                FULL JOIN (SELECT district_no, committee_id, sum(votes) AS votes FROM pe_powiat_list_votes
+                           GROUP BY ALL HAVING sum(votes) IS NOT NULL) p USING (district_no, committee_id)
+                WHERE d.votes IS DISTINCT FROM p.votes""",
+        })
+    run_checks(con, year, checks)

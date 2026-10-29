@@ -108,6 +108,70 @@ def fallback_answer(rows: list[dict[str, Any]]) -> str:
     return f"Znaleziono {format_number(len(rows))} wierszy. Pierwszy: {first}."
 
 
+def _values(rows: list[dict[str, Any]], column: str) -> set[Any]:
+    """Distinct values of ``column`` in the rows."""
+    return {row.get(column) for row in rows if column in row}
+
+
+def _about(rows: list[dict[str, Any]], sql: str, election: str, year: int) -> bool:
+    """Whether the rows (``election``/``year`` columns) or the SQL text concern one election-year."""
+    sql_l = sql.lower()
+    elections = _values(rows, "election") or {e for e in ("prezydent", "pe", "sejm", "senat") if f"'{e}'" in sql_l or f"v_{e}_" in sql_l}
+    years = _values(rows, "year") or {int(y) for y in re.findall(r"\b(?:19|20)\d{2}\b", sql)}
+    return election in elections and year in years
+
+
+# Caveats of the data that a reader must know to interpret the rows. Each rule looks only at the rows
+# and the SQL, never at outside facts, so the text contains no numbers of its own. Details of each
+# gap are in docs/MART.md ("Known gaps").
+CAVEATS: tuple[tuple[str, Any], ...] = (
+    (
+        "Porównanie dotyczy różnych komitetów tej samej rodziny partyjnej (np. PO → KO, PSL → Trzecia Droga); "
+        "zmiana poparcia nie jest porównaniem tego samego komitetu.",
+        lambda rows, sql: False in _values(rows, "comparable"),
+    ),
+    (
+        "W części okręgów rad PKW nie opublikowała kandydatów skreślonych po druku kart, więc głosy na listy "
+        "są tam sumą głosów pozostałych kandydatów (dane przybliżone).",
+        lambda rows, sql: False in _values(rows, "votes_exact"),
+    ),
+    (
+        "Frekwencja w wyborach prezydenckich 2010 jest liczona z głosów oddanych (pliki nie podają liczby kart "
+        "ważnych), więc może się nieznacznie różnić od frekwencji podanej przez PKW, liczonej z kart wydanych.",
+        lambda rows, sql: _about(rows, sql, "prezydent", 2010) and ("turnout_pct" in sql.lower() or bool(_values(rows, "turnout_pct"))),
+    ),
+    (
+        "Frekwencja w wyborach do Sejmu 2005 i 2007 oraz prezydenckich 2005 jest liczona z kart ważnych, "
+        "więc jest nieznacznie niższa niż podana przez PKW, liczona z kart wydanych.",
+        lambda rows, sql: (_about(rows, sql, "sejm", 2005) or _about(rows, sql, "sejm", 2007)
+                           or _about(rows, sql, "prezydent", 2005))
+        and ("turnout_pct" in sql.lower() or bool(_values(rows, "turnout_pct"))),
+    ),
+    (
+        "Frekwencja w wyborach do PE 2014 nie obejmuje pakietów wyborczych (głosowanie korespondencyjne), "
+        "więc może być nieznacznie niższa niż podana przez PKW.",
+        lambda rows, sql: _about(rows, sql, "pe", 2014) and ("turnout_pct" in sql.lower() or bool(_values(rows, "turnout_pct"))),
+    ),
+    (
+        "Wyniki kandydatów na prezydenta są sumą wyników obwodów; kilka obwodów za granicą nie opublikowało "
+        "wyników, więc sumy krajowe mogą być nieco niższe od oficjalnych (oficjalne są w prezydent_candidates).",
+        lambda rows, sql: "v_prezydent_results" in sql.lower() and "country" in _values(rows, "level"),
+    ),
+    (
+        "PKW nie publikuje identyfikatorów osób: kandydatury łączone są po imieniu, nazwisku, płci "
+        "(i roku urodzenia w wyborach samorządowych), więc imiennicy mogą być połączeni lub rozdzieleni błędnie.",
+        lambda rows, sql: "v_person_history" in sql.lower() or "persons" in sql.lower(),
+    ),
+)
+
+
+def caveats(rows: list[dict[str, Any]], sql: str) -> list[str]:
+    """Polish caveats that apply to these rows and this SQL (empty when there are no rows)."""
+    if not rows:
+        return []
+    return [text for text, applies in CAVEATS if applies(rows, sql or "")]
+
+
 def _llm_answer(question: str, rows: list[dict[str, Any]]) -> tuple[str, dict[str, int]]:
     """Ask the chat model for a short answer; return (text, token usage)."""
     payload = json.dumps(rows[:MAX_ROWS_IN_PROMPT], ensure_ascii=False, default=str)
@@ -127,13 +191,14 @@ def _llm_answer(question: str, rows: list[dict[str, Any]]) -> tuple[str, dict[st
     return text, tokens
 
 
-def compose_answer(question: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
+def compose_answer(question: str, rows: list[dict[str, Any]], sql: str = "") -> dict[str, Any]:
     """Answer text for the rows: LLM text when every number checks out, otherwise the fallback summary.
 
-    Returns ``{"text", "source": "llm" | "fallback", "verified": bool, ...}``; ``rejected_numbers`` lists
-    the numbers that made an LLM text fail the check.
+    Returns ``{"text", "source": "llm" | "fallback", "verified": bool, "caveats": [...], ...}``;
+    ``rejected_numbers`` lists the numbers that made an LLM text fail the check; ``caveats`` are fixed
+    Polish notes about data gaps that apply to these rows (see ``CAVEATS``).
     """
-    result: dict[str, Any] = {"text": fallback_answer(rows), "source": "fallback", "verified": True}
+    result: dict[str, Any] = {"text": fallback_answer(rows), "source": "fallback", "verified": True, "caveats": caveats(rows, sql)}
     if not rows or not ANSWER_SUMMARY_ENABLED or not OPENAI_API_KEY:
         return result
     try:

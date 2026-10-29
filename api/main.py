@@ -15,11 +15,12 @@ from pydantic import BaseModel, ConfigDict, Field
 from api.services import answer, config, db, feedback_store, opensearch_store, router
 from api.services.mart import examples as sql_examples
 from api.services.mart import schema as mart_schema
-from api.services.rate_limit import make_limiter
+from api.services.rate_limit import make_limiter, make_token_budget
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 log = logging.getLogger("plujka.api")
 ask_limiter = make_limiter(config.ASK_RATE_LIMIT_PER_MINUTE, config.REDIS_URL)
+token_budget = make_token_budget(config.DAILY_TOKEN_LIMIT_PER_CLIENT, config.REDIS_URL)
 
 OPENAPI_TAGS: list[dict[str, str]] = [
     {"name": "health", "description": "Liveness probe and approximate KBW table stats"},
@@ -129,7 +130,7 @@ class AskResponse(BaseModel):
     )
     answer: dict[str, Any] | None = Field(
         default=None,
-        description="Polish answer text: {text, source: llm|fallback, verified}; LLM text only when its numbers match the rows",
+        description="Polish answer text: {text, source: llm|fallback, verified, caveats}; LLM text only when its numbers match the rows; caveats are fixed notes about data gaps",
     )
     clarification: dict[str, Any] | None = Field(
         default=None,
@@ -231,18 +232,22 @@ def ask(request: AskRequest, http_request: Request, api_key: str | None = Depend
     if not request.question.strip():
         raise HTTPException(status_code=400, detail="Question is required.")
     client = http_request.client.host if http_request.client else "unknown"
-    # With API keys each key has its own limit; otherwise each client IP.
-    if not ask_limiter.allow(f"key:{api_key}" if api_key else client):
+    # With API keys each key has its own limit and budget; otherwise each client IP.
+    client_key = f"key:{api_key}" if api_key else client
+    if not ask_limiter.allow(client_key):
         raise HTTPException(status_code=429, detail="Too many questions; try again in a minute.")
+    if token_budget.exceeded(client_key):
+        raise HTTPException(status_code=429, detail="Daily token budget used up; try again tomorrow.")
 
     started = time.monotonic()
     refs = [r.model_dump() for r in request.entity_refs] if request.entity_refs else None
     previous = request.previous.model_dump() if request.previous else None
     result = router.route_question(request.question, entity_refs=refs, previous=previous)
     if not result.get("clarification"):
-        result["answer"] = answer.compose_answer(request.question, result.get("result") or [])
+        result["answer"] = answer.compose_answer(request.question, result.get("result") or [], result.get("sql") or "")
     result["result"] = [{k: _json_value(v) for k, v in row.items()} for row in result.get("result") or []]
     telemetry = _telemetry(result, started)
+    token_budget.add(client_key, telemetry["prompt_tokens"] + telemetry["completion_tokens"])
     log.info(
         "ask intent=%s status=%s rows=%s latency_ms=%s answer=%s tokens=%s/%s",
         result["intent"], telemetry["status"], telemetry["row_count"], telemetry["latency_ms"],

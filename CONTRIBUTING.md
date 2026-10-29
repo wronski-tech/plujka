@@ -43,13 +43,19 @@ From the repo root (no Docker DB needed for the default suite):
 make test
 ```
 
-Integration tests against PostgreSQL: `make test-integration` with `DATABASE_URL` set and `PLUJKA_RUN_DB_TESTS=1` (see `tests/test_integration_kbw_db.py`). CI runs the same against `pgvector/pgvector:pg16` after the unit job passes.
+Integration tests against PostgreSQL: `make test-integration` with `DATABASE_URL` set and `PLUJKA_RUN_DB_TESTS=1` (see `tests/test_integration_kbw_db.py`). CI runs the same against `pgvector/pgvector:pg16` after the unit job passes, then builds the whole mart from the committed parquet and checks the curated SQL examples; a separate job builds the Docker images and smoke-tests `docker compose`.
 
 ## Pull requests
 
 - Keep changes focused and consistent with existing style (see [.github/pull_request_template.md](.github/pull_request_template.md)).
 - Describe **what** changed and **why** in the PR body.
 - If behavior changes, mention how you verified it (manual steps or commands).
+
+## Releasing
+
+1. Move the `[Unreleased]` entries of `CHANGELOG.md` to a new `## [x.y.z] - YYYY-MM-DD` section.
+2. Commit, then `git tag vx.y.z && git push origin vx.y.z`.
+3. `.github/workflows/release.yml` builds the images and publishes the GitHub release with that section as notes.
 
 ## Security
 

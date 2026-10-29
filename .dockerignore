@@ -1,0 +1,8 @@
+# Keep build contexts small: images need code and tracked data only.
+.git
+.amp
+.tmp
+backups
+data/kbw_mirror
+**/__pycache__
+*.pyc

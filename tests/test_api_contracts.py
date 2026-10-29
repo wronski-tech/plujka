@@ -115,6 +115,19 @@ class TestAskEndpoint(unittest.TestCase):
             self.assertEqual(self.client.post("/feedback", json={"rating": "thumbs_up", "question": "q"}).status_code, 401)
         self.assertEqual(self.client.post("/ask", json={"question": "q"}).status_code, 200)
 
+    def test_daily_token_budget_per_key(self) -> None:
+        from api.services.rate_limit import TokenBudget
+
+        routed = {**self.ROUTED, "params": {"_dynamic_sql_meta": {"tokens": {"prompt_tokens": 60, "completion_tokens": 50}}}}
+        self.route.return_value = routed
+        with patch("api.main.config.API_KEYS", frozenset({"k1", "k2"})), patch("api.main.token_budget", TokenBudget(100)):
+            first = self.client.post("/ask", json={"question": "q"}, headers={"X-API-Key": "k1"})
+            second = self.client.post("/ask", json={"question": "q"}, headers={"X-API-Key": "k1"})
+            other = self.client.post("/ask", json={"question": "q"}, headers={"X-API-Key": "k2"})
+        # The first question may use the budget up (110 >= 100); the next one from that key is refused.
+        self.assertEqual((first.status_code, second.status_code, other.status_code), (200, 429, 200))
+        self.assertIn("token", second.json()["detail"])
+
 
 if __name__ == "__main__":
     unittest.main()

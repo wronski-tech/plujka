@@ -1,0 +1,33 @@
+# Weekly check whether KBW republished any source file of the mart (HEAD requests only, no download).
+# A failed run means files changed or disappeared; run scripts/check_sources.py --update locally.
+name: Source files
+
+on:
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/check_sources.py
+            data/source_manifest.json
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Compare server headers with data/source_manifest.json
+        run: |
+          set -o pipefail
+          python scripts/check_sources.py | tee check.txt
+
+      - name: Summary
+        if: always()
+        run: |
+          { echo '### KBW source files'; echo '```'; cat check.txt 2>/dev/null; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

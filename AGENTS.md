@@ -15,7 +15,7 @@ SQL safety), `docs/DATA.md` (sources), `docs/DEPLOYMENT.md` (API keys, Redis lim
 | `api/services/router.py` | `route_question`: `dynamic_sql` first for every question; legacy templates only when it has no rows and the question is a plain Sejm one (no clarification answer, no follow-up, no mart-only election) |
 | `api/services/sql_templates.py` | Legacy SQL templates over `kbw_facts` (JSONB rows) |
 | `api/services/dynamic_sql.py` | LLM-written SQL over `mart`: entities/clarification, follow-ups (`previous`), relevant schema only (`FAMILY_KEYWORDS`), examples, sqlglot guard, read-only run, one repair, SQL cache |
-| `api/services/answer.py` | Polish answer text; every number must appear in the SQL rows, else a deterministic summary |
+| `api/services/answer.py` | Polish answer text; every number must appear in the SQL rows, else a deterministic summary; `CAVEATS` (fixed notes about data gaps) |
 | `api/services/rate_limit.py` | Limit for `POST /ask`: in-process sliding window, or shared through Redis (`REDIS_URL`) |
 | `api/services/mart/schema.py` | `mart` DDL with English `COMMENT`s, read-only role, list of queryable relations |
 | `api/services/mart/build_common.py`, `build_precincts.py` | Shared DuckDB macros, header matching, loading; precinct geography/protocol columns |
@@ -28,6 +28,7 @@ SQL safety), `docs/DATA.md` (sources), `docs/DEPLOYMENT.md` (API keys, Redis lim
 | `scripts/build_mart.py` | Builds `mart`: every family-year that is staged (`--years`, `--elections`) |
 | `scripts/add_sql_example.py` | Adds a curated SQL example after running it; `--check` runs them all |
 | `scripts/backup_db.sh` | `pg_dump` backup with retention |
+| `scripts/check_sources.py`, `data/source_manifest.json` | Detects republished KBW files (HEAD vs manifest), re-stages them, names the family-years to rebuild |
 | `streamlit_app/app.py`, `streamlit_app/geo/` | UI: answer, table, bar chart, choropleth (TERYT-keyed boundaries), SQL + source, follow-up toggle |
 | `tests/` | `unittest`. DB tests run only with `PLUJKA_RUN_DB_TESTS=1` |
 
@@ -56,6 +57,10 @@ SQL safety), `docs/DATA.md` (sources), `docs/DEPLOYMENT.md` (API keys, Redis lim
 - **The prompt describes only relevant relations.** A new relation group needs its prefix and Polish
   keywords in `dynamic_sql.FAMILY_KEYWORDS` (cross-election relations go to `SHARED_RELATIONS`),
   otherwise questions naming that election never see its tables.
+- **Known gaps that change how a result reads get a caveat** in `answer.CAVEATS` (rule on rows/SQL,
+  Polish text without numbers of its own).
+- **New downloaded sources go into the manifest:** run `scripts/check_sources.py --record` after
+  adding files to the mirror, and commit `data/source_manifest.json`.
 - **API responses carry plain JSON numbers.** Rows pass through `main._json_value`; the UI charts and
   maps rely on numbers, not strings.
 - **Curated SQL examples must run.** After changing views or rebuilding, run

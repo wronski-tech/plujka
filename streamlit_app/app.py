@@ -262,6 +262,8 @@ def _render_answer(data: dict) -> None:
         st.caption("✓ Każda liczba w tej odpowiedzi występuje w wyniku zapytania SQL.")
     else:
         st.caption("Podsumowanie złożone bezpośrednio z wyników zapytania.")
+    for caveat in answer.get("caveats") or []:
+        st.warning(caveat, icon="⚠️")
 
 
 def _render_clarification(question: str, data: dict) -> None:

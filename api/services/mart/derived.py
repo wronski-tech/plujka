@@ -103,11 +103,17 @@ WHERE c.chamber = 'pe' AND c.year = k.year AND c.candidate_id = k.candidate_id;
 # in that local election (one sejmik candidate, mayor candidates of one gmina, or one council
 # candidate among all council candidates of the year). Local candidacies never create persons:
 # tens of thousands of local namesakes would merge strangers.
+# When several national persons share the name, the one whose published residence (residence_teryt,
+# national registers from 2019) lies in the local candidacy's powiat (sejmik: voivodeship) is taken,
+# if there is exactly one.
 # Local registers publish the candidate's age, national registers do not. All local candidacies
 # linked to one person must agree on the birth year (election year minus age; two candidacies of
 # one person differ by at most 1, because age is counted on election day). When they do not, the
 # name belongs to several people and none of that person's local candidacies stays linked.
-# Overrides (PERSON_OVERRIDES) are applied last and win over every rule.
+# Overrides (PERSON_OVERRIDES) win over every rule.
+# Finally, local candidacies still unlinked become local persons (match_rule 'local:...'): same
+# name, gender and powiat (sejmik: voivodeship) with birth years at most 1 apart. This links a mayor
+# or councillor across 2014, 2018 and 2024 even without a national candidacy.
 LOCAL_PERSONS_SQL = r"""
 CREATE TEMP TABLE national_name ON COMMIT DROP AS
 SELECT name_key, gender, min(person_id) AS person_id FROM candidacy_ids
@@ -131,6 +137,54 @@ UPDATE mart.rada_candidates k SET person_id = n.person_id
 FROM (SELECT year, full_name FROM mart.rada_candidates GROUP BY year, full_name HAVING count(*) = 1) u, national_name n
 WHERE u.year = k.year AND u.full_name = k.full_name
   AND n.name_key = upper(regexp_replace(k.full_name, '\s+', ' ', 'g')) AND n.gender IS NOT DISTINCT FROM k.gender;
+
+-- Names shared by several national persons: a local candidacy joins the one whose published
+-- residence (residence_teryt, registers from 2019) is in the same powiat (sejmik: voivodeship),
+-- when exactly one such person exists and the name occurs once there in that local election.
+CREATE TEMP TABLE national_residence ON COMMIT DROP AS
+SELECT DISTINCT i.name_key, i.gender, left(x.residence_teryt, 4) AS powiat, i.person_id
+FROM candidacy_ids i
+JOIN (SELECT 'sejm' AS chamber, year, 1 AS round, candidate_id, residence_teryt FROM mart.sejm_candidates
+      UNION ALL SELECT 'senat', year, 1, candidate_id, residence_teryt FROM mart.senat_candidates
+      UNION ALL SELECT 'prezydent', year, round, candidate_id, residence_teryt FROM mart.prezydent_candidates
+      UNION ALL SELECT 'pe', year, 1, candidate_id, residence_teryt FROM mart.pe_candidates) x
+  USING (chamber, year, round, candidate_id)
+WHERE x.residence_teryt IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM national_name n WHERE n.name_key = i.name_key AND n.gender IS NOT DISTINCT FROM i.gender);
+
+CREATE TEMP TABLE residence_powiat ON COMMIT DROP AS
+SELECT name_key, gender, powiat, min(person_id) AS person_id FROM national_residence
+GROUP BY name_key, gender, powiat HAVING count(DISTINCT person_id) = 1;
+CREATE TEMP TABLE residence_woj ON COMMIT DROP AS
+SELECT name_key, gender, left(powiat, 2) AS code, min(person_id) AS person_id FROM national_residence
+GROUP BY name_key, gender, left(powiat, 2) HAVING count(DISTINCT person_id) = 1;
+-- Temp tables get no automatic statistics; without them the joins below can become nested loops.
+ANALYZE residence_powiat;
+ANALYZE residence_woj;
+
+-- Statistics after the resets above (ANALYZE sees this transaction's rows); with the stale ones the
+-- planner expects one unlinked candidacy and turns the joins below into nested loops.
+ANALYZE mart.sejmik_candidates;
+ANALYZE mart.wbp_candidates;
+ANALYZE mart.rada_candidates;
+UPDATE mart.wbp_candidates k SET person_id = r.person_id
+FROM residence_powiat r
+WHERE k.person_id IS NULL AND r.powiat = left(k.teryt_gmina, 4)
+  AND r.name_key = upper(regexp_replace(k.full_name, '\s+', ' ', 'g')) AND r.gender IS NOT DISTINCT FROM k.gender
+  AND NOT EXISTS (SELECT 1 FROM mart.wbp_candidates o WHERE o.year = k.year AND o.full_name = k.full_name
+                  AND left(o.teryt_gmina, 4) = left(k.teryt_gmina, 4) AND o.teryt_gmina <> k.teryt_gmina);
+UPDATE mart.rada_candidates k SET person_id = r.person_id
+FROM residence_powiat r
+WHERE k.person_id IS NULL AND r.powiat = left(k.teryt, 4)
+  AND r.name_key = upper(regexp_replace(k.full_name, '\s+', ' ', 'g')) AND r.gender IS NOT DISTINCT FROM k.gender
+  AND NOT EXISTS (SELECT 1 FROM mart.rada_candidates o WHERE o.year = k.year AND o.full_name = k.full_name
+                  AND left(o.teryt, 4) = left(k.teryt, 4) AND o.candidate_id <> k.candidate_id);
+UPDATE mart.sejmik_candidates k SET person_id = r.person_id
+FROM (SELECT DISTINCT wojewodztwo, left(teryt_gmina, 2) AS code FROM mart.sejmik_gmina_protocols) w, residence_woj r
+WHERE k.person_id IS NULL AND w.wojewodztwo = k.wojewodztwo AND r.code = w.code
+  AND r.name_key = upper(regexp_replace(k.full_name, '\s+', ' ', 'g')) AND r.gender IS NOT DISTINCT FROM k.gender
+  AND NOT EXISTS (SELECT 1 FROM mart.sejmik_candidates o WHERE o.year = k.year AND o.full_name = k.full_name
+                  AND o.wojewodztwo = k.wojewodztwo AND o.candidate_id <> k.candidate_id);
 
 CREATE TEMP TABLE birth_conflict ON COMMIT DROP AS
 SELECT person_id FROM (
@@ -158,6 +212,115 @@ UPDATE mart.wbp_candidates k SET person_id = (SELECT person_id FROM override_per
 FROM override_hit h WHERE h.chamber = 'wbp' AND h.year = k.year AND h.round = k.round AND h.candidate_id = k.candidate_id;
 UPDATE mart.rada_candidates k SET person_id = (SELECT person_id FROM override_person o WHERE o.grp = h.grp)
 FROM override_hit h WHERE h.chamber = 'rada' AND h.year = k.year AND h.candidate_id = k.candidate_id;
+
+-- Local persons. Local candidacies with an age that are still unlinked are grouped by name, gender
+-- and powiat into runs of birth years at most 1 apart ("islands"). An island that contains
+-- candidacies of exactly one national person joins that person; an island without one becomes a
+-- new local person; an island with several national persons stays unlinked. Overridden candidacies
+-- keep the override.
+CREATE TEMP TABLE local_candidacy ON COMMIT DROP AS
+SELECT 'wbp' AS chamber, k.year, k.round, k.candidate_id, k.full_name, k.last_name, k.first_names, k.gender,
+       k.year - k.age AS birth_year, upper(regexp_replace(k.full_name, '\s+', ' ', 'g')) AS name_key,
+       left(k.teryt_gmina, 4) AS area, k.person_id
+FROM mart.wbp_candidates k
+WHERE k.age IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM override_hit h WHERE h.chamber = 'wbp' AND (h.year, h.round, h.candidate_id) = (k.year, k.round, k.candidate_id))
+UNION ALL
+SELECT 'rada', k.year, 1, k.candidate_id, k.full_name, k.last_name, k.first_names, k.gender,
+       k.year - k.age, upper(regexp_replace(k.full_name, '\s+', ' ', 'g')), left(k.teryt, 4), k.person_id
+FROM mart.rada_candidates k
+WHERE k.age IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM override_hit h WHERE h.chamber = 'rada' AND (h.year, h.candidate_id) = (k.year, k.candidate_id));
+
+CREATE TEMP TABLE local_island ON COMMIT DROP AS
+SELECT c.*, name_key || '|' || coalesce(gender, '') || '|' || area || '|' ||
+       sum(new_island) OVER (PARTITION BY name_key, gender, area ORDER BY birth_year, year, chamber, round, candidate_id) AS island
+FROM (
+  SELECT c.*, CASE WHEN birth_year - lag(birth_year) OVER (
+                 PARTITION BY name_key, gender, area ORDER BY birth_year, year, chamber, round, candidate_id) > 1
+              THEN 1 ELSE 0 END AS new_island
+  FROM local_candidacy c
+) c;
+
+CREATE TEMP TABLE island_person ON COMMIT DROP AS
+SELECT island, count(DISTINCT person_id) AS national_persons, min(person_id) AS person_id,
+       min(birth_year) AS birth_min, max(birth_year) AS birth_max,
+       min(name_key) AS name_key, min(gender) AS gender, min(area) AS area
+FROM local_island GROUP BY island;
+
+UPDATE island_person i SET person_id = n.next_id + n.rn
+FROM (SELECT island, (SELECT coalesce(max(person_id), 0) FROM mart.persons) AS next_id,
+             CAST(dense_rank() OVER (ORDER BY island) AS INT) AS rn
+      FROM island_person WHERE national_persons = 0) n
+WHERE n.island = i.island;
+
+-- Sejmik candidacies (voivodeship-wide, no powiat) join the one local or national island of the same
+-- name, gender and voivodeship whose birth years fit; otherwise they form their own islands.
+CREATE TEMP TABLE woj_code ON COMMIT DROP AS
+SELECT DISTINCT wojewodztwo, left(teryt_gmina, 2) AS code FROM mart.sejmik_gmina_protocols;
+
+CREATE TEMP TABLE sejmik_base ON COMMIT DROP AS
+SELECT k.year, k.candidate_id, k.full_name, k.last_name, k.first_names, k.gender, k.year - k.age AS birth_year,
+       upper(regexp_replace(k.full_name, '\s+', ' ', 'g')) AS name_key, w.code
+FROM mart.sejmik_candidates k JOIN woj_code w USING (wojewodztwo)
+WHERE k.person_id IS NULL AND k.age IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM override_hit h WHERE h.chamber = 'sejmik' AND (h.year, h.candidate_id) = (k.year, k.candidate_id));
+
+CREATE TEMP TABLE sejmik_local ON COMMIT DROP AS
+SELECT s.*, m.islands_matched, CASE WHEN m.islands_matched = 1 THEN m.person_id END AS island_person_id
+FROM sejmik_base s
+LEFT JOIN (
+  SELECT s.year, s.candidate_id, count(DISTINCT i.person_id) AS islands_matched, min(i.person_id) AS person_id
+  FROM sejmik_base s
+  JOIN island_person i ON i.name_key = s.name_key AND i.gender IS NOT DISTINCT FROM s.gender
+   AND left(i.area, 2) = s.code AND s.birth_year BETWEEN i.birth_min - 1 AND i.birth_max + 1
+   AND i.national_persons <= 1
+  GROUP BY s.year, s.candidate_id
+) m USING (year, candidate_id);
+
+CREATE TEMP TABLE sejmik_island ON COMMIT DROP AS
+SELECT s.*, name_key || '|' || coalesce(gender, '') || '|W' || code || '|' ||
+       sum(new_island) OVER (PARTITION BY name_key, gender, code ORDER BY birth_year, year, candidate_id) AS island
+FROM (
+  SELECT s.*, CASE WHEN birth_year - lag(birth_year) OVER (PARTITION BY name_key, gender, code ORDER BY birth_year, year, candidate_id) > 1
+                   THEN 1 ELSE 0 END AS new_island
+  FROM sejmik_local s WHERE islands_matched IS NULL
+) s;
+
+CREATE TEMP TABLE sejmik_island_person ON COMMIT DROP AS
+SELECT island, greatest((SELECT coalesce(max(person_id), 0) FROM island_person),
+                       (SELECT coalesce(max(person_id), 0) FROM mart.persons))
+              + CAST(dense_rank() OVER (ORDER BY island) AS INT) AS person_id
+FROM (SELECT DISTINCT island FROM sejmik_island) i;
+
+INSERT INTO mart.persons (person_id, full_name, last_name, first_names, gender, match_rule, candidacies)
+SELECT i.person_id, (array_agg(c.full_name ORDER BY c.year DESC))[1], (array_agg(c.last_name ORDER BY c.year DESC))[1],
+       (array_agg(c.first_names ORDER BY c.year DESC))[1], (array_agg(c.gender ORDER BY c.year DESC))[1],
+       'local:name+gender+birth year+powiat', count(*)
+FROM island_person i JOIN local_island c USING (island)
+WHERE i.national_persons = 0
+GROUP BY i.person_id
+UNION ALL
+SELECT i.person_id, (array_agg(c.full_name ORDER BY c.year DESC))[1], (array_agg(c.last_name ORDER BY c.year DESC))[1],
+       (array_agg(c.first_names ORDER BY c.year DESC))[1], (array_agg(c.gender ORDER BY c.year DESC))[1],
+       'local:name+gender+birth year+voivodeship', count(*)
+FROM sejmik_island_person i JOIN sejmik_island c USING (island)
+GROUP BY i.person_id;
+
+UPDATE mart.wbp_candidates k SET person_id = i.person_id
+FROM local_island c JOIN island_person i USING (island)
+WHERE c.chamber = 'wbp' AND (c.year, c.round, c.candidate_id) = (k.year, k.round, k.candidate_id)
+  AND k.person_id IS NULL AND i.national_persons <= 1;
+UPDATE mart.rada_candidates k SET person_id = i.person_id
+FROM local_island c JOIN island_person i USING (island)
+WHERE c.chamber = 'rada' AND (c.year, c.candidate_id) = (k.year, k.candidate_id)
+  AND k.person_id IS NULL AND i.national_persons <= 1;
+UPDATE mart.sejmik_candidates k SET person_id = s.island_person_id
+FROM sejmik_local s WHERE (s.year, s.candidate_id) = (k.year, k.candidate_id) AND s.island_person_id IS NOT NULL;
+UPDATE mart.sejmik_candidates k SET person_id = i.person_id
+FROM sejmik_island c JOIN sejmik_island_person i USING (island)
+WHERE (c.year, c.candidate_id) = (k.year, k.candidate_id);
+
 """
 
 # Manual person corrections, one row per candidacy (or set of candidacies): columns election, year,
@@ -221,6 +384,7 @@ def link_persons(pg: psycopg.Connection, overrides: Path = PERSON_OVERRIDES) -> 
 # committees) fall into 'other'. Families group predecessor and successor committees (PO -> KO);
 # v_party_change marks such pairs as not directly comparable.
 PARTY_FAMILIES = {
+    "LiD": "Lewica",
     "PiS": "PiS",
     "KO": "KO",
     "PO": "KO",
@@ -472,7 +636,7 @@ WITH lists AS (
   SELECT l.year, l.council_level, d.wojewodztwo, l.teryt, l.committee_id, l.candidates, l.seats,
          coalesce(l.votes, l.candidate_votes) AS votes, l.votes IS NULL AND l.candidate_votes IS NOT NULL AS unknown
   FROM mart.rada_district_lists l JOIN mart.rada_districts d USING (year, council_level, teryt, district_no)
-), agg AS (
+), agg AS MATERIALIZED (
   SELECT year, council_level,
          CASE WHEN GROUPING(teryt) = 0 THEN 'council' WHEN GROUPING(wojewodztwo) = 0 THEN 'wojewodztwo' ELSE 'country' END AS level,
          wojewodztwo, teryt, committee_id, sum(candidates) AS candidates, sum(seats) AS seats, sum(votes) AS votes,
@@ -480,7 +644,7 @@ WITH lists AS (
   FROM lists
   GROUP BY GROUPING SETS ((year, council_level, committee_id), (year, council_level, committee_id, wojewodztwo),
                           (year, council_level, committee_id, wojewodztwo, teryt))
-), units AS (
+), units AS MATERIALIZED (
   SELECT year, council_level,
          CASE WHEN GROUPING(teryt) = 0 THEN 'council' WHEN GROUPING(wojewodztwo) = 0 THEN 'wojewodztwo' ELSE 'country' END AS level,
          wojewodztwo, teryt, min(unit_name) AS unit_name, min(council_name) AS council_name, count(DISTINCT teryt) AS councils,
@@ -496,7 +660,7 @@ SELECT a.year, a.council_level, a.level, a.wojewodztwo, a.teryt,
        u.valid_votes AS unit_valid_votes, round(100.0 * a.votes / NULLIF(u.valid_votes, 0), 2) AS pct
 FROM agg a
 JOIN units u ON u.year = a.year AND u.council_level = a.council_level AND u.level = a.level
-            AND u.wojewodztwo IS NOT DISTINCT FROM a.wojewodztwo AND u.teryt IS NOT DISTINCT FROM a.teryt
+            AND coalesce(u.wojewodztwo, '') = coalesce(a.wojewodztwo, '') AND coalesce(u.teryt, '') = coalesce(a.teryt, '')
 JOIN mart.rada_committees c ON c.year = a.year AND c.committee_id = a.committee_id;
 COMMENT ON MATERIALIZED VIEW mart.v_rada_results IS 'Council results (rady gmin/miast, rady powiatów, rady dzielnic m.st. Warszawy) per committee: seats, votes and percent of valid votes, per council (level ''council'', teryt = council unit), voivodeship and country, separately for each council_level. Use for "ile mandatów PiS zdobył w radach powiatów", "kto wygrał wybory do rady miasta Krakowa". Committees are matched by name, so at wojewodztwo/country level local committees with identical names are added up; compare parties by aliases.';
 COMMENT ON COLUMN mart.v_rada_results.council_level IS 'gmina, powiat or dzielnica (as in mart.rada_districts).';
@@ -579,6 +743,8 @@ COMMENT ON COLUMN mart.v_party_results.lead_aliases IS 'First aliases of the com
 COMMENT ON COLUMN mart.v_party_results.pct IS 'votes / unit_valid_votes in percent (0-100).';
 CREATE INDEX ON mart.v_party_results (election, year, level, party);
 CREATE INDEX ON mart.v_party_results (unit_key);
+-- Statistics before the self-join below; without them the planner picks a nested loop (minutes).
+ANALYZE mart.v_party_results;
 
 CREATE MATERIALIZED VIEW mart.v_party_change AS
 WITH kinds AS (SELECT DISTINCT election, year FROM mart.v_party_results),
@@ -663,7 +829,7 @@ JOIN (
   LEFT JOIN mart.rada_districts d USING (year, council_level, teryt, district_no)
   WHERE k.person_id IS NOT NULL
 ) x USING (person_id);
-COMMENT ON VIEW mart.v_person_history IS 'Every candidacy of a person (one row per candidacy and round): Sejm, Senate, President, European Parliament, and sejmik/mayor/council candidacies linked to the same person. Use for "w których wyborach startował X", "kto zmienił komitet", "kto przeszedł z Sejmu do Senatu".';
+COMMENT ON VIEW mart.v_person_history IS 'Every candidacy of a person (one row per candidacy and round): Sejm, Senate, President, European Parliament, sejmik, mayor and council candidacies of the same person (national persons, or local persons matched by name, gender, birth year and powiat). Use for "w których wyborach startował X", "kto zmienił komitet", "kto przeszedł z Sejmu do Senatu".';
 COMMENT ON COLUMN mart.v_person_history.age IS 'Age on election day; only local registers (sejmik, wbp, councils) publish it, NULL for national candidacies.';
 COMMENT ON COLUMN mart.v_person_history.chamber IS 'Election: sejm, senat, prezydent, pe, sejmik, wbp (mayor), rada_gminy, rada_powiatu or rada_dzielnicy (councils).';
 COMMENT ON COLUMN mart.v_person_history.area IS 'sejmik: voivodeship; wbp: gmina; councils: council name (2014: unit name). NULL otherwise.';
@@ -702,7 +868,10 @@ SELECT 'person', p.full_name, mart.fold_name(p.last_name), p.person_id::text,
            CASE WHEN h.elected THEN 'elected' END), '') || ')', ''), '; '),
        array_agg(DISTINCT h.year ORDER BY h.year)
 FROM mart.persons p JOIN mart.v_person_history h USING (person_id)
-GROUP BY p.person_id, p.full_name, p.last_name
+GROUP BY p.person_id, p.full_name, p.last_name, p.match_rule
+-- Local persons are hundreds of thousands of councillor candidates; only elected mayors and sejmik
+-- councillors are names worth resolving in questions (the rest are found by SQL on full_name).
+HAVING p.match_rule NOT LIKE 'local:%' OR bool_or(h.elected AND h.chamber IN ('wbp', 'sejmik'))
 UNION ALL
 SELECT 'committee', alias, mart.fold_name(alias), committee_name, string_agg(DISTINCT source, ', '),
        array_agg(DISTINCT year ORDER BY year)
@@ -735,8 +904,11 @@ ANALYZED = (
 def rebuild(pg: psycopg.Connection) -> None:
     """Rebuild persons, views and the entity lexicon from everything loaded (caller's transaction)."""
     link_persons(pg)
-    persons = pg.execute("SELECT count(*), count(*) FILTER (WHERE candidacies > 1) FROM mart.persons").fetchone()
-    log.info("persons: %s (with more than one national candidacy: %s)", *persons)
+    persons = pg.execute(
+        "SELECT count(*) FILTER (WHERE match_rule NOT LIKE 'local:%'), count(*) FILTER (WHERE match_rule LIKE 'local:%')"
+        " FROM mart.persons"
+    ).fetchone()
+    log.info("persons: %s national, %s local", *persons)
     pg.execute(DROP_SQL)
     pg.execute(SEJM_VIEWS_SQL)
     pg.execute(_results_views_sql())

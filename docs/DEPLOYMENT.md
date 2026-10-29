@@ -11,7 +11,8 @@ dashboards and how the staged data is versioned. Configuration variables are lis
 2. Strong owner password (`DATABASE_URL`) and reader password (`MART_READER_PASSWORD`); rebuild the
    mart once so the build sets the reader password.
 3. `API_KEYS` when the API is not meant to be public; give the UI one of them in `PLUJKA_API_KEY`.
-4. `REDIS_URL` when more than one API worker or replica serves `/ask`.
+4. `REDIS_URL` when more than one API worker or replica serves `/ask`, and
+   `DAILY_TOKEN_LIMIT_PER_CLIENT` to cap what one key or IP can spend on OpenAI per day.
 5. A scheduled backup (`scripts/backup_db.sh`) and a restore test.
 6. `OPENAI_API_KEY`; without it every question falls back to the legacy Sejm templates.
 
@@ -40,6 +41,14 @@ REDIS_URL=redis://redis:6379/0 docker compose --profile redis up -d
 ```
 
 The bundled Redis keeps nothing on disk (counters are disposable).
+
+## Daily token budget
+
+`DAILY_TOKEN_LIMIT_PER_CLIENT` caps the OpenAI tokens (prompt + completion, as reported by the API)
+that one API key, or one client IP without keys, may use per UTC day. A request is refused with 429
+once the day's total is reached; the request that crosses the limit still completes. Counters live
+in Redis (`plujka:tokens:<key>:<day>`) when `REDIS_URL` is set, otherwise per process. Watch real
+usage in the dashboards (sum of `prompt_tokens` and `completion_tokens`) before choosing a value.
 
 ## Backups
 
@@ -91,6 +100,34 @@ example:
 - latency: 50th/95th percentile of `latency_ms` per day.
 
 The bundled OpenSearch runs without its security plugin; do not expose ports 9200 or 5601 publicly.
+
+## CI, images and releases
+
+`.github/workflows/ci.yml` runs three jobs: unit tests; integration on PostgreSQL 16 (DB tests, full
+mart build from the committed parquet, curated SQL examples); and `compose`, which validates every
+Compose file and profile, builds all images, starts postgres, OpenSearch, the API and the UI, and
+checks `/health`, one `/ask` request and the Streamlit health endpoint.
+
+Releases: move the `[Unreleased]` section of `CHANGELOG.md` to `## [x.y.z] - YYYY-MM-DD`, commit,
+then `git tag vx.y.z && git push origin vx.y.z`. `.github/workflows/release.yml` builds the images
+and publishes a GitHub release with that CHANGELOG section as notes (it fails when the section is
+missing).
+
+## Source files changed by PKW
+
+`data/source_manifest.json` records every file of the KBW mirror (URL, size, SHA-256, ETag,
+Last-Modified). `.github/workflows/sources.yml` runs `scripts/check_sources.py` every Monday: HEAD
+requests only, compared with the manifest. A failed run lists changed or missing files and the
+family-years to rebuild. With the mirror locally:
+
+```bash
+python3 scripts/check_sources.py --update             # download changed files, re-stage, update manifest
+DATABASE_URL=... python3 scripts/check_sources.py --update --rebuild   # ... and rebuild those family-years
+python3 scripts/check_sources.py --record             # after downloading new elections
+```
+
+Then run `scripts/add_sql_example.py --check`, compare the national results with PKW, and commit the
+changed parquet and manifest. Files that disappeared are kept; check the KBW page by hand.
 
 ## Staged data in Git
 

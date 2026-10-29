@@ -3,11 +3,11 @@
 
 Elections are grouped in families that are built together from one year's files:
 
-- ``parliament``: Sejm and Senate (2011, 2015, 2019, 2023)
-- ``prezydent``: presidential elections, both rounds (2010, 2015, 2020, 2025)
-- ``pe``: European Parliament (2014, 2019, 2024)
+- ``parliament``: Sejm and Senate (2005, 2007, 2011, 2015, 2019, 2023)
+- ``prezydent``: presidential elections, both rounds (2005, 2010, 2015, 2020, 2025)
+- ``pe``: European Parliament (2004, 2009, 2014, 2019, 2024)
 - ``referendum``: nationwide referendums (2015, 2023)
-- ``samorzad``: local elections, voivodeship assemblies and mayors (2018, 2024)
+- ``samorzad``: local elections: voivodeship assemblies, mayors and councils (2010, 2014, 2018, 2024)
 
 Every family-year is built in its own in-memory DuckDB database, checked against official totals
 and loaded into PostgreSQL in one transaction (its tables and its ``mart.elections`` rows). A failed
@@ -60,7 +60,9 @@ from api.services.mart.build_sejm import available_layout, build_sejm  # noqa: E
 
 log = logging.getLogger("mart")
 
-PARLIAMENT_DATES = {2011: "2011-10-09", 2015: "2015-10-25", 2019: "2019-10-13", 2023: "2023-10-15"}
+PARLIAMENT_DATES = {
+    2005: "2005-09-25", 2007: "2007-10-21", 2011: "2011-10-09", 2015: "2015-10-25", 2019: "2019-10-13", 2023: "2023-10-15",
+}
 
 
 def build_parliament(con: duckdb.DuckDBPyConnection, sources: YearSources) -> list[Election]:
@@ -89,20 +91,22 @@ class Family:
 
 FAMILIES = {
     "parliament": Family(
-        (2011, 2015, 2019, 2023), schema.PARLIAMENT_TABLES, ("sejm", "senat"),
+        (2005, 2007, 2011, 2015, 2019, 2023), schema.PARLIAMENT_TABLES, ("sejm", "senat"),
         lambda s: available_layout(s) is not None, build_parliament,
     ),
     "prezydent": Family(
-        (2010, 2015, 2020, 2025), build_prezydent.TABLES, build_prezydent.FAMILY,
+        (2005, 2010, 2015, 2020, 2025), build_prezydent.TABLES, build_prezydent.FAMILY,
         build_prezydent.available, build_prezydent.build_prezydent,
     ),
-    "pe": Family((2014, 2019, 2024), build_pe.TABLES, build_pe.FAMILY, build_pe.available, build_pe.build_pe),
+    "pe": Family(
+        (2004, 2009, 2014, 2019, 2024), build_pe.TABLES, build_pe.FAMILY, build_pe.available, build_pe.build_pe,
+    ),
     "referendum": Family(
         (2015, 2023), build_referendum.TABLES, build_referendum.FAMILY,
         build_referendum.available, build_referendum.build_referendum,
     ),
     "samorzad": Family(
-        (2014, 2018, 2024), build_samorzad.TABLES, build_samorzad.FAMILY,
+        (2010, 2014, 2018, 2024), build_samorzad.TABLES, build_samorzad.FAMILY,
         build_samorzad.available, build_samorzad.build_samorzad,
     ),
 }

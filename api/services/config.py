@@ -33,6 +33,8 @@ ANSWER_SUMMARY_ENABLED = os.getenv("ANSWER_SUMMARY_ENABLED", "1").strip().lower(
 ASK_RATE_LIMIT_PER_MINUTE = int(os.getenv("ASK_RATE_LIMIT_PER_MINUTE", "30"))
 # Optional Redis (redis://host:6379/0) that shares the rate limit across API workers and replicas.
 REDIS_URL = os.getenv("REDIS_URL", "").strip()
+# LLM tokens (prompt + completion) per API key or client IP and UTC day for POST /ask; 0 disables.
+DAILY_TOKEN_LIMIT_PER_CLIENT = int(os.getenv("DAILY_TOKEN_LIMIT_PER_CLIENT", "0"))
 # Optional comma-separated API keys; when set, POST /ask and POST /feedback require X-API-Key.
 API_KEYS = frozenset(k.strip() for k in os.getenv("API_KEYS", "").split(",") if k.strip())
 SEED_SAMPLE_CSV = os.getenv("SEED_SAMPLE_CSV", "data/sample/sejm_results_sample_1000.csv")

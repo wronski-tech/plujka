@@ -18,7 +18,7 @@ COMBINED_PRECINCTS = "%w ujęciu łącznym%"
 GEO_ALIASES = {
     "teryt": ("TERYT gminy", "Kod TERYT", "TERYT Gminy", "Teryt Gminy", "Kod terytorialny gminy", "TERYT", "Kod gm."),
     "precinct_no": ("Numer obwodu", "Nr komisji", "Nr obwodu głosowania", "Nr obw.", "Numer", "Nr obwodu"),
-    "gmina": ("Gmina",),
+    "gmina": ("Gmina", "Nazwa gminy"),
     "powiat": ("Powiat",),
     "wojewodztwo": ("Województwo",),
     "address": ("Siedziba", "Siedziba komisji", "Siedziba Obwodowej Komisji Wyborczej", "Adres", "Adres obwodu"),
@@ -37,10 +37,15 @@ PROTOCOL_ALIASES = {
         "Liczba wyborców, którym wydano karty do głosowania",
         "Liczba osób, którym wydano karty do głosowania",
         "Wydane karty do głosowania",  # EP 2014, president 2010
+        "Karty wydane (frekwencja)",  # president 2005, round 1
+        "Wydane karty do głosowania - liczba",  # president 2005, round 2
     ),
     # President 2010 has no separate count of valid ballots: 'Głosy oddane' (votes cast) = valid + invalid votes.
-    "valid_ballots": ("Liczba kart ważnych", "Karty ważne (głosy oddane)", "Głosy oddane"),
-    "invalid_votes": ("Liczba głosów nieważnych", "Liczba głosów nieważnych (z kart ważnych)", "Głosy nieważne"),
+    # President 2005 round 2: 'Karty wyjęte (głosy oddane)', ballots taken from the box (valid ballots).
+    "valid_ballots": ("Liczba kart ważnych", "Karty ważne (głosy oddane)", "Głosy oddane", "Karty wyjęte (głosy oddane)"),
+    "invalid_votes": (
+        "Liczba głosów nieważnych", "Liczba głosów nieważnych (z kart ważnych)", "Głosy nieważne", "Głosy nieważne - liczba",
+    ),
     "valid_votes": (
         "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów",
         "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów (z kart ważnych)",
@@ -49,11 +54,35 @@ PROTOCOL_ALIASES = {
         "Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów (z kart ważnych)",
         "Liczba głosów ważnych",
         "Głosy ważne",  # EP 2014, president 2010
+        "Głosy ważne - liczba",  # president 2005, round 2
     ),
 }
 
-# Columns that are never candidates or lists even when they follow the valid-votes column.
-NOT_VOTE_COLUMNS = {"razem", "year"}
+# Columns that are never candidates or lists even when they follow the valid-votes column (president
+# 2005 round 1 publishes invalid votes after valid votes).
+NOT_VOTE_COLUMNS = {"razem", "year", "głosy nieważne"}
+
+# 2005 files publish Warsaw as one gmina (146501) and give its district as a letter in the
+# '7-ma cyfra TERYT' column (A = Bemowo ... R = Żoliborz, the order of the district TERYT codes).
+WARSAW_DISTRICTS_2005 = {
+    "A": ("146502", "Bemowo"), "B": ("146503", "Białołęka"), "C": ("146504", "Bielany"), "D": ("146505", "Mokotów"),
+    "E": ("146506", "Ochota"), "F": ("146507", "Praga-Południe"), "G": ("146508", "Praga-Północ"),
+    "H": ("146509", "Rembertów"), "I": ("146510", "Śródmieście"), "J": ("146511", "Targówek"),
+    "K": ("146512", "Ursus"), "L": ("146513", "Ursynów"), "M": ("146514", "Wawer"), "N": ("146515", "Wesoła"),
+    "O": ("146516", "Wilanów"), "P": ("146517", "Włochy"), "Q": ("146518", "Wola"), "R": ("146519", "Żoliborz"),
+}
+
+# Precinct type codes of the 2005/2007 files ('Kody' sheet of the 2005 presidential precinct file).
+PRECINCT_TYPES_2005 = {
+    "P": "powszechny", "L": "szpital", "K": "zakład karny", "A": "areszt śledczy", "Z": "zakład pomocy społecznej",
+    "O": "oddział zewnętrzny zakładu karnego lub aresztu śledczego", "G": "zagranica", "S": "statek",
+}
+
+
+def create_warsaw_districts(con: duckdb.DuckDBPyConnection) -> None:
+    """Create ``warsaw_districts_2005(letter, teryt, gmina)`` from WARSAW_DISTRICTS_2005."""
+    rows = ", ".join(f"({sql_literal(k)}, {sql_literal(t)}, {sql_literal(n)})" for k, (t, n) in WARSAW_DISTRICTS_2005.items())
+    con.execute(f"CREATE OR REPLACE TABLE warsaw_districts_2005 AS SELECT * FROM (VALUES {rows}) t(letter, teryt, gmina)")
 
 
 def precinct_select(con: duckdb.DuckDBPyConnection, source: str, protocol: tuple[str, ...] = tuple(PROTOCOL_ALIASES)) -> str:
@@ -96,11 +125,12 @@ def rows_without_number(con: duckdb.DuckDBPyConnection, files_by_district: dict[
 
 
 def vote_columns(con: duckdb.DuckDBPyConnection, source: str) -> list[str]:
-    """Headers after the valid-votes column (candidates or lists), without totals."""
+    """Headers after the valid-votes column (candidates or lists), without totals and without the
+    percent columns of tables with a unit row (``'<name> - %'``, president 2005 round 2)."""
     columns = columns_of(con, source)
     valid = column(con, source, *PROTOCOL_ALIASES["valid_votes"]).strip('"').replace('""', '"')
     start = columns.index(valid) + 1
-    return [c for c in columns[start:] if normalize_header(c) not in NOT_VOTE_COLUMNS]
+    return [c for c in columns[start:] if normalize_header(c) not in NOT_VOTE_COLUMNS and not c.endswith(" - %")]
 
 
 def unpivot_votes(

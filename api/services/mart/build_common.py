@@ -34,6 +34,9 @@ VOIVODESHIPS = {
 # the first matching key wins (e.g. "TRZECIA DROGA ... POLSKIE STRONNICTWO LUDOWE" must hit TRZECIA DROGA).
 COMMITTEE_ALIASES: list[tuple[str, list[str]]] = [
     ("PRAWO I SPRAWIEDLIWOŚĆ", ["PiS", "Zjednoczona Prawica"]),
+    # Small 2004/2005 committees that the broad needles below would mislabel as KO and Konfederacja.
+    ("OGÓLNOPOLSKA KOALICJA OBYWATELSKA", ["OKO", "Ogólnopolska Koalicja Obywatelska"]),
+    ("KONFEDERACJA RUCH OBRONY BEZROBOTNYCH", ["KROB"]),
     ("KOALICJA OBYWATELSKA", ["KO", "PO", "Platforma Obywatelska"]),
     ("PLATFORMA OBYWATELSKA", ["PO", "Platforma Obywatelska"]),
     # European Parliament 2019: PO-led coalition with PSL, SLD, .N and Zieloni.
@@ -74,8 +77,21 @@ COMMITTEE_ALIASES: list[tuple[str, list[str]]] = [
     ("WOLNI I SOLIDARNI", ["WiS", "Wolni i Solidarni"]),
     ("POLSKA JEST JEDNA", ["PJJ"]),
     ("MNIEJSZOŚĆ NIEMIECKA", ["MN", "Mniejszość Niemiecka"]),
-    ("SKUTECZNI", ["Skuteczni"]),
+    # Local elections 2010: the German minority ran as the TSKN society.
+    ("NIEMCÓW NA ŚLĄSKU OPOLSKIM", ["MN", "Mniejszość Niemiecka"]),
+    ("SKUTECZNI PIOTRA", ["Skuteczni"]),
     ("AKCJA ZAWIEDZIONYCH EMERYTÓW", ["AZER"]),
+    # 2004-2009 Sejm and EP committees (and sejmik/council committees of these parties). Genitive forms
+    # are the 2004-2007 committee names ("Komitet Wyborczy Polskiego Stronnictwa Ludowego").
+    # "LEWICA I DEMOKRACI" must precede the generic "WYBORCZY LEWICA" below.
+    ("LEWICA I DEMOKRACI", ["LiD", "Lewica i Demokraci", "SLD"]),
+    ("POLSKIEGO STRONNICTWA LUDOWEGO", ["PSL"]),
+    ("SAMOOBRONA RZECZPOSPOLITEJ", ["Samoobrona"]),
+    ("LIGA POLSKICH RODZIN", ["LPR", "Liga Polskich Rodzin"]),
+    ("SOCJALDEMOKRACJI POLSKIEJ", ["SDPL", "Socjaldemokracja Polska"]),
+    ("PARTII DEMOKRATYCZNEJ", ["PD", "Partia Demokratyczna"]),
+    ("UNII WOLNOŚCI", ["UW", "Unia Wolności"]),
+    ("POLITYKI REALNEJ", ["UPR", "Unia Polityki Realnej"]),
     # Generic last: 2024 committees named just "... LEWICA" (after the specific Lewica rules above).
     ("WYBORCZY LEWICA", ["Lewica"]),
 ]
@@ -366,6 +382,17 @@ def parse_list_blocks(columns: list[str]) -> dict[str, ColumnRef]:
             current_list = None
         elif current_list is not None:
             refs[col] = ColumnRef(name_key=python_name_key(re.sub(r"_\d+$", "", col)), list_no=current_list)
+    return refs
+
+
+def parse_numbered_names(columns: list[str], list_no: int | None = None) -> dict[str, ColumnRef]:
+    """2007 Sejm and Senate candidate files: ``'3. Kowalski Jan Maria (T)'`` (ballot position, name,
+    elected T/N). With ``list_no`` (Sejm: from the file name) the position identifies the slot."""
+    refs = {}
+    for col in columns:
+        if m := re.match(r"^(\d+)\. (.+) \([TN]\)$", col):
+            position = int(m[1]) if list_no is not None else None
+            refs[col] = ColumnRef(name_key=python_name_key(m[2]), list_no=list_no, position=position)
     return refs
 
 

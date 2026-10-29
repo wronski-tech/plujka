@@ -9,7 +9,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Mart: Sejm and Senate 2011, president 2010, European Parliament 2014, local elections 2014 (sejmiki, mayors), and councils of gminas, powiats and Warsaw districts 2014/2018/2024 (`rada_*` tables, `v_rada_results`), each reconciled with official PKW figures; known gaps documented in `docs/MART.md`.
+- Mart: Sejm and Senate 2005/2007, president 2005 (both rounds) and European Parliament 2004/2009 (gmina level), reconciled with PKW; `residence_teryt` for national candidates (published from 2019), used to link local candidacies to one of several national namesakes living in the same powiat; committee aliases for LiD, Samoobrona, LPR, SDPL, PD, UW, UPR, OKO, KROB and the 2010 German minority (TSKN); the `SKUTECZNI` needle narrowed to `SKUTECZNI PIOTRA`.
+- Local persons: mayors, councillors and sejmik candidates without a national candidacy are linked across elections by name, gender, birth year and powiat (or voivodeship); runs containing one national person join that person.
+- Answer caveats (`answer.caveats`): fixed notes about data gaps (non-comparable party changes, approximate council list totals, president 2010, Sejm 2005/2007, president 2005 and EP 2014 turnout, presidential precinct sums, person linking), shown under the answer.
+- Daily OpenAI token budget per API key or IP (`DAILY_TOKEN_LIMIT_PER_CLIENT`, shared through Redis).
+- Security tests: attack list and seeded fuzzer for the SQL guard; previous-turn SQL is never executed.
+- CI `compose` job (build all images, start the stack, smoke-test `/health`, `/ask` and the UI); release workflow for `v*` tags with notes from CHANGELOG.
+- Source freshness: `data/source_manifest.json`, `scripts/check_sources.py` (HEAD check, `--update`, `--rebuild`) and a weekly workflow.
+
+- Mart: Sejm and Senate 2011, president 2010, European Parliament 2014, local elections 2010 and 2014 (sejmiki, mayors), and councils of gminas, powiats and Warsaw districts 2010/2014/2018/2024 (`rada_*` tables, `v_rada_results`), each reconciled with official PKW figures; known gaps documented in `docs/MART.md`.
 - Persons: local candidacies linked to one person must agree on the birth year (from `age`, now also in `sejmik_candidates` and `v_person_history`); manual corrections in `api/services/mart/person_overrides.csv` (`match_rule = 'manual'`).
 - Committee aliases for RN, TR, RAŚ, Zieloni, Wolność w Samorządzie, WiS, KNP, Ruch Palikota, PJN, Solidarna Polska, Polska Razem, Europa Plus.
 - Follow-up questions: `/ask` accepts `previous` (`{question, sql, entity_refs}`); missing entity kinds are inherited and the previous SQL goes into the prompt. The UI keeps the conversation and shows a "Dopytaj o poprzedni wynik" toggle (on by default for questions such as "a w 2019?").
@@ -34,6 +42,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `POST /question-hints` (OpenSearch text + kNN) and Streamlit podpowiedzi przy wpisywaniu oraz „Inne z historii” pod wynikiem.
 
 ### Changed
+
+- SQL guard also rejects quoted system functions (`"pg_read_file"(...)`) and sequence functions (`nextval`, `setval`, ...).
 
 - `Razem` and `Bezpartyjni` aliases match only the party and the Bezpartyjni Samorządowcy movement (local committees such as "ZAWSZE RAZEM" no longer count as Razem in `v_party_results`).
 - Every question goes to LLM SQL over the mart first; the legacy Sejm templates run only when it returns nothing for a plain Sejm question (not a clarification answer, follow-up or mart-only election).

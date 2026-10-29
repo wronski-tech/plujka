@@ -4,6 +4,15 @@ called from ``build_samorzad.build_samorzad`` after the sejmik tables (committee
 from sejmik committees of the same name).
 
 Sources (KBW mirror):
+- 2010: ``2010-kand-rady`` (candidates of every council with votes, ``% gł. w okręgu`` and
+  ``Wybrany`` = T / B (elected without voting)) and ``2010-frekwencja-i-niewazne-gminy`` (valid votes
+  per gmina / Warsaw district for every council type, used for the checks). There is no district
+  register (seats are the elected candidates, national totals are checked against ``OFFICIAL_2010``).
+  Gminas up to 20,000 inhabitants elected their councils in majoritarian districts of 1-5 seats where
+  every voter had as many votes as seats; ``valid_votes`` of such a district is the votes cast for all
+  its candidates, and the number of valid ballots (recovered from the candidates' percentages) is only
+  used to check the district against the gmina totals. A vote marked only next to a struck-off
+  candidate was invalid in 2010, so list totals are exactly the candidates' votes.
 - 2014: ``2014-kand-rady`` (candidates of every council with votes, the district's valid votes in
   ``Ważne`` and ``Mandat`` = T / B (elected without voting)). There is no district register, so a
   district's seats are its elected candidates (PKW: every 2014 seat was filled); national totals are
@@ -30,7 +39,7 @@ import logging
 
 import duckdb
 
-from api.services.mart.build_common import BuildError, YearSources, run_checks, sql_literal
+from api.services.mart.build_common import BuildError, YearSources, columns_of, run_checks, sql_literal
 from api.services.mart.schema import RADA_TABLES
 
 log = logging.getLogger("mart")
@@ -38,6 +47,10 @@ log = logging.getLogger("mart")
 TABLES = RADA_TABLES
 
 SOURCES = {
+    2010: {
+        "candidates": "**/samorzad/samo2010/2010-kand-rady.parquet",
+        "gminas": "**/samorzad/samo2010/2010-frekwencja-i-niewazne-gminy.parquet",
+    },
     2014: {"candidates": "**/samorzad/2014-kand-rady.parquet"},
     2018: {"candidates": "**/samorzad/2018-kand-rady.parquet", "districts": "**/samorzad/okregi/*.parquet"},
     2024: {
@@ -63,6 +76,22 @@ OFFICIAL_2014 = {
     ("powiat", False): (6276, 1332),
     ("dzielnica", False): (423, 75),
 }
+
+# 2010 has no district register either: councillors, districts and councils per council type are
+# compared with the PKW figures (wybory2010.pkw.gov.pl/geo/pl/000000.html, "Zbiorcze informacje o
+# wyborach - Kraj": gminas over 20,000 inhabitants 327 councils / 7,269 councillors / 1,220 districts
+# including the 65 cities with powiat rights).
+OFFICIAL_2010 = {
+    # (council_level, city_with_powiat_rights, voting_system): (councillors, districts, councils)
+    ("gmina", False, "majoritarian"): (32280, 20379, 2152),
+    ("gmina", False, "proportional"): (5568, 921, 262),
+    ("gmina", True, "proportional"): (1701, 299, 65),
+    ("powiat", False, "proportional"): (6290, 1345, 314),
+    ("dzielnica", False, "proportional"): (409, 70, 18),
+}
+# Largest majoritarian district: 2010 gminas up to 20,000 inhabitants had districts of 1-5 seats;
+# single-member districts since 2014.
+MAJORITARIAN_MAX_SEATS = {2010: 5}
 
 # Districts where nobody registered, so the seat stayed empty (PKW 2018: two districts in gminas up
 # to 20,000 inhabitants; by-elections were held later).
@@ -105,7 +134,7 @@ def available(sources: YearSources) -> bool:
 def build_rady(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     """Build and check the council tables of ``sources.year`` (needs ``sejmik_committees``)."""
     year = sources.year
-    {2014: _sources_2014, 2018: _sources_2018, 2024: _sources_2024}[year](con, sources)
+    {2010: _sources_2010, 2014: _sources_2014, 2018: _sources_2018, 2024: _sources_2024}[year](con, sources)
     _build_tables(con, year)
     _check(con, year)
 
@@ -124,6 +153,76 @@ def _tidy(expr: str) -> str:
 
 
 _UNIT = "CASE WHEN {t} = '146501' THEN 'm. st. Warszawa' ELSE regexp_replace({j}, '^(.*), (m\\. st\\.|m\\.|gm\\.)$', '\\2 \\1') END"
+
+
+def _sources_2010(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
+    """2010: candidates only (the register is derived from them, as in 2014), plus for the checks the
+    valid ballots of majoritarian districts (``rada_ballots``) and the official gmina statistics
+    (``rada_stats``)."""
+    spec = SOURCES[2010]
+    raw = sources.load("rada_cand_raw", spec["candidates"])
+    stats = sources.load("rada_stats_raw", spec["gminas"])
+    # Gmina statistics: one column group per council type under a two-row header; staging keeps the
+    # group names as headers, the second row (first data row) labels the columns.
+    columns = columns_of(con, stats)
+    groups = {4: "Rada gminy", 13: "Rada powiatu", 31: "Rada dzielnicy"}
+    labels = con.execute(f"""SELECT column7, column16, column34 FROM {stats} WHERE "Gmina" = 'TERYT'""").fetchall()
+    if [columns[i] for i in groups] != list(groups.values()) or labels != [("gł. ważne",) * 3]:
+        raise BuildError(f"year 2010: unexpected council statistics headers {columns} / {labels}")
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE rada_stats AS
+        SELECT clean_teryt("Gmina") AS teryt, column1 AS gmina, int_(column7) AS gmina_valid, int_(column16) AS powiat_valid,
+               int_(column34) AS dzielnica_valid
+        FROM {stats} WHERE "Gmina" <> 'TERYT'
+        """
+    )
+    level = "CASE k.\"Szczebel\" WHEN 'powiat' THEN 'powiat' WHEN 'rada dzielnicy' THEN 'dzielnica' ELSE 'gmina' END"
+    teryt = "CASE WHEN k.\"Szczebel\" = 'powiat' THEN left(clean_teryt(k.\"TERYT\"), 4) ELSE clean_teryt(k.\"TERYT\") END"
+    # Gmina councils are named by the statistics file ('m. Bolesławiec', 'gm. Bolesławiec'); the
+    # candidate file has the bare name. Warsaw's city council is not a row there (only its districts).
+    unit = (
+        "CASE WHEN k.\"Szczebel\" IN ('powiat', 'rada dzielnicy') THEN k.\"Jednostka\" "
+        "WHEN clean_teryt(k.\"TERYT\") = '146501' THEN 'm. st. Warszawa' ELSE s.gmina END"
+    )
+    # district_valid: votes cast for all candidates of the district (in majoritarian districts a voter
+    # had up to `seats` votes); the checks compare them with the gmina statistics.
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE rada_cand AS
+        SELECT {level} AS council_level, {teryt} AS teryt, CAST(int_(k."Okręg") AS INT) AS district_no,
+               {unit} AS unit_name, CAST(NULL AS VARCHAR) AS council_name,
+               CASE WHEN k."Szczebel" = 'gmina do 20 tyś.' THEN 'majoritarian' ELSE 'proportional' END AS voting_system,
+               CAST(int_(k."Nr listy") AS INT) AS list_no, CAST(int_(k."Pozycja") AS INT) AS list_position,
+               {_tidy('upper(k."Nazwisko")')} AS last_name, {_tidy('capw_(k."Imiona")')} AS first_names,
+               k."Komitet" AS committee, k."Plec" AS gender, int_(k."Wiek") AS age, k."Miejsce zamieszkania" AS residence,
+               int_(k."L. głosów") AS votes, coalesce(k."Wybrany" IN ('T', 'B'), false) AS elected,
+               num_(k."% gł. w okręgu") AS pct,
+               sum(int_(k."L. głosów")) OVER (PARTITION BY {level}, {teryt}, k."Okręg") AS district_valid
+        FROM {raw} k LEFT JOIN rada_stats s ON s.teryt = clean_teryt(k."TERYT") AND k."Szczebel" NOT IN ('powiat', 'rada dzielnicy')
+        WHERE k."Szczebel" <> 'sejmik'
+        """
+    )
+    # Valid ballots of a majoritarian district: every candidate's percentage (2 decimals) is votes /
+    # ballots, so each gives an interval; the intersection must hold exactly one integer.
+    con.execute(
+        """
+        CREATE OR REPLACE TABLE rada_ballots AS
+        SELECT teryt, district_no, CAST(ceil(max(votes * 100 / (pct + 0.005 + 1e-9))) AS BIGINT) AS lo,
+               CAST(floor(min(votes * 100 / (pct - 0.005 - 1e-9))) AS BIGINT) AS hi
+        FROM rada_cand WHERE voting_system = 'majoritarian' AND votes > 0 AND pct > 0
+        GROUP BY ALL
+        """
+    )
+    con.execute(
+        """
+        CREATE OR REPLACE TABLE rada_reg AS
+        SELECT council_level, teryt, district_no, any_value(council_name) AS council_name, any_value(unit_name) AS unit_name,
+               any_value(voting_system) AS voting_system, CAST(count(*) FILTER (WHERE elected) AS INT) AS seats,
+               bool_or(votes IS NOT NULL) AS contested
+        FROM rada_cand GROUP BY ALL
+        """
+    )
 
 
 def _sources_2014(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
@@ -346,6 +445,7 @@ def _struck_off(year: int) -> dict[int, list[tuple[str, str, int]]]:
 def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
     """Councils must reconcile between the district register, candidates and valid votes."""
     struck_off = _named(year, _struck_off(year))
+    max_seats = MAJORITARIAN_MAX_SEATS.get(year, 1)
     checks = {
         "rada: duplicate districts in the register": """
             SELECT count(*) - count(DISTINCT (council_level, teryt, district_no)) FROM rada_reg""",
@@ -366,9 +466,10 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
         "rada: named empty districts that have candidates": f"""
             SELECT count(*) FROM rada_districts WHERE candidates > 0
               AND (council_level, teryt, district_no) IN ({_named(year, EMPTY_DISTRICTS)})""",
-        "rada: majoritarian districts with seats != 1 or proportional with fewer than 3": """
+        f"rada: majoritarian districts with seats outside 1-{max_seats} or proportional with fewer than 3": f"""
             SELECT count(*) FROM rada_districts
-            WHERE (voting_system = 'majoritarian' AND seats <> 1) OR (voting_system = 'proportional' AND seats < 3)""",
+            WHERE (voting_system = 'majoritarian' AND seats NOT BETWEEN 1 AND {max_seats})
+               OR (voting_system = 'proportional' AND seats < 3)""",
         "rada: voting system differs between register and candidates": """
             SELECT count(*) FROM rada_dist_cand d JOIN rada_districts r USING (council_level, teryt, district_no)
             WHERE d.voting_system <> r.voting_system""",
@@ -419,6 +520,39 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
             checks[f"rada: 2014 {level}{' (cities with powiat rights)' if city else ''}: districts != PKW {districts}"] = (
                 f"SELECT abs((SELECT count(*) FROM rada_districts WHERE {unit}) - {districts})"
             )
+    if year == 2010:
+        for (level, city, system), (councillors, districts, councils) in OFFICIAL_2010.items():
+            unit = f"council_level = '{level}' AND city_with_powiat_rights = {city} AND voting_system = '{system}'"
+            name = f"rada: 2010 {level} {system}{' (cities with powiat rights)' if city else ''}"
+            checks[f"{name}: councillors != PKW {councillors}"] = (
+                f"SELECT abs((SELECT sum(seats) FROM rada_districts WHERE {unit}) - {councillors})"
+            )
+            checks[f"{name}: districts != PKW {districts}"] = f"SELECT abs((SELECT count(*) FROM rada_districts WHERE {unit}) - {districts})"
+            checks[f"{name}: councils != PKW {councils}"] = (
+                f"SELECT abs((SELECT count(DISTINCT teryt) FROM rada_districts WHERE {unit}) - {councils})"
+            )
+        checks["rada: 2010 majoritarian districts whose valid ballots do not follow from the candidates' percentages"] = """
+            SELECT count(*) FROM rada_districts r LEFT JOIN rada_ballots b USING (teryt, district_no)
+            WHERE r.voting_system = 'majoritarian' AND r.contested
+              AND (b.lo IS DISTINCT FROM b.hi OR r.valid_votes > b.lo * r.seats OR (r.seats = 1 AND r.valid_votes <> b.lo))"""
+        # Official valid votes per council: gmina councils (Rada m.st. Warszawy as the sum of its
+        # districts' rows), powiat councils as the sum of their gminas, Warsaw district councils.
+        checks["rada: 2010 councils whose valid votes (ballots in majoritarian districts) != official gmina statistics"] = """
+            WITH built AS (
+                SELECT r.council_level, r.teryt,
+                       sum(CASE WHEN NOT r.contested THEN 0 WHEN r.voting_system = 'majoritarian' THEN b.lo ELSE r.valid_votes END) AS v
+                FROM rada_districts r LEFT JOIN rada_ballots b ON r.voting_system = 'majoritarian' AND b.teryt = r.teryt
+                     AND b.district_no = r.district_no
+                GROUP BY ALL),
+            official AS (
+                SELECT 'gmina' AS council_level, CASE WHEN left(teryt, 4) = '1465' THEN '146501' ELSE teryt END AS teryt,
+                       sum(gmina_valid) AS v FROM rada_stats GROUP BY ALL
+                UNION ALL
+                SELECT 'powiat', left(teryt, 4), sum(powiat_valid) FROM rada_stats WHERE substr(teryt, 3, 2) < '61' GROUP BY ALL
+                UNION ALL
+                SELECT 'dzielnica', teryt, dzielnica_valid FROM rada_stats WHERE left(teryt, 4) = '1465')
+            SELECT count(*) FROM built b FULL JOIN official o USING (council_level, teryt)
+            WHERE coalesce(b.v, 0) <> coalesce(o.v, 0)"""
     run_checks(con, year, checks)
     unknown = con.execute("SELECT count(*) FROM rada_district_lists WHERE votes IS NULL AND candidate_votes IS NOT NULL").fetchone()[0]
     log.info("year %s councils: %s lists with unknown list votes (struck-off candidates)", year, unknown)

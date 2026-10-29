@@ -7,6 +7,9 @@ Two independent layers protect the database:
    functions; it also caps the row count with LIMIT.
 2. ``run_readonly`` executes it as the ``MART_DATABASE_URL`` login role, which may only SELECT from
    mart, runs every transaction read-only and has a statement timeout (see ``schema.ensure_reader_role``).
+
+Expensive but harmless queries (huge ``generate_series``, cross joins, ``repeat``) are not rejected by
+the parser; the statement timeout and the row cap bound them.
 """
 
 from __future__ import annotations
@@ -33,6 +36,7 @@ _FORBIDDEN_FUNCTIONS = frozenset(
         "set_config", "current_setting", "dblink", "dblink_exec", "lo_import", "lo_export", "lo_get",
         "lo_put", "query_to_xml", "query_to_json", "table_to_xml", "cursor_to_xml", "database_to_xml",
         "schema_to_xml", "txid_current", "version", "inet_server_addr", "inet_client_addr",
+        "inet_server_port", "inet_client_port", "nextval", "setval", "currval", "lastval",
     }
 )
 
@@ -44,7 +48,8 @@ class UnsafeSqlError(ValueError):
 def _function_name(node: exp.Expression) -> str:
     """Lower-case name of a function call node (anonymous or known)."""
     if isinstance(node, exp.Anonymous):
-        return str(node.this).lower()
+        # ``name`` drops identifier quotes: "pg_read_file"(...) must not slip past the pg_ check.
+        return node.name.lower()
     return node.sql_name().lower() if isinstance(node, exp.Func) else ""
 
 

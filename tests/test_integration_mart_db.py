@@ -1,7 +1,7 @@
 """PostgreSQL checks of the mart (``PLUJKA_RUN_DB_TESTS=1``; needs CREATEROLE on DATABASE_URL).
 
 The read-only role must deny writes, other schemas and long queries; person linking must split
-namesakes by birth year and apply manual overrides. The linking test fills the candidate tables
+namesakes by birth year, build local persons and apply manual overrides. The linking test fills the candidate tables
 inside a transaction that is rolled back, so a built mart is left untouched.
 """
 
@@ -75,8 +75,15 @@ class TestPersonLinking(unittest.TestCase):
             " full_name, last_name, first_names, gender, votes, elected) VALUES (%s, %s, %s, 1, 1, 1, %s, %s, %s, %s, 10, false)",
             sejm,
         )
+        conn.cursor().executemany(  # namesakes in one election, told apart by residence
+            "INSERT INTO mart.sejm_candidates (year, candidate_id, district_no, committee_id, list_no, list_position,"
+            " full_name, last_name, first_names, gender, residence, residence_teryt, votes, elected)"
+            " VALUES (2023, %s, %s, 1, 1, 2, 'Tomasz WÓJCIK', 'WÓJCIK', 'Tomasz', 'Mężczyzna', %s, %s, 10, false)",
+            [(5, 1, "Bolesławiec", "020101"), (6, 13, "Kraków", "126101")],
+        )
         wbp = [(2018, 1, "020101", "Anna NOWAK", "NOWAK", "Anna", "Kobieta", 40),
-               (2018, 2, "020102", "Marek LIS", "LIS", "Marek", "Mężczyzna", 50)]
+               (2018, 2, "020102", "Marek LIS", "LIS", "Marek", "Mężczyzna", 50),
+               (2024, 3, "020106", "Piotr ZIELIŃSKI", "ZIELIŃSKI", "Piotr", "Mężczyzna", 46)]
         conn.cursor().executemany(
             "INSERT INTO mart.wbp_candidates (year, round, candidate_id, teryt_gmina, full_name, last_name, first_names,"
             " gender, age, elected) VALUES (%s, 1, %s, %s, %s, %s, %s, %s, %s, false)",
@@ -84,7 +91,11 @@ class TestPersonLinking(unittest.TestCase):
         )
         rada = [(2024, 1, "020103", "Anna NOWAK", "NOWAK", "Anna", "Kobieta", 48),
                 (2024, 2, "020104", "Marek LIS", "LIS", "Marek", "Mężczyzna", 55),
-                (2018, 3, "020105", "Ewa WIŚNIEWSKA", "WIŚNIEWSKA", "Ewa", "Kobieta", 44)]
+                (2018, 3, "020105", "Ewa WIŚNIEWSKA", "WIŚNIEWSKA", "Ewa", "Kobieta", 44),
+                (2018, 4, "020107", "Piotr ZIELIŃSKI", "ZIELIŃSKI", "Piotr", "Mężczyzna", 40),
+                (2018, 5, "0301", "Piotr ZIELIŃSKI", "ZIELIŃSKI", "Piotr", "Mężczyzna", 40),
+                (2024, 6, "126105", "Tomasz WÓJCIK", "WÓJCIK", "Tomasz", "Mężczyzna", 40),
+                (2024, 7, "300101", "Tomasz WÓJCIK", "WÓJCIK", "Tomasz", "Mężczyzna", 52)]
         conn.cursor().executemany(
             "INSERT INTO mart.rada_candidates (year, candidate_id, council_level, teryt, district_no, committee_id,"
             " full_name, last_name, first_names, gender, age, elected) VALUES (%s, %s, 'gmina', %s, 1, 1, %s, %s, %s, %s, %s, false)",
@@ -117,9 +128,33 @@ class TestPersonLinking(unittest.TestCase):
                 marek = self._person(conn, "sejm_candidates", 2015, "Marek LIS")
                 self.assertEqual(self._person(conn, "wbp_candidates", 2018, "Marek LIS"), marek)
                 self.assertEqual(self._person(conn, "rada_candidates", 2024, "Marek LIS"), marek)
-                # Anna: born 1978 and 1976 -> two people with one name; neither local candidacy is linked.
-                self.assertIsNone(self._person(conn, "wbp_candidates", 2018, "Anna NOWAK"))
-                self.assertIsNone(self._person(conn, "rada_candidates", 2024, "Anna NOWAK"))
+                # Anna: born 1978 and 1976 -> two people with one name; neither is the national Anna, and
+                # each becomes a separate local person.
+                anna = self._person(conn, "sejm_candidates", 2023, "Anna NOWAK")
+                anna_wbp = self._person(conn, "wbp_candidates", 2018, "Anna NOWAK")
+                anna_rada = self._person(conn, "rada_candidates", 2024, "Anna NOWAK")
+                self.assertEqual(len({anna, anna_wbp, anna_rada}), 3)
+                # Piotr has no national candidacy: council 2018 and mayor 2024 in powiat 0201 (born 1978) are one
+                # local person; the namesake in powiat 0301 is another.
+                piotr = conn.execute(
+                    "SELECT k.person_id, p.match_rule FROM mart.rada_candidates k JOIN mart.persons p USING (person_id)"
+                    " WHERE k.year = 2018 AND k.teryt = '020107'"
+                ).fetchone()
+                self.assertEqual(piotr[1], "local:name+gender+birth year+powiat")
+                self.assertEqual(self._person(conn, "wbp_candidates", 2024, "Piotr ZIELIŃSKI"), piotr[0])
+                other = conn.execute("SELECT person_id FROM mart.rada_candidates WHERE year = 2018 AND teryt = '0301'").fetchone()[0]
+                self.assertNotEqual(other, piotr[0])
+                # Two national Tomasz WÓJCIK: the councillor in powiat 1261 joins the one living in Kraków
+                # (residence_teryt 126101); the one in powiat 3001, where neither lives, stays local.
+                tomasz = dict(conn.execute(
+                    "SELECT residence_teryt, person_id FROM mart.sejm_candidates WHERE full_name = 'Tomasz WÓJCIK'"
+                ).fetchall())
+                self.assertNotEqual(tomasz["020101"], tomasz["126101"])
+                rada_tomasz = dict(conn.execute(
+                    "SELECT teryt, person_id FROM mart.rada_candidates WHERE full_name = 'Tomasz WÓJCIK'"
+                ).fetchall())
+                self.assertEqual(rada_tomasz["126105"], tomasz["126101"])
+                self.assertNotIn(rada_tomasz["300101"], tomasz.values())
                 # Override links a local candidacy under another surname to the national person.
                 ewa = self._person(conn, "sejm_candidates", 2019, "Ewa MALINOWSKA")
                 self.assertEqual(self._person(conn, "rada_candidates", 2018, "Ewa WIŚNIEWSKA"), ewa)

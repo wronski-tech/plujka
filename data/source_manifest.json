@@ -1,0 +1,2564 @@
+{
+ "2004/parlament_eu/pe2004-kand.xls": {
+  "bytes": 559616,
+  "etag": "\"5c49c397-88a00\"",
+  "last_modified": "Thu, 24 Jan 2019 13:54:31 GMT",
+  "sha256": "e693021e81ec12174c5eb97b22791e0a77fd6152ea8cae6ce8c92310089151fb",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2004/parlament_eu/pe2004-kand.xls"
+ },
+ "2004/parlament_eu/pe2004-lis-gm.xls": {
+  "bytes": 882688,
+  "etag": "\"61c3057b-d7800\"",
+  "last_modified": "Wed, 22 Dec 2021 11:01:15 GMT",
+  "sha256": "50b0c38b2b86cdaef9c5df842e48d88bc3550ab2679ef9137683939b2739bfd5",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2004/parlament_eu/pe2004-lis-gm.xls"
+ },
+ "2004/parlament_eu/pe2004-lis-pow.xls": {
+  "bytes": 135168,
+  "etag": "\"5c483f8e-21000\"",
+  "last_modified": "Wed, 23 Jan 2019 10:18:54 GMT",
+  "sha256": "6d6427787905f81a1e6d917f09a07f32a47141ba25bcb1ff41b753af748ccf47",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2004/parlament_eu/pe2004-lis-pow.xls"
+ },
+ "2005/2005-parl-frekw-gm.xls": {
+  "bytes": 402432,
+  "etag": "\"4d9c59b8-62400\"",
+  "last_modified": "Wed, 06 Apr 2011 12:16:56 GMT",
+  "sha256": "abc59ae1b14da6cd237c34df4722dbb0ce87368c964e65460aa414e1b8b8e232",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/2005-parl-frekw-gm.xls"
+ },
+ "2005/prezydent/1/1456148660_37030.xls": {
+  "bytes": 8698368,
+  "etag": "\"61c0da80-84ba00\"",
+  "last_modified": "Mon, 20 Dec 2021 19:33:20 GMT",
+  "sha256": "c29ba9d9faf76686269c53c3c97cb47b11ac4802bfdfd634c5c6773fbbf79fe1",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/prezydent/1/1456148660_37030.xls"
+ },
+ "2005/prezydent/1/1456148660_37032.xls": {
+  "bytes": 1501184,
+  "etag": "\"61c0da87-16e800\"",
+  "last_modified": "Mon, 20 Dec 2021 19:33:27 GMT",
+  "sha256": "674002e0231c51d48843d07118f1d05df42628c0cc51fddb8cfd6503520d65b3",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/prezydent/1/1456148660_37032.xls"
+ },
+ "2005/prezydent/1/1456148660_37033.xls": {
+  "bytes": 651264,
+  "etag": "\"61c0da8c-9f000\"",
+  "last_modified": "Mon, 20 Dec 2021 19:33:32 GMT",
+  "sha256": "0a7e2d5f798fc419e0afdee439b7293d91a5335856d029f9278e67775ba1f3a2",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/prezydent/1/1456148660_37033.xls"
+ },
+ "2005/prezydent/1/1456148660_37035.xls": {
+  "bytes": 326144,
+  "etag": "\"61c0da94-4fa00\"",
+  "last_modified": "Mon, 20 Dec 2021 19:33:40 GMT",
+  "sha256": "919b37804b38c7884ef741d62e054cd8f8943650f7ea02aae49ca1e4a105f63a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/prezydent/1/1456148660_37035.xls"
+ },
+ "2005/prezydent/1/1456148660_37037.xls": {
+  "bytes": 99840,
+  "etag": "\"61c0da7d-18600\"",
+  "last_modified": "Mon, 20 Dec 2021 19:33:17 GMT",
+  "sha256": "12e7b894929286f9aa5929dad13f6619b0978aae22fcda17eb877dd584188396",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/prezydent/1/1456148660_37037.xls"
+ },
+ "2005/prezydent/1/2005-prez-pow1tura-liczby.xls": {
+  "bytes": 99840,
+  "etag": "\"434b978d-18600\"",
+  "last_modified": "Tue, 11 Oct 2005 10:44:29 GMT",
+  "sha256": "fd3532f4b4dc3034e5aeafc85163e8e1f062f5f1db2af1b73dbb35718ee73e03",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/prezydent/1/2005-prez-pow1tura-liczby.xls"
+ },
+ "2005/prezydent/2/1456148721_37553.xls": {
+  "bytes": 11059712,
+  "etag": "\"61c0dbff-a8c200\"",
+  "last_modified": "Mon, 20 Dec 2021 19:39:43 GMT",
+  "sha256": "ea6eef7c9d9764356e0fc7ec603cf770a3db3ca69b964f9e2384aff94937a2b5",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/prezydent/2/1456148721_37553.xls"
+ },
+ "2005/prezydent/2/1456148721_37554.xls": {
+  "bytes": 906752,
+  "etag": "\"61c0dc03-dd600\"",
+  "last_modified": "Mon, 20 Dec 2021 19:39:47 GMT",
+  "sha256": "3c94d82ec8218249f6dc849a96405ccb38e3a49797b7a54a03623210a0d42ea9",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/prezydent/2/1456148721_37554.xls"
+ },
+ "2005/prezydent/2/1456148721_37555.xls": {
+  "bytes": 140800,
+  "etag": "\"61c0dc06-22600\"",
+  "last_modified": "Mon, 20 Dec 2021 19:39:50 GMT",
+  "sha256": "cdb7f51d884bc2d58419172155ca116e245270587c9eec114927b5c61391b552",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/prezydent/2/1456148721_37555.xls"
+ },
+ "2005/prezydent/2005_granice_obwodów.xls": {
+  "bytes": 9773568,
+  "etag": "\"50aa6f0e-952200\"",
+  "last_modified": "Mon, 19 Nov 2012 17:40:30 GMT",
+  "sha256": "7a6770e6d068472359ae0219ba8078bddb2698f95fbfc943a3941e3b2dd3af2d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/prezydent/2005_granice_obwod%C3%B3w.xls"
+ },
+ "2005/sejm/1456225675_36793.xls": {
+  "bytes": 9560064,
+  "etag": "\"61c104e7-91e000\"",
+  "last_modified": "Mon, 20 Dec 2021 22:34:15 GMT",
+  "sha256": "e07daaa8a386066781ca70d9411b9770cc77b6c90861893f34e7074f4557e422",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/sejm/1456225675_36793.xls"
+ },
+ "2005/sejm/1456225675_36795.xls": {
+  "bytes": 757248,
+  "etag": "\"61c104db-b8e00\"",
+  "last_modified": "Mon, 20 Dec 2021 22:34:03 GMT",
+  "sha256": "0b4fcc6aa81b8932ca5157a0ccb19341a7fb4a3be69d3569e6c14c72637fc55d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/sejm/1456225675_36795.xls"
+ },
+ "2005/sejm/kandsejm2005kom.xls": {
+  "bytes": 2236416,
+  "etag": "\"60954d58-222000\"",
+  "last_modified": "Fri, 07 May 2021 14:23:20 GMT",
+  "sha256": "3152474881e9c5e699c7027ce615ae313ae626cc1e410ee728e88d9152102c7f",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/sejm/kandsejm2005kom.xls"
+ },
+ "2005/sejm/okregi2005sejm.xls": {
+  "bytes": 41472,
+  "etag": "\"5575639a-a200\"",
+  "last_modified": "Mon, 08 Jun 2015 09:42:50 GMT",
+  "sha256": "28be7bb5988b86c1719ac20d2ed23dd8c5e107f132d6ac0a202ee92c690718d2",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/sejm/okregi2005sejm.xls"
+ },
+ "2005/sejm/sejm2005-lis-obw.zip": {
+  "bytes": 2383155,
+  "etag": "\"61c3555b-245d33\"",
+  "last_modified": "Wed, 22 Dec 2021 16:42:03 GMT",
+  "sha256": "7cec2783885cb7c59d65c1ae987e7c3d542152ab1ab67116f58623fae4631082",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/sejm/sejm2005-lis-obw.zip"
+ },
+ "2005/sejm/sejm2005-lis-okr.xls": {
+  "bytes": 39936,
+  "etag": "\"45b5f4d8-9c00\"",
+  "last_modified": "Tue, 23 Jan 2007 11:43:20 GMT",
+  "sha256": "9c0fdca222d69ccf01a7872374c6fb415011d473b902d92d71c283a82ba45fad",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/sejm/sejm2005-lis-okr.xls"
+ },
+ "2005/sejm/sejm2005.zip": {
+  "bytes": 7504362,
+  "etag": "\"61c3573f-7281ea\"",
+  "last_modified": "Wed, 22 Dec 2021 16:50:07 GMT",
+  "sha256": "94705652a2b40d8c862acb4724abe1e4c8c461eedc20a8492554e21404745a4f",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/sejm/sejm2005.zip"
+ },
+ "2005/senat/2005-sen-gl_kan_pow.zip": {
+  "bytes": 156678,
+  "etag": "\"46caeaf2-26406\"",
+  "last_modified": "Tue, 21 Aug 2007 13:38:58 GMT",
+  "sha256": "b33a297843803d0a537d6fde19950994d49eafaa7b5b6e51b0da438445b99b83",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/senat/2005-sen-gl_kan_pow.zip"
+ },
+ "2005/senat/kandsen2005.xls": {
+  "bytes": 161792,
+  "etag": "\"5fb25150-27800\"",
+  "last_modified": "Mon, 16 Nov 2020 10:15:44 GMT",
+  "sha256": "21b80dcc24a424da5a5e21eb806fcb457ca1b10284845b8130ef1f0c053b6e5c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/senat/kandsen2005.xls"
+ },
+ "2005/senat/senat2005okręgi.xls": {
+  "bytes": 47616,
+  "etag": "\"61ea7fb2-ba00\"",
+  "last_modified": "Fri, 21 Jan 2022 09:41:06 GMT",
+  "sha256": "19c6e216316acf50776ab6d69bc04e94821ecf8da8b95e0376ecb0755ff09eba",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/senat/senat2005okr%C4%99gi.xls"
+ },
+ "2005/senat/senat2005zbiorcze.xls": {
+  "bytes": 36864,
+  "etag": "\"61ea7fec-9000\"",
+  "last_modified": "Fri, 21 Jan 2022 09:42:04 GMT",
+  "sha256": "403e85ce433d69b8974622930f7be93f3f83ca62521d0094f80958063661d2ed",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2005/senat/senat2005zbiorcze.xls"
+ },
+ "2007/sejm/kandsejm2007.xls": {
+  "bytes": 1776128,
+  "etag": "\"5da9a9de-1b1a00\"",
+  "last_modified": "Fri, 18 Oct 2019 12:02:38 GMT",
+  "sha256": "ebed931f731cfad80f2bfe8d905b081da33a7a96afc12f6ac29931a10fb2954d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/sejm/kandsejm2007.xls"
+ },
+ "2007/sejm/okręgi2007sejm.xls": {
+  "bytes": 33280,
+  "etag": "\"55756b59-8200\"",
+  "last_modified": "Mon, 08 Jun 2015 10:15:53 GMT",
+  "sha256": "f53e10f0561f7b6039d7791577eadd4778b6ae2741be2f246dccbd868a71003c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/sejm/okr%C4%99gi2007sejm.xls"
+ },
+ "2007/sejm/sejm2007-gl-kand-gm.zip": {
+  "bytes": 1999757,
+  "etag": "\"63763f3e-1e838d\"",
+  "last_modified": "Thu, 17 Nov 2022 14:03:42 GMT",
+  "sha256": "44ab2836d78424ff285c60c9b90e26ae0e36d2df43048e0abdde665881886699",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/sejm/sejm2007-gl-kand-gm.zip"
+ },
+ "2007/sejm/sejm2007-gm-listy.xls": {
+  "bytes": 613888,
+  "etag": "\"5d3ef42a-95e00\"",
+  "last_modified": "Mon, 29 Jul 2019 13:27:06 GMT",
+  "sha256": "19c97cb34633af94a6b32796cccbe5ca5f353805cbc095a076afffd9c5c47a71",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/sejm/sejm2007-gm-listy.xls"
+ },
+ "2007/sejm/sejm2007-kand-obw.zip": {
+  "bytes": 13944923,
+  "etag": "\"63763dd2-d4c85b\"",
+  "last_modified": "Thu, 17 Nov 2022 13:57:38 GMT",
+  "sha256": "90c1702ffee219a0a25066c55704b0c5b94846a1289469bf06570d80b8e5db10",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/sejm/sejm2007-kand-obw.zip"
+ },
+ "2007/sejm/sejm2007-obw-listy.xls": {
+  "bytes": 9139712,
+  "etag": "\"5d3ee8d6-8b7600\"",
+  "last_modified": "Mon, 29 Jul 2019 12:38:46 GMT",
+  "sha256": "d861460f732f2e9e5cf40564327d440c41ad16f5845f7f11c3f95c6f386cb2de",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/sejm/sejm2007-obw-listy.xls"
+ },
+ "2007/sejm/sejm2007-pow-listy.xls": {
+  "bytes": 103936,
+  "etag": "\"5d3ee5fa-19600\"",
+  "last_modified": "Mon, 29 Jul 2019 12:26:34 GMT",
+  "sha256": "20efd66a2e689542d48a99124c248d9aaa867b8854c2f43629f8eed5fef76642",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/sejm/sejm2007-pow-listy.xls"
+ },
+ "2007/sejm/sejm2007zagrkraje.xlsx": {
+  "bytes": 101081,
+  "etag": "\"5c767c2c-18ad9\"",
+  "last_modified": "Wed, 27 Feb 2019 12:01:48 GMT",
+  "sha256": "83f1996273f2e7cd898454f7aaa83b5645981689f6747b01e3028c8c4be91733",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/sejm/sejm2007zagrkraje.xlsx"
+ },
+ "2007/sejm/sejm2007zagrobw.xlsx": {
+  "bytes": 207622,
+  "etag": "\"5c767a5b-32b06\"",
+  "last_modified": "Wed, 27 Feb 2019 11:54:03 GMT",
+  "sha256": "7f7357e7b14eaa40919cbbd64a50bed09cb669e4fd13cc4d98f361d0aad2cd9a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/sejm/sejm2007zagrobw.xlsx"
+ },
+ "2007/senat/2007-senat-zagr.xls": {
+  "bytes": 42496,
+  "etag": "\"53d7bcd5-a600\"",
+  "last_modified": "Tue, 29 Jul 2014 15:25:09 GMT",
+  "sha256": "16f86814ea7c6a3e11dd976ccfc32e1fdde03306d66c31f059261c24cc3f938c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/senat/2007-senat-zagr.xls"
+ },
+ "2007/senat/kandsen2007.xls": {
+  "bytes": 123392,
+  "etag": "\"5da9a9a7-1e200\"",
+  "last_modified": "Fri, 18 Oct 2019 12:01:43 GMT",
+  "sha256": "c1e1ff1c9b339eb15c8b05b2bd559fb215ee667933e9c3a6b5aed30b0609f234",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/senat/kandsen2007.xls"
+ },
+ "2007/senat/okr2007senat.xlsx": {
+  "bytes": 20082,
+  "etag": "\"63ce648c-4e72\"",
+  "last_modified": "Mon, 23 Jan 2023 10:42:20 GMT",
+  "sha256": "046083e81faee63f57f3703520798b45224c337ab592724a264334e1bf641b27",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/senat/okr2007senat.xlsx"
+ },
+ "2007/senat/parl2007-sen-gl_kand_gm.zip": {
+  "bytes": 254689,
+  "etag": "\"61e817d2-3e2e1\"",
+  "last_modified": "Wed, 19 Jan 2022 13:53:22 GMT",
+  "sha256": "a5fe149b1df6077bfbb9a5e6ad338ca624e3b9837bcaa401e96b876e5c1fadc9",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/senat/parl2007-sen-gl_kand_gm.zip"
+ },
+ "2007/senat/parl2007-sen-gl_kand_obw.zip": {
+  "bytes": 1995918,
+  "etag": "\"61e817b6-1e748e\"",
+  "last_modified": "Wed, 19 Jan 2022 13:52:54 GMT",
+  "sha256": "d0916519b4a5999f7bfe96671cff9b4f7e71fc0b593e64572970f8fd491284f7",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/senat/parl2007-sen-gl_kand_obw.zip"
+ },
+ "2007/senat/sen2007obw-18.xls": {
+  "bytes": 299520,
+  "etag": "\"61d43e60-49200\"",
+  "last_modified": "Tue, 04 Jan 2022 12:32:32 GMT",
+  "sha256": "566c0dbb1aac5a26fbab73631e83324f30a5bde72054a8de41ecf3d020815fef",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2007/senat/sen2007obw-18.xls"
+ },
+ "2009/parlament_eu/kandpe2009.xls": {
+  "bytes": 351232,
+  "etag": "\"63ce82b3-55c00\"",
+  "last_modified": "Mon, 23 Jan 2023 12:50:59 GMT",
+  "sha256": "478b13457b84a5788bed057f3b65bb20218576ec0c85bd64851db22ab532dc27",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2009/parlament_eu/kandpe2009.xls"
+ },
+ "2009/parlament_eu/pe2009.zip": {
+  "bytes": 654117,
+  "etag": "\"61c3629e-9fb25\"",
+  "last_modified": "Wed, 22 Dec 2021 17:38:38 GMT",
+  "sha256": "c5c97311cdb4c8ed93c38c452cc2297036528b17d58cb8706973c79d5337a88d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2009/parlament_eu/pe2009.zip"
+ },
+ "2010/prezydent/1/pzt2010-gminy.csv": {
+  "bytes": 174293,
+  "etag": "\"4c1e0ba4-2a8d5\"",
+  "last_modified": "Sun, 20 Jun 2010 12:37:56 GMT",
+  "sha256": "af952fccb0033d947f599c3b032a0a671a9041aaffdff31a475f0ad520207a2c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/1/pzt2010-gminy.csv"
+ },
+ "2010/prezydent/1/pzt2010-obwody.zip": {
+  "bytes": 1743203,
+  "etag": "\"4c1e0ba4-1a9963\"",
+  "last_modified": "Sun, 20 Jun 2010 12:37:56 GMT",
+  "sha256": "5135c0f92fc1948e68375545faed308758873cc9e79c9f41f721333781f8cbbe",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/1/pzt2010-obwody.zip"
+ },
+ "2010/prezydent/1/pzt2010-wyn-gmn.csv": {
+  "bytes": 288391,
+  "etag": "\"4c1f76f2-46687\"",
+  "last_modified": "Mon, 21 Jun 2010 14:28:02 GMT",
+  "sha256": "8371e77cd5e717d770986c74804f852c7997cd9788b4ad753d4dc28a02ce0755",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/1/pzt2010-wyn-gmn.csv"
+ },
+ "2010/prezydent/1/pzt2010-wyn-obw-zgr.csv": {
+  "bytes": 33897,
+  "etag": "\"4c1f76f2-8469\"",
+  "last_modified": "Mon, 21 Jun 2010 14:28:02 GMT",
+  "sha256": "9281fe72c7b232d25b38a79b7f5acf7c797184f8abe8957b5355304bc58ef6c5",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/1/pzt2010-wyn-obw-zgr.csv"
+ },
+ "2010/prezydent/1/pzt2010-wyn-obw.zip": {
+  "bytes": 1048327,
+  "etag": "\"4c1fb092-fff07\"",
+  "last_modified": "Mon, 21 Jun 2010 18:33:54 GMT",
+  "sha256": "e389ddaca58337d2edb6782e02e0c3d2d586377bc54fa3053d5192e48402af10",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/1/pzt2010-wyn-obw.zip"
+ },
+ "2010/prezydent/1/pzt2010-wyn-woj.csv": {
+  "bytes": 2112,
+  "etag": "\"4c1f76f2-840\"",
+  "last_modified": "Mon, 21 Jun 2010 14:28:02 GMT",
+  "sha256": "a3fcdd38ae64b78ed524c9bb7aaa633166d948cc83757b616c14775819297fa6",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/1/pzt2010-wyn-woj.csv"
+ },
+ "2010/prezydent/1/pzt2010-wyn-zagranica.csv": {
+  "bytes": 5594,
+  "etag": "\"4c1f76f2-15da\"",
+  "last_modified": "Mon, 21 Jun 2010 14:28:02 GMT",
+  "sha256": "b7818d7b84920cbaa91c8f4cdd2062d941c55c628fc7928c7f60458b61c71234",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/1/pzt2010-wyn-zagranica.csv"
+ },
+ "2010/prezydent/2/pzt2010-gminy.csv": {
+  "bytes": 174286,
+  "etag": "\"4c356e3d-2a8ce\"",
+  "last_modified": "Thu, 08 Jul 2010 06:20:45 GMT",
+  "sha256": "e7c4b8aeb9e0986b1635c8f51514c3d06099293332e269c9a687bd8cb36576dd",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/2/pzt2010-gminy.csv"
+ },
+ "2010/prezydent/2/pzt2010-obwody.zip": {
+  "bytes": 1742719,
+  "etag": "\"4c356e52-1a977f\"",
+  "last_modified": "Thu, 08 Jul 2010 06:21:06 GMT",
+  "sha256": "68254c022a5e5cd82ef9f082400f99e643568ddf1c8c89e0fa91caf4fda9a581",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/2/pzt2010-obwody.zip"
+ },
+ "2010/prezydent/2/pzt2010-wyn-gmn.csv": {
+  "bytes": 227367,
+  "etag": "\"4c31ae7f-37827\"",
+  "last_modified": "Mon, 05 Jul 2010 10:05:51 GMT",
+  "sha256": "fb625d2c8ea8473c8b57a416adf19c164d40d136ca3fc6beb206ba0ab383553c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/2/pzt2010-wyn-gmn.csv"
+ },
+ "2010/prezydent/2/pzt2010-wyn-obw-zgr.csv": {
+  "bytes": 29159,
+  "etag": "\"4c31ae7f-71e7\"",
+  "last_modified": "Mon, 05 Jul 2010 10:05:51 GMT",
+  "sha256": "58f68d990b1213d8c64f2ae38b66485af5264286bf6f4e03501f252b71d0d760",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/2/pzt2010-wyn-obw-zgr.csv"
+ },
+ "2010/prezydent/2/pzt2010-wyn-obw.zip": {
+  "bytes": 841783,
+  "etag": "\"4c31ae7f-cd837\"",
+  "last_modified": "Mon, 05 Jul 2010 10:05:51 GMT",
+  "sha256": "f51d6fbc339bc027f6506081b5d01addd02003cb832ef043325f1963742c0849",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/2/pzt2010-wyn-obw.zip"
+ },
+ "2010/prezydent/2/pzt2010-wyn-woj.csv": {
+  "bytes": 1217,
+  "etag": "\"4c31ae7f-4c1\"",
+  "last_modified": "Mon, 05 Jul 2010 10:05:51 GMT",
+  "sha256": "5403d600fd815b000a76acc29f0be3270a8c6588020622db5e311880e26070b5",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/2/pzt2010-wyn-woj.csv"
+ },
+ "2010/prezydent/2/pzt2010-wyn-zagranica.csv": {
+  "bytes": 3768,
+  "etag": "\"4c31c1a5-eb8\"",
+  "last_modified": "Mon, 05 Jul 2010 11:27:33 GMT",
+  "sha256": "793ea5004c707ac6fb9223106ffce4029a57056649d7dc63c7c91d8be1118c32",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/prezydent/2/pzt2010-wyn-zagranica.csv"
+ },
+ "2010/samorzad/2010-frekw-wbp-gm.xls": {
+  "bytes": 555008,
+  "etag": "\"6351552a-87800\"",
+  "last_modified": "Thu, 20 Oct 2022 14:03:22 GMT",
+  "sha256": "ea6fe21f19b8b966ab9153f60b4f1cc23d197cce4b016a5e5c1648c1ce7826d4",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/2010-frekw-wbp-gm.xls"
+ },
+ "2010/samorzad/2010-frekwencja-i-nieważne-gminy.xls": {
+  "bytes": 953856,
+  "etag": "\"635154b5-e8e00\"",
+  "last_modified": "Thu, 20 Oct 2022 14:01:25 GMT",
+  "sha256": "76de2f0d3b22c4d4893dff2cb14293e59045405318c400f9c8f78ec04b865a48",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/2010-frekwencja-i-niewa%C5%BCne-gminy.xls"
+ },
+ "2010/samorzad/powiaty/2010pow.zip": {
+  "bytes": 2285665,
+  "etag": "\"634033cf-22e061\"",
+  "last_modified": "Fri, 07 Oct 2022 14:12:31 GMT",
+  "sha256": "8d32b42e97debc0ed52aa806bf2dea86e9899eedc19697f2ac80006089840452",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/powiaty/2010pow.zip"
+ },
+ "2010/samorzad/samo2010/2010-WBP.xls": {
+  "bytes": 3137024,
+  "etag": "\"62064b68-2fde00\"",
+  "last_modified": "Fri, 11 Feb 2022 11:41:28 GMT",
+  "sha256": "1a1531b3a91b299c0a42d84cf255fad3194d532cbf83924ab892de4e870d4521",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/samo2010/2010-WBP.xls"
+ },
+ "2010/samorzad/samo2010/2010-frekwencja-i-niewazne-gminy.xls": {
+  "bytes": 980480,
+  "etag": "\"54ae8354-ef600\"",
+  "last_modified": "Thu, 08 Jan 2015 13:17:08 GMT",
+  "sha256": "2d8391eb5dd98d4a1ddad4813a2fbb727ad76c932926ed2c40121faa2de616f9",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/samo2010/2010-frekwencja-i-niewazne-gminy.xls"
+ },
+ "2010/samorzad/samo2010/2010-kand-rady.xlsx": {
+  "bytes": 29824330,
+  "etag": "\"590317cb-1c7154a\"",
+  "last_modified": "Fri, 28 Apr 2017 10:22:03 GMT",
+  "sha256": "ed6c67f8c4de8c60de1c84bc2b5e5616ff25e17da9a83eb5cdebabc4ac938456",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/samo2010/2010-kand-rady.xlsx"
+ },
+ "2010/samorzad/samo2010/samo2010mpp.zip": {
+  "bytes": 722733,
+  "etag": "\"63cfd3ac-b072d\"",
+  "last_modified": "Tue, 24 Jan 2023 12:48:44 GMT",
+  "sha256": "8f08f582a1119908447745f61cfa14367ce1b2bc38e50156c3d62b4b6945f8d4",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/samo2010/samo2010mpp.zip"
+ },
+ "2010/samorzad/samo2010/wbp/wbp2010obw1tura.zip": {
+  "bytes": 4945182,
+  "etag": "\"63cfca83-4b751e\"",
+  "last_modified": "Tue, 24 Jan 2023 12:09:39 GMT",
+  "sha256": "a54725d7b45fa363a2dfc33bff04a24e0223422fbdeb66455a4223f0010dc097",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/samo2010/wbp/wbp2010obw1tura.zip"
+ },
+ "2010/samorzad/samo2010/wbp/wbp2010obw2tura.xlsx": {
+  "bytes": 1458559,
+  "etag": "\"63cfd144-16417f\"",
+  "last_modified": "Tue, 24 Jan 2023 12:38:28 GMT",
+  "sha256": "6bddbeb82778bdfb6b48a1afc483b5cb38909557b81fb675fc827436ddc32e0b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/samo2010/wbp/wbp2010obw2tura.xlsx"
+ },
+ "2010/samorzad/sejmik/2010-sejmiki-po-gminach.xls": {
+  "bytes": 1170944,
+  "etag": "\"61c3057b-11de00\"",
+  "last_modified": "Wed, 22 Dec 2021 11:01:15 GMT",
+  "sha256": "08aa834aaa79d61f221efa35301f03beffb5cc77a24b7ae51a0b20dae36e5b18",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/sejmik/2010-sejmiki-po-gminach.xls"
+ },
+ "2010/samorzad/sejmik/2010-sejmiki-po-obwodach.xls": {
+  "bytes": 11821056,
+  "etag": "\"5416c362-b46000\"",
+  "last_modified": "Mon, 15 Sep 2014 10:45:54 GMT",
+  "sha256": "4cf07c8534c50588f455570c218a75c2c7842fd93943b73f4043195a818b3014",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/sejmik/2010-sejmiki-po-obwodach.xls"
+ },
+ "2010/samorzad/sejmik/2010-sejmiki-po-powiatach.xls": {
+  "bytes": 172032,
+  "etag": "\"5433f9a6-2a000\"",
+  "last_modified": "Tue, 07 Oct 2014 14:33:10 GMT",
+  "sha256": "a8709279f02cf7910ba699d622ffd6ac69f50add8a1af3bb110a026d8ede4d46",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/sejmik/2010-sejmiki-po-powiatach.xls"
+ },
+ "2010/samorzad/sejmik/2010-sejmiki-po-woj.xls": {
+  "bytes": 24576,
+  "etag": "\"54344746-6000\"",
+  "last_modified": "Tue, 07 Oct 2014 20:04:22 GMT",
+  "sha256": "fd8955cd0f9427ec0fc4ef1cde7a2e97489daab93cbfe3a31107cce443047df3",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2010/sejmik/2010-sejmiki-po-woj.xls"
+ },
+ "2011/sejmsenat/020000-obwody.zip": {
+  "bytes": 122037,
+  "etag": "\"61c0feee-1dcb5\"",
+  "last_modified": "Mon, 20 Dec 2021 22:08:46 GMT",
+  "sha256": "b02720ea56599c35e782ebefcaa6cf5075a99a8334bb50b114b03362e93e977c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/020000-obwody.zip"
+ },
+ "2011/sejmsenat/040000-obwody.zip": {
+  "bytes": 96322,
+  "etag": "\"61c0fef2-17842\"",
+  "last_modified": "Mon, 20 Dec 2021 22:08:50 GMT",
+  "sha256": "d9a70af18b49f1515aee0cda5913163948b0e5bc982eebca1afc67fd75fb4bf8",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/040000-obwody.zip"
+ },
+ "2011/sejmsenat/060000-obwody.zip": {
+  "bytes": 105319,
+  "etag": "\"61c0fef4-19b67\"",
+  "last_modified": "Mon, 20 Dec 2021 22:08:52 GMT",
+  "sha256": "6eba8709ac86466f38fad45ce2d7936584ed33f01b874b0666bf1c1403bfcb7b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/060000-obwody.zip"
+ },
+ "2011/sejmsenat/080000-obwody.zip": {
+  "bytes": 46459,
+  "etag": "\"61c0fef7-b57b\"",
+  "last_modified": "Mon, 20 Dec 2021 22:08:55 GMT",
+  "sha256": "aa6a594fc633b054eec6a8f1dd262cf3b0261e31194e5c8549e29a618b4ca9cc",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/080000-obwody.zip"
+ },
+ "2011/sejmsenat/100000-obwody.zip": {
+  "bytes": 127470,
+  "etag": "\"61c0fef9-1f1ee\"",
+  "last_modified": "Mon, 20 Dec 2021 22:08:57 GMT",
+  "sha256": "c9924c605ff424f4a32f1afffd57ae7c34d4b444b786c6766e76cf62f335458e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/100000-obwody.zip"
+ },
+ "2011/sejmsenat/120000-obwody.zip": {
+  "bytes": 138365,
+  "etag": "\"61c0fefc-21c7d\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:00 GMT",
+  "sha256": "b5945b69b318930d21e745e8deaa70b87d8d367e3c71776ea65b94c4be0a0068",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/120000-obwody.zip"
+ },
+ "2011/sejmsenat/140000-obwody.zip": {
+  "bytes": 271817,
+  "etag": "\"61c0fefe-425c9\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:02 GMT",
+  "sha256": "1847592d47b0365d46a04e11e4592780ab3676652bb8856d4a3c5f8fee64b377",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/140000-obwody.zip"
+ },
+ "2011/sejmsenat/160000-obwody.zip": {
+  "bytes": 50433,
+  "etag": "\"61c0ff01-c501\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:05 GMT",
+  "sha256": "a4af80bde0efc046754bff47eea72afd8fc5e7d9ff9bf4e41d72b6b1268e75f0",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/160000-obwody.zip"
+ },
+ "2011/sejmsenat/180000-obwody.zip": {
+  "bytes": 87852,
+  "etag": "\"61c0ff03-1572c\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:07 GMT",
+  "sha256": "84d8ae1c9867877fc34f1106b338d41386a373fdc962043415a8a411044e800b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/180000-obwody.zip"
+ },
+ "2011/sejmsenat/200000-obwody.zip": {
+  "bytes": 67647,
+  "etag": "\"61c0ff06-1083f\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:10 GMT",
+  "sha256": "f65c3f41265a13d1185052ce2b2e318aa934a8ad0c6bf5d76f85711c85f186c7",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/200000-obwody.zip"
+ },
+ "2011/sejmsenat/2011-gl-lis-gm.xls": {
+  "bytes": 746496,
+  "etag": "\"61d59190-b6400\"",
+  "last_modified": "Wed, 05 Jan 2022 12:39:44 GMT",
+  "sha256": "71cccf392f13b1592d8938b2c8b3232f97ef78f1706d43fe9f3880c037dc012a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/2011-gl-lis-gm.xls"
+ },
+ "2011/sejmsenat/2011-kand-sejm.xls": {
+  "bytes": 1646592,
+  "etag": "\"4e96b6c2-192000\"",
+  "last_modified": "Thu, 13 Oct 2011 10:00:34 GMT",
+  "sha256": "a6ee343a9b2e3d34ac00dbab162886bc835a02f2f20d427da8dc1203ff0bdddf",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/2011-kand-sejm.xls"
+ },
+ "2011/sejmsenat/2011-kand-sen.zip": {
+  "bytes": 42917,
+  "etag": "\"61e6aabf-a7a5\"",
+  "last_modified": "Tue, 18 Jan 2022 11:55:43 GMT",
+  "sha256": "3be2589f7e65b2e129b39bbabd5ac2ea9c4cfe18b48e9505108ea164ae654f60",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/2011-kand-sen.zip"
+ },
+ "2011/sejmsenat/2011-sejm-gl-lis-obw.xls": {
+  "bytes": 11848704,
+  "etag": "\"50223dff-b4cc00\"",
+  "last_modified": "Wed, 08 Aug 2012 10:22:55 GMT",
+  "sha256": "31c8ee03ca9ab66a7dcf8b4bef686c58d08b7dae2040b922c3229b2ad18f6a0b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/2011-sejm-gl-lis-obw.xls"
+ },
+ "2011/sejmsenat/2011-sejm-pow-listy.xls": {
+  "bytes": 143360,
+  "etag": "\"61d59179-23000\"",
+  "last_modified": "Wed, 05 Jan 2022 12:39:21 GMT",
+  "sha256": "8b4acfa176597e08d27dc44e28daf0f0c0c5c899f9991549733731ca08598328",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/2011-sejm-pow-listy.xls"
+ },
+ "2011/sejmsenat/2011-sen-gm.xls": {
+  "bytes": 551424,
+  "etag": "\"4eb13b2a-86a00\"",
+  "last_modified": "Wed, 02 Nov 2011 12:44:26 GMT",
+  "sha256": "8061497c965c1da700250e0c6fa98d27afa6969f6631dd9251ab21fce64355f7",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/2011-sen-gm.xls"
+ },
+ "2011/sejmsenat/2011-senat-głosy-w-obwodach.zip": {
+  "bytes": 1607881,
+  "etag": "\"621f5eb7-1888c9\"",
+  "last_modified": "Wed, 02 Mar 2022 12:10:31 GMT",
+  "sha256": "16277f09318b34a426859ae69d5272bb63588ae833520707dbdce9865d97eb9c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/2011-senat-g%C5%82osy-w-obwodach.zip"
+ },
+ "2011/sejmsenat/220000-obwody.zip": {
+  "bytes": 98277,
+  "etag": "\"61c0ff08-17fe5\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:12 GMT",
+  "sha256": "e25ae6ef431767c184b152c400f3ca7ac3a530e2e84f058ed285dc7c49f42297",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/220000-obwody.zip"
+ },
+ "2011/sejmsenat/240000-obwody.zip": {
+  "bytes": 205171,
+  "etag": "\"61c0ff0b-32173\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:15 GMT",
+  "sha256": "ceaa2699f82d8f7cdce58aec69dd5bc34145f6d28858e639ba8a860bfcdf8b1f",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/240000-obwody.zip"
+ },
+ "2011/sejmsenat/260000-obwody.zip": {
+  "bytes": 58505,
+  "etag": "\"61c0ff0e-e489\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:18 GMT",
+  "sha256": "c48f2adfd5c325854b5aa6be8ecb83af1b56caedb323621b832b13abd5ca6814",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/260000-obwody.zip"
+ },
+ "2011/sejmsenat/280000-obwody.zip": {
+  "bytes": 75158,
+  "etag": "\"61c0ff10-12596\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:20 GMT",
+  "sha256": "3ff44f88bd0a0276d962a4254aefd9c05d89579903388dd69ec87999801cb014",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/280000-obwody.zip"
+ },
+ "2011/sejmsenat/300000-obwody.zip": {
+  "bytes": 164578,
+  "etag": "\"61c0ff13-282e2\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:23 GMT",
+  "sha256": "3ce0a6d3c99ad2c5efe622388f9b9930c59885ee1346bcb9ddc750c29c41de9b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/300000-obwody.zip"
+ },
+ "2011/sejmsenat/320000-obwody.zip": {
+  "bytes": 80391,
+  "etag": "\"61c0ff16-13a07\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:26 GMT",
+  "sha256": "356d7df3d47733cb7f3627f9426359e72b1c77c8258290fae53df60eda9cbafc",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/320000-obwody.zip"
+ },
+ "2011/sejmsenat/kandydaci_sejm.zip": {
+  "bytes": 238636,
+  "etag": "\"61c0ff1c-3a42c\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:32 GMT",
+  "sha256": "8bebb29159961f8c43dd739069686a38cfc884106d8c84630f892f06985dcd10",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/kandydaci_sejm.zip"
+ },
+ "2011/sejmsenat/kandydaci_senat.zip": {
+  "bytes": 20146,
+  "etag": "\"61c0ff1f-4eb2\"",
+  "last_modified": "Mon, 20 Dec 2021 22:09:35 GMT",
+  "sha256": "4a76edb5dfa26e6218f894495ebc0beeffb3abab2455171796719f68a2e88a8a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/kandydaci_senat.zip"
+ },
+ "2011/sejmsenat/komitety.zip": {
+  "bytes": 7896,
+  "etag": "\"61c0fede-1ed8\"",
+  "last_modified": "Mon, 20 Dec 2021 22:08:30 GMT",
+  "sha256": "ce124e73382cc46785e75837238cc6f15be3b52dd87e0bfb79835dfa34cd865b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/komitety.zip"
+ },
+ "2011/sejmsenat/parl2011-sejm-kand-obw.zip": {
+  "bytes": 4831629,
+  "etag": "\"640882e9-49b98d\"",
+  "last_modified": "Wed, 08 Mar 2023 12:43:21 GMT",
+  "sha256": "1329470da3481da4ef3b055ce43520dc258f4e5df70cd78e41bfda8b5754615e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/parl2011-sejm-kand-obw.zip"
+ },
+ "2011/sejmsenat/parl2011okręgi.xlsx": {
+  "bytes": 19968,
+  "etag": "\"63ce6980-4e00\"",
+  "last_modified": "Mon, 23 Jan 2023 11:03:28 GMT",
+  "sha256": "367695db58aa9d12401504b494ee8e98aeb068bd085999511b92daa2e9196ca9",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2011/sejmsenat/parl2011okr%C4%99gi.xlsx"
+ },
+ "2014/parlament_eu/obwody-2014-05-25-00-00-07.zip": {
+  "bytes": 1728541,
+  "etag": "\"61c185c7-1a601d\"",
+  "last_modified": "Tue, 21 Dec 2021 07:44:07 GMT",
+  "sha256": "44342566f9ec13da266f1d7159920fac955fcfdf44bf5169093e6a260c7ea7b5",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/parlament_eu/obwody-2014-05-25-00-00-07.zip"
+ },
+ "2014/parlament_eu/pe2014-gl-lis-gm.zip": {
+  "bytes": 225824,
+  "etag": "\"61c185cd-37220\"",
+  "last_modified": "Tue, 21 Dec 2021 07:44:13 GMT",
+  "sha256": "c3e8f7ee0a02512bf85df116e1f7a469f1d5dbb357e7d5cb970d9514042fab72",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/parlament_eu/pe2014-gl-lis-gm.zip"
+ },
+ "2014/parlament_eu/pe2014-gl-lis-obw.zip": {
+  "bytes": 2740700,
+  "etag": "\"61c185cb-29d1dc\"",
+  "last_modified": "Tue, 21 Dec 2021 07:44:11 GMT",
+  "sha256": "b8b7d3ad68cd9e1e4210af9fae4f9ce4db7216ee9b354f11d215591fd5cd7bc4",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/parlament_eu/pe2014-gl-lis-obw.zip"
+ },
+ "2014/parlament_eu/pe2014-gl-lis-okr.zip": {
+  "bytes": 9898,
+  "etag": "\"61c185d7-26aa\"",
+  "last_modified": "Tue, 21 Dec 2021 07:44:23 GMT",
+  "sha256": "dd64fdfb3a6398bee6e0870431dd2860bd1106a302991d1579ddcf2f689b5303",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/parlament_eu/pe2014-gl-lis-okr.zip"
+ },
+ "2014/parlament_eu/pe2014-kand-obw.zip": {
+  "bytes": 3221655,
+  "etag": "\"6408789d-312897\"",
+  "last_modified": "Wed, 08 Mar 2023 11:59:25 GMT",
+  "sha256": "1bb8c59f08268f6206c498131ef7532b93631c592b7995300c69d87b1458054c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/parlament_eu/pe2014-kand-obw.zip"
+ },
+ "2014/parlament_eu/pe2014kand.xls": {
+  "bytes": 340480,
+  "etag": "\"62051207-53200\"",
+  "last_modified": "Thu, 10 Feb 2022 13:24:23 GMT",
+  "sha256": "e1fe1a05909d99994d3181c53b7ba44c5f1aaa28d8a8e4f3a4b810542ed29d24",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/parlament_eu/pe2014kand.xls"
+ },
+ "2014/samorzad/1461141888_227c4ffa2ca5a7c591813a3a55e92378.xls": {
+  "bytes": 667136,
+  "etag": "\"61c1e740-a2e00\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:00 GMT",
+  "sha256": "baf7fb582a75319da2710df47acaa8b7844bd7d073fea0c995476ef614a13563",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461141888_227c4ffa2ca5a7c591813a3a55e92378.xls"
+ },
+ "2014/samorzad/1461141888_397ab225e548ef61d76aec0c7783e6be.xlsx": {
+  "bytes": 74517,
+  "etag": "\"61c1e739-12315\"",
+  "last_modified": "Tue, 21 Dec 2021 14:39:53 GMT",
+  "sha256": "0b2de5a23bc096bc9f65bac5645a24d8d51e741640d3595650b769ce17c15c7c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461141888_397ab225e548ef61d76aec0c7783e6be.xlsx"
+ },
+ "2014/samorzad/1461141888_60a2c8c18b68f08e29e2e5316b4c898a.xls": {
+  "bytes": 589312,
+  "etag": "\"61c1e743-8fe00\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:03 GMT",
+  "sha256": "a5f25fd019c292d5c4595c40d8d0f44ca1762b02e277b7e54362f47a943df175",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461141888_60a2c8c18b68f08e29e2e5316b4c898a.xls"
+ },
+ "2014/samorzad/1461141888_67c91a2322635813753677cf19709292.xls": {
+  "bytes": 629248,
+  "etag": "\"61c1e72f-99a00\"",
+  "last_modified": "Tue, 21 Dec 2021 14:39:43 GMT",
+  "sha256": "c8c172e8bf725843ffb01501cb92a30c14870b07fcb0f2c80e5d1cf417ddaf14",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461141888_67c91a2322635813753677cf19709292.xls"
+ },
+ "2014/samorzad/1461141888_debd211b0dd6b702ec81a9da369c64fa.xlsx": {
+  "bytes": 6838487,
+  "etag": "\"61c1e73d-6858d7\"",
+  "last_modified": "Tue, 21 Dec 2021 14:39:57 GMT",
+  "sha256": "025ad2603bdd19c45fff16d85bd01f372f63c661fa9d9d8fa78ed2735f6557f3",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461141888_debd211b0dd6b702ec81a9da369c64fa.xlsx"
+ },
+ "2014/samorzad/1461141888_eff5f2b2b2ba3a9d3c47ea6c8e600e98.zip": {
+  "bytes": 4443735,
+  "etag": "\"61c1e747-43ce57\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:07 GMT",
+  "sha256": "d306dd59c211fb904de9373b6498fbbe906a5b268519625a47cd7e174dedc49f",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461141888_eff5f2b2b2ba3a9d3c47ea6c8e600e98.zip"
+ },
+ "2014/samorzad/1461141888_f3ccb2999d4dc1f4880b1c159d271b83.xls": {
+  "bytes": 837120,
+  "etag": "\"61c1e732-cc600\"",
+  "last_modified": "Tue, 21 Dec 2021 14:39:46 GMT",
+  "sha256": "b070e35b84a2e4616c26585ce68f3ce4c73f519ef72fb4863f25af99680ef438",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461141888_f3ccb2999d4dc1f4880b1c159d271b83.xls"
+ },
+ "2014/samorzad/1461143032_1a26fc9ae091dc390576d4cfc902ca03.xlsx": {
+  "bytes": 891631,
+  "etag": "\"61c1e75b-d9aef\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:27 GMT",
+  "sha256": "80b2983df85624da780c4b9bd34586f553ab30d66704f4108598a2bd8fd4edca",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461143032_1a26fc9ae091dc390576d4cfc902ca03.xlsx"
+ },
+ "2014/samorzad/1461143032_2b8023339905ebac28880330d62c60bb.xls": {
+  "bytes": 69632,
+  "etag": "\"61c1e74d-11000\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:13 GMT",
+  "sha256": "7d086bff8f06908e73a809513442f10d9d40b4c5149799217adb2a59c3f84610",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461143032_2b8023339905ebac28880330d62c60bb.xls"
+ },
+ "2014/samorzad/1461143032_477212cb47b894747ceedb40f977b878.xls": {
+  "bytes": 27648,
+  "etag": "\"61c1e76f-6c00\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:47 GMT",
+  "sha256": "82c5d86ecc5a302841acfe55fc2c5a23d565b35f385add57c760348d70cf6f2c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461143032_477212cb47b894747ceedb40f977b878.xls"
+ },
+ "2014/samorzad/1461143032_5903645a3ed6e57c78fbd6bdc4d488b7.xls": {
+  "bytes": 35328,
+  "etag": "\"61c1e765-8a00\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:37 GMT",
+  "sha256": "5f5588d4004b2b74ee8d941d7ae4c438c7a8dd6233ed1e88aa25a78136770782",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461143032_5903645a3ed6e57c78fbd6bdc4d488b7.xls"
+ },
+ "2014/samorzad/1461143032_6495aa6d943286bbe94cc6a8d53d8391.xls": {
+  "bytes": 1430016,
+  "etag": "\"61c1e751-15d200\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:17 GMT",
+  "sha256": "8b1f953091a93a4372024fc8f0cc1229fceabf5408974235c9e0d182fd9d5487",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461143032_6495aa6d943286bbe94cc6a8d53d8391.xls"
+ },
+ "2014/samorzad/1461143032_a1c242476ecfd74febac7beef6a12fcb.xls": {
+  "bytes": 1254912,
+  "etag": "\"61c1e75e-132600\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:30 GMT",
+  "sha256": "d0a903e966ad322eeb8969414d977aff663fbefcf62395a8ef62740b94fb6e8e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461143032_a1c242476ecfd74febac7beef6a12fcb.xls"
+ },
+ "2014/samorzad/1461143032_bab07a8f3f90c3aaac3a1ad1b2ac08a3.xls": {
+  "bytes": 54784,
+  "etag": "\"61c1e762-d600\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:34 GMT",
+  "sha256": "b17a8f5a8172461541e97f2733fbb2e9dbbf6be1ca3a2179f7c91ed91712c49e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461143032_bab07a8f3f90c3aaac3a1ad1b2ac08a3.xls"
+ },
+ "2014/samorzad/1461143032_d5811b80bd7ef3784a47ab0dd241d195.xls": {
+  "bytes": 38400,
+  "etag": "\"61c1e74a-9600\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:10 GMT",
+  "sha256": "14ead6e1e5f6bc1ef157081a469498487b40ab3de86a4298d8ad794406924ae5",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461143032_d5811b80bd7ef3784a47ab0dd241d195.xls"
+ },
+ "2014/samorzad/1461143032_e98502c393fb74140ee137cd863dc15c.xls": {
+  "bytes": 28672,
+  "etag": "\"61c1e769-7000\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:41 GMT",
+  "sha256": "ad155ab149573623e3274afe7523a1ddf96e27a4d1d5c0d08efe0bf57032075a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461143032_e98502c393fb74140ee137cd863dc15c.xls"
+ },
+ "2014/samorzad/1461143032_facb2c08c48163d35e3fa5f47e07a1ad.xls": {
+  "bytes": 202240,
+  "etag": "\"61c1e754-31600\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:20 GMT",
+  "sha256": "6b27ca0b7e9205853b267cf5903ab7ffb53df9543304297ce99b2e2e7e21964e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461143032_facb2c08c48163d35e3fa5f47e07a1ad.xls"
+ },
+ "2014/samorzad/1461143032_fe244ad24ff3ad70dbc8e6b8eb3a983d.xlsx": {
+  "bytes": 898357,
+  "etag": "\"61c1e76c-db535\"",
+  "last_modified": "Tue, 21 Dec 2021 14:40:44 GMT",
+  "sha256": "a36df36200c8ab109cefc1513951f3044a40567d32a97674d58b1ab84b2dd9a2",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1461143032_fe244ad24ff3ad70dbc8e6b8eb3a983d.xlsx"
+ },
+ "2014/samorzad/1579520736_samo2014_kandydaci_na_WBP.xls": {
+  "bytes": 3949056,
+  "etag": "\"61c1e708-3c4200\"",
+  "last_modified": "Tue, 21 Dec 2021 14:39:04 GMT",
+  "sha256": "a9246a0b5d28bf42382e6e0dc961e55557f23022585aa6a500a5f55a7197906e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/1579520736_samo2014_kandydaci_na_WBP.xls"
+ },
+ "2014/samorzad/2014-kand-rady.xlsx": {
+  "bytes": 30953819,
+  "etag": "\"620643a3-1d8515b\"",
+  "last_modified": "Fri, 11 Feb 2022 11:08:19 GMT",
+  "sha256": "411b36c351eb8a6eb2ed65f7a44148606cc56a9cba23dd0d42ec4e46ed09083e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/2014-kand-rady.xlsx"
+ },
+ "2014/samorzad/samo2014-pow-lis-gm-kraj.xlsx": {
+  "bytes": 6806147,
+  "etag": "\"55b60d2d-67da83\"",
+  "last_modified": "Mon, 27 Jul 2015 10:51:25 GMT",
+  "sha256": "05cadbaabde8bc0092a7b22036b7bfe9f3cdde071fec9a6504f966166a137f12",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/samo2014-pow-lis-gm-kraj.xlsx"
+ },
+ "2014/samorzad/samo2014-statystyki-według-gmin.zip": {
+  "bytes": 586622,
+  "etag": "\"63515879-8f37e\"",
+  "last_modified": "Thu, 20 Oct 2022 14:17:29 GMT",
+  "sha256": "12b33489da8db81d08d97ec5bb7b8433f7bf497d3d562b30417177a6bcce4f5e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/samo2014-statystyki-wed%C5%82ug-gmin.zip"
+ },
+ "2014/samorzad/samo2014obwody.xlsx": {
+  "bytes": 4357815,
+  "etag": "\"63cfbdf7-427eb7\"",
+  "last_modified": "Tue, 24 Jan 2023 11:16:07 GMT",
+  "sha256": "37a227bb5587b8bb30e6e129efac343e54699e0962b37a274a95a5f032400ab5",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/samo2014obwody.xlsx"
+ },
+ "2015/obwody2015parl.xlsx": {
+  "bytes": 5347902,
+  "etag": "\"6399932f-519a3e\"",
+  "last_modified": "Wed, 14 Dec 2022 09:11:11 GMT",
+  "sha256": "83321dcb71931455b94c192cb2aab49dbf834726065440ac93b242edf8032d9f",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/obwody2015parl.xlsx"
+ },
+ "2015/prezydent/1/prez2015_1_tura_gm.xls": {
+  "bytes": 843264,
+  "etag": "\"57fcae3b-cde00\"",
+  "last_modified": "Tue, 11 Oct 2016 09:17:47 GMT",
+  "sha256": "e47398bafa5163e889a36f1eb8eacc844a7ca77ec3d84c316b83f94ae1985bb3",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/prezydent/1/prez2015_1_tura_gm.xls"
+ },
+ "2015/prezydent/1/prezydent_2015_tura1.zip": {
+  "bytes": 3664617,
+  "etag": "\"61c096c5-37eae9\"",
+  "last_modified": "Mon, 20 Dec 2021 14:44:21 GMT",
+  "sha256": "7b078e76fb82afa56eb3fb8da9dd28d4e4ecc3e647ef935675cdeaaa0cd4cfc0",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/prezydent/1/prezydent_2015_tura1.zip"
+ },
+ "2015/prezydent/2/prez2015_2_tura_gm.xls": {
+  "bytes": 706560,
+  "etag": "\"57fcbc67-ac800\"",
+  "last_modified": "Tue, 11 Oct 2016 10:18:15 GMT",
+  "sha256": "ba998d3fd758cf9593bd215344ee85b1e66d9b7d13f90a58595b3ccf91c89ac1",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/prezydent/2/prez2015_2_tura_gm.xls"
+ },
+ "2015/prezydent/2/wyniki_tura2.zip": {
+  "bytes": 1283373,
+  "etag": "\"61c09709-13952d\"",
+  "last_modified": "Mon, 20 Dec 2021 14:45:29 GMT",
+  "sha256": "3e2259e57fef6b7f4f72717ad5299ecdb2c6c34bbeb016c5afed8c865b3ce337",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/prezydent/2/wyniki_tura2.zip"
+ },
+ "2015/referendum/ref2015obw.zip": {
+  "bytes": 4690399,
+  "etag": "\"6346c056-4791df\"",
+  "last_modified": "Wed, 12 Oct 2022 13:25:42 GMT",
+  "sha256": "45f5a1baf542c76496bb547e4b63ce01a1af46c230f8953f52dfadb41bfa550e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/referendum/ref2015obw.zip"
+ },
+ "2015/referendum/ref2015woj.xls": {
+  "bytes": 39936,
+  "etag": "\"6346c056-9c00\"",
+  "last_modified": "Wed, 12 Oct 2022 13:25:42 GMT",
+  "sha256": "f1dc96579e54f5e9041574607e69b6813936ff55b3100d86255bc49e87719ae1",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/referendum/ref2015woj.xls"
+ },
+ "2015/sejm/2015-gl-lis-obw.zip": {
+  "bytes": 2859304,
+  "etag": "\"563675a0-2ba128\"",
+  "last_modified": "Sun, 01 Nov 2015 20:27:12 GMT",
+  "sha256": "0d355c32effecaa6816a4b0631116b7894a3ac37fe0727cbeae2c9024b03ca91",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/2015-gl-lis-obw.zip"
+ },
+ "2015/sejm/2015-gl-lis-okr.zip": {
+  "bytes": 12541,
+  "etag": "\"563675a0-30fd\"",
+  "last_modified": "Sun, 01 Nov 2015 20:27:12 GMT",
+  "sha256": "68c2f8dee52825519a827721557b66eed321fda3a58aaae4ad388613116c1198",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/2015-gl-lis-okr.zip"
+ },
+ "2015/sejm/2015-gl-lis-pow.zip": {
+  "bytes": 54966,
+  "etag": "\"563675a0-d6b6\"",
+  "last_modified": "Sun, 01 Nov 2015 20:27:12 GMT",
+  "sha256": "1a616501abffcdd7a8d3aee00372790fd0331ad4f954f1afea0c537c8befdc73",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/2015-gl-lis-pow.zip"
+ },
+ "2015/sejm/2015-kand-sejm.xls": {
+  "bytes": 2207232,
+  "etag": "\"5fc41c26-21ae00\"",
+  "last_modified": "Sun, 29 Nov 2020 22:09:42 GMT",
+  "sha256": "3aa16b29182778f2365233a66453fd280ab37da2ea316ebb35b4bab181578b9d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/2015-kand-sejm.xls"
+ },
+ "2015/sejm/wyniki_okr_sejm/01.xlsx": {
+  "bytes": 686636,
+  "etag": "\"563cc604-a7a2c\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:48 GMT",
+  "sha256": "44080ace37c8d5ff4296889ff415365de1138fbbb28e074bbe0aece80ce84d40",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/01.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/02.xlsx": {
+  "bytes": 432038,
+  "etag": "\"563cc604-697a6\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:48 GMT",
+  "sha256": "ea1934ca189b30aab8fe4e59bb31e9d02b37d57868de2a532ccec7181d4a374a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/02.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/03.xlsx": {
+  "bytes": 877535,
+  "etag": "\"563cc604-d63df\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:48 GMT",
+  "sha256": "4b2c2a5cde58e8ae1cf012f9c8adb335ca79b03ef36e3fcb0ad02e54b47c5774",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/03.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/04.xlsx": {
+  "bytes": 837057,
+  "etag": "\"563cc604-cc5c1\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:48 GMT",
+  "sha256": "05cc169cc735e3ec9d75919c7e8ce0b0859bf3f99de0e6f6c9af6d3e17378daa",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/04.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/05.xlsx": {
+  "bytes": 872956,
+  "etag": "\"563cc606-d51fc\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:50 GMT",
+  "sha256": "7bd6b89b4a39cc69b1bba3c75e9fa4f3a39e8ca9a4e030931f0dc447ad1aec2a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/05.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/06.xlsx": {
+  "bytes": 1279763,
+  "etag": "\"563cc606-138713\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:50 GMT",
+  "sha256": "67fc704f72ba1a5d43b7bd107079fd50b9dba08dd754f9e4b50441b05d495185",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/06.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/07.xlsx": {
+  "bytes": 901598,
+  "etag": "\"563cc606-dc1de\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:50 GMT",
+  "sha256": "b0ff894057957d933c35ce798014c13cce180bd3f0fd4b0e354f651e9329b06d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/07.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/08.xlsx": {
+  "bytes": 740015,
+  "etag": "\"563cc608-b4aaf\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:52 GMT",
+  "sha256": "ab1a76fb7dc3b603b5bd8d06891feab3a5a0a1cd7ab8a4d48ce8a29e6f6f9675",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/08.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/09.xlsx": {
+  "bytes": 467960,
+  "etag": "\"563cc608-723f8\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:52 GMT",
+  "sha256": "685c9072d71ae4c5862dc16f3a3c10641a2cf6d350c7d9ea496f21b18d7adfe6",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/09.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/10.xlsx": {
+  "bytes": 419896,
+  "etag": "\"563cc608-66838\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:52 GMT",
+  "sha256": "a78505db6b106cddeedfccba33a030f726bb7b22090296f639c23630afeb6777",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/10.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/11.xlsx": {
+  "bytes": 895780,
+  "etag": "\"563cc608-dab24\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:52 GMT",
+  "sha256": "d30f7343fb5c90bd1e50df31040a21950fdbfaca97a84aedefc2b699d22f8781",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/11.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/12.xlsx": {
+  "bytes": 333499,
+  "etag": "\"563cc608-516bb\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:52 GMT",
+  "sha256": "1e794a4f09e0fca430f03d5f11111c299dfa7fe5f590379ddd3c3b96d4ea8513",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/12.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/13.xlsx": {
+  "bytes": 1019021,
+  "etag": "\"563cc60a-f8c8d\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:54 GMT",
+  "sha256": "3ed304d237c639355ff0ca4f0888b5fb792cc1a5742eabe8e031388314239e57",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/13.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/14.xlsx": {
+  "bytes": 575291,
+  "etag": "\"563cc608-8c73b\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:52 GMT",
+  "sha256": "adc420319645616eedeb78e9e3d9c35efe0b028e670434b85db4e167990568ce",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/14.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/15.xlsx": {
+  "bytes": 503408,
+  "etag": "\"57459e8e-7ae70\"",
+  "last_modified": "Wed, 25 May 2016 12:46:06 GMT",
+  "sha256": "0b24e91211005c197b14590f4e390a851d7b9866d7d9bddf3ea33756bc9009a1",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/15.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/16.xlsx": {
+  "bytes": 578380,
+  "etag": "\"563cc60c-8d34c\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:56 GMT",
+  "sha256": "552012f7eca1447a75836bba7be6e6cecdec4352a033c103f64f28a3380cc2ca",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/16.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/17.xlsx": {
+  "bytes": 504376,
+  "etag": "\"563cc60a-7b238\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:54 GMT",
+  "sha256": "19cbf909bb0c258d6148476a1e7be71823d136c9a0820855f9518ea0963ea1ed",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/17.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/18.xlsx": {
+  "bytes": 888397,
+  "etag": "\"563cc60a-d8e4d\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:54 GMT",
+  "sha256": "6f485bb48fa0ce5f140ab908e56ea1ff5996304065fea0a95085114975e33760",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/18.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/19.xlsx": {
+  "bytes": 1778604,
+  "etag": "\"563cc60c-1b23ac\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:56 GMT",
+  "sha256": "249db0dd1cc29e04130085bb05faba158bd23ad779e84180023f015c11ee6be3",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/19.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/20.xlsx": {
+  "bytes": 688658,
+  "etag": "\"563cc60c-a8212\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:56 GMT",
+  "sha256": "feb13b5d2699b24cb66ae700da8153b19fc78269025e4a8caf90587149e7d650",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/20.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/21.xlsx": {
+  "bytes": 981476,
+  "etag": "\"563cc60c-ef9e4\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:56 GMT",
+  "sha256": "27d21e8f53be835cd22c70bedca6a1c4ecc4791bb7424457b3eda9f3f56f6e15",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/21.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/22.xlsx": {
+  "bytes": 867060,
+  "etag": "\"563cc60c-d3af4\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:56 GMT",
+  "sha256": "fd38ab1a282eddf4670f0ae10846dc00a4147829a4ecc7ce08dcf4af3cc6dae1",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/22.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/23.xlsx": {
+  "bytes": 1257667,
+  "etag": "\"563cc60e-1330c3\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:58 GMT",
+  "sha256": "36c09ebd625f2e4d261a4a80c3ad8f6c65138fb5aa3a4ff6c166c3bdacf3d7ba",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/23.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/24.xlsx": {
+  "bytes": 1312333,
+  "etag": "\"563cc60e-14064d\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:58 GMT",
+  "sha256": "20b4b7e5b700aba85e1211927ce6c99fdd2c8883850c0bd9c5b77ce876eaa917",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/24.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/25.xlsx": {
+  "bytes": 670243,
+  "etag": "\"563cc60e-a3a23\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:58 GMT",
+  "sha256": "687c95e81aef538e8b860284de311cb84f49986cdb2de617e64c0964518f9e64",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/25.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/26.xlsx": {
+  "bytes": 878334,
+  "etag": "\"563cc60e-d66fe\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:58 GMT",
+  "sha256": "bcd66d1b472c4f79a4f103090cdc21b8ece0abe805a7483d77f6429df7583f6e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/26.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/27.xlsx": {
+  "bytes": 407149,
+  "etag": "\"563cc610-6366d\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:00 GMT",
+  "sha256": "2ae0ec225475d24ddd17e59a1bc3582bf5506c902ab6d53738fa5f36d9f25b8e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/27.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/28.xlsx": {
+  "bytes": 352744,
+  "etag": "\"563cc60e-561e8\"",
+  "last_modified": "Fri, 06 Nov 2015 15:23:58 GMT",
+  "sha256": "d3c471efee403101b613db280782839b53ea4f2ac8df5decc41eb53c0ee63c07",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/28.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/29.xlsx": {
+  "bytes": 405829,
+  "etag": "\"563cc610-63145\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:00 GMT",
+  "sha256": "49e55adf1aae9882bf62702354c31f79e9b4dae9af78e1bfc1cf1c3aeea14f2f",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/29.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/30.xlsx": {
+  "bytes": 404682,
+  "etag": "\"563cc610-62cca\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:00 GMT",
+  "sha256": "6c87a079db8bf66a5305fff397490a15bb5426d1d1f917bd00f44dddcdba0206",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/30.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/31.xlsx": {
+  "bytes": 602230,
+  "etag": "\"563cc610-93076\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:00 GMT",
+  "sha256": "78b38cdde84245c184e3646e8209fa69f127e45f8c51e9aba2c1ac719438964d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/31.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/32.xlsx": {
+  "bytes": 359585,
+  "etag": "\"563cc610-57ca1\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:00 GMT",
+  "sha256": "4d48e21e9b23bf5c5469921ec3a6abb6055c80592430c3da4be2178406d4560e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/32.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/33.xlsx": {
+  "bytes": 1407995,
+  "etag": "\"563cc610-157bfb\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:00 GMT",
+  "sha256": "6f21a4fdb6e4c22d5a6789d090cb0ccec85e7d9bced4d9b93506378e60b6f689",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/33.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/34.xlsx": {
+  "bytes": 390349,
+  "etag": "\"563cc610-5f4cd\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:00 GMT",
+  "sha256": "27c1f9fa7a6b3472a9d4002633b58a16e803166dc3d52ce0da5059f391d4ca73",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/34.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/35.xlsx": {
+  "bytes": 599532,
+  "etag": "\"563cc610-925ec\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:00 GMT",
+  "sha256": "9b2765453fbe530ba0989fc42c2c865599ec0ed6e5f10b7fac0cc535a2b99d67",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/35.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/36.xlsx": {
+  "bytes": 772189,
+  "etag": "\"563cc612-bc85d\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:02 GMT",
+  "sha256": "72438e4184e7648d09aad3456f65f4d72cc9535f9a9587b6f8c416640527b212",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/36.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/37.xlsx": {
+  "bytes": 427538,
+  "etag": "\"563cc612-68612\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:02 GMT",
+  "sha256": "61325364c1f22184a384a29a98de8bb4c46dbbc4dec950f93357d1a083802ce7",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/37.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/38.xlsx": {
+  "bytes": 448430,
+  "etag": "\"563cc612-6d7ae\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:02 GMT",
+  "sha256": "db6d8dce450080cec4ac251c9fc5967e7fa65559879194292b3d0aff67cb7495",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/38.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/39.xlsx": {
+  "bytes": 460362,
+  "etag": "\"563cc612-7064a\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:02 GMT",
+  "sha256": "996ae5be6a2d94ad6fec237ea6c7faca066b6abc354f1c87e500613d6b2ef306",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/39.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/40.xlsx": {
+  "bytes": 351485,
+  "etag": "\"563cc612-55cfd\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:02 GMT",
+  "sha256": "14e869a5e7f5d891b8da6bff72c31502e3386d69c029a0c481284c72672a4467",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/40.xlsx"
+ },
+ "2015/sejm/wyniki_okr_sejm/41.xlsx": {
+  "bytes": 641120,
+  "etag": "\"563cc612-9c860\"",
+  "last_modified": "Fri, 06 Nov 2015 15:24:02 GMT",
+  "sha256": "43a718012d1b997130dcbaa99fefe868cf63cba09add8548efa12a20f8d962cb",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/sejm/wyniki_okr_sejm/41.xlsx"
+ },
+ "2015/senat/2015-kand-sen.xls": {
+  "bytes": 137216,
+  "etag": "\"61e561e0-21800\"",
+  "last_modified": "Mon, 17 Jan 2022 12:32:32 GMT",
+  "sha256": "b6deb610ed72fc4a487db0f09dd3a8e5982fd6b04e93fa1345943c601111511e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/2015-kand-sen.xls"
+ },
+ "2015/senat/wyniki_okr_senat/001.xlsx": {
+  "bytes": 55816,
+  "etag": "\"563d0bbc-da08\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "d3e4429ed4a4122d3d67e9d05c5ce00c138770d32c0d8bb76f3e421c008f81ec",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/001.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/002.xlsx": {
+  "bytes": 53380,
+  "etag": "\"563d0bbc-d084\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "0e34b46fd35e19abb06367e14fc79f14b56489c17e4d8ae899420fe0aa47f4a5",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/002.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/003.xlsx": {
+  "bytes": 58706,
+  "etag": "\"563d0bbc-e552\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "1d49162697e76ac36aa9e7b004ebc6c7735a75e5c7379b634ebefa7fd5cfefae",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/003.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/004.xlsx": {
+  "bytes": 57926,
+  "etag": "\"563d0bbc-e246\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "3100491aa7088f4df5e2779a3357336b376bd7e2ef0f11d2a06bdbff2cd8b928",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/004.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/005.xlsx": {
+  "bytes": 68432,
+  "etag": "\"563d0bbc-10b50\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "89bc112c5ff8d84bf8da8cdb63050a6a04cbcccc67e592c780ab29a3d2b51ca4",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/005.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/006.xlsx": {
+  "bytes": 88249,
+  "etag": "\"563d0bbc-158b9\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "c6a3db2982f444691a41221f3d8168a697f61fada43ce8a1dd4d11efafb6c375",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/006.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/007.xlsx": {
+  "bytes": 36179,
+  "etag": "\"563d0bbc-8d53\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "5f4027895a25896d929136118ad2200d5048d14bf2664a0f2ebbf145cadb2004",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/007.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/008.xlsx": {
+  "bytes": 38253,
+  "etag": "\"563d0bbc-956d\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "da0122c46620d8e7620c2217fe349eaba4b085ee77fece9ebcc328fdd397a661",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/008.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/009.xlsx": {
+  "bytes": 97820,
+  "etag": "\"563d0bbc-17e1c\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "90a2dacfab277339ee5c5c7c9d8f74c087092c1f223064e502a06328a92fa3cc",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/009.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/010.xlsx": {
+  "bytes": 89836,
+  "etag": "\"563d0bbc-15eec\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "85633771e9d81bc63e8d950e98a62e7fdf8563d90ea5dfc90f4ab5e1fe31a6ac",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/010.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/011.xlsx": {
+  "bytes": 55834,
+  "etag": "\"563d0bbc-da1a\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "ff02c77e478cb88a2015a1af89e63183edb8dd55c5108e4a756dfff6cfbf3aad",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/011.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/012.xlsx": {
+  "bytes": 58727,
+  "etag": "\"563d0bbc-e567\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "088d7d20a1dd4d74ad46c5d5d606fcecaea1ca65d02b8b9641fe522e8586becf",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/012.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/013.xlsx": {
+  "bytes": 75616,
+  "etag": "\"563d0bbc-12760\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "a0c07f171499895d55cfae6c706a66ad87099b4bc5efbd9f2c89b42568a29e93",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/013.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/014.xlsx": {
+  "bytes": 87532,
+  "etag": "\"563d0bbc-155ec\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "4a49023d2e75e1eced44fc2eec10bf6dab41880baeb2b076cf0ec1f68fe74ee8",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/014.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/015.xlsx": {
+  "bytes": 75226,
+  "etag": "\"563d0bbc-125da\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "3454ca827ae745445f1ef7d16178c2224c58d1e54fe379b746f4ee263516211d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/015.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/016.xlsx": {
+  "bytes": 48983,
+  "etag": "\"563d0bbc-bf57\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "352600d725993d14ddbc13700368701d6712bb726f15e23552666b33c6bbb164",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/016.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/017.xlsx": {
+  "bytes": 55749,
+  "etag": "\"563d0bbc-d9c5\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "c1d4003fa457ca5d12580638abd6f30f2468be021b4a9bc84ccb202c840594ef",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/017.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/018.xlsx": {
+  "bytes": 59686,
+  "etag": "\"563d0bbc-e926\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "b46fe96e08d79526b9fe31062bfefd902b1ed9fe4f987d238afae2b978d9fa2e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/018.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/019.xlsx": {
+  "bytes": 91473,
+  "etag": "\"563d0bbc-16551\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "0492373b19a411025c2af337eef157e5f61cfb23e85378d601ef90607b8cef29",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/019.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/020.xlsx": {
+  "bytes": 48620,
+  "etag": "\"563d0bbc-bdec\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "0878333a3465fca2eaa5aae72a034c7444e5a6bccbf6f4872f2d8a3ba1c40171",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/020.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/021.xlsx": {
+  "bytes": 68761,
+  "etag": "\"563d0bbc-10c99\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "5421d9d229bdb21fa5d51747f0fb5756af003fd0c4693556e305aa66c21935f9",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/021.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/022.xlsx": {
+  "bytes": 49073,
+  "etag": "\"563d0bbc-bfb1\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "85da5205d4e29fa0f586684e312d90dbeaf7679f48afda8099d44daad78f340e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/022.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/023.xlsx": {
+  "bytes": 57649,
+  "etag": "\"563d0bbc-e131\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "d76be3423c67eb0ed39def00235ef8ae7fe12e492a26b5217b28e2e28668d2c3",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/023.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/024.xlsx": {
+  "bytes": 65318,
+  "etag": "\"563d0bbc-ff26\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:16 GMT",
+  "sha256": "15afb4ac7931a117f945e2a0b142870fae2593735fbbea0f13437c98c4e5fa09",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/024.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/025.xlsx": {
+  "bytes": 57318,
+  "etag": "\"563d0bbe-dfe6\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "38398b904a7d64f0d159959e7b12d165c750f03e5886fe7c25299fefa53ce531",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/025.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/026.xlsx": {
+  "bytes": 58283,
+  "etag": "\"563d0bbe-e3ab\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "a95eb504322ae1748ba82cce98c5d851a79c3b5694d5daaab524944b0e23a278",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/026.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/027.xlsx": {
+  "bytes": 66530,
+  "etag": "\"563d0bbe-103e2\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "2adaf09f97c48de6e5aa4eab93da2cae927f1bf0d0e1231bbda2ed60441d7cb9",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/027.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/028.xlsx": {
+  "bytes": 63786,
+  "etag": "\"563d0bbe-f92a\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "ffdc7593b4edfe16030d6e3d8c9393c9727c45f16476cf1e6da364bb5ce7f666",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/028.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/029.xlsx": {
+  "bytes": 56972,
+  "etag": "\"563d0bbe-de8c\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "d8f44fc954f3f2f188caa95fd49bfff4e27d219ec67b7360fa6b359b4f454616",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/029.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/030.xlsx": {
+  "bytes": 94308,
+  "etag": "\"563d0bbe-17064\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "3a5b2b6d1d7724fd1abc956ac6836def324aeafb73972cec1cc5d7a5c2a9bb5a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/030.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/031.xlsx": {
+  "bytes": 79426,
+  "etag": "\"563d0bbe-13642\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "11c265d56f92ce5423ca881e2a808d630ce8721cd0b0cfc993869a6c5c187a87",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/031.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/032.xlsx": {
+  "bytes": 51494,
+  "etag": "\"563d0bbe-c926\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "d1433d533a4772e68c540743f69af8b13157f5744365fea2d78eeefac74d2fb1",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/032.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/033.xlsx": {
+  "bytes": 57751,
+  "etag": "\"563d0bbe-e197\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "818271c098edc87e23249a2a8cbbaed4526eba0a185dd8a7373747fafa61317b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/033.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/034.xlsx": {
+  "bytes": 60365,
+  "etag": "\"563d0bbe-ebcd\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "0a34d6b450d81b8e6a67ac29a34c3e713a5e10aefe0e91b680a00d2c2b74a1db",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/034.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/035.xlsx": {
+  "bytes": 61269,
+  "etag": "\"563d0bbe-ef55\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "31101482dfeb39f253c10e0c8229cfdeac3d2b8bfe45178ceccd325e2d214750",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/035.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/036.xlsx": {
+  "bytes": 65032,
+  "etag": "\"563d0bbe-fe08\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "d2469d5601a7138d6fbabbec6dcc69e023aed72b99a86ab677700ff5deed4433",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/036.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/037.xlsx": {
+  "bytes": 66369,
+  "etag": "\"563d0bbe-10341\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "9e47a2302096bee319fcc4ce185517abd98517be71ada43e70b636abbf1af371",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/037.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/038.xlsx": {
+  "bytes": 87067,
+  "etag": "\"563d0bbe-1541b\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "21b2ed2d16fbeff7ba67d334c99fb415e0d534bd1c14283cebfba42b7c8e2923",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/038.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/039.xlsx": {
+  "bytes": 65765,
+  "etag": "\"563d0bbe-100e5\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "a82dff5b7b83983cdf9dd78ce5c4073de9eb6a22a34ada5787a53fc8fef95a2f",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/039.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/040.xlsx": {
+  "bytes": 69764,
+  "etag": "\"563d0bbe-11084\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "595087f6f425abd0ced25e9550c246f616862b8815623ded3ca2113a5b688868",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/040.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/041.xlsx": {
+  "bytes": 78059,
+  "etag": "\"563d0bbe-130eb\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "26f383f99b61c27844b42d64a2abc8140cb35ccefed935965f3c5ca7944c5ba6",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/041.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/042.xlsx": {
+  "bytes": 46996,
+  "etag": "\"563d0bbe-b794\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "ac46b898bf080725301109bea43b2b73d0b0ec579d05c80b38ffd6fa3586c684",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/042.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/043.xlsx": {
+  "bytes": 52345,
+  "etag": "\"563d0bbe-cc79\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "1ee6e0d790764d4777445dc9578bb037ff1b441adf9ecd6f1b5670192322f66b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/043.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/044.xlsx": {
+  "bytes": 99425,
+  "etag": "\"563d0bbe-18461\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "f99aa79f4e397a5f03999cbb423c7abe588f207650302f9410067431cf501512",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/044.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/045.xlsx": {
+  "bytes": 52765,
+  "etag": "\"563d0bbe-ce1d\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "7b7ced6544c72005dba2a61e48260a346511e5a8a651481d80cc185038a48c55",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/045.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/046.xlsx": {
+  "bytes": 79315,
+  "etag": "\"563d0bbe-135d3\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "c2ca9a0f2fb89a96ae81f614232529166b12a0731123f087c0bee72c3eb92398",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/046.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/047.xlsx": {
+  "bytes": 61383,
+  "etag": "\"563d0bbe-efc7\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "b481918ac622250ce734b53e9deaae2603d801d81b01edc741eaff62266283a4",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/047.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/048.xlsx": {
+  "bytes": 45718,
+  "etag": "\"563d0bbe-b296\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "cfed7f6c8d1e07b213f63512a04121d774be756e3bf963b632e1bf7cd59c5f25",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/048.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/049.xlsx": {
+  "bytes": 45369,
+  "etag": "\"563d0bbe-b139\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "ce96e9dc72a854b63135996b28663b4ef43ad78d290f752254960d1eee1172e8",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/049.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/050.xlsx": {
+  "bytes": 82827,
+  "etag": "\"563d0bbe-1438b\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "d5ff932f4a3539cb8dad16e65ef4a5532e39f558877176c6f6cfd3cbb97a57b1",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/050.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/051.xlsx": {
+  "bytes": 88075,
+  "etag": "\"563d0bbe-1580b\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "4e00a9a84c69d2ecad366a30eda668ee7d883e801258f46797d8d8c169a4abb8",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/051.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/052.xlsx": {
+  "bytes": 50817,
+  "etag": "\"563d0bbe-c681\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "fffcab30289338b47270985d51f14f402e34e4ddc1a3b05f9b9b72cbc4049e58",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/052.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/053.xlsx": {
+  "bytes": 72602,
+  "etag": "\"563d0bbe-11b9a\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "433f5a6438874704c63e06e091c1b747942e465e516505f653e743fe3becbf79",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/053.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/054.xlsx": {
+  "bytes": 61826,
+  "etag": "\"563d0bbe-f182\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "43b5d78b0b4596efe7f313c87c0b7ab02b3579198c65fd1bc89f9a9f78d56359",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/054.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/055.xlsx": {
+  "bytes": 88395,
+  "etag": "\"563d0bbe-1594b\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "741c1bce7d695df7a47d32f044f3c0c90dd0ab034edefea8ceb5a39c358fcef0",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/055.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/056.xlsx": {
+  "bytes": 65646,
+  "etag": "\"563d0bbe-1006e\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "3a50d1f8aed50d429b60fa8c941123c81451548019b6637dc16e6ec0a349ce1d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/056.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/057.xlsx": {
+  "bytes": 73874,
+  "etag": "\"563d0bbe-12092\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "c907d9ff8947376ff63425e6028447948706c33d64078dc3d4a2f4d933b34276",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/057.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/058.xlsx": {
+  "bytes": 106995,
+  "etag": "\"563d0bbe-1a1f3\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "645992858518f18a2b67715a63904f9285a255dcc320e0281c393535d1aa1220",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/058.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/059.xlsx": {
+  "bytes": 88547,
+  "etag": "\"563d0bbe-159e3\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "2023e2bb3c7df0f6d5f26f94f3fbdf2d760b73b2cb81c6fa4401888ddddf4892",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/059.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/060.xlsx": {
+  "bytes": 84298,
+  "etag": "\"563d0bbe-1494a\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "0e601aadea451fff81cf5b251845dbd451723fb66a24bf8616b42d69f9dc14bb",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/060.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/061.xlsx": {
+  "bytes": 46307,
+  "etag": "\"563d0bbe-b4e3\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "3e3f1f7a23ed81887675a83d97a6142b68495147efafeff205fedb87467d5806",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/061.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/062.xlsx": {
+  "bytes": 63728,
+  "etag": "\"563d0bbe-f8f0\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "e8d01d9131c481c4aa8ff1a9c3e0b7f9b2c82f98e29560bab91e976873518af7",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/062.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/063.xlsx": {
+  "bytes": 70539,
+  "etag": "\"563d0bbe-1138b\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:18 GMT",
+  "sha256": "0c91b18bfabf63d91f33de761a0a483d00c67a39d4205991836c8fe6e5b37817",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/063.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/064.xlsx": {
+  "bytes": 41616,
+  "etag": "\"563d0bc0-a290\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "b79d80bb7e0b29abd4fc85a9c5fff419e3edf0b6008da5070dbaa0fa7b53681e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/064.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/065.xlsx": {
+  "bytes": 55755,
+  "etag": "\"563d0bc0-d9cb\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "f8136e7b55c86542e1ce9385a252b5c2cd4ed01e155e7d8d4ccc1298bd8cec02",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/065.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/066.xlsx": {
+  "bytes": 52795,
+  "etag": "\"563d0bc0-ce3b\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "58a0e0f366ccc17f0190dbc95abcb4fff9d73580f7c66a074f9cae2fedd1d7de",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/066.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/067.xlsx": {
+  "bytes": 41274,
+  "etag": "\"563d0bc0-a13a\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "45c1b60a22147a1d9ad970cedd099efba899d3807841d93905d7e36aa0897c89",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/067.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/068.xlsx": {
+  "bytes": 71969,
+  "etag": "\"563d0bc0-11921\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "51fccfe0ac9bff621ed64e090ef14df4e46dda0dd27846d77febcf0fe938a24f",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/068.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/069.xlsx": {
+  "bytes": 34653,
+  "etag": "\"563d0bc0-875d\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "5890574c315eb39b602959c8a868f24528cedd6e0ce21a656c32f9a6c90da5b7",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/069.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/070.xlsx": {
+  "bytes": 66333,
+  "etag": "\"563d0bc0-1031d\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "6bf14918cf1a7e15f5ec052ad316e93239f6a5f0a80c8cfd78682b1957bee146",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/070.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/071.xlsx": {
+  "bytes": 40939,
+  "etag": "\"563d0bc0-9feb\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "505d903e9594307a0210fead1810b894140607bbce033bd45d348e01718459df",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/071.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/072.xlsx": {
+  "bytes": 60160,
+  "etag": "\"563d0bc0-eb00\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "68459558006b7f24bf754c60b778d22b1a6be3a16a27172322de4689d474f732",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/072.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/073.xlsx": {
+  "bytes": 44402,
+  "etag": "\"563d0bc0-ad72\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "578d95b3014aa3a4545f461a250724525361767c2fc2ad9bdca0521b52da185c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/073.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/074.xlsx": {
+  "bytes": 54576,
+  "etag": "\"563d0bc0-d530\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "e1f88a69a1d0da78373da6ca46ce22ef09dbe0973ecb12fb621dcb82b1575aee",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/074.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/075.xlsx": {
+  "bytes": 34256,
+  "etag": "\"563d0bc0-85d0\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "123568298f7177d484910592f756c3aec5bd3b1e99b2f74f0c4ef8f0a8d7c14c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/075.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/076.xlsx": {
+  "bytes": 59493,
+  "etag": "\"563d0bc0-e865\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "3caa6d7fa9a1645f90300a7b01766bd08d943cbe2c9ed5e7770da03672725455",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/076.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/077.xlsx": {
+  "bytes": 41467,
+  "etag": "\"563d0bc0-a1fb\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "29bf9dca1336b6cd33cb449e06b2d07020613f8d7d7325fdfe1e31490c5040df",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/077.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/078.xlsx": {
+  "bytes": 55780,
+  "etag": "\"563d0bc0-d9e4\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "daad03a1beac943272f548fb4a97664ed1531f32f0338ad57a92ed9296d2a924",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/078.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/079.xlsx": {
+  "bytes": 53344,
+  "etag": "\"563d0bc0-d060\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "eddbac5ec4c54b842ef51b635a1dda88980e2b722b88d9944501a55115381751",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/079.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/080.xlsx": {
+  "bytes": 42550,
+  "etag": "\"563d0bc0-a636\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "0133eb63234d46a997a366f917620467230be562560f3390dfcf1ffdc996436c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/080.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/081.xlsx": {
+  "bytes": 91687,
+  "etag": "\"563d0bc0-16627\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "b841cd7cd0151e561de64067c34e609610dac806efcc50c1afec0f92f1c8a5be",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/081.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/082.xlsx": {
+  "bytes": 76454,
+  "etag": "\"563d0bc0-12aa6\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "8d38cddf36410b1502c00c7dd1d35a3d3066804cfa0c4638d7acf0961f3f9dc0",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/082.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/083.xlsx": {
+  "bytes": 62378,
+  "etag": "\"563d0bc0-f3aa\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "639e22e0cdf6037cb7177136c88cb20ee487f38541b53cddff62f49dd9077d65",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/083.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/084.xlsx": {
+  "bytes": 49222,
+  "etag": "\"563d0bc0-c046\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "fe72a0cf0496cd1c0f4ddbe5544886643485b8a6aee269f4a16331e6d810aa0e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/084.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/085.xlsx": {
+  "bytes": 55696,
+  "etag": "\"563d0bc0-d990\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "c544ac9d910458c1390299b954a89f9307e69db77610cf9812d0bcdfdad45505",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/085.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/086.xlsx": {
+  "bytes": 71911,
+  "etag": "\"563d0bc0-118e7\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "6ad16cc2194d66a808a4f54043c2be3fa2aa5e6403d93d6e22daf257f16f30aa",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/086.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/087.xlsx": {
+  "bytes": 72219,
+  "etag": "\"563d0bc0-11a1b\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "1ba023a2a1d8aa2fa3460861aeaf4bf4c5f5007efaac8f73f479fb969ead6c69",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/087.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/088.xlsx": {
+  "bytes": 67991,
+  "etag": "\"563d0bc0-10997\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "780767b0994a9f13a9799af1567f1bc814978aefbce7723cd98e41677cbd10d4",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/088.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/089.xlsx": {
+  "bytes": 53006,
+  "etag": "\"563d0bc0-cf0e\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "97944b115811a6e3051adaf697af435051e465fe6a019ae0d8bda3f17683923b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/089.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/090.xlsx": {
+  "bytes": 49261,
+  "etag": "\"563d0bc0-c06d\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "f591ba1b01ffc7501d1ed36e9963f8e1b2e3ed4acbf0461d1e67655130ce54ed",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/090.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/091.xlsx": {
+  "bytes": 56644,
+  "etag": "\"563d0bc0-dd44\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "21b663a19b0ff70c7fddd04de49e7cfeb819682cbaf59d73d0baa3dc940734de",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/091.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/092.xlsx": {
+  "bytes": 60876,
+  "etag": "\"563d0bc0-edcc\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "06c04dedc69e1f09ed5613b24da55e5947e3b019c7806be21d9c8df302fc0255",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/092.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/093.xlsx": {
+  "bytes": 64490,
+  "etag": "\"563d0bc0-fbea\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "958be7ec307d156faad8e51f08338dba118918b153649af874799b0dc85fd0a3",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/093.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/094.xlsx": {
+  "bytes": 55155,
+  "etag": "\"563d0bc0-d773\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "61361bd347f5e38be86cdc9f977a6efa5187df98ebbbd208962bcd82dbcadf40",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/094.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/095.xlsx": {
+  "bytes": 60728,
+  "etag": "\"563d0bc0-ed38\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "e9c7fcd4e6f33a052527fab435ca6f42030c0cfd8ca91c466c1f077f34422b7b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/095.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/096.xlsx": {
+  "bytes": 51849,
+  "etag": "\"563d0bc0-ca89\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "3bd425a28427a332e208dda46abda17fb6ddfc0d2353ef88915fbea6a5536063",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/096.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/097.xlsx": {
+  "bytes": 57892,
+  "etag": "\"563d0bc0-e224\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "5de931e42aced3b4242a1c9b6c601e0c3cdbb393ea2bfab52809f2418df3ee23",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/097.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/098.xlsx": {
+  "bytes": 93722,
+  "etag": "\"563d0bc0-16e1a\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "53cc66ae9e9b1c395b6711ddc5fc4ce4bfb9d206248177cf433969afa2cbc444",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/098.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/099.xlsx": {
+  "bytes": 59721,
+  "etag": "\"563d0bc0-e949\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "78afee1f10dd3b6efe0394a14e114685d660dc7aa67cc51815021a5df192bb69",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/099.xlsx"
+ },
+ "2015/senat/wyniki_okr_senat/100.xlsx": {
+  "bytes": 52029,
+  "etag": "\"563d0bc0-cb3d\"",
+  "last_modified": "Fri, 06 Nov 2015 20:21:20 GMT",
+  "sha256": "8fcddef533cf3e106bc929de8e1e16c1094559a2f502ece13ee82ceb52d517b0",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2015/senat/wyniki_okr_senat/100.xlsx"
+ },
+ "2018/samorzad/2018-frekwencja-i-nieważne-w-obwodach.zip": {
+  "bytes": 15723004,
+  "etag": "\"61c1c525-efe9fc\"",
+  "last_modified": "Tue, 21 Dec 2021 12:14:29 GMT",
+  "sha256": "955c28ab26c10de2e0ddf8337c8843389bb1ea8e4cc06569a12e8b6e24040db6",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2018/samorzad/2018-frekwencja-i-niewa%C5%BCne-w-obwodach.zip"
+ },
+ "2018/samorzad/2018-kand-rady.xlsx": {
+  "bytes": 24686483,
+  "etag": "\"5fe8f9ff-178af93\"",
+  "last_modified": "Sun, 27 Dec 2020 21:17:51 GMT",
+  "sha256": "ec01a6c60304fba9dfb83ddbeefeed87685da51d00bbaa18d2f449ca7f3f82bf",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2018/samorzad/2018-kand-rady.xlsx"
+ },
+ "2018/samorzad/2018-sejmiki.zip": {
+  "bytes": 15953672,
+  "etag": "\"61c1c518-f36f08\"",
+  "last_modified": "Tue, 21 Dec 2021 12:14:16 GMT",
+  "sha256": "6a0020771648d9c27c0a70f1f4e5fdd54747a22094f93090a102f9dcf7e147fd",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2018/samorzad/2018-sejmiki.zip"
+ },
+ "2018/samorzad/2018-wybbp.zip": {
+  "bytes": 11795459,
+  "etag": "\"61c1c51e-b3fc03\"",
+  "last_modified": "Tue, 21 Dec 2021 12:14:22 GMT",
+  "sha256": "7c8c5dde7b7f6b5b5527f89d4ca4f8c71e30dedb685ef7e42a23d247c8447434",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2018/samorzad/2018-wybbp.zip"
+ },
+ "2018/samorzad/kandydaci_wbp.zip": {
+  "bytes": 355956,
+  "etag": "\"61c1c530-56e74\"",
+  "last_modified": "Tue, 21 Dec 2021 12:14:40 GMT",
+  "sha256": "1fdbdc7ad20577338a6fdd7dfbab203e76cf02cddd23aaa164ddeef1a4d92b7d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2018/samorzad/kandydaci_wbp.zip"
+ },
+ "2018/samorzad/komitety.zip": {
+  "bytes": 570327,
+  "etag": "\"61c1c535-8b3d7\"",
+  "last_modified": "Tue, 21 Dec 2021 12:14:45 GMT",
+  "sha256": "d15b619b91fbf76a9153f1dfa4d77b54f60dad86b93c0f453fae61b5c2f7658e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2018/samorzad/komitety.zip"
+ },
+ "2018/samorzad/obwody_glosowania.zip": {
+  "bytes": 2444126,
+  "etag": "\"61c1c528-254b5e\"",
+  "last_modified": "Tue, 21 Dec 2021 12:14:32 GMT",
+  "sha256": "c9ad830983d3de328bc3276c0bacfd77cc0237980f5f04a3ab9eb034ac083090",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2018/samorzad/obwody_glosowania.zip"
+ },
+ "2018/samorzad/okregi.zip": {
+  "bytes": 1784290,
+  "etag": "\"61c1c52c-1b39e2\"",
+  "last_modified": "Tue, 21 Dec 2021 12:14:36 GMT",
+  "sha256": "e6d3210e5007688fceb3ca833019a31d62f9a7ccf33f441a4fa3c928844ac664",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2018/samorzad/okregi.zip"
+ },
+ "2018/samorzad/wbp/IItura.xlsx": {
+  "bytes": 2699043,
+  "etag": "\"5d404aea-292f23\"",
+  "last_modified": "Tue, 30 Jul 2019 13:49:30 GMT",
+  "sha256": "6091a51687a06095f0d1606faf80e1add496fb57505584b98a83a4433917d88f",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2018/samorzad/wbp/IItura.xlsx"
+ },
+ "2018/samorzad/wbp/Itura.xlsx": {
+  "bytes": 16333667,
+  "etag": "\"5d404106-f93b63\"",
+  "last_modified": "Tue, 30 Jul 2019 13:07:18 GMT",
+  "sha256": "b261932a256099eeaf36bed0d00335a4099e2daab1709e8c4ce7ab30c8825f00",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2018/samorzad/wbp/Itura.xlsx"
+ },
+ "2018/samorzad/wyniki_gl_na_kand_po_obwodach_sw_csv.zip": {
+  "bytes": 4250797,
+  "etag": "\"61d40b4a-40dcad\"",
+  "last_modified": "Tue, 04 Jan 2022 08:54:34 GMT",
+  "sha256": "dff0ed8316615213fdb575f0a4a6a1a235b6d23e88b9042fbad4ff85c6b5e495",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2018/samorzad/wyniki_gl_na_kand_po_obwodach_sw_csv.zip"
+ },
+ "2019/parlament_eu/kandydaci_csv.zip": {
+  "bytes": 38528,
+  "etag": "\"5d1f1c91-9680\"",
+  "last_modified": "Fri, 05 Jul 2019 09:46:57 GMT",
+  "sha256": "ba7b3015d887c69a548edfec2abc8473c6a0cc80a139e639a6417cfe74bf6676",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/parlament_eu/kandydaci_csv.zip"
+ },
+ "2019/parlament_eu/obwody_glosowania_csv.zip": {
+  "bytes": 2546382,
+  "etag": "\"5d1f1c8f-26dace\"",
+  "last_modified": "Fri, 05 Jul 2019 09:46:55 GMT",
+  "sha256": "d2adc3bd93439de48c78381f67214210cfea76824d61e56d30c9aacfc5c75048",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/parlament_eu/obwody_glosowania_csv.zip"
+ },
+ "2019/parlament_eu/okregi_csv.zip": {
+  "bytes": 1598,
+  "etag": "\"5d1f1c8f-63e\"",
+  "last_modified": "Fri, 05 Jul 2019 09:46:55 GMT",
+  "sha256": "1bed8af1f64d030aaab940da5e101ea5f3a9d40dc1e62f47664ea59798dada7c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/parlament_eu/okregi_csv.zip"
+ },
+ "2019/parlament_eu/pe2019-gl-lis-obw.xlsx": {
+  "bytes": 6295297,
+  "etag": "\"5dc3d03c-600f01\"",
+  "last_modified": "Thu, 07 Nov 2019 08:05:16 GMT",
+  "sha256": "56a54c2e0ef7b615cd95488e9f549355d213a5a828ea2c5acc5107c0f4515655",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/parlament_eu/pe2019-gl-lis-obw.xlsx"
+ },
+ "2019/parlament_eu/wykaz_list_csv.zip": {
+  "bytes": 1655,
+  "etag": "\"5d1f1c90-677\"",
+  "last_modified": "Fri, 05 Jul 2019 09:46:56 GMT",
+  "sha256": "c4bdc9b44448bf7ac238bc6f8733f79191cfd1fe17a970288acd9e3fcc5c428b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/parlament_eu/wykaz_list_csv.zip"
+ },
+ "2019/parlament_eu/wyniki_gl_na_kand_po_obwodach_xlsx.zip": {
+  "bytes": 9201196,
+  "etag": "\"5d1f1bdd-8c662c\"",
+  "last_modified": "Fri, 05 Jul 2019 09:43:57 GMT",
+  "sha256": "15a3ea1b6ebf3a1a512e5b92752909455c66437bad603e12def80eda6c77cac4",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/parlament_eu/wyniki_gl_na_kand_po_obwodach_xlsx.zip"
+ },
+ "2019/parlament_eu/wyniki_gl_na_listy_po_gminach_csv.zip": {
+  "bytes": 135382,
+  "etag": "\"5d1f1c42-210d6\"",
+  "last_modified": "Fri, 05 Jul 2019 09:45:38 GMT",
+  "sha256": "531edef74a3ab3e377c75b814287b4398722215d89cae8d5454c740af97eefa2",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/parlament_eu/wyniki_gl_na_listy_po_gminach_csv.zip"
+ },
+ "2019/parlament_eu/wyniki_gl_na_listy_po_okregach_csv.zip": {
+  "bytes": 2269,
+  "etag": "\"5d1f1c12-8dd\"",
+  "last_modified": "Fri, 05 Jul 2019 09:44:50 GMT",
+  "sha256": "70b1e9676ebb72eca0e9cbcbad9d87593f0c17ae1c98069a014deed16ecaaa55",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/parlament_eu/wyniki_gl_na_listy_po_okregach_csv.zip"
+ },
+ "2019/parlament_eu/wyniki_gl_na_listy_po_wojewodztwach_csv.zip": {
+  "bytes": 2676,
+  "etag": "\"5d1f1c81-a74\"",
+  "last_modified": "Fri, 05 Jul 2019 09:46:41 GMT",
+  "sha256": "0b3b2e5c322bfc40fda35100eab3f3960db1e9b1c4e63c7cfc3df0766dbd1cec",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/parlament_eu/wyniki_gl_na_listy_po_wojewodztwach_csv.zip"
+ },
+ "2019/sejmsenat/kandydaci_sejm_csv.zip": {
+  "bytes": 309572,
+  "etag": "\"61c0e0d7-4b944\"",
+  "last_modified": "Mon, 20 Dec 2021 20:00:23 GMT",
+  "sha256": "b2aa164f57d52345fa248e1526c5b9a9f09dab89c7fd63d7b6ff03d3c91f6e30",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/sejmsenat/kandydaci_sejm_csv.zip"
+ },
+ "2019/sejmsenat/kandydaci_senat_csv.zip": {
+  "bytes": 17069,
+  "etag": "\"61c0e0dd-42ad\"",
+  "last_modified": "Mon, 20 Dec 2021 20:00:29 GMT",
+  "sha256": "b0a47a043cd6d1fc75d8929924c13117ac38809e174d76c54c87b21232e1621d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/sejmsenat/kandydaci_senat_csv.zip"
+ },
+ "2019/sejmsenat/obwody_glosowania_csv.zip": {
+  "bytes": 2575847,
+  "etag": "\"61c0e0c0-274de7\"",
+  "last_modified": "Mon, 20 Dec 2021 20:00:00 GMT",
+  "sha256": "345bba9f7b532f9086b064fd8a2170d20a9527e3a65d4f93675ffbe32977a157",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/sejmsenat/obwody_glosowania_csv.zip"
+ },
+ "2019/sejmsenat/okregi_sejm_csv.zip": {
+  "bytes": 3128,
+  "etag": "\"61c0e0cd-c38\"",
+  "last_modified": "Mon, 20 Dec 2021 20:00:13 GMT",
+  "sha256": "c62bc23a323b029af06019c01a9bf9cf5306bc0953a010ef1396ca9cd0c9802a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/sejmsenat/okregi_sejm_csv.zip"
+ },
+ "2019/sejmsenat/okregi_senat_csv.zip": {
+  "bytes": 4943,
+  "etag": "\"61c0e0d2-134f\"",
+  "last_modified": "Mon, 20 Dec 2021 20:00:18 GMT",
+  "sha256": "05073306d599e7278526f4e816e5282d42b755facf9a7b29efd72f5a4755f29a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/sejmsenat/okregi_senat_csv.zip"
+ },
+ "2019/sejmsenat/wykaz_list_sejm_csv.zip": {
+  "bytes": 6030,
+  "etag": "\"61c0e0e2-178e\"",
+  "last_modified": "Mon, 20 Dec 2021 20:00:34 GMT",
+  "sha256": "a5a2835b352f4d6ee77806508f6087a0fb2f587b4ad53d28aa9175764a261e13",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/sejmsenat/wykaz_list_sejm_csv.zip"
+ },
+ "2019/sejmsenat/wyniki_gl_na_kand_po_obwodach_sejm_csv.zip": {
+  "bytes": 5010852,
+  "etag": "\"61c0e136-4c75a4\"",
+  "last_modified": "Mon, 20 Dec 2021 20:01:58 GMT",
+  "sha256": "5e363ad22055dc947f32e8bc61cbe13f8a3613fa1e651052af7145c2d40e40e8",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/sejmsenat/wyniki_gl_na_kand_po_obwodach_sejm_csv.zip"
+ },
+ "2019/sejmsenat/wyniki_gl_na_kand_po_obwodach_senat_csv.zip": {
+  "bytes": 2490761,
+  "etag": "\"61c0e13c-260189\"",
+  "last_modified": "Mon, 20 Dec 2021 20:02:04 GMT",
+  "sha256": "d959d094246931027cb10e2d68f720f222f883086dcd420bbc46bc01c04c7009",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/sejmsenat/wyniki_gl_na_kand_po_obwodach_senat_csv.zip"
+ },
+ "2019/sejmsenat/wyniki_gl_na_listy_po_obwodach_sejm_csv.zip": {
+  "bytes": 2483991,
+  "etag": "\"61c0e0e7-25e717\"",
+  "last_modified": "Mon, 20 Dec 2021 20:00:39 GMT",
+  "sha256": "952fb60aedbe6c861f219940769f4ee4adab7d7b3d279e65f48e067cadee5061",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2019/sejmsenat/wyniki_gl_na_listy_po_obwodach_sejm_csv.zip"
+ },
+ "2020/prezydent/1/kandydaci_csv.zip": {
+  "bytes": 1590,
+  "etag": "\"61c08e09-636\"",
+  "last_modified": "Mon, 20 Dec 2021 14:07:05 GMT",
+  "sha256": "1ed4c05e3549c175be556e9ec72b620797ed00a108f5e7a8fa0cc8ec1f6cc4e0",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2020/prezydent/1/kandydaci_csv.zip"
+ },
+ "2020/prezydent/1/obwody_glosowania_csv.zip": {
+  "bytes": 3479830,
+  "etag": "\"61c08e10-351916\"",
+  "last_modified": "Mon, 20 Dec 2021 14:07:12 GMT",
+  "sha256": "96f7ff7ba77c8d07b2111e321ba529b8d877070902887f03e1ffa65705fff281",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2020/prezydent/1/obwody_glosowania_csv.zip"
+ },
+ "2020/prezydent/1/wyniki_gl_na_kand_po_obwodach_csv.zip": {
+  "bytes": 2425955,
+  "etag": "\"61c08e1b-250463\"",
+  "last_modified": "Mon, 20 Dec 2021 14:07:23 GMT",
+  "sha256": "c51f5f6c4ad0ea973fbf6f1b8379755fbf149f0b87ce274c92d0f85a3e759c1c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2020/prezydent/1/wyniki_gl_na_kand_po_obwodach_csv.zip"
+ },
+ "2020/prezydent/1/wyniki_gl_na_kand_po_wojewodztwach_csv.zip": {
+  "bytes": 2684,
+  "etag": "\"61c08e3e-a7c\"",
+  "last_modified": "Mon, 20 Dec 2021 14:07:58 GMT",
+  "sha256": "87abcfe163baa9c8b50fa8ed48a24b96b4bb0aa969eb6f0327fbb99c37c49261",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2020/prezydent/1/wyniki_gl_na_kand_po_wojewodztwach_csv.zip"
+ },
+ "2020/prezydent/2/kandydaci_csv.zip": {
+  "bytes": 689,
+  "etag": "\"61c08ebb-2b1\"",
+  "last_modified": "Mon, 20 Dec 2021 14:10:03 GMT",
+  "sha256": "385aac70557c6afefce8c0e7daa3e568ce717054c1d99321f5b41c5fbd51b607",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2020/prezydent/2/kandydaci_csv.zip"
+ },
+ "2020/prezydent/2/obwody_glosowania_csv.zip": {
+  "bytes": 3483211,
+  "etag": "\"61c08ec3-35264b\"",
+  "last_modified": "Mon, 20 Dec 2021 14:10:11 GMT",
+  "sha256": "b5cf9ea26c06e41667787946816e98401ad188c7929b81ef025bcbeeb98155df",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2020/prezydent/2/obwody_glosowania_csv.zip"
+ },
+ "2020/prezydent/2/wyniki_gl_na_kand_po_obwodach_csv.zip": {
+  "bytes": 2223533,
+  "etag": "\"61c08ece-21edad\"",
+  "last_modified": "Mon, 20 Dec 2021 14:10:22 GMT",
+  "sha256": "77958f67300b6f1cc790e9f172c3602062fdd015d09b525431d9e581bedae5e8",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2020/prezydent/2/wyniki_gl_na_kand_po_obwodach_csv.zip"
+ },
+ "2020/prezydent/2/wyniki_gl_na_kand_po_wojewodztwach_csv.zip": {
+  "bytes": 2128,
+  "etag": "\"61c08eef-850\"",
+  "last_modified": "Mon, 20 Dec 2021 14:10:55 GMT",
+  "sha256": "126d61eef750b94c851cd860bcdbe43b57212e07fd3e7d4bb6e47b12560c9144",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2020/prezydent/2/wyniki_gl_na_kand_po_wojewodztwach_csv.zip"
+ },
+ "2023/sejmsenat/kandydaci_sejm_csv.zip": {
+  "bytes": 251223,
+  "etag": "\"653f9c02-3d557\"",
+  "last_modified": "Mon, 30 Oct 2023 12:05:22 GMT",
+  "sha256": "e2f4da68eb059cac0a826fa38582a1bbdc8cd131d1460b6b665c8a98bf090a40",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2023/sejmsenat/kandydaci_sejm_csv.zip"
+ },
+ "2023/sejmsenat/kandydaci_senat_csv.zip": {
+  "bytes": 17468,
+  "etag": "\"653f9c03-443c\"",
+  "last_modified": "Mon, 30 Oct 2023 12:05:23 GMT",
+  "sha256": "e15ca4c96431a36b12aaf344617487f4fdf2d2999a9f14ca2fc98b1d8e0e64f9",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2023/sejmsenat/kandydaci_senat_csv.zip"
+ },
+ "2023/sejmsenat/obwody_glosowania_csv.zip": {
+  "bytes": 2858109,
+  "etag": "\"653f9c04-2b9c7d\"",
+  "last_modified": "Mon, 30 Oct 2023 12:05:24 GMT",
+  "sha256": "11baa64be4f76253efd772f6fecca4acbddedc17e4db849cce40f391910e4476",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2023/sejmsenat/obwody_glosowania_csv.zip"
+ },
+ "2023/sejmsenat/okregi_sejm_csv.zip": {
+  "bytes": 3115,
+  "etag": "\"653f9c06-c2b\"",
+  "last_modified": "Mon, 30 Oct 2023 12:05:26 GMT",
+  "sha256": "275b0617e81bf1643f0139d279873cbec8d8fb6c14b6fd3657345dd3d26e5a1c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2023/sejmsenat/okregi_sejm_csv.zip"
+ },
+ "2023/sejmsenat/okregi_senat_csv.zip": {
+  "bytes": 3983,
+  "etag": "\"653f9c06-f8f\"",
+  "last_modified": "Mon, 30 Oct 2023 12:05:26 GMT",
+  "sha256": "a3ba5227c640df601c093e33ba514be75b484e381e314a3f1ec37b0092c1e693",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2023/sejmsenat/okregi_senat_csv.zip"
+ },
+ "2023/sejmsenat/protokoly_po_obwodach_sejm_csv.zip": {
+  "bytes": 1450563,
+  "etag": "\"654a3038-162243\"",
+  "last_modified": "Tue, 07 Nov 2023 12:40:24 GMT",
+  "sha256": "42f6c1920d5e0b559b9fce047865e747fda0b607554459d353f7d3f49140be8c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2023/sejmsenat/protokoly_po_obwodach_sejm_csv.zip"
+ },
+ "2023/sejmsenat/protokoly_po_obwodach_senat_csv.zip": {
+  "bytes": 1451933,
+  "etag": "\"654a3040-16279d\"",
+  "last_modified": "Tue, 07 Nov 2023 12:40:32 GMT",
+  "sha256": "7820cacb4fba01ea8fa49111d3e8f13258e647855fc0371d41e67d44d97b8122",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2023/sejmsenat/protokoly_po_obwodach_senat_csv.zip"
+ },
+ "2023/sejmsenat/wykaz_list_sejm_csv.zip": {
+  "bytes": 4234,
+  "etag": "\"653f9c0a-108a\"",
+  "last_modified": "Mon, 30 Oct 2023 12:05:30 GMT",
+  "sha256": "1f0b9897148af3279adf7bd069a841a1af66af75400e7f7340ab3657f7cb4459",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2023/sejmsenat/wykaz_list_sejm_csv.zip"
+ },
+ "2023/sejmsenat/wyniki_gl_na_kandydatow_po_obwodach_sejm_csv.zip": {
+  "bytes": 3190793,
+  "etag": "\"653f9c0d-30b009\"",
+  "last_modified": "Mon, 30 Oct 2023 12:05:33 GMT",
+  "sha256": "eaf22a7f270b3ae34b1ec1e324b33cd3b764db22f3f808391e65bd6d449c97b8",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2023/sejmsenat/wyniki_gl_na_kandydatow_po_obwodach_sejm_csv.zip"
+ },
+ "2023/sejmsenat/wyniki_gl_na_kandydatow_po_obwodach_senat_csv.zip": {
+  "bytes": 737319,
+  "etag": "\"653f9c12-b4027\"",
+  "last_modified": "Mon, 30 Oct 2023 12:05:38 GMT",
+  "sha256": "b13a6003a139d0fade5ecea6ecc09400af97178449e024c5efa6e8e1c39c2a22",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2023/sejmsenat/wyniki_gl_na_kandydatow_po_obwodach_senat_csv.zip"
+ },
+ "2023/sejmsenat/wyniki_gl_na_listy_po_obwodach_sejm_csv.zip": {
+  "bytes": 1812823,
+  "etag": "\"653f9c18-1ba957\"",
+  "last_modified": "Mon, 30 Oct 2023 12:05:44 GMT",
+  "sha256": "be8823c579ef443bd2a9fcff012cebd6a393904ffa85c104b53ab53583a40c45",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2023/sejmsenat/wyniki_gl_na_listy_po_obwodach_sejm_csv.zip"
+ },
+ "2024/parlament_eu/kandydaci_csv.zip": {
+  "bytes": 43818,
+  "etag": "\"6669693b-ab2a\"",
+  "last_modified": "Wed, 12 Jun 2024 09:24:11 GMT",
+  "sha256": "76c08e84b95493da79d0178dd5aa929ba51de69443683666864e8120f93153ab",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/parlament_eu/kandydaci_csv.zip"
+ },
+ "2024/parlament_eu/komitety_csv.zip": {
+  "bytes": 3507,
+  "etag": "\"66696935-db3\"",
+  "last_modified": "Wed, 12 Jun 2024 09:24:05 GMT",
+  "sha256": "39a1460aa1fbcba7e7fb0ffc8b4906bcad92b9f2c7ca4bb0b0da050fc22ea6ae",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/parlament_eu/komitety_csv.zip"
+ },
+ "2024/parlament_eu/obwody_glosowania_csv.zip": {
+  "bytes": 2864238,
+  "etag": "\"66696947-2bb46e\"",
+  "last_modified": "Wed, 12 Jun 2024 09:24:23 GMT",
+  "sha256": "f576339a73d18772d7d19a4c9b3d1b2c85bda7966b5c807747121a862a362d2f",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/parlament_eu/obwody_glosowania_csv.zip"
+ },
+ "2024/parlament_eu/okregi_csv.zip": {
+  "bytes": 1031,
+  "etag": "\"6669692e-407\"",
+  "last_modified": "Wed, 12 Jun 2024 09:23:58 GMT",
+  "sha256": "1e93990fcfa3aca7b75c5776ae925f65f6081e655829eabc013f2183038f3f40",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/parlament_eu/okregi_csv.zip"
+ },
+ "2024/parlament_eu/protokoly_po_obwodach_csv.zip": {
+  "bytes": 3603728,
+  "etag": "\"66696955-36fd10\"",
+  "last_modified": "Wed, 12 Jun 2024 09:24:37 GMT",
+  "sha256": "d0b3e2d2b38c0b0a68b7a0850f26d3611b87ee502549a37b87950b5864ef0d40",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/parlament_eu/protokoly_po_obwodach_csv.zip"
+ },
+ "2024/parlament_eu/wykaz_list_csv.zip": {
+  "bytes": 1785,
+  "etag": "\"66696941-6f9\"",
+  "last_modified": "Wed, 12 Jun 2024 09:24:17 GMT",
+  "sha256": "6abb0f04f4162371f32d5f5b3a606f0dd937e8275b20e4ef558437cc0ec836ee",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/parlament_eu/wykaz_list_csv.zip"
+ },
+ "2024/parlament_eu/wyniki_gl_na_kandydatow_po_obwodach_csv.zip": {
+  "bytes": 1889261,
+  "etag": "\"6669698d-1cd3ed\"",
+  "last_modified": "Wed, 12 Jun 2024 09:25:33 GMT",
+  "sha256": "c1277546642ff704c70c58436d9c923217b423056899ecf6a66c88a00ec61109",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/parlament_eu/wyniki_gl_na_kandydatow_po_obwodach_csv.zip"
+ },
+ "2024/parlament_eu/wyniki_gl_na_listy_po_gminach_csv.zip": {
+  "bytes": 155352,
+  "etag": "\"66696959-25ed8\"",
+  "last_modified": "Wed, 12 Jun 2024 09:24:41 GMT",
+  "sha256": "0f97b1aff967cce8cf39e2d6f9a8d0c8702cd415bba8c717385f2c11c3dc9038",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/parlament_eu/wyniki_gl_na_listy_po_gminach_csv.zip"
+ },
+ "2024/parlament_eu/wyniki_gl_na_listy_po_okregach_csv.zip": {
+  "bytes": 2464,
+  "etag": "\"66696981-9a0\"",
+  "last_modified": "Wed, 12 Jun 2024 09:25:21 GMT",
+  "sha256": "6ac21256e2af3939d8fb90c3bc83d65f772f247acc39a1d4fd1007c58dbc0aba",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/parlament_eu/wyniki_gl_na_listy_po_okregach_csv.zip"
+ },
+ "2024/samorzad/gminy_i_miasta_wbp2_csv.zip": {
+  "bytes": 23755,
+  "etag": "\"66431389-5ccb\"",
+  "last_modified": "Tue, 14 May 2024 07:32:25 GMT",
+  "sha256": "2fff10a581c27e8d4f280212c5c51f6ad30b9900077681fce13bef5ef0d0ad81",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/gminy_i_miasta_wbp2_csv.zip"
+ },
+ "2024/samorzad/kandydaci_rady_dzielnic_csv.zip": {
+  "bytes": 76857,
+  "etag": "\"6643131e-12c39\"",
+  "last_modified": "Tue, 14 May 2024 07:30:38 GMT",
+  "sha256": "73f36122ed0af48333dbe069730a44a78aec2476e554a99e5aa5579ce7e35e62",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/kandydaci_rady_dzielnic_csv.zip"
+ },
+ "2024/samorzad/kandydaci_rady_gmin_do_20k_xlsx.zip": {
+  "bytes": 6668851,
+  "etag": "\"6643131c-65c233\"",
+  "last_modified": "Tue, 14 May 2024 07:30:36 GMT",
+  "sha256": "e3611c2bc2789abe56d4687c20056f1d020e6a5694f8fe45deb04e331e9ba7ad",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/kandydaci_rady_gmin_do_20k_xlsx.zip"
+ },
+ "2024/samorzad/kandydaci_rady_gmin_powyzej_20k_csv.zip": {
+  "bytes": 1335256,
+  "etag": "\"66431313-145fd8\"",
+  "last_modified": "Tue, 14 May 2024 07:30:27 GMT",
+  "sha256": "12170d5d36c93cffe46528de8332512a420436687524707cabaed4d02d89437c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/kandydaci_rady_gmin_powyzej_20k_csv.zip"
+ },
+ "2024/samorzad/kandydaci_rady_powiatow_csv.zip": {
+  "bytes": 1414091,
+  "etag": "\"6643130d-1593cb\"",
+  "last_modified": "Tue, 14 May 2024 07:30:21 GMT",
+  "sha256": "a8020286b03659d91c42b88caa9673bb9d29c4b370e9d994634efd9bfaa95994",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/kandydaci_rady_powiatow_csv.zip"
+ },
+ "2024/samorzad/kandydaci_sejmiki_wojewodztw_csv.zip": {
+  "bytes": 197134,
+  "etag": "\"66431304-3020e\"",
+  "last_modified": "Tue, 14 May 2024 07:30:12 GMT",
+  "sha256": "bf54cf76ba6d9871b54ecc26c56a24334bc6b38de532734158b8289d0d021d59",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/kandydaci_sejmiki_wojewodztw_csv.zip"
+ },
+ "2024/samorzad/kandydaci_wbp2_csv.zip": {
+  "bytes": 87767,
+  "etag": "\"6643138f-156d7\"",
+  "last_modified": "Tue, 14 May 2024 07:32:31 GMT",
+  "sha256": "537917583bd5792315f1206e13caeca43ddd4758a648d2561e8fbeb6e8c3e517",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/kandydaci_wbp2_csv.zip"
+ },
+ "2024/samorzad/kandydaci_wbp_csv.zip": {
+  "bytes": 368583,
+  "etag": "\"6643132d-59fc7\"",
+  "last_modified": "Tue, 14 May 2024 07:30:53 GMT",
+  "sha256": "490d5a9012402e96889380f9ed61fd5a9f0a8b460574e414569f5dc7db434902",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/kandydaci_wbp_csv.zip"
+ },
+ "2024/samorzad/obwody_glosowania_csv.zip": {
+  "bytes": 2834903,
+  "etag": "\"6643133f-2b41d7\"",
+  "last_modified": "Tue, 14 May 2024 07:31:11 GMT",
+  "sha256": "ff63cd5b6a253845104d73eb24216c4186ce89d904456714a9e10dd5cffd4211",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/obwody_glosowania_csv.zip"
+ },
+ "2024/samorzad/obwody_glosowania_wbp2_csv.zip": {
+  "bytes": 1155178,
+  "etag": "\"664313a4-11a06a\"",
+  "last_modified": "Tue, 14 May 2024 07:32:52 GMT",
+  "sha256": "df623d3d8b3c6f42342f03da3c897ee766b121bbd4b801366787dbf92dc029d3",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/obwody_glosowania_wbp2_csv.zip"
+ },
+ "2024/samorzad/okregi_rady_dzielnic_csv.zip": {
+  "bytes": 46162,
+  "etag": "\"664312e4-b452\"",
+  "last_modified": "Tue, 14 May 2024 07:29:40 GMT",
+  "sha256": "9964add77f77720e46d1ade15715b89c1d5ddf1d9af4181a3e1e291ee0d77710",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/okregi_rady_dzielnic_csv.zip"
+ },
+ "2024/samorzad/okregi_rady_gmin_csv.zip": {
+  "bytes": 2113761,
+  "etag": "\"664312de-2040e1\"",
+  "last_modified": "Tue, 14 May 2024 07:29:34 GMT",
+  "sha256": "d81ea6e393ec756c2558ef2917ed273c492b2f9b7bdbcd4eb5ac6ee656dbf3f2",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/okregi_rady_gmin_csv.zip"
+ },
+ "2024/samorzad/okregi_rady_powiatow_csv.zip": {
+  "bytes": 86965,
+  "etag": "\"664312d8-153b5\"",
+  "last_modified": "Tue, 14 May 2024 07:29:28 GMT",
+  "sha256": "8266baaa097ae6d596e559e90b28bd16af4c473905130accade84ec4eb527a81",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/okregi_rady_powiatow_csv.zip"
+ },
+ "2024/samorzad/okregi_sejmiki_wojewodztw_csv.zip": {
+  "bytes": 4762,
+  "etag": "\"664312d0-129a\"",
+  "last_modified": "Tue, 14 May 2024 07:29:20 GMT",
+  "sha256": "a13f1d87f99a3efcda78234b12619aae443edd4a9301e3200df61dedf15f89e7",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/okregi_sejmiki_wojewodztw_csv.zip"
+ },
+ "2024/samorzad/okregi_wojt_burmistrz_prezydent_csv.zip": {
+  "bytes": 71479,
+  "etag": "\"664312ea-11737\"",
+  "last_modified": "Tue, 14 May 2024 07:29:46 GMT",
+  "sha256": "72d9c1402575bc758a47b56b97b843554517a04a580fb1586fc031dd157f7937",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/okregi_wojt_burmistrz_prezydent_csv.zip"
+ },
+ "2024/samorzad/protokoly_po_obwodach_sejmik_wojewodztwa_csv.zip": {
+  "bytes": 3528173,
+  "etag": "\"6643134b-35d5ed\"",
+  "last_modified": "Tue, 14 May 2024 07:31:23 GMT",
+  "sha256": "a4bd284845f3d9630180417714329c278be2ada92798450eb8658b1d13022d3c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/protokoly_po_obwodach_sejmik_wojewodztwa_csv.zip"
+ },
+ "2024/samorzad/protokoly_po_obwodach_wbp2_csv.zip": {
+  "bytes": 852426,
+  "etag": "\"664313c5-d01ca\"",
+  "last_modified": "Tue, 14 May 2024 07:33:25 GMT",
+  "sha256": "d93bc9be4004145206739544fa5c7598adfc776a7de8f663b7825d3ac1aa74c0",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/protokoly_po_obwodach_wbp2_csv.zip"
+ },
+ "2024/samorzad/protokoly_po_obwodach_wbp_csv.zip": {
+  "bytes": 2199549,
+  "etag": "\"66431379-218ffd\"",
+  "last_modified": "Tue, 14 May 2024 07:32:09 GMT",
+  "sha256": "605745b69d2166a25c6300f0e72211ab461652da513157941d04e8b77531a580",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/protokoly_po_obwodach_wbp_csv.zip"
+ },
+ "2024/samorzad/wybrani_wojt_burmistrz_prezydent_csv.zip": {
+  "bytes": 108573,
+  "etag": "\"6643137f-1a81d\"",
+  "last_modified": "Tue, 14 May 2024 07:32:15 GMT",
+  "sha256": "adee75733696009a88e14bf70cda01e18680997ea4e5f2f52693aa74571596a1",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/wybrani_wojt_burmistrz_prezydent_csv.zip"
+ },
+ "2024/samorzad/wyniki_glosowania_na_listy_kandydatow_do_sejmikow_wojewodztw.zip": {
+  "bytes": 951995,
+  "etag": "\"66d04013-e86bb\"",
+  "last_modified": "Thu, 29 Aug 2024 09:32:03 GMT",
+  "sha256": "24d829b3858288aaf3144ee56347f50bf5e3fd4dd0b99d10f896ac1eaba76e50",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2024/samorzad/wyniki_glosowania_na_listy_kandydatow_do_sejmikow_wojewodztw.zip"
+ },
+ "2025/prezydent/1/kandydaci_csv.1752152970.zip": {
+  "bytes": 1673,
+  "etag": "\"68b6ede5-689\"",
+  "last_modified": "Tue, 02 Sep 2025 13:15:17 GMT",
+  "sha256": "6b3b2ddb1237d619e15aa4d06a8eaa514c83475a244b35f05c928ac5c1d3ac61",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2025/prezydent/1/kandydaci_csv.1752152970.zip"
+ },
+ "2025/prezydent/1/obwody_glosowania_csv.1752152970.zip": {
+  "bytes": 2874450,
+  "etag": "\"68b6edfd-2bdc52\"",
+  "last_modified": "Tue, 02 Sep 2025 13:15:41 GMT",
+  "sha256": "b8509ea27e139c5aaf359082b30ede72cbbbbb3ffa1fe2e6b7b8691ccf9fa1d1",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2025/prezydent/1/obwody_glosowania_csv.1752152970.zip"
+ },
+ "2025/prezydent/1/protokoly_po_obwodach_csv.1752152970.zip": {
+  "bytes": 1981973,
+  "etag": "\"68b6ee2f-1e3e15\"",
+  "last_modified": "Tue, 02 Sep 2025 13:16:31 GMT",
+  "sha256": "a55079bf2fc819f2c27928d51e2445d2a5d0fb555bcb27abf3d4409de64acfcd",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2025/prezydent/1/protokoly_po_obwodach_csv.1752152970.zip"
+ },
+ "2025/prezydent/1/wyniki_gl_na_kandydatow_po_gminach_csv.1752152970.zip": {
+  "bytes": 165047,
+  "etag": "\"68b6ee32-284b7\"",
+  "last_modified": "Tue, 02 Sep 2025 13:16:34 GMT",
+  "sha256": "1689d9293739ee008cacb04c0643aff5beddf08a658fafaf5d7f5c3a9729cd23",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2025/prezydent/1/wyniki_gl_na_kandydatow_po_gminach_csv.1752152970.zip"
+ },
+ "2025/prezydent/1/wyniki_gl_na_kandydatow_po_wojewodztwach_csv.1752152970.zip": {
+  "bytes": 2813,
+  "etag": "\"68b6ee3b-afd\"",
+  "last_modified": "Tue, 02 Sep 2025 13:16:43 GMT",
+  "sha256": "b87f9dac93cf15acc12320b706c5d88656bf4c0b3939047c9b5b6e2cab1d9615",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2025/prezydent/1/wyniki_gl_na_kandydatow_po_wojewodztwach_csv.1752152970.zip"
+ },
+ "2025/prezydent/2/kandydaci_w_drugiej_turze_csv.1752152970.zip": {
+  "bytes": 734,
+  "etag": "\"68b6f0f3-2de\"",
+  "last_modified": "Tue, 02 Sep 2025 13:28:19 GMT",
+  "sha256": "6696a7b31a4e012d6edfec57d0da4a1df103239535e896418d531d963ad336a7",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2025/prezydent/2/kandydaci_w_drugiej_turze_csv.1752152970.zip"
+ },
+ "2025/prezydent/2/obwody_glosowania_w_drugiej_turze_csv.1752152970.zip": {
+  "bytes": 2876059,
+  "etag": "\"68b6f104-2be29b\"",
+  "last_modified": "Tue, 02 Sep 2025 13:28:36 GMT",
+  "sha256": "368d77268b149ca1a8feaa132fb35209c7f36cb14f7b9d293dd652583a0f697d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2025/prezydent/2/obwody_glosowania_w_drugiej_turze_csv.1752152970.zip"
+ },
+ "2025/prezydent/2/protokoly_po_obwodach_w_drugiej_turze_csv.1752152970.zip": {
+  "bytes": 1637623,
+  "etag": "\"68b6f117-18fcf7\"",
+  "last_modified": "Tue, 02 Sep 2025 13:28:55 GMT",
+  "sha256": "9a148690344f8eea1fa77fca8c46d7e135a54525789f6d6432d71d6a9e3c419a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2025/prezydent/2/protokoly_po_obwodach_w_drugiej_turze_csv.1752152970.zip"
+ },
+ "2025/prezydent/2/wyniki_gl_na_kandydatow_po_gminach_w_drugiej_turze_csv.1752152970.zip": {
+  "bytes": 126179,
+  "etag": "\"68b6f11c-1ece3\"",
+  "last_modified": "Tue, 02 Sep 2025 13:29:00 GMT",
+  "sha256": "9972352c1a9a47a067c61563e9438ba671d9030a122067800df0099fafc4f083",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2025/prezydent/2/wyniki_gl_na_kandydatow_po_gminach_w_drugiej_turze_csv.1752152970.zip"
+ },
+ "2025/prezydent/2/wyniki_gl_na_kandydatow_po_wojewodztwach_w_drugiej_turze_csv.1752152970.zip": {
+  "bytes": 2154,
+  "etag": "\"68b6f124-86a\"",
+  "last_modified": "Tue, 02 Sep 2025 13:29:08 GMT",
+  "sha256": "6dacdba518dd0cae3c5531cff4f83c619eb4e78d98d9908210af0ed94d48627b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2025/prezydent/2/wyniki_gl_na_kandydatow_po_wojewodztwach_w_drugiej_turze_csv.1752152970.zip"
+ }
+}
