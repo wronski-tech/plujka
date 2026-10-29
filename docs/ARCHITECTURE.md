@@ -22,7 +22,7 @@ flowchart LR
 5. **Answer** — `answer.compose_answer` turns the rows into Polish text. LLM text is used only when every number in it appears in the rows or the question; otherwise the answer is a summary built from the rows. Numeric values in `result` are JSON numbers (PostgreSQL `numeric` 34.27 is sent as `34.27`, not `"34.27"`).
 6. **Persistence and telemetry** — Results come from PostgreSQL only. Each request logs one line and one OpenSearch document with status, latency, row count, answer source and token usage (`api/services/opensearch_store.py`); OpenSearch Dashboards (Compose profile `observability`) charts them ([DEPLOYMENT.md](DEPLOYMENT.md)).
 
-A clarification answer is sent back as `POST /ask` with `entity_refs: [{"kind": "person", "ref": "<person_id>"}]`; the Streamlit UI shows the options as buttons and does this for the user. The UI also keeps the last answered turn and sends it as `previous` when the "Dopytaj o poprzedni wynik" toggle is on (on by default for questions such as "a w 2019?"). It draws a bar chart when each row is one labelled unit with a number, a choropleth when rows carry `teryt_gmina`, `teryt_powiat` or `wojewodztwo` (boundaries in `streamlit_app/geo/`), and shows the SQL with the PKW/KBW source.
+A clarification answer is sent back as `POST /ask` with `entity_refs: [{"kind": "person", "ref": "<person_id>"}]`; the Streamlit UI shows the options as buttons and does this for the user. The UI also keeps the last answered turn and sends it as `previous` when the "Dopytaj o poprzedni wynik" toggle is on (on by default for questions such as "a w 2019?"). It draws a bar chart when each row is one labelled unit with a number, a choropleth when rows carry `teryt_gmina`, `teryt_powiat` or `wojewodztwo` (boundaries in `streamlit_app/geo/`), and shows the SQL with the PKW/KBW source. Maps match `teryt_gmina`/`teryt_powiat` against `streamlit_app/geo/*.json` through `streamlit_app/map_units.py`: old codes are translated by `geo/teryt_changes.json` (votes of merged units are summed, percentages skipped with a caption), and features with `parts` are pre-division outlines (Warsaw, Kamienica, Supraśl, powiat wałbrzyski) drawn only when the result uses the old unit. See `streamlit_app/geo/README.md`.
 
 ## Startup and data loading
 
@@ -64,5 +64,5 @@ Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `
 | Embeddings           | `api/services/embeddings.py`      |
 | KBW import           | `api/services/kbw_import.py`, `scripts/import_kbw_facts.py`, `loader` service |
 | Legacy PKW helpers   | `api/services/seed.py`            |
-| UI (charts, map, follow-ups) | `streamlit_app/app.py`, `streamlit_app/geo/` |
+| UI (charts, map, follow-ups) | `streamlit_app/app.py`, `streamlit_app/map_units.py`, `streamlit_app/geo/` |
 | Feedback JSONL       | `api/services/feedback_store.py`  |

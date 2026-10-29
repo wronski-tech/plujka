@@ -16,7 +16,7 @@ from api.services.mart.build_common import BuildError, column, columns_of, norma
 COMBINED_PRECINCTS = "%w ujęciu łącznym%"
 
 GEO_ALIASES = {
-    "teryt": ("TERYT gminy", "Kod TERYT", "TERYT Gminy", "Teryt Gminy", "Kod terytorialny gminy", "TERYT", "Kod gm."),
+    "teryt": ("TERYT gminy", "Kod TERYT", "TERYT Gminy", "Teryt Gminy", "Kod terytorialny gminy", "TERYT", "Kod gm.", "Kod gminy"),
     "precinct_no": ("Numer obwodu", "Nr komisji", "Nr obwodu głosowania", "Nr obw.", "Numer", "Nr obwodu"),
     "gmina": ("Gmina", "Nazwa gminy"),
     "powiat": ("Powiat",),
@@ -31,6 +31,7 @@ PROTOCOL_ALIASES = {
         "Liczba wyborców uprawnionych do głosowania (umieszczonych w spisie, z uwzględnieniem dodatkowych formularzy) w chwili zakończenia głosowania",
         "Liczba uprawnionych do głosowania",  # EP 2014
         "Uprawnieni do głosowania",  # president 2010
+        "Uprawnieni",  # president 2000
     ),
     "ballots_issued": (
         "Liczba wyborców, którym wydano karty do głosowania w lokalu wyborczym oraz w głosowaniu korespondencyjnym (łącznie)",
@@ -39,6 +40,7 @@ PROTOCOL_ALIASES = {
         "Wydane karty do głosowania",  # EP 2014, president 2010
         "Karty wydane (frekwencja)",  # president 2005, round 1
         "Wydane karty do głosowania - liczba",  # president 2005, round 2
+        "Wydane karty",  # president 2000
     ),
     # President 2010 has no separate count of valid ballots: 'Głosy oddane' (votes cast) = valid + invalid votes.
     # President 2005 round 2: 'Karty wyjęte (głosy oddane)', ballots taken from the box (valid ballots).
@@ -77,12 +79,42 @@ PRECINCT_TYPES_2005 = {
     "P": "powszechny", "L": "szpital", "K": "zakład karny", "A": "areszt śledczy", "Z": "zakład pomocy społecznej",
     "O": "oddział zewnętrzny zakładu karnego lub aresztu śledczego", "G": "zagranica", "S": "statek",
 }
+# Precinct type codes of the 2000/2001 files (inferred from the addresses: hospitals and care homes, prisons
+# and remand centres, the 165-167 precincts abroad, ships).
+PRECINCT_TYPES_2001 = {
+    "P": "powszechny", "L": "zakład opieki zdrowotnej lub pomocy społecznej", "K": "zakład karny lub areszt śledczy",
+    "Z": "zagranica", "S": "statek",
+}
 
 
 def create_warsaw_districts(con: duckdb.DuckDBPyConnection) -> None:
     """Create ``warsaw_districts_2005(letter, teryt, gmina)`` from WARSAW_DISTRICTS_2005."""
     rows = ", ".join(f"({sql_literal(k)}, {sql_literal(t)}, {sql_literal(n)})" for k, (t, n) in WARSAW_DISTRICTS_2005.items())
     con.execute(f"CREATE OR REPLACE TABLE warsaw_districts_2005 AS SELECT * FROM (VALUES {rows}) t(letter, teryt, gmina)")
+
+
+# Until 2002 Warsaw was powiat 1431 made of eleven gminas, and the 2000/2001 files use their TERYT codes.
+# The 2001 Sejm and Senate files split gmina Warszawa-Centrum (143104) by a letter in 'Teren' (A = Mokotów
+# ... G = Żoliborz, alphabetical; checked against the precinct addresses). (old TERYT, letter) -> letter of
+# the post-2002 district in WARSAW_DISTRICTS_2005. Wesoła (N) was a gmina of powiat miński until 2002.
+WARSAW_GMINAS_2001 = {
+    ("143101", None): "A", ("143102", None): "B", ("143103", None): "C",
+    ("143104", "A"): "D", ("143104", "B"): "E", ("143104", "C"): "F", ("143104", "D"): "G",
+    ("143104", "E"): "I", ("143104", "F"): "Q", ("143104", "G"): "R",
+    ("143112", None): "H", ("143113", None): "J", ("143114", None): "K", ("143115", None): "L",
+    ("143116", None): "M", ("143117", None): "O", ("143118", None): "P",
+}
+
+
+def create_warsaw_gminas_2001(con: duckdb.DuckDBPyConnection) -> None:
+    """Create ``warsaw_gminas_2001(old_teryt, letter, teryt, gmina)`` from WARSAW_GMINAS_2001 (letter NULL
+    for whole gminas). Join on ``old_teryt`` and ``letter IS NULL OR letter = <Centrum letter>``."""
+    rows = ", ".join(
+        f"({sql_literal(old)}, {sql_literal(letter) if letter else 'NULL'}, {sql_literal(WARSAW_DISTRICTS_2005[new][0])}, "
+        f"{sql_literal(WARSAW_DISTRICTS_2005[new][1])})"
+        for (old, letter), new in WARSAW_GMINAS_2001.items()
+    )
+    con.execute(f"CREATE OR REPLACE TABLE warsaw_gminas_2001 AS SELECT * FROM (VALUES {rows}) t(old_teryt, letter, teryt, gmina)")
 
 
 def precinct_select(con: duckdb.DuckDBPyConnection, source: str, protocol: tuple[str, ...] = tuple(PROTOCOL_ALIASES)) -> str:

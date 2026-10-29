@@ -1,6 +1,6 @@
 """Build the presidential election tables of one year (both rounds) in DuckDB (loader side).
 
-Sources per round:
+Sources per round (2000 had one round only):
 - 2020, 2025: one per-precinct file with geography, protocol and one column per candidate
   (``wyniki_gl_na_kand_po_obwodach`` / ``protokoly_po_obwodach``) plus the candidate register
   ``kandydaci`` with official totals.
@@ -10,6 +10,9 @@ Sources per round:
   round 1, ``1456148721_37553`` / ``_37554`` for round 2), candidates from the headers ('Surname Given'
   in round 1, 'Given Surname - liczba' next to a percent column in round 2). Warsaw is one gmina
   (146501); see ``_fix_2005_warsaw``.
+- 2000: per-precinct file ``prez2000obw`` ('Given SURNAME' headers, no candidate register) and per-gmina
+  totals ``gm-kraj2000``, otherwise like 2010. Warsaw consists of the pre-2002 gminas
+  (``WARSAW_GMINAS_2001``); Warszawa-Centrum (143104) is published without its districts.
 - 2015: per-precinct files only (``prezydent_2015_tura1.csv``, ``wyniki_tura2.xls``) and per-gmina
   totals (``prez2015_N_tura_gm.xls``); there is no candidate register, so candidates come from the
   column headers. The round 2 file publishes TERYT as 0: its precincts get the TERYT of the round 1
@@ -31,6 +34,7 @@ from api.services.mart.build_common import Election, YearSources, column, python
 from api.services.mart.build_precincts import (
     PROTOCOL_ALIASES,
     create_warsaw_districts,
+    create_warsaw_gminas_2001,
     precinct_select,
     unpivot_votes,
     vote_columns,
@@ -42,6 +46,7 @@ TABLES = ("prezydent_candidates", "prezydent_precinct_protocols", "prezydent_pre
 FAMILY = ("prezydent",)
 
 SOURCES = {
+    2000: {1: {"results": "**/prezydent/prez2000obw.parquet", "gmina_totals": "**/prezydent/gm-kraj2000.parquet"}},
     2005: {
         1: {"results": "**/prezydent/1/1456148660_37030__sheet02_*.parquet", "gmina_totals": "**/prezydent/1/1456148660_37033.parquet",
             "surname_first": True},
@@ -71,6 +76,7 @@ SOURCES = {
 }
 
 DATES = {
+    (2000, 1): "2000-10-08",
     (2005, 1): "2005-10-09", (2005, 2): "2005-10-23",
     (2010, 1): "2010-06-20", (2010, 2): "2010-07-04",
     (2015, 1): "2015-05-10", (2015, 2): "2015-05-24",
@@ -208,6 +214,20 @@ def _fix_2005_warsaw(con: duckdb.DuckDBPyConnection, src: str, rnd: int) -> str:
     return f"prez_warsaw_{rnd}"
 
 
+def _fix_2000_warsaw(con: duckdb.DuckDBPyConnection, src: str) -> str:
+    """2000: precincts of the pre-2002 Warsaw gminas (1431xx) get the TERYT of the post-2002 district.
+
+    Warszawa-Centrum (143104) covered seven districts and the file does not say which: it keeps 143104.
+    """
+    create_warsaw_gminas_2001(con)
+    con.execute(
+        f"""CREATE OR REPLACE TABLE prez_warsaw_2000 AS
+            SELECT s.* REPLACE (coalesce(w.teryt, s."Kod gminy") AS "Kod gminy", coalesce(w.gmina, s."Gmina") AS "Gmina")
+            FROM {src} s LEFT JOIN warsaw_gminas_2001 w ON w.letter IS NULL AND w.old_teryt = lpad(trim(s."Kod gminy"), 6, '0')"""
+    )
+    return "prez_warsaw_2000"
+
+
 def _header_name(header: str) -> str:
     """Candidate name of a vote column: 2005 round 2 headers end with ' - liczba' (unit row)."""
     return re.sub(r" - liczba$", "", header)
@@ -223,6 +243,8 @@ def build_prezydent(con: duckdb.DuckDBPyConnection, sources: YearSources) -> lis
             src = _fix_2015_round2_teryt(con, src)
         if year == 2005:
             src = _fix_2005_warsaw(con, src, rnd)
+        if year == 2000:
+            src = _fix_2000_warsaw(con, src)
         headers = vote_columns(con, src)
         if "candidates" in spec:
             _candidates_from_register(con, year, rnd, sources.load(f"prez_candidates_{rnd}", spec["candidates"]))
@@ -271,7 +293,7 @@ def _fill_2015_totals(con: duckdb.DuckDBPyConnection, rnd: int, gmina_src: str) 
     con.execute(
         f"""
         UPDATE prot_{rnd} p SET powiat = g."Powiat"
-        FROM {gmina_src} g WHERE lpad(trim(g.{column(con, gmina_src, "TERYT", "Kod gm.")}), 6, '0') = p.teryt_gmina AND p.powiat IS NULL
+        FROM {gmina_src} g WHERE lpad(trim(g.{column(con, gmina_src, "TERYT", "Kod gm.", "Kod gminy")}), 6, '0') = p.teryt_gmina AND p.powiat IS NULL
         """
     )
     # Elected: over 50% of valid votes (round 1) or the most votes in the run-off (round 2).
@@ -288,6 +310,9 @@ def _check_round(con: duckdb.DuckDBPyConnection, year: int, rnd: int) -> None:
         f"round {rnd}: duplicate precincts": f"SELECT count(*) - count(DISTINCT pkey) FROM prot_{rnd}",
         # Warsaw is split into its districts in every year (2005: see _fix_2005_warsaw).
         f"round {rnd}: Warsaw precincts without a district (146501)": f"SELECT count(*) FROM prot_{rnd} WHERE teryt_gmina = '146501'",
+        # 2000: only Warszawa-Centrum (143104) keeps its pre-2002 code (see _fix_2000_warsaw).
+        f"round {rnd}: Warsaw precincts with a pre-2002 code other than Warszawa-Centrum (143104)": f"""
+            SELECT count(*) FROM prot_{rnd} WHERE teryt_gmina LIKE '1431%' AND teryt_gmina <> '143104'""",
         f"round {rnd}: vote columns that match no candidate": f"SELECT count(*) FROM cand_{rnd}_unmapped",
         f"round {rnd}: candidates not read from exactly one column": f"""
             SELECT count(*) FROM cand_{rnd} c
@@ -332,7 +357,7 @@ def _assemble(con: duckdb.DuckDBPyConnection, year: int) -> None:
         + " UNION ALL ".join(
             f"""SELECT year, round, candidate_id, full_name, last_name, first_names, gender, occupation, residence,
                        residence_teryt, party_membership, committee_name, votes, pct, elected,
-                       CASE WHEN round = 1 THEN nkey IN (SELECT nkey FROM cand_2) END AS advanced_to_round2
+                       CASE WHEN round = 1 THEN {"nkey IN (SELECT nkey FROM cand_2)" if 2 in rounds else "false"} END AS advanced_to_round2
                 FROM cand_{r}"""
             for r in rounds
         )

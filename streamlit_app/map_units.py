@@ -1,0 +1,137 @@
+"""Match result rows to boundary features across TERYT changes (see geo/README.md).
+
+Kept free of Streamlit so the matching rules can be unit tested.
+"""
+
+from __future__ import annotations
+
+import json
+import unicodedata
+from collections import defaultdict
+from functools import lru_cache
+from pathlib import Path
+
+# Simplified boundaries keyed by current TERYT, and old codes mapped to current ones.
+GEO_DIR = Path(__file__).resolve().parent / "geo"
+# A value column is summed over old units that map to one current unit only when it is a count.
+_ADDITIVE = ("votes", "seats", "mandat", "voters", "ballots", "precincts", "residents", "candidates", "count")
+_NOT_ADDITIVE = ("pct", "_pp", "turnout", "share", "avg", "rate", "ratio", "rank", "median", "age")
+
+
+def fold(text: str) -> str:
+    """Lowercase without Polish diacritics (for matching voivodeship names)."""
+    return unicodedata.normalize("NFKD", text.lower().replace("ł", "l")).encode("ascii", "ignore").decode()
+
+
+@lru_cache(maxsize=3)
+def boundaries(level: str) -> dict:
+    """GeoJSON FeatureCollection for ``gminy``, ``powiaty`` or ``wojewodztwa``.
+
+    Public-domain features come from ``<level>.json``; features derived from OpenStreetMap (ODbL,
+    ``properties.source == "osm"``) from ``<level>_osm.json`` when it exists. Current units come
+    first and former extents last, so extents are drawn on top.
+    """
+    features = json.loads((GEO_DIR / f"{level}.json").read_text(encoding="utf-8"))["features"]
+    osm = GEO_DIR / f"{level}_osm.json"
+    if osm.exists():
+        features = features + json.loads(osm.read_text(encoding="utf-8"))["features"]
+    return {"type": "FeatureCollection", "features": sorted(features, key=lambda f: "parts" in f["properties"])}
+
+
+def is_osm(feature: dict) -> bool:
+    """True for a feature derived from OpenStreetMap (needs the ODbL attribution when drawn)."""
+    return feature["properties"].get("source") == "osm"
+
+
+@lru_cache(maxsize=1)
+def teryt_changes() -> dict:
+    """Old gmina/powiat code -> current code, per boundary level."""
+    data = json.loads((GEO_DIR / "teryt_changes.json").read_text(encoding="utf-8"))
+    return {level: {old: entry["current"] for old, entry in data[level].items()} for level in ("gminy", "powiaty")}
+
+
+def is_additive(column: str) -> bool:
+    """True for counts (votes, seats, voters), which may be summed; False for percentages and rates."""
+    name = column.lower()
+    return any(p in name for p in _ADDITIVE) and not any(p in name for p in _NOT_ADDITIVE)
+
+
+def feature_key(props: dict, level: str) -> str:
+    """Key of a boundary feature in ``unit_values``: TERYT, or folded name for voivodeships."""
+    return fold(props["name"]) if level == "wojewodztwa" else props["teryt"]
+
+
+def unit_values(rows: list[dict], column: str, value: str, level: str) -> tuple[dict, dict, list[str]]:
+    """Value per current boundary code.
+
+    Old codes are mapped to the current unit that covers them. When several rows land on one unit,
+    their values are summed if the column is additive and the rows come from the same election
+    (year, round); otherwise the unit is left out. Returns (values, merged, skipped): ``merged`` maps
+    a summed unit to the number of rows in it, ``skipped`` lists the units left out.
+    """
+    key = fold if level == "wojewodztwa" else str
+    changes = teryt_changes().get(level, {})
+    groups: dict[str, list[dict]] = defaultdict(list)
+    for row in rows:
+        if row.get(value) is not None:
+            code = key(row[column])
+            groups[changes.get(code, code)].append(row)
+    values, merged, skipped = {}, {}, []
+    for code, members in groups.items():
+        if len(members) == 1:
+            values[code] = members[0][value]
+        elif is_additive(value) and len({(r.get("year"), r.get("round")) for r in members}) == 1:
+            values[code] = sum(r[value] for r in members)
+            merged[code] = len(members)
+        else:
+            skipped.append(code)
+    return values, merged, skipped
+
+
+def _former_applies(props: dict, codes: set[str], years: set[int], current: set[str]) -> bool:
+    """Whether a former extent describes the result (see ``visible_features``)."""
+    others = set(props["parts"]) - {props["teryt"]}
+    if props["teryt"] not in codes or others & codes:
+        return False
+    if "years" not in props:
+        return True
+    if years:
+        first, last = props["years"]
+        return all(first <= year <= last for year in years)
+    # Without a year column only codes tell the periods apart.
+    return bool(others) or props["teryt"] not in current
+
+
+def visible_features(features: list[dict], codes: set[str], years: set[int] | None = None) -> list[dict]:
+    """Features to draw for the result codes and the result years (``year`` column, if any).
+
+    A feature with ``parts`` is a former extent (Warsaw before its districts are shown, a gmina
+    before a new gmina was split off, a powiat before gminas moved in or out). It replaces the
+    current units listed in ``parts`` when the result has its own code and none of the other part
+    codes. An extent with ``years`` ([first, last]) is valid only then: it is drawn when every result
+    year falls in that period, or, without a year column, when its own code no longer exists or
+    another part code (a unit created later) is absent from the result.
+
+    OpenStreetMap units that the result does not use (all grey) are drawn as the public-domain former
+    extent that covers them instead (Warsaw as one unit, Kamienica and Supraśl before 2025), so a
+    map needs the OpenStreetMap attribution only when it colours such a unit.
+    """
+    current = {f["properties"]["teryt"] for f in features if "parts" not in f["properties"]}
+    former = [
+        f for f in features
+        if "parts" in f["properties"] and _former_applies(f["properties"], codes, years or set(), current)
+    ]
+    for extent in features:
+        props = extent["properties"]
+        parts = set(props.get("parts", []))
+        if not parts or is_osm(extent) or props["teryt"] in codes or parts & codes:
+            continue
+        covered = [f for f in features if "parts" not in f["properties"] and f["properties"]["teryt"] in parts]
+        if covered and all(is_osm(f) for f in covered):
+            former.append(extent)
+    drawn = {id(f) for f in former}
+    hidden = {code for f in former for code in f["properties"]["parts"]}
+    return [
+        f for f in features
+        if id(f) in drawn or ("parts" not in f["properties"] and f["properties"]["teryt"] not in hidden)
+    ]

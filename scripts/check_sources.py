@@ -55,9 +55,10 @@ def family_year(rel_path: str) -> tuple[str, int]:
     return family, year
 
 
-# Mirror prefixes that differ from the server path: the server keeps the 2010 local-election files
-# directly under /dane/2010/, the mirror under 2010/samorzad/ (apart from the 2010 presidential files).
-SERVER_PREFIX = {"2010/samorzad/": "2010/"}
+# Mirror prefixes that differ from the server path: the server keeps the 2002, 2006 and 2010
+# local-election files directly under /dane/<year>/, the mirror under <year>/samorzad/ (apart from the
+# 2010 presidential files).
+SERVER_PREFIX = {"2002/samorzad/": "2002/", "2006/samorzad/": "2006/", "2010/samorzad/": "2010/"}
 
 
 def file_url(rel_path: str) -> str:

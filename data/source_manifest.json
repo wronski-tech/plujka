@@ -1,4 +1,277 @@
 {
+ "2000/prezydent/gm-kraj2000-proc.xls": {
+  "bytes": 906240,
+  "etag": "\"5412ff1a-dd400\"",
+  "last_modified": "Fri, 12 Sep 2014 14:11:38 GMT",
+  "sha256": "95ef4bc7a1078a786f307fb488e57a26bc2e58f2171eee48b35e1a929bd27b95",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2000/prezydent/gm-kraj2000-proc.xls"
+ },
+ "2000/prezydent/gm-kraj2000.xls": {
+  "bytes": 573952,
+  "etag": "\"5412fbd1-8c200\"",
+  "last_modified": "Fri, 12 Sep 2014 13:57:37 GMT",
+  "sha256": "2128aed5248da21e5935f6e368ef1cfb060ba45c35bfc14c73037471413431de",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2000/prezydent/gm-kraj2000.xls"
+ },
+ "2000/prezydent/prez2000-pow-kraj-proc.xls": {
+  "bytes": 137728,
+  "etag": "\"5412fffc-21a00\"",
+  "last_modified": "Fri, 12 Sep 2014 14:15:24 GMT",
+  "sha256": "6e80bfb24c0cb5f67fa28d5859b31d97ad67c90f51550f1f9514c0795a05c926",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2000/prezydent/prez2000-pow-kraj-proc.xls"
+ },
+ "2000/prezydent/prez2000-pow-kraj.xls": {
+  "bytes": 87040,
+  "etag": "\"5412ff41-15400\"",
+  "last_modified": "Fri, 12 Sep 2014 14:12:17 GMT",
+  "sha256": "8ca0b617b51ffc16a3a675c4d620185b7760ea5350406c118a0ca8327a346aa0",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2000/prezydent/prez2000-pow-kraj.xls"
+ },
+ "2000/prezydent/prez2000obw.xls": {
+  "bytes": 7719936,
+  "etag": "\"3a3a1820-75cc00\"",
+  "last_modified": "Fri, 15 Dec 2000 13:09:52 GMT",
+  "sha256": "e8aa47e9b0610b1ae629200550a71a9e2592bb6d9b69bb9df68398b78029374d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2000/prezydent/prez2000obw.xls"
+ },
+ "2000/prezydent/woj2000-proc.xls": {
+  "bytes": 17920,
+  "etag": "\"541300a5-4600\"",
+  "last_modified": "Fri, 12 Sep 2014 14:18:13 GMT",
+  "sha256": "1d4a9702c8acdd4b50a234c2eab9f0e1d8fd2f4a88d864f729399a6fb8ab3bc7",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2000/prezydent/woj2000-proc.xls"
+ },
+ "2000/prezydent/woj2000.xls": {
+  "bytes": 15872,
+  "etag": "\"497ed167-3e00\"",
+  "last_modified": "Tue, 27 Jan 2009 09:18:31 GMT",
+  "sha256": "d858ceabdc0ae43d5193c467647d13fb4cd287e127f3830afac7812ff724642c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2000/prezydent/woj2000.xls"
+ },
+ "2001/sejm/2001zagrkraj.xlsx": {
+  "bytes": 115232,
+  "etag": "\"5c77de4b-1c220\"",
+  "last_modified": "Thu, 28 Feb 2019 13:12:43 GMT",
+  "sha256": "f5e764f4f5f727611cd3b0962d36c7d9238ce08307fcf62a13f49bcb0fda715f",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/sejm/2001zagrkraj.xlsx"
+ },
+ "2001/sejm/2001zagrobw.xlsx": {
+  "bytes": 200224,
+  "etag": "\"5c77d14d-30e20\"",
+  "last_modified": "Thu, 28 Feb 2019 12:17:17 GMT",
+  "sha256": "400f95abbab508d1e631a8507e578b1a1a329d3c1fea3cdb788f07f0e13192b6",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/sejm/2001zagrobw.xlsx"
+ },
+ "2001/sejm/kandsejm2001kom.xls": {
+  "bytes": 2070528,
+  "etag": "\"5da9a22a-1f9800\"",
+  "last_modified": "Fri, 18 Oct 2019 11:29:46 GMT",
+  "sha256": "adcb3e63bcf202ef0d924339d708ce185687ccbb67242aee580cc6cbbb28d5a4",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/sejm/kandsejm2001kom.xls"
+ },
+ "2001/sejm/okr-lis-2001.xls": {
+  "bytes": 48640,
+  "etag": "\"61ea6950-be00\"",
+  "last_modified": "Fri, 21 Jan 2022 08:05:36 GMT",
+  "sha256": "e83c94581cd94b99485ec0e5eb3f8861574d0d0ac1e99abd9ad90a1fabd26413",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/sejm/okr-lis-2001.xls"
+ },
+ "2001/sejm/okręgi2001sejm.xls": {
+  "bytes": 34304,
+  "etag": "\"55755f76-8600\"",
+  "last_modified": "Mon, 08 Jun 2015 09:25:10 GMT",
+  "sha256": "9f351821dbcc9caded5140780501da58dd339dc60f8c2a8134c5122a62a1aa82",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/sejm/okr%C4%99gi2001sejm.xls"
+ },
+ "2001/sejm/sejm2001-lis-gm-proc.xls": {
+  "bytes": 898560,
+  "etag": "\"5d89f263-db600\"",
+  "last_modified": "Tue, 24 Sep 2019 10:39:31 GMT",
+  "sha256": "68249ad7d82c4ed414957465ae01f0b24df8be5216116823d87bafc039ed1433",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/sejm/sejm2001-lis-gm-proc.xls"
+ },
+ "2001/sejm/sejm2001-lis-gm.xls": {
+  "bytes": 553984,
+  "etag": "\"61c3057b-87400\"",
+  "last_modified": "Wed, 22 Dec 2021 11:01:15 GMT",
+  "sha256": "f40d2f3b821d5085c0c3db546b4d9bf1fb8259eaa4557f95b4d7e220aae5c307",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/sejm/sejm2001-lis-gm.xls"
+ },
+ "2001/sejm/sejm2001-lis-obw-proc.xls": {
+  "bytes": 10770432,
+  "etag": "\"4ad436db-a45800\"",
+  "last_modified": "Tue, 13 Oct 2009 08:14:19 GMT",
+  "sha256": "b0814fe1cc991e37ddf37434d785b9994447ef8cdbf81f7804f5b66709a68b8a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/sejm/sejm2001-lis-obw-proc.xls"
+ },
+ "2001/sejm/sejm2001-lis-obw.xls": {
+  "bytes": 8842240,
+  "etag": "\"4ef32eff-86ec00\"",
+  "last_modified": "Thu, 22 Dec 2011 13:22:07 GMT",
+  "sha256": "50832602f8d06f6c0b95caeb1200641d2285e6948486eaa871abbc4517fb97ce",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/sejm/sejm2001-lis-obw.xls"
+ },
+ "2001/sejm/sejm2001-lis-pow.xls": {
+  "bytes": 98304,
+  "etag": "\"4ad455d6-18000\"",
+  "last_modified": "Tue, 13 Oct 2009 10:26:30 GMT",
+  "sha256": "bb74feec40544bb870a90b62d95c350d392c85ef002eb236a7bec585913ea81e",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/sejm/sejm2001-lis-pow.xls"
+ },
+ "2001/senat/2001-frekw-gm.xls": {
+  "bytes": 338944,
+  "etag": "\"4d9b2522-52c00\"",
+  "last_modified": "Tue, 05 Apr 2011 14:20:18 GMT",
+  "sha256": "28ad523845682582954f3a90729aa8af96ed5240a9f5793ef7fc6e736b5da469",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/senat/2001-frekw-gm.xls"
+ },
+ "2001/senat/2001-kan-sen.xls": {
+  "bytes": 135680,
+  "etag": "\"5cd18047-21200\"",
+  "last_modified": "Tue, 07 May 2019 12:55:35 GMT",
+  "sha256": "c5915c3812d645754350d491245f59530c2357425a799174da314e13172c2dad",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/senat/2001-kan-sen.xls"
+ },
+ "2001/senat/2001senzagrkraj.xlsx": {
+  "bytes": 19329,
+  "etag": "\"5c77e9d1-4b81\"",
+  "last_modified": "Thu, 28 Feb 2019 14:01:53 GMT",
+  "sha256": "54429917cc5b071462652a541075a2b3912f29dcadbcc0d81f32705229004261",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/senat/2001senzagrkraj.xlsx"
+ },
+ "2001/senat/2001senzagrobw.xls": {
+  "bytes": 64512,
+  "etag": "\"5c77e9e3-fc00\"",
+  "last_modified": "Thu, 28 Feb 2019 14:02:11 GMT",
+  "sha256": "c227c00878135e7a222d014b53ec1f685d934645e4341bbd48123aab8d1a2caf",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/senat/2001senzagrobw.xls"
+ },
+ "2001/senat/okręgi2001senat.xls": {
+  "bytes": 33280,
+  "etag": "\"5654596e-8200\"",
+  "last_modified": "Tue, 24 Nov 2015 12:34:54 GMT",
+  "sha256": "6f1f957dc02758128bef0c2fbbcd68e5a69ab14f7e6e6fd5b862d11c9e96c841",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/senat/okr%C4%99gi2001senat.xls"
+ },
+ "2001/senat/parl2001OBWSEN.zip": {
+  "bytes": 2198861,
+  "etag": "\"3bc2f650-218d4d\"",
+  "last_modified": "Tue, 09 Oct 2001 13:06:24 GMT",
+  "sha256": "f380fe8d7ad1514d0719ef36d5511cf1aeccf395e7d36c9b38731e0431a472d5",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2001/senat/parl2001OBWSEN.zip"
+ },
+ "2002/samorzad/2002-frekwencja-i-nieważne-gminy.xls": {
+  "bytes": 985088,
+  "etag": "\"63514261-f0800\"",
+  "last_modified": "Thu, 20 Oct 2022 12:43:13 GMT",
+  "sha256": "6163fd37c49a14b99b9fec36b9b15f70fd8e28f879e4a2666c80f7dfb0e05810",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/2002-frekwencja-i-niewa%C5%BCne-gminy.xls"
+ },
+ "2002/samorzad/2002-kand-rady.xlsx": {
+  "bytes": 26982595,
+  "etag": "\"62065212-19bb8c3\"",
+  "last_modified": "Fri, 11 Feb 2022 12:09:54 GMT",
+  "sha256": "f88a886d1ba869b5cf19d459c94a870f82e37123b763c4e798659abfb0cb289b",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/2002-kand-rady.xlsx"
+ },
+ "2002/samorzad/rada_powiatu/samo2002pow-kand-obw.zip": {
+  "bytes": 11676029,
+  "etag": "\"61dc253b-b2297d\"",
+  "last_modified": "Mon, 10 Jan 2022 12:23:23 GMT",
+  "sha256": "ef029acbd63dcb355b80ed4f73805419ad4d759602c1c57742c22f8e7b599f29",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/rada_powiatu/samo2002pow-kand-obw.zip"
+ },
+ "2002/samorzad/rada_powiatu/samo2002pow-listy.xls": {
+  "bytes": 1127936,
+  "etag": "\"649598fd-113600\"",
+  "last_modified": "Fri, 23 Jun 2023 13:07:09 GMT",
+  "sha256": "bf6b5438dbe37b1aae18fddbe9391d06d9fda594ad812ea8f94bc3ddb613af40",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/rada_powiatu/samo2002pow-listy.xls"
+ },
+ "2002/samorzad/rada_powiatu/samo2002pow-stat.xls": {
+  "bytes": 67072,
+  "etag": "\"42b17d74-10600\"",
+  "last_modified": "Thu, 16 Jun 2005 13:24:04 GMT",
+  "sha256": "0d85d78afcf2d92429ba711b74a294fa527147b92fc8b700795ed2524c37b55c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/rada_powiatu/samo2002pow-stat.xls"
+ },
+ "2002/samorzad/rada_powiatu/samo2002powiaty-okręgi.doc": {
+  "bytes": 889856,
+  "etag": "\"3fd89e9f-d9400\"",
+  "last_modified": "Thu, 11 Dec 2003 16:43:11 GMT",
+  "sha256": "fc8844f1f35e6ed1e9413f184ca1183c32c334522f1e41ecf1e295437e05b1db",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/rada_powiatu/samo2002powiaty-okr%C4%99gi.doc"
+ },
+ "2002/samorzad/samo2002gminy.xlsx": {
+  "bytes": 106743,
+  "etag": "\"6495831f-1a0f7\"",
+  "last_modified": "Fri, 23 Jun 2023 11:33:51 GMT",
+  "sha256": "ef3cf032e83a062a1850a0655bc43da0f727c0f9a6adddfbbe98a8a0b66fdf0d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/samo2002gminy.xlsx"
+ },
+ "2002/samorzad/sejmik/2002sejmiki-kand-obw.zip": {
+  "bytes": 16172587,
+  "etag": "\"61dc2540-f6c62b\"",
+  "last_modified": "Mon, 10 Jan 2022 12:23:28 GMT",
+  "sha256": "b413bb8b1f5e5ae7a70f2ea04ad3f84c29529c72a10b4cc7ed097a02932e4260",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/sejmik/2002sejmiki-kand-obw.zip"
+ },
+ "2002/samorzad/sejmik/samo2002-sej-kom-obw.xlsx": {
+  "bytes": 7410376,
+  "etag": "\"64944e82-7112c8\"",
+  "last_modified": "Thu, 22 Jun 2023 13:37:06 GMT",
+  "sha256": "621fc14d05489fee625456471de61fdafdad856670a1aa0899f15b713103d4e8",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/sejmik/samo2002-sej-kom-obw.xlsx"
+ },
+ "2002/samorzad/sejmik/samo2002sejmiki-okręgi.zip": {
+  "bytes": 553035,
+  "etag": "\"64944c4a-8704b\"",
+  "last_modified": "Thu, 22 Jun 2023 13:27:38 GMT",
+  "sha256": "1c74a84b37f8bfa6a10f9a6dc588baac7cbc00baba45f1cccc29b512769ccafc",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/sejmik/samo2002sejmiki-okr%C4%99gi.zip"
+ },
+ "2002/samorzad/wbp/samo2002_II_tura.zip": {
+  "bytes": 2263630,
+  "etag": "\"64957779-228a4e\"",
+  "last_modified": "Fri, 23 Jun 2023 10:44:09 GMT",
+  "sha256": "1373cbe4b0356325dae4853b2ba5261593698f8ab5540c3b65e0252a24780e09",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/wbp/samo2002_II_tura.zip"
+ },
+ "2002/samorzad/wbp/samo2002_I_tura.zip": {
+  "bytes": 4706909,
+  "etag": "\"64957740-47d25d\"",
+  "last_modified": "Fri, 23 Jun 2023 10:43:12 GMT",
+  "sha256": "189719eb0308f554e5e2c21a015f5527d49a0ff08b52aa15268ebd15618124c6",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/wbp/samo2002_I_tura.zip"
+ },
+ "2002/samorzad/wbp/wbp2002.zip": {
+  "bytes": 1058749,
+  "etag": "\"61c35a43-1027bd\"",
+  "last_modified": "Wed, 22 Dec 2021 17:02:59 GMT",
+  "sha256": "cc5114a5f56a7afe0d41dc347a9370117f9fc1153c08722ae0a46269bf174a22",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2002/wbp/wbp2002.zip"
+ },
+ "2003/referendum/prot-gm.xls": {
+  "bytes": 472576,
+  "etag": "\"62136787-73600\"",
+  "last_modified": "Mon, 21 Feb 2022 10:20:55 GMT",
+  "sha256": "026b700036d99a072fbc302654451729457c92b008c69b496c4ece13471a72af",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2003/referendum/prot-gm.xls"
+ },
+ "2003/referendum/prot-obw.xls": {
+  "bytes": 6191104,
+  "etag": "\"62136782-5e7800\"",
+  "last_modified": "Mon, 21 Feb 2022 10:20:50 GMT",
+  "sha256": "8eb86692cc656e02a47461366374ad41a18f8e76751e223ae9948ee95c0eab41",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2003/referendum/prot-obw.xls"
+ },
+ "2003/referendum/prot-pow.xls": {
+  "bytes": 65536,
+  "etag": "\"6213678c-10000\"",
+  "last_modified": "Mon, 21 Feb 2022 10:21:00 GMT",
+  "sha256": "a78a1d697dbee52e8131c6ff9b0678b9ac98eed17f97c231d3d46593015131ee",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2003/referendum/prot-pow.xls"
+ },
  "2004/parlament_eu/pe2004-kand.xls": {
   "bytes": 559616,
   "etag": "\"5c49c397-88a00\"",
@@ -173,6 +446,69 @@
   "last_modified": "Fri, 21 Jan 2022 09:42:04 GMT",
   "sha256": "403e85ce433d69b8974622930f7be93f3f83ca62521d0094f80958063661d2ed",
   "url": "https://danewyborcze.kbw.gov.pl/dane/2005/senat/senat2005zbiorcze.xls"
+ },
+ "2006/samorzad/2006-frekw-wbp-gm.xls": {
+  "bytes": 749056,
+  "etag": "\"5b7fd68e-b6e00\"",
+  "last_modified": "Fri, 24 Aug 2018 09:57:34 GMT",
+  "sha256": "0c532cef778201cf0e54bf5baaf101f98a21d1a00af06a37723900737865dffc",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2006/2006-frekw-wbp-gm.xls"
+ },
+ "2006/samorzad/2006-frekwencja-i-nieważne-gminy.xls": {
+  "bytes": 939008,
+  "etag": "\"54ae7f2d-e5400\"",
+  "last_modified": "Thu, 08 Jan 2015 12:59:25 GMT",
+  "sha256": "751090cea6b6b42c35b6911b4f31eb874a89408f700e2877e47f65faa36f9c23",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2006/2006-frekwencja-i-niewa%C5%BCne-gminy.xls"
+ },
+ "2006/samorzad/2006-kand-rady-new.xlsx": {
+  "bytes": 33768304,
+  "etag": "\"62064f31-2034370\"",
+  "last_modified": "Fri, 11 Feb 2022 11:57:37 GMT",
+  "sha256": "3f1af334aa753c2e312e4dc9d4996f5306643f9d51bd94b90d4264c66f9bae35",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2006/2006-kand-rady-new.xlsx"
+ },
+ "2006/samorzad/samo2006obw.xlsx": {
+  "bytes": 1387194,
+  "etag": "\"63cfda40-152aba\"",
+  "last_modified": "Tue, 24 Jan 2023 13:16:48 GMT",
+  "sha256": "372c0414f2abe035366c152f4aad6a9ff771ec5cdf9ac6e018102402a0dcc314",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2006/samo2006obw.xlsx"
+ },
+ "2006/samorzad/sejmik/2006.zip": {
+  "bytes": 4480686,
+  "etag": "\"61c353e9-445eae\"",
+  "last_modified": "Wed, 22 Dec 2021 16:35:53 GMT",
+  "sha256": "eb013e055409ffb161fe27fa230f4bc1baecfcfe1f0d48712a4c5db2916e5d91",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2006/sejmik/2006.zip"
+ },
+ "2006/samorzad/sejmik/kand.txt": {
+  "bytes": 9883293,
+  "etag": "\"46665c27-96ce9d\"",
+  "last_modified": "Wed, 06 Jun 2007 07:03:03 GMT",
+  "sha256": "14bdb9f0fda7db749ebb7be5fce11694e0c4afc031c90b19d89e03900f3d5f4c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2006/sejmik/kand.txt"
+ },
+ "2006/samorzad/sejmik/sejmik-kand-obw.txt": {
+  "bytes": 126418839,
+  "etag": "\"46665c43-788ff97\"",
+  "last_modified": "Wed, 06 Jun 2007 07:03:31 GMT",
+  "sha256": "5836f82863f75ada45236c6c88ab64c4710f515a476d6d5fb46173cc04b297d1",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2006/sejmik/sejmik-kand-obw.txt"
+ },
+ "2006/samorzad/wbp/samo2006-wbp-obw.xlsx": {
+  "bytes": 12762489,
+  "etag": "\"63cfe469-c2bd79\"",
+  "last_modified": "Tue, 24 Jan 2023 14:00:09 GMT",
+  "sha256": "43e19969e9309017b5d8c7c71f2ada16726174082f0febe7c5a4030951727117",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2006/wbp/samo2006-wbp-obw.xlsx"
+ },
+ "2006/samorzad/wbp/wbp2006.zip": {
+  "bytes": 1014240,
+  "etag": "\"61c35b4f-f79e0\"",
+  "last_modified": "Wed, 22 Dec 2021 17:07:27 GMT",
+  "sha256": "e038b7d591639acb24781e517230ef158888ff6d515ec2d9799f202fb4dc26b7",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/2006/wbp/wbp2006.zip"
  },
  "2007/sejm/kandsejm2007.xls": {
   "bytes": 1776128,

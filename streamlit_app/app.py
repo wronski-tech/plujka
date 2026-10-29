@@ -4,10 +4,7 @@ import hashlib
 import json
 import math
 import os
-import unicodedata
 from datetime import timedelta
-from functools import lru_cache
-from pathlib import Path
 
 import altair as alt
 import pandas as pd
@@ -15,12 +12,12 @@ import pydeck as pdk
 import requests
 import streamlit as st
 
+from map_units import boundaries, feature_key, is_osm, unit_values, visible_features
+
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 # Sent as X-API-Key when the API requires keys (API_KEYS on the API side).
 API_KEY = os.getenv("PLUJKA_API_KEY", "")
 API_HEADERS = {"X-API-Key": API_KEY} if API_KEY else {}
-# Simplified boundaries keyed by TERYT (see streamlit_app/geo/README.md).
-GEO_DIR = Path(__file__).resolve().parent / "geo"
 # Result column that identifies a unit -> boundary file (gminy/powiaty by TERYT, voivodeships by name).
 MAP_LEVELS = (("teryt_gmina", "gminy"), ("teryt_powiat", "powiaty"), ("wojewodztwo", "wojewodztwa"))
 # Charts and maps are drawn only for results that fit on screen.
@@ -133,17 +130,6 @@ def _value_column(rows: list[dict]) -> str | None:
     return numeric[0] if numeric else None
 
 
-def _fold(text: str) -> str:
-    """Lowercase without Polish diacritics (for matching voivodeship names)."""
-    return unicodedata.normalize("NFKD", text.lower().replace("ł", "l")).encode("ascii", "ignore").decode()
-
-
-@lru_cache(maxsize=3)
-def _boundaries(level: str) -> dict:
-    """GeoJSON FeatureCollection for ``gminy``, ``powiaty`` or ``wojewodztwa``."""
-    return json.loads((GEO_DIR / f"{level}.json").read_text(encoding="utf-8"))
-
-
 def _render_chart(rows: list[dict]) -> None:
     """Horizontal bar chart when each row is one labelled unit with a number (e.g. results by party)."""
     if not 2 <= len(rows) <= MAX_CHART_ROWS:
@@ -200,16 +186,19 @@ def _render_map(rows: list[dict]) -> None:
             break
     else:
         return
-    key = _fold if level == "wojewodztwa" else str
-    values = {key(r[column]): r[value] for r in rows if r.get(value) is not None}
-    if not values:
+    # Old TERYT codes are mapped to current units; Warsaw, split gminas and changed powiats use their former
+    # extent when the result describes the old layout.
+    values, merged, skipped = unit_values(rows, column, value, level)
+    years = {r["year"] for r in rows if isinstance(r.get("year"), int)}
+    shown = visible_features(boundaries(level)["features"], set(values) | set(skipped), years)
+    drawn = [values[k] for k in (feature_key(f["properties"], level) for f in shown) if k in values]
+    if not drawn:
         return
-    low, high = min(values.values()), max(values.values())
-    geo = _boundaries(level)
+    low, high = min(drawn), max(drawn)
     features, matched_points = [], []
-    for feature in geo["features"]:
+    for feature in shown:
         props = feature["properties"]
-        found = values.get(key(props["name"] if level == "wojewodztwa" else props["teryt"]))
+        found = values.get(feature_key(props, level))
         if found is None:
             fill = [226, 232, 240, 90]
         else:
@@ -238,6 +227,20 @@ def _render_map(rows: list[dict]) -> None:
         use_container_width=True,
     )
     st.caption(f"Kolor: {value} (jaśniej {low:g} → ciemniej {high:g}). Szare jednostki nie występują w wyniku.")
+    if any(is_osm(f) for f in shown):
+        st.caption("© OpenStreetMap contributors (ODbL)")
+    names = {feature_key(f["properties"], level): f["properties"]["name"] for f in shown}
+    if merged:
+        st.caption(
+            "Dawne jednostki zsumowane w obecnych granicach: "
+            + ", ".join(f"{names.get(code, code)} ({count})" for code, count in merged.items()) + "."
+        )
+    if skipped:
+        st.caption(
+            f"Pominięto (szare), bo kilka dawnych jednostek leży w jednej obecnej, a wartości {value} "
+            "nie da się zsumować: "
+            + ", ".join(names.get(code, code) for code in skipped) + "."
+        )
 
 
 def _code_columns(rows: list[dict]) -> dict:

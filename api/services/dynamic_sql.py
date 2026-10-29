@@ -54,6 +54,9 @@ SQL_RULES = f"""Rules:
 - Comparisons across elections: mart.v_turnout (turnout of every election), mart.v_party_results
   and mart.v_party_change (party families; return the comparable column so the answer can say
   when the committees differed). Join units by teryt_gmina / teryt_powiat / wojewodztwo.
+- Seats under another method or threshold ("co gdyby"): mart.v_seat_methods (Sejm, sejmik), or
+  mart.allocate_seats(array_agg(votes ORDER BY committee_id), <district seats>, 'dhondt' | 'sainte_lague' |
+  'sainte_lague_modified') per district over the lists that pass the chosen threshold, then sum.
 - Percentages in the mart are already 0-100. Order results deterministically.
 - Include LIMIT {MART_MAX_ROWS} or less.
 Return JSON: {{"sql": "..."}}"""
@@ -138,9 +141,11 @@ FAMILY_KEYWORDS: dict[str, tuple[str, ...]] = {
     r"samorzad": ("sejmik_", "v_sejmik_", "wbp_", "rada_", "v_rada_"),
     r"wojt|burmistrz|mayor": ("wbp_",),
     r"\brad(a|y|e|zie|ach|ami)\b|radn": ("rada_", "v_rada_"),
+    r"hondt|sainte|lague|metod|podzial\w* mandat|gdyby": ("v_seat_", "sejm_district", "sejmik_district", "rada_district"),
 }
 SHARED_RELATIONS = (
     "elections", "persons", "v_person_history", "v_turnout", "v_party_results", "v_party_change", "v_gmina_continuity",
+    "party_families",
 )
 
 

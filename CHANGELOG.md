@@ -9,10 +9,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Mart: local elections 2002 and 2006 (sejmiki, mayors, councils), reconciled with PKW; 2006 list blocs (`list_group`, scraped from PKW's results pages into `data/pkw_html/list_groups_2006.csv`). The seat check allocates in two stages (lists and blocs, then inside a bloc) and covers 2002's thresholds.
+- Mart: Sejm and Senate 2001, president 2000 and the 2003 EU accession referendum, reconciled with PKW (turnout from ballots issued for 2000/2001). Staging keeps a group row that names a single list (Excel). Committee aliases for AWS(P) and the 2001 Samoobrona spelling.
+- UI maps: old TERYT codes are mapped to current units (`streamlit_app/geo/teryt_changes.json`: Wałbrzych 2004–2012, Rejowiec 2004–2005, gmina Zielona Góra 2004–2014); votes are summed where old units merged, percentages are skipped with a caption. Warsaw is drawn as 18 districts, or as one unit when a result only has 146501. Szczawa and Grabówka (2025) are added, with their parent gminas' pre-2025 outlines for older results. District and 2025 polygons © OpenStreetMap contributors (ODbL).
+- Turnout as PKW computed it: `v_turnout` / `v_sejm_turnout` gain `ballots_issued` and `turnout_basis` (ballots issued for Sejm/Senate 2005 and 2007, president 2005 and 2010); the turnout caveats for those years are gone.
+- Seat allocation: `mart.allocate_seats(votes, seats, method)` (D'Hondt, Sainte-Laguë, modified Sainte-Laguë), `v_seat_methods` (Sejm and sejmik seats per method), and a build check that recomputes every Sejm, sejmik and proportional council district (exact ties logged).
+- Party lineages: `PARTY_FAMILIES` covers Nowoczesna, Solidarna Polska, Polska Razem, Wiosna, KORWiN/KNP/RN and UW/PD; queryable as `mart.party_families` with a note per alias.
+- Persons: residence text of pre-2019 national candidates is mapped to a powiat through place names published with a TERYT since 2019, so more local candidacies reach the right national namesake.
 - Year-specific committee alias rules (`YEAR_COMMITTEE_ALIASES`): the 2010 sejmik and council committee "KOALICYJNY KOMITET WYBORCZY LEWICA" is `KKW Lewica`, no longer counted with SLD in the Lewica family.
 - Mart: Sejm and Senate 2005/2007, president 2005 (both rounds) and European Parliament 2004/2009 (gmina level), reconciled with PKW; `residence_teryt` for national candidates (published from 2019), used to link local candidacies to one of several national namesakes living in the same powiat; committee aliases for LiD, Samoobrona, LPR, SDPL, PD, UW, UPR, OKO, KROB and the 2010 German minority (TSKN); the `SKUTECZNI` needle narrowed to `SKUTECZNI PIOTRA`.
 - Local persons: mayors, councillors and sejmik candidates without a national candidacy are linked across elections by name, gender, birth year and powiat (or voivodeship); runs containing one national person join that person.
-- Answer caveats (`answer.caveats`): fixed notes about data gaps (non-comparable party changes, approximate council list totals, president 2010, Sejm 2005/2007, president 2005 and EP 2014 turnout, presidential precinct sums, person linking), shown under the answer.
+- Answer caveats (`answer.caveats`): fixed notes about data gaps (non-comparable party changes, approximate council list totals, EP 2014 turnout, presidential precinct sums, person linking), shown under the answer.
 - Daily OpenAI token budget per API key or IP (`DAILY_TOKEN_LIMIT_PER_CLIENT`, shared through Redis).
 - Security tests: attack list and seeded fuzzer for the SQL guard; previous-turn SQL is never executed.
 - CI `compose` job (build all images, start the stack, smoke-test `/health`, `/ask` and the UI); release workflow for `v*` tags with notes from CHANGELOG.

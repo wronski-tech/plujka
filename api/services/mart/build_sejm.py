@@ -8,9 +8,9 @@ Three source layouts are supported:
   candidate votes), ``2015-kand-sejm.xls``, ``obwody2015parl.xlsx`` and ``2015-gl-lis-pow`` (powiat names).
 - 2011 layout: one precinct file with list votes, one candidate file per district and registers
   (see ``_build_2011_layout``).
-- 2005/2007 layout: one precinct file with list votes, the candidate register with official votes,
+- 2001/2005/2007 layout: one precinct file with list votes, the candidate register with official votes,
   the district table and, in 2007 only, one candidate file per district and list (see
-  ``_build_2005_layout``). 2005 has no per-precinct candidate results.
+  ``_build_2005_layout``). 2001 and 2005 have no per-precinct candidate results.
 
 All produce the same DuckDB tables, named like the PostgreSQL mart tables (``precincts`` keeps an
 extra ``pkey`` column used to join the per-precinct files).
@@ -44,12 +44,15 @@ from api.services.mart.build_common import (
     python_name_key,
     quote_ident,
     run_checks,
+    sql_list,
     sql_literal,
 )
 from api.services.mart.build_precincts import (
     COMBINED_PRECINCTS,
+    PRECINCT_TYPES_2001,
     PRECINCT_TYPES_2005,
     create_warsaw_districts,
+    create_warsaw_gminas_2001,
     rows_without_number,
 )
 
@@ -61,11 +64,13 @@ EXCEL_DISTRICT_RESULTS = "**/sejm/wyniki_okr_sejm/*.parquet"
 LIST_RESULTS_2011 = "**/sejmsenat/*-sejm-gl-lis-obw.parquet"
 CANDIDATE_RESULTS_2011 = "**/sejmsenat/*-sejm-kand-obw/*.parquet"
 LIST_RESULTS_2005 = "**/sejm/sejm*-lis-obw/*.parquet"
+LIST_RESULTS_2001 = "**/sejm/sejm*-lis-obw.parquet"
 LIST_RESULTS_2007 = "**/sejm/sejm*-obw-listy.parquet"
 CANDIDATE_RESULTS_2007 = "**/sejm/sejm*-kand-obw/*.parquet"
 # Senate district of each precinct: 2005 per gmina, 2007 from the Senate per-precinct files.
 SENATE_GMINAS_2005 = "**/*-parl-frekw-gm.parquet"
 SENATE_RESULTS_2007 = "**/senat/parl*-sen-gl_kand_obw/*.parquet"
+SENATE_RESULTS_2001 = "**/senat/parl*OBWSEN/*.parquet"
 
 PROTOCOL_ALIASES = {
     "eligible_voters": (
@@ -92,6 +97,10 @@ PROTOCOL_ALIASES = {
 PROTOCOL_ALIASES["eligible_voters"] += ("Uprawnieni do głosowania", "Upr.")
 PROTOCOL_ALIASES["ballots_issued"] += ("Karty wydane (frekwencja)", "Frekw.")
 PROTOCOL_ALIASES["valid_ballots"] += ("Karty ważne (głosy oddane)", "Odd.")
+# 2001 headers ('Karty ważne' is already an alias of valid ballots).
+PROTOCOL_ALIASES["ballots_issued"] += ("Wydane karty (frekwencja)",)
+PROTOCOL_ALIASES["invalid_votes"] += ("Głosy nieważne z kart ważnych",)
+PROTOCOL_ALIASES["valid_votes"] += ("Głosy ważne z kart ważnych",)
 
 # TERYT 'rodzaj gminy' codes used by the 2011 precinct file ('Teren obw.'), worded like the 2015 register.
 AREA_TYPES_2011 = {
@@ -109,7 +118,7 @@ def available_layout(sources: YearSources) -> str | None:
         return "excel"
     if sources.has(LIST_RESULTS_2011):
         return "2011"
-    if sources.has(LIST_RESULTS_2005) or sources.has(LIST_RESULTS_2007):
+    if sources.has(LIST_RESULTS_2005) or sources.has(LIST_RESULTS_2007) or sources.has(LIST_RESULTS_2001):
         return "2005"
     return None
 
@@ -141,8 +150,8 @@ def build_sejm(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
         GROUP BY ALL
         """
     )
-    # 2005 publishes no per-precinct candidate results.
-    _check(con, sources.year, candidate_precincts=not sources.has(LIST_RESULTS_2005))
+    # 2001 and 2005 publish no per-precinct candidate results.
+    _check(con, sources.year, candidate_precincts=not (sources.has(LIST_RESULTS_2005) or sources.has(LIST_RESULTS_2001)))
 
 
 def _protocol_select(con: duckdb.DuckDBPyConnection, table: str) -> str:
@@ -617,58 +626,73 @@ def _build_2011_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> 
 
 
 def _build_2005_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
-    """2005 and 2007 KBW workbooks.
+    """2001, 2005 and 2007 KBW workbooks.
 
-    ``sejm2005-lis-obw`` / ``sejm2007-obw-listy`` (precincts, protocol, list votes as ``'<list no> -
-    <name>'``), ``kandsejm<year>`` (candidates with official votes), ``okregi2005sejm`` /
-    ``okręgi2007sejm`` (seat city, seats, boundaries). Official list votes per district come from the
-    register's ``'Gł. na listę'`` (2005) or the gmina table ``sejm2007-gm-listy`` (2007). Only 2007 has
+    ``sejm2001-lis-obw`` / ``sejm2005-lis-obw`` / ``sejm2007-obw-listy`` (precincts, protocol, list votes
+    as ``'<list no> - <name>'``), ``kandsejm<year>`` (candidates with official votes), ``okręgi2001sejm``
+    / ``okregi2005sejm`` / ``okręgi2007sejm`` (seat city, seats, boundaries; 2001 continues a boundary
+    description on the rows below). Official list votes per district come from the register's
+    ``'Gł. na listę'`` (2001, 2005) or the gmina table ``sejm2007-gm-listy`` (2007). Only 2007 has
     per-precinct candidate votes: ``sejm2007-kand-obw/kandsejmobw-2007-DD-LL`` (district DD, list LL).
     List numbers are national, except that in 2005 number 19 belongs to a different committee in each
-    district that has one, so list columns are mapped per (district, list number).
+    district that has one, so list columns are mapped per (district, list number). 2001 uses the
+    pre-2002 Warsaw gminas (``WARSAW_GMINAS_2001``); the precinct key keeps their codes, which the
+    2001 Senate files use too.
     """
     year = sources.year
-    results = sources.load("sejm_results", LIST_RESULTS_2005 if sources.has(LIST_RESULTS_2005) else LIST_RESULTS_2007)
+    layout_2001 = sources.has(LIST_RESULTS_2001)
+    results = sources.load(
+        "sejm_results", next(p for p in (LIST_RESULTS_2005, LIST_RESULTS_2001, LIST_RESULTS_2007) if sources.has(p))
+    )
     candidates_src = sources.load("sejm_candidates", "**/sejm/kandsejm*.parquet")
     districts_src = sources.load("districts", "**/sejm/okr*sejm.parquet")
     create_warsaw_districts(con)
-    r_district = column(con, results, "Nr okręgu", "Okręg")
-    r_teryt = column(con, results, "TERYT", "Kod gm.")
+    create_warsaw_gminas_2001(con)
+    r_district = column(con, results, "Nr okręgu", "Okręg", "Nr okr.")
+    r_teryt = column(con, results, "TERYT", "Kod gm.", "Kod gminy")
     r_number = column(con, results, "Numer obwodu", "Nr obw.")
     r_area = column(con, results, "7-ma cyfra TERYT", "Teren")
     r_type = column(con, results, "Typ obwodu", "Typ")
     con.execute(
         f"""
         CREATE OR REPLACE TABLE src_sejm_precincts AS
-        SELECT r.*, lpad(trim(r.{r_teryt}), 6, '0') AS teryt_raw, coalesce(w.teryt, lpad(trim(r.{r_teryt}), 6, '0')) AS teryt_fixed,
-               coalesce(w.gmina, r."Gmina") AS gmina_name, w.letter IS NOT NULL AS warsaw_letter
+        SELECT r.*, lpad(trim(r.{r_teryt}), 6, '0') AS teryt_raw,
+               coalesce(w.teryt, w1.teryt, lpad(trim(r.{r_teryt}), 6, '0')) AS teryt_fixed,
+               -- Precinct key: 2001 Warsaw precincts keep their pre-2002 code (numbers are unique per old gmina).
+               coalesce(w.teryt, lpad(trim(r.{r_teryt}), 6, '0')) AS teryt_key,
+               coalesce(w.gmina, w1.gmina, r."Gmina") AS gmina_name, w.letter IS NOT NULL AS warsaw_letter,
+               w1.letter IS NOT NULL AS centrum_letter_2001
         FROM {results} r
         LEFT JOIN warsaw_districts_2005 w ON lpad(trim(r.{r_teryt}), 6, '0') = '146501' AND w.letter = trim(r.{r_area})
+        LEFT JOIN warsaw_gminas_2001 w1 ON {year} < 2002 AND w1.old_teryt = lpad(trim(r.{r_teryt}), 6, '0')
+          AND (w1.letter IS NULL OR w1.letter = trim(r.{r_area}))
         """
     )
-    # Senate district of each precinct: per gmina in 2005, from the Senate per-precinct files in 2007.
+    # Senate district of each precinct: per gmina in 2005, from the Senate per-precinct files in 2001/2007.
     con.execute("CREATE OR REPLACE TABLE senate_district_of (key VARCHAR, senat_district_no INT)")
     senate_key = "NULL"
     if sources.has(SENATE_GMINAS_2005):
         gminas = sources.load("senate_gminas", SENATE_GMINAS_2005)
         con.execute(f"""INSERT INTO senate_district_of SELECT lpad(trim("TERYT"), 6, '0'), int_("Nr okr. - Senat") FROM {gminas}""")
         senate_key = "r.teryt_raw"
-    elif sources.has(SENATE_RESULTS_2007):
-        for district, path in district_files(sources.files(SENATE_RESULTS_2007), r"obw-(\d+)__").items():
+    elif sources.has(SENATE_RESULTS_2007) or sources.has(SENATE_RESULTS_2001):
+        pattern, regex = (SENATE_RESULTS_2001, r"^SENOBW(\d+)__") if layout_2001 else (SENATE_RESULTS_2007, r"obw-(\d+)__")
+        for district, path in district_files(sources.files(pattern), regex).items():
             source = f"read_parquet({sql_literal(path)}, hive_partitioning = false)"
             con.execute(
-                f"INSERT INTO senate_district_of SELECT DISTINCT pkey({column(con, source, 'TERYT')}, {column(con, source, 'Nr obwodu')}), "
-                f"{district} FROM {source}"
+                f"INSERT INTO senate_district_of SELECT DISTINCT pkey({column(con, source, 'TERYT', 'Kod gminy')}, "
+                f"{column(con, source, 'Nr obwodu', 'Nr obw.')}), {district} FROM {source}"
             )
-        senate_key = f"pkey(r.teryt_fixed, r.{r_number})"
+        senate_key = f"pkey(r.teryt_key, r.{r_number})"
     area_cases = " ".join(f"WHEN {sql_literal(code)} THEN {sql_literal(name)}" for code, name in AREA_TYPES_2011.items())
-    type_cases = " ".join(f"WHEN {sql_literal(code)} THEN {sql_literal(name)}" for code, name in PRECINCT_TYPES_2005.items())
+    precinct_types = PRECINCT_TYPES_2001 if layout_2001 else PRECINCT_TYPES_2005
+    type_cases = " ".join(f"WHEN {sql_literal(code)} THEN {sql_literal(name)}" for code, name in precinct_types.items())
     con.execute(
         f"""
         CREATE OR REPLACE TABLE precincts AS
         SELECT {year} AS year,
                CAST(row_number() OVER (ORDER BY clean_teryt(r.teryt_fixed) NULLS LAST, r.gmina_name, int_(r.{r_number})) AS INT) AS precinct_id,
-               pkey(r.teryt_fixed, r.{r_number}) AS pkey,
+               pkey(r.teryt_key, r.{r_number}) AS pkey,
                clean_teryt(r.teryt_fixed) AS teryt_gmina,
                r.gmina_name AS gmina,
                CASE WHEN clean_teryt(r.teryt_fixed) IS NOT NULL THEN r."Powiat" END AS powiat,
@@ -678,8 +702,10 @@ def _build_2005_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> 
                CAST(int_(r.{r_number}) AS INT) AS precinct_no,
                r.{column(con, results, "Adres obwodu", "Adres")} AS address,
                CASE trim(r.{r_type}) {type_cases} END AS precinct_type,
-               CASE WHEN r.warsaw_letter THEN {sql_literal(AREA_TYPES_2011["8"])} ELSE CASE trim(r.{r_area}) {area_cases} END END
-                 AS area_type,
+               -- 2001: Warszawa-Centrum, whose districts the letter names, was an urban gmina.
+               CASE WHEN r.warsaw_letter THEN {sql_literal(AREA_TYPES_2011["8"])}
+                    WHEN r.centrum_letter_2001 THEN {sql_literal(AREA_TYPES_2011["1"])}
+                    ELSE CASE trim(r.{r_area}) {area_cases} END END AS area_type,
                CAST(NULL AS INT) AS residents,
                true AS in_register
         FROM src_sejm_precincts r
@@ -690,15 +716,21 @@ def _build_2005_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> 
         f"""
         CREATE OR REPLACE TABLE sejm_precinct_protocols AS
         SELECT {year} AS year, p.precinct_id, {_protocol_select(con, "src_sejm_precincts")}
-        FROM src_sejm_precincts r JOIN precincts p ON p.pkey = pkey(r.teryt_fixed, r.{r_number})
+        FROM src_sejm_precincts r JOIN precincts p ON p.pkey = pkey(r.teryt_key, r.{r_number})
         """
     )
 
     k_district = column(con, candidates_src, "Nr okr.", "Okręg")
+    k_list = column(con, candidates_src, "Nr listy", "Lista")
     k_position = column(con, candidates_src, "Pozycja", "Nr kand.")
+    # 2001 publishes the first and the second given name in two columns.
+    if column(con, candidates_src, "Imiona", required=False):
+        first_names = 'trim(k."Imiona")'
+    else:
+        first_names = """concat_ws(' ', NULLIF(trim(k."1. imię"), ''), NULLIF(trim(k."2. imię"), ''))"""
     k_party = column(con, candidates_src, "Partia", required=False)
     k_support = column(con, candidates_src, "Poparcie", required=False)
-    # 2005 publishes the list and district totals next to each candidate, 2007 the percentages.
+    # 2001 and 2005 publish the list and district totals next to each candidate, 2007 the percentages.
     k_list_total = column(con, candidates_src, "Gł. na listę", required=False)
     if k_list_total:
         pct_of_list = f"""CAST(round(100.0 * int_(k."Głosy") / NULLIF(int_(k.{k_list_total}), 0), 2) AS DECIMAL(6, 2))"""
@@ -709,20 +741,20 @@ def _build_2005_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> 
         pct_of_district = pct_expr(con, candidates_src, '"% w okręgu"')
     _committee_table(
         con, year,
-        f'SELECT strip_signature("Komitet wyborczy") AS committee_name, min(int_("Nr listy")) AS min_list FROM {candidates_src} GROUP BY 1',
+        f'SELECT strip_signature("Komitet wyborczy") AS committee_name, min(int_({k_list})) AS min_list FROM {candidates_src} GROUP BY 1',
     )
     con.execute(
         f"""
         CREATE OR REPLACE TABLE sejm_candidates AS
         SELECT {year} AS year,
-               CAST(row_number() OVER (ORDER BY int_(k.{k_district}), int_(k."Nr listy"), int_(k.{k_position})) AS INT) AS candidate_id,
+               CAST(row_number() OVER (ORDER BY int_(k.{k_district}), int_(k.{k_list}), int_(k.{k_position})) AS INT) AS candidate_id,
                CAST(int_(k.{k_district}) AS INT) AS district_no,
                c.committee_id,
-               CAST(int_(k."Nr listy") AS INT) AS list_no,
+               CAST(int_(k.{k_list}) AS INT) AS list_no,
                CAST(int_(k.{k_position}) AS INT) AS list_position,
-               trim(k."Imiona") || ' ' || upper(trim(k."Nazwisko")) AS full_name,
+               {first_names} || ' ' || upper(trim(k."Nazwisko")) AS full_name,
                upper(trim(k."Nazwisko")) AS last_name,
-               trim(k."Imiona") AS first_names,
+               {first_names} AS first_names,
                gender_(k."Płeć") AS gender,
                k."Zawód" AS occupation,
                k."Miejsce zamieszkania" AS residence,
@@ -748,7 +780,7 @@ def _build_2005_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> 
             """
         )
         list_totals_differ = f"""
-            SELECT count(*) FROM (SELECT 1 FROM {candidates_src} GROUP BY int_({k_district}), int_("Nr listy")
+            SELECT count(*) FROM (SELECT 1 FROM {candidates_src} GROUP BY int_({k_district}), int_({k_list})
                                   HAVING count(DISTINCT int_({k_list_total})) <> 1)"""
     else:
         gminas = sources.load("sejm_gmina_totals", "**/sejm/sejm*-gm-listy.parquet")
@@ -764,20 +796,28 @@ def _build_2005_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> 
                 )
         list_totals_differ = "SELECT 0"
     _district_lists_from_candidates(con, year)
+    d_number = column(con, districts_src, "Numer okręgu", "Nr okręgu")
+    # 2005/2007: 'Liczba' spans four columns (powiats, gminas, precincts, seats); seats is the unnamed last one.
+    d_seats = column(con, districts_src, "Liczba mandatów", "column7")
     con.execute(
         f"""
         CREATE OR REPLACE TABLE sejm_districts AS
+        WITH rows AS (
+          -- A row without a district number continues the description of the district above (2001).
+          SELECT *, count(int_({d_number})) OVER (ORDER BY filename, file_row_number) AS district_row
+          FROM read_parquet({sql_list(sources.files("**/sejm/okr*sejm.parquet"))}, filename = true, file_row_number = true)
+        )
         SELECT {year} AS year,
-               CAST(int_(d."Numer okręgu") AS INT) AS district_no,
+               CAST(int_(d.{d_number}) AS INT) AS district_no,
                d."Siedziba Okręgowej Komisji Wyborczej" AS seat_city,
                w.wojewodztwo,
-               -- 'Liczba' spans four columns (powiats, gminas, precincts, seats); seats is the unnamed last one.
-               CAST(int_(d."column7") AS INT) AS seats,
+               CAST(int_(d.{d_seats}) AS INT) AS seats,
                CAST(NULL AS INT) AS eligible_voters,
-               regexp_replace(d."Obszar okręgu wyborczego", '\\s+', ' ', 'g') AS description
-        FROM {districts_src} d
-        LEFT JOIN {_districts_wojewodztwo(con)} w ON w.sejm_district_no = int_(d."Numer okręgu")
-        WHERE int_(d."Numer okręgu") IS NOT NULL
+               (SELECT regexp_replace(string_agg(c."Obszar okręgu wyborczego", ' ' ORDER BY c.file_row_number), '\\s+', ' ', 'g')
+                FROM rows c WHERE c.district_row = d.district_row) AS description
+        FROM rows d
+        LEFT JOIN {_districts_wojewodztwo(con)} w ON w.sejm_district_no = int_(d.{d_number})
+        WHERE int_(d.{d_number}) IS NOT NULL
         """
     )
 
@@ -790,7 +830,7 @@ def _build_2005_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> 
         f"""
         CREATE OR REPLACE TABLE sejm_precinct_list_votes_raw AS
         SELECT district_no, pkey, header, votes
-        FROM (UNPIVOT (SELECT CAST(int_({r_district}) AS INT) AS district_no, pkey(teryt_fixed, {r_number}) AS pkey, {cols}
+        FROM (UNPIVOT (SELECT CAST(int_({r_district}) AS INT) AS district_no, pkey(teryt_key, {r_number}) AS pkey, {cols}
                        FROM src_sejm_precincts)
               ON {cols} INTO NAME header VALUE votes)
         """
@@ -812,6 +852,8 @@ def _build_2005_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> 
         {
             "candidates of one district list with different list totals": list_totals_differ,
             "Warsaw precincts (146501) without a district letter": "SELECT count(*) FROM precincts WHERE teryt_gmina = '146501'",
+            "Warsaw precincts with a pre-2002 code (1431xx) not mapped to a district": """
+                SELECT count(*) FROM precincts WHERE teryt_gmina LIKE '1431%'""",
             "list votes in a column whose list number did not run in the precinct's district": """
                 SELECT count(*) FROM sejm_precinct_list_votes_raw r JOIN sejm_list_columns m USING (header)
                 WHERE coalesce(int_(r.votes), 0) <> 0 AND NOT EXISTS (

@@ -136,18 +136,6 @@ CAVEATS: tuple[tuple[str, Any], ...] = (
         lambda rows, sql: False in _values(rows, "votes_exact"),
     ),
     (
-        "Frekwencja w wyborach prezydenckich 2010 jest liczona z głosów oddanych (pliki nie podają liczby kart "
-        "ważnych), więc może się nieznacznie różnić od frekwencji podanej przez PKW, liczonej z kart wydanych.",
-        lambda rows, sql: _about(rows, sql, "prezydent", 2010) and ("turnout_pct" in sql.lower() or bool(_values(rows, "turnout_pct"))),
-    ),
-    (
-        "Frekwencja w wyborach do Sejmu 2005 i 2007 oraz prezydenckich 2005 jest liczona z kart ważnych, "
-        "więc jest nieznacznie niższa niż podana przez PKW, liczona z kart wydanych.",
-        lambda rows, sql: (_about(rows, sql, "sejm", 2005) or _about(rows, sql, "sejm", 2007)
-                           or _about(rows, sql, "prezydent", 2005))
-        and ("turnout_pct" in sql.lower() or bool(_values(rows, "turnout_pct"))),
-    ),
-    (
         "Frekwencja w wyborach do PE 2014 nie obejmuje pakietów wyborczych (głosowanie korespondencyjne), "
         "więc może być nieznacznie niższa niż podana przez PKW.",
         lambda rows, sql: _about(rows, sql, "pe", 2014) and ("turnout_pct" in sql.lower() or bool(_values(rows, "turnout_pct"))),

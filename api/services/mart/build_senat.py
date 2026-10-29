@@ -9,12 +9,12 @@ Supported layouts:
   ``senat_districts`` only has district numbers.
 - 2011: ``kandydaci_senat``, ``parl2011okręgi`` and ``2011-senat-głosy-w-obwodach/sNNN`` (protocol
   and bare-name candidate columns, like 2019).
-- 2005/2007: ``kandsen<year>`` (candidates with official votes), the district table
-  (``senat2005okręgi`` / ``okr2007senat``: seat city, seats, boundaries) and, in 2007,
-  ``parl2007-sen-gl_kand_obw/sen2007obw-NN`` (protocol and ``'N. Surname Given (T)'`` candidate
-  columns). 40 districts elected 2-4 senators each. 2005 publishes candidate votes per powiat only
-  (``2005-sen-gl_kan_pow/SNT_NN_g_p``): they are checked against the official totals, and the Senate
-  precinct tables stay empty for 2005.
+- 2001/2005/2007: ``2001-kan-sen`` / ``kandsen<year>`` (candidates with official votes), the district
+  table (``okręgi2001senat`` / ``senat2005okręgi`` / ``okr2007senat``: seat city, seats, boundaries) and,
+  in 2001 and 2007, ``parl2001OBWSEN/SENOBWNN`` / ``parl2007-sen-gl_kand_obw/sen2007obw-NN`` (protocol
+  and ``'N. Surname Given (T)'`` candidate columns, 2001: ``(W)``). 40 districts elected 2-4 senators
+  each. 2005 publishes candidate votes per powiat only (``2005-sen-gl_kan_pow/SNT_NN_g_p``): they are
+  checked against the official totals, and the Senate precinct tables stay empty for 2005.
 Requires the ``precincts`` table built by ``build_sejm`` in the same DuckDB connection.
 """
 
@@ -22,11 +22,16 @@ from __future__ import annotations
 
 import logging
 import re
+import tempfile
+from pathlib import Path
 
 import duckdb
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 from api.services.mart.build_common import (
     PATRONYMIC,
+    BuildError,
     ColumnRef,
     YearSources,
     build_wide_votes,
@@ -42,6 +47,7 @@ from api.services.mart.build_common import (
     python_name_key,
     quote_ident,
     run_checks,
+    sql_list,
     sql_literal,
 )
 from api.services.mart.build_precincts import COMBINED_PRECINCTS, rows_without_number
@@ -55,11 +61,13 @@ PROTOCOLS = "**/protokoly_po_obwodach_senat_csv/*.parquet"
 EXCEL_CANDIDATES = "**/senat/2015-kand-sen.parquet"
 EXCEL_RESULTS = "**/senat/wyniki_okr_senat/*.parquet"
 CANDIDATES_2005 = "**/senat/kandsen*.parquet"
+CANDIDATES_2001 = "**/senat/*-kan-sen.parquet"
 DISTRICTS_2005 = "**/senat/*okr*.parquet"
 RESULTS_2007 = "**/senat/parl*-sen-gl_kand_obw/*.parquet"
+RESULTS_2001 = "**/senat/parl*OBWSEN/*.parquet"
 POWIAT_RESULTS_2005 = "**/senat/*-sen-gl_kan_pow/*.parquet"
-# Senate districts per year where not 100 single-member districts (2005/2007: 40 districts, 2-4 seats).
-DISTRICTS = {2005: 40, 2007: 40}
+# Senate districts per year where not 100 single-member districts (2001-2007: 40 districts, 2-4 seats).
+DISTRICTS = {2001: 40, 2005: 40, 2007: 40}
 
 PROTOCOL_ALIASES = {
     "eligible_voters": ("Liczba wyborców uprawnionych do głosowania", "Senat - Liczba wyborców uprawnionych do głosowania"),
@@ -83,15 +91,27 @@ PROTOCOL_ALIASES = {
 PROTOCOL_ALIASES["eligible_voters"] += ("Upr",)
 PROTOCOL_ALIASES["ballots_issued"] += ("Frekw",)
 PROTOCOL_ALIASES["valid_ballots"] += ("Odd",)
-TERYT_ALIASES = ("TERYT Gminy", "Kod TERYT", "TERYT gminy", "Kod terytorialny gminy", "TERYT")
-NUMBER_ALIASES = ("Nr komisji", "Numer", "Numer obwodu", "Nr obwodu głosowania", "Nr obwodu")
+# 2001 headers: valid and invalid votes are counted in ballots ('Karty ważne z głosami (nie)ważnymi').
+PROTOCOL_ALIASES["eligible_voters"] += ("Uprawnieni do głosowania",)
+PROTOCOL_ALIASES["ballots_issued"] += ("Wydane karty (frekwencja)",)
+PROTOCOL_ALIASES["valid_ballots"] += ("Karty ważne",)
+PROTOCOL_ALIASES["invalid_votes"] += ("Karty ważne z głosami nieważnymi",)
+PROTOCOL_ALIASES["valid_votes"] += ("Karty ważne z głosami ważnymi",)
+# Rows of the 2001 per-precinct files whose address is split over two cells followed by an empty cell, so
+# that the rest of the row sits two columns to the right: (district, TERYT, precinct number). Łęczna 6:
+# with the row realigned, district 6 reproduces the official candidate totals.
+SHIFTED_ROWS_2001 = {(6, "061003", 6)}
+TERYT_ALIASES = ("TERYT Gminy", "Kod TERYT", "TERYT gminy", "Kod terytorialny gminy", "TERYT", "Kod gminy")
+NUMBER_ALIASES = ("Nr komisji", "Numer", "Numer obwodu", "Nr obwodu głosowania", "Nr obwodu", "Nr obw.")
 
 
 def available(sources: YearSources) -> bool:
     """Whether the year has staged Senate candidates and per-precinct results."""
     csv = sources.has("**/kandydaci_senat_csv/*.parquet") and sources.has(CANDIDATE_RESULTS)
     layout_2011 = sources.has(CANDIDATES_2011) and sources.has(RESULTS_2011)
-    layout_2005 = sources.has(CANDIDATES_2005) and (sources.has(RESULTS_2007) or sources.has(POWIAT_RESULTS_2005))
+    layout_2005 = (sources.has(CANDIDATES_2005) or sources.has(CANDIDATES_2001)) and (
+        sources.has(RESULTS_2007) or sources.has(RESULTS_2001) or sources.has(POWIAT_RESULTS_2005)
+    )
     return csv or layout_2011 or layout_2005 or (sources.has(EXCEL_CANDIDATES) and sources.has(EXCEL_RESULTS))
 
 
@@ -194,45 +214,62 @@ def _build_csv_registers(con: duckdb.DuckDBPyConnection, year: int, sources: Yea
 
 
 def _build_2005_registers(con: duckdb.DuckDBPyConnection, year: int, sources: YearSources) -> None:
-    """2005/2007: candidates from ``kandsen<year>`` and districts from the district table.
+    """2001/2005/2007: candidates from ``2001-kan-sen`` / ``kandsen<year>`` and districts from the district table.
 
     ``senat_district_seats`` keeps the seats per district for the checks (not a mart column).
-    2005 gives each candidate's district valid votes ('Głos w okr.'), 2007 the percentage.
+    2005 gives each candidate's district valid votes ('Głos w okr.'), 2001 and 2007 the percentage.
+    2001 has the given names in two columns and the party affiliation ('Afiliacja': membership or
+    'pop. ...' support, as published).
     """
-    candidates_src = sources.load("senat_candidates", CANDIDATES_2005)
+    candidates_src = sources.load("senat_candidates", CANDIDATES_2005 if sources.has(CANDIDATES_2005) else CANDIDATES_2001)
     districts_src = sources.load("senat_districts", DISTRICTS_2005)
     if district_votes := column(con, candidates_src, "Głos w okr.", required=False):
         pct = f'CAST(round(100.0 * int_(k."Głosy") / NULLIF(int_(k.{district_votes}), 0), 2) AS DECIMAL(6, 2))'
     else:
         pct = pct_expr(con, candidates_src, '"%"')
+    k_district = column(con, candidates_src, "Okręg", "Nr okr.")
+    k_position = column(con, candidates_src, "Nr poz.", "Poz.")
+    if column(con, candidates_src, "Imiona", required=False):
+        first_names = 'trim(k."Imiona")'
+    else:
+        first_names = """concat_ws(' ', NULLIF(trim(k."1. Imię"), ''), NULLIF(trim(k."2. Imię"), ''))"""
+    affiliation = column(con, candidates_src, "Afiliacja", required=False)
     con.execute(
         f"""
         CREATE OR REPLACE TABLE senat_candidates AS
         SELECT {year} AS year,
-               CAST(row_number() OVER (ORDER BY int_(k."Okręg"), int_(k."Nr poz.")) AS INT) AS candidate_id,
-               CAST(int_(k."Okręg") AS INT) AS district_no,
+               CAST(row_number() OVER (ORDER BY int_(k.{k_district}), int_(k.{k_position})) AS INT) AS candidate_id,
+               CAST(int_(k.{k_district}) AS INT) AS district_no,
                strip_signature(k."Komitet wyborczy") AS committee_name,
-               trim(k."Imiona") || ' ' || upper(trim(k."Nazwisko")) AS full_name,
-               upper(trim(k."Nazwisko")) AS last_name, trim(k."Imiona") AS first_names,
-               gender_(k."Płeć") AS gender, k."Zawód" AS occupation, k."Miejsce zamieszkania" AS residence,
-               CAST(NULL AS VARCHAR) AS residence_teryt, CAST(NULL AS VARCHAR) AS party_membership,
+               {first_names} || ' ' || upper(trim(k."Nazwisko")) AS full_name,
+               upper(trim(k."Nazwisko")) AS last_name, {first_names} AS first_names,
+               gender_(k."Płeć") AS gender, k."Zawód" AS occupation,
+               k.{column(con, candidates_src, "Miejsce zamieszkania", "Mieszka")} AS residence,
+               CAST(NULL AS VARCHAR) AS residence_teryt,
+               {f"NULLIF(trim(k.{affiliation}), '')" if affiliation else "CAST(NULL AS VARCHAR)"} AS party_membership,
                CAST(NULL AS VARCHAR) AS party_support,
                int_(k."Głosy") AS votes, {pct} AS pct_of_district, yes_(k."Mandat") AS elected
         FROM {candidates_src} k
         """
     )
-    number = column(con, districts_src, "Numer okręgu", "Numer okręgu -")
-    # 'Liczba' spans four columns (powiats, gminas, precincts, seats); seats is the last one.
-    seats = column(con, districts_src, "mandatów", "column7")
+    number = column(con, districts_src, "Numer okręgu", "Numer okręgu -", "Nr okręgu")
+    # 2005/2007: 'Liczba' spans four columns (powiats, gminas, precincts, seats); seats is the last one.
+    seats = column(con, districts_src, "mandatów", "column7", "Liczba mandatów")
+    description = column(con, districts_src, "Obszar okręgu wyborczego", "Obszar okręgu wyborczego -")
     con.execute(
         f"""
         CREATE OR REPLACE TABLE senat_districts AS
+        WITH rows AS (
+          -- A row without a district number continues the description of the district above (2001).
+          SELECT *, count(int_({number})) OVER (ORDER BY filename, file_row_number) AS district_row
+          FROM read_parquet({sql_list(sources.files(DISTRICTS_2005))}, filename = true, file_row_number = true)
+        )
         SELECT {year} AS year, CAST(int_(d.{number}) AS INT) AS district_no,
                d.{column(con, districts_src, "Siedziba Okręgowej Komisji Wyborczej", "Siedziba Okręgowej Komisji Wyborczej -")} AS seat_city,
                CAST(NULL AS INT) AS eligible_voters,
-               regexp_replace(d.{column(con, districts_src, "Obszar okręgu wyborczego", "Obszar okręgu wyborczego -")}, '\\s+', ' ', 'g')
-                 AS description
-        FROM {districts_src} d WHERE int_(d.{number}) IS NOT NULL
+               (SELECT regexp_replace(string_agg(c.{description}, ' ' ORDER BY c.file_row_number), '\\s+', ' ', 'g')
+                FROM rows c WHERE c.district_row = d.district_row) AS description
+        FROM rows d WHERE int_(d.{number}) IS NOT NULL
         """
     )
     con.execute(
@@ -277,12 +314,52 @@ def _check_2005_powiats(con: duckdb.DuckDBPyConnection, year: int, sources: Year
     )
 
 
+def _realign_2001(
+    con: duckdb.DuckDBPyConnection, by_district: dict[int, str], tmp_dir: str
+) -> dict[int, str]:
+    """2001: copies of the district files with the SHIFTED_ROWS_2001 rows moved back into place.
+
+    Fills ``senat_misaligned_rows(district_no, teryt, precinct_no)`` with every other row that has a
+    value in the unnamed columns right of the last candidate (a check fails on any). A listed row
+    that is not found, or whose cell after the split address is not empty, fails the build.
+    """
+    out, found = {}, set()
+    for district, path in by_district.items():
+        table = pq.read_table(path, partitioning=None)
+        names = table.column_names
+        extra = [i for i, name in enumerate(names) if re.fullmatch(r"column\d+", name)]
+        rows, changed = table.to_pylist(), False
+        for row in rows:
+            key = (district, (row["Kod gminy"] or "").strip(), int(row["Nr obw."]))
+            values = [row[name] for name in names]
+            if key in SHIFTED_ROWS_2001:
+                a = names.index("Adres")
+                if values[a + 2] not in (None, ""):
+                    raise BuildError(f"year 2001: Senate district {district} row {key} is not shifted as expected")
+                address = " ".join(v.strip() for v in values[a:a + 2] if v and v.strip())
+                values = values[:a] + [address] + values[a + 3:] + [None, None]
+                row.update(zip(names, values))
+                found.add(key)
+                changed = True
+            elif any(values[i] not in (None, "") for i in extra):
+                con.execute("INSERT INTO senat_misaligned_rows VALUES (?, ?, ?)", list(key))
+        out[district] = path
+        if changed:
+            out[district] = str(Path(tmp_dir) / Path(path).name)
+            pq.write_table(pa.Table.from_pylist(rows, schema=table.schema), out[district])
+    if missing := {k for k in SHIFTED_ROWS_2001 if k[0] in by_district} - found:
+        raise BuildError(f"year 2001: shifted Senate rows {sorted(missing)} not found")
+    return out
+
+
 def build_senat(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     """Build and check all Senate tables of ``sources.year``."""
     year = sources.year
-    if sources.has(CANDIDATES_2005):
+    if sources.has(CANDIDATES_2005) or sources.has(CANDIDATES_2001):
         _build_2005_registers(con, year, sources)
-        if not sources.has(RESULTS_2007):
+        if sources.has(RESULTS_2001):
+            by_district = district_files(sources.files(RESULTS_2001), r"^SENOBW(\d+)__")
+        elif not sources.has(RESULTS_2007):
             # 2005: no per-precinct results; empty precinct tables, candidate totals checked per powiat.
             _check_2005_powiats(con, year, sources)
             con.execute("CREATE OR REPLACE TABLE senat_precinct_protocols (year INT, precinct_id INT, eligible_voters INT, "
@@ -290,7 +367,8 @@ def build_senat(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
             con.execute("CREATE OR REPLACE TABLE senat_precinct_candidate_votes (year INT, precinct_id INT, candidate_id INT, votes INT)")
             _check(con, year, precinct_results=False)
             return
-        by_district = district_files(sources.files(RESULTS_2007), r"obw-(\d+)__")
+        else:
+            by_district = district_files(sources.files(RESULTS_2007), r"obw-(\d+)__")
     elif sources.has(EXCEL_CANDIDATES) and not sources.has(CANDIDATE_RESULTS):
         _build_excel_registers(con, year, sources.load("senat_candidates", EXCEL_CANDIDATES))
         by_district = district_files(sources.files(EXCEL_RESULTS), r"^(\d+)\.parquet$")
@@ -300,6 +378,11 @@ def build_senat(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     else:
         _build_csv_registers(con, year, sources)
         by_district = district_files(sources.files(CANDIDATE_RESULTS), r"(?:okreg|okr)_(\d+)_")
+    con.execute("CREATE OR REPLACE TABLE senat_misaligned_rows (district_no INT, teryt VARCHAR, precinct_no INT)")
+    # Corrected copies of source files live until the votes are read (2001 only).
+    corrected = tempfile.TemporaryDirectory(prefix="mart_senat_")
+    if sources.has(RESULTS_2001):
+        by_district = _realign_2001(con, by_district, corrected.name)
     # Rows without a precinct number (2011: combined military precincts abroad); empty otherwise.
     if sources.has(RESULTS_2011):
         rows_without_number(con, by_district, "senat_rows_without_number")
@@ -364,6 +447,7 @@ def build_senat(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
         con, year=year, target="senat_precinct_candidate_votes", key_name="candidate_id", files=files,
         teryt_aliases=TERYT_ALIASES, number_aliases=NUMBER_ALIASES,
     )
+    corrected.cleanup()
     con.execute(
         """
         CREATE OR REPLACE TABLE senat_combined_candidate_votes AS
@@ -401,6 +485,8 @@ def _check(con: duckdb.DuckDBPyConnection, year: int, precinct_results: bool = T
             "Senate protocol rows of unknown precincts": "SELECT count(*) FROM senat_protocols_raw WHERE pkey NOT IN (SELECT pkey FROM precincts)",
             "Senate result rows of unknown precincts": "SELECT count(*) FROM senat_precinct_candidate_votes_raw WHERE pkey NOT IN (SELECT pkey FROM precincts)",
             "Senate candidate columns that match no candidate": "SELECT count(*) FROM senat_candidate_columns_unmapped",
+            "Senate rows with values right of the last candidate, other than SHIFTED_ROWS_2001": """
+                SELECT count(*) FROM senat_misaligned_rows""",
             "Senate rows without a precinct number, other than combined military precincts": f"""
                 SELECT count(*) FROM senat_rows_without_number WHERE address NOT LIKE '{COMBINED_PRECINCTS}'""",
             "Senate candidates not read from exactly one column": """

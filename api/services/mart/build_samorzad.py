@@ -3,6 +3,24 @@
 councils of gminas, powiats and Warsaw districts.
 
 Sources (KBW mirror):
+- 2002 sejmik: ``2002-kand-rady`` (candidates of every council; ``Szczebel = 'województwo'``, ``Mandat``
+  G = elected by votes, L = by lot, B = without voting) and the per-precinct committee results
+  ``samo2002-sej-kom-obw``, summed to gminas (Warsaw is one gmina there, 146501, split between three
+  districts; Łódź between two). Invalid votes are votes cast minus valid votes (not published per
+  precinct); the gmina sums are checked against ``2002-frekwencja-i-nieważne-gminy``. There is no
+  district register; the 561 seats are checked against the PKW total. Gmina and powiat names come
+  from ``samo2002gminy`` and the gmina type of the mayor file (see ``_gmina_names_2002``).
+- 2002 wbp: ``wojt2002`` (both rounds, column ``Tura``) and the per-round gmina statistics in
+  ``2002-frekwencja-i-nieważne-gminy`` (Warsaw as the sum of its districts). Votes against a single
+  candidate are not published: the ballot offered only "za" / "przeciw", so they are valid votes
+  minus votes for (see ``_wbp_2002``).
+- 2006 sejmik: ``2006-kand-rady-new`` (candidates of every council with the list's district total;
+  ``Szczebel = 'WO'``), ``2006-sejmiki-okregi`` (seats) and ``2006-sejmiki-gm`` (gmina results, full
+  committee names; Łódź is split between two districts).
+- 2006 wbp: ``wojt2006-zbiorówka`` (both rounds, column ``Tura``), the per-round gmina statistics
+  ``2006-frekw-wbp-gm`` (side by side, like 2010), votes against a single candidate from the
+  per-precinct file ``samo2006-wbp-obw`` and the withdrawals before the run-off ``2006-trzecia-tura``
+  (see ``_wbp_2006``).
 - 2010 sejmik: ``2010-kand-rady`` (candidates of every council; ``Szczebel = 'sejmik'``) and
   ``2010-sejmiki-po-gminach`` (full committee names; Łódź is split between two districts and has one
   row per district). There is no district register; the 561 seats are checked against the PKW total.
@@ -61,14 +79,32 @@ log = logging.getLogger("mart")
 TABLES = SEJMIK_TABLES + WBP_TABLES + RADA_TABLES
 FAMILY = ("sejmik", "wbp", "rada")
 
-# 2010: ten run-offs took place on 19 December instead of 5 December (see LATE_RUNOFFS).
+# 2006 and 2010: some run-offs took place two weeks later (see LATE_RUNOFFS).
 DATES = {
+    2002: ("2002-10-27", "2002-11-10"),
+    2006: ("2006-11-12", "2006-11-26"),
     2010: ("2010-11-21", "2010-12-05"),
     2014: ("2014-11-16", "2014-11-30"),
     2018: ("2018-10-21", "2018-11-04"),
     2024: ("2024-04-07", "2024-04-21"),
 }
 SOURCES = {
+    2002: {
+        "sejmik_candidates": "**/samorzad/2002-kand-rady.parquet",
+        "sejmik_precincts": "**/samorzad/sejmik/samo2002-sej-kom-obw.parquet",
+        "gminas": "**/samorzad/samo2002gminy.parquet",
+        "stats": "**/samorzad/2002-frekwencja-i-niewa*ne-gminy.parquet",
+        "wbp_candidates": "**/samorzad/wbp/wbp2002/wojt2002__*.parquet",
+    },
+    2006: {
+        "sejmik_candidates": "**/samorzad/2006-kand-rady-new.parquet",
+        "sejmik_seats": "**/samorzad/sejmik/2006/2006-sejmiki-okregi__*.parquet",
+        "sejmik_gminas": "**/samorzad/sejmik/2006/2006-sejmiki-gm__*.parquet",
+        "wbp_candidates": "**/samorzad/wbp/wbp2006/wojt2006-zbi*__*.parquet",
+        "wbp_protocols": "**/samorzad/2006-frekw-wbp-gm.parquet",
+        "wbp_precincts": "**/samorzad/wbp/samo2006-wbp-obw.parquet",
+        "wbp_withdrawn": "**/samorzad/wbp/wbp2006/2006-trzecia-tura__*.parquet",
+    },
     2010: {
         "sejmik_candidates": "**/samorzad/samo2010/2010-kand-rady.parquet",
         "sejmik_gminas": "**/samorzad/sejmik/2010-sejmiki-po-gminach.parquet",
@@ -107,28 +143,49 @@ SOURCES = {
 }
 PROTOCOL = ("eligible_voters", "ballots_issued", "valid_ballots", "invalid_votes", "valid_votes")
 # 2014 gmina statistics use short headers, 2010 sejmik gmina results long ones ('Liczba głosów
-# oddanych' = valid ballots, as in the 2010 protocols); they come after the shared aliases, so later
-# years are unaffected.
+# oddanych' = valid ballots, as in the 2010 protocols), 2002/2006 abbreviations ('Odd.' = votes cast =
+# valid ballots, 'Frekw.' = ballots issued); they come after the shared aliases, so later years are
+# unaffected.
 LOCAL_PROTOCOL_ALIASES = {
     name: PROTOCOL_ALIASES[name] + extra
     for name, extra in {
-        "eligible_voters": ("Liczba wyborców",),
-        "ballots_issued": ("Wydane karty", "Liczba wydanych kart do głosowania"),
-        "valid_ballots": ("Karty ważne", "Liczba głosów oddanych"),
-        "invalid_votes": ("Głosy nieważne",),
-        "valid_votes": ("Głosy ważne",),
+        "eligible_voters": ("Liczba wyborców", "Upr."),
+        "ballots_issued": ("Wydane karty", "Liczba wydanych kart do głosowania", "Frekw."),
+        "valid_ballots": ("Karty ważne", "Liczba głosów oddanych", "Odd."),
+        "invalid_votes": ("Głosy nieważne", "Niew."),
+        "valid_votes": ("Głosy ważne", "Ważne"),
     }.items()
 }
-# 2010 and 2014 have no sejmik district register: PKW totals of seats ("Wybory samorządowe 2014 -
+# 2002, 2010 and 2014 have no sejmik district register: PKW totals of seats ("Wybory samorządowe 2014 -
 # statystyki", pkw.gov.pl: 555 radnych województw; wybory2010.pkw.gov.pl/geo/pl/000000.html: 561
-# radnych in 87 districts).
-SEJMIK_SEATS = {2010: 561, 2014: 555}
-# Gminas split between two sejmik districts (one gmina-file row per district): Łódź 2010 (districts
-# 1 and 2, PKW "Zbiorcze informacje o okręgach" of łódzkie).
-SEJMIK_SPLIT_GMINAS = {2010: ["106101"]}
-# 2010 run-offs held on 19 December instead of 5 December ('data gł.' in the candidate file): a
-# candidate who qualified withdrew (see _wbp_2010).
-LATE_RUNOFFS = {2010: ["020603", "040902", "061403", "120604", "200404", "200802", "201209", "220903", "281501", "321408"]}
+# radnych in 87 districts; PKW announcement of 8 November 2002, Dz. U. Nr 187, poz. 1568: 561 radnych
+# in 88 districts).
+SEJMIK_SEATS = {2002: 561, 2010: 561, 2014: 555}
+# Gminas split between sejmik districts (one gmina-file row per district) -> number of districts:
+# Łódź 2002, 2006 and 2010 (districts 1 and 2, PKW "Zbiorcze informacje o okręgach" of łódzkie);
+# Warsaw 2002, published as one gmina in three districts (the 2002 precinct file has no district
+# TERYT).
+SEJMIK_SPLIT_GMINAS = {2002: {"106101": 2, "146501": 3}, 2006: {"106101": 2}, 2010: {"106101": 2}}
+# Sejmik districts whose eligible voters in the district register differ from the sum of their gmina
+# rows (2006: dolnośląskie 1 register 502,072 vs gminas 502,060; lubelskie 1 276,406 vs 276,409; all
+# other protocol figures agree). The gmina rows are loaded, so national eligible voters are 30,241,176
+# against PKW's 30,241,185 (the district sum).
+SEJMIK_ELIGIBLE_GAPS = {2006: [("dolnośląskie", 1), ("lubelskie", 1)]}
+# Run-offs held two weeks later because a candidate who qualified withdrew: 2006 on 10 December
+# instead of 26 November (PKW announcements of 27 November and 11 December 2006: 16 gminas, listed in
+# '2006-trzecia-tura', see _wbp_2006), 2010 on 19 December instead of 5 December ('data gł.' in the
+# candidate file, see _wbp_2010).
+LATE_RUNOFFS = {
+    2006: ["040804", "041804", "060304", "061812", "061902", "100402", "101508", "120702", "142001", "142011",
+           "181706", "221308", "241703", "246201", "280705", "320701"],
+    2010: ["020603", "040902", "061403", "120604", "200404", "200802", "201209", "220903", "281501", "321408"],
+}
+# 2002 run-offs (all on 10 November) where a qualified candidate withdrew and the candidate with the
+# next most round-1 votes took the place ('rezyg.txt' in the KBW bundle wbp2002.zip: 17 gminas).
+REPLACED_RUNOFF_CANDIDATES = {
+    2002: ["040606", "062004", "101605", "121502", "140502", "141608", "160802", "180307", "181408", "200802",
+           "200903", "220205", "220305", "220705", "280804", "281408", "321406"],
+}
 OFFICES = {"W": "wójt", "B": "burmistrz", "P": "prezydent miasta"}
 _AGAINST = re.compile(r"^Głosy przeciw wyborowi kandydata - (.+?) zarejestrowanego przez ")
 
@@ -152,7 +209,11 @@ def build_samorzad(con: duckdb.DuckDBPyConnection, sources: YearSources) -> list
         "CREATE OR REPLACE MACRO capw_(x) AS CASE WHEN upper(x) = x THEN array_to_string("
         "list_transform(str_split(x, ' '), w -> upper(left(w, 1)) || lower(substr(w, 2))), ' ') ELSE x END"
     )
+    if year == 2002:
+        _gmina_names_2002(con, sources)
+        _stats_2002(con, sources)
     _build_sejmik(con, sources)
+    build_rady.add_list_groups(con, year, "sejmik")
     _build_wbp(con, sources)
     _check(con, year)
     first, second = DATES[year]
@@ -178,7 +239,25 @@ def _build_sejmik(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     spec = SOURCES[year]
     create_committee_aliases(con, sources.year)
     raw = sources.load("sejmik_cand", spec["sejmik_candidates"])
-    if year == 2010:
+    if year == 2002:
+        # Mandat: G elected by votes, L by lot (tie), B without voting, N not elected.
+        con.execute(
+            f"""CREATE OR REPLACE TABLE sejmik_cand AS SELECT *, CASE WHEN "Mandat" IN ('G', 'L', 'B') THEN 'T' ELSE 'N' END AS elected_
+                FROM {raw} WHERE "Szczebel" = 'województwo'"""
+        )
+        f = {
+            "woj": '"Jednostka"', "district": '"Okręg"', "list_no": '"Nr listy"', "position": '"Nr pozycji"',
+            "name": """concat_ws(' ', cap_("1. imię"), cap_("2. imię"), upper("Nazwisko"))""", "committee": '"Komitet"',
+            "residence": '"Miejsce zamieszkania"', "elected": "elected_", "votes": '"Głosy"',
+        }
+    elif year == 2006:
+        con.execute(f"CREATE OR REPLACE TABLE sejmik_cand AS SELECT * FROM {raw} WHERE \"Szczebel\" = 'WO'")
+        f = {
+            "woj": '"Jednostka"', "district": '"Okręg"', "list_no": '"Lista"', "position": '"Pozycja"',
+            "name": """concat_ws(' ', capw_("Imiona"), upper("Nazwisko"))""", "committee": '"Komitet"',
+            "residence": '"Miejsce zamieszkania"', "elected": '"Mandat"', "votes": '"Gł. na kand."',
+        }
+    elif year == 2010:
         con.execute(f"CREATE OR REPLACE TABLE sejmik_cand AS SELECT * FROM {raw} WHERE \"Szczebel\" = 'sejmik'")
         f = {
             "woj": '"Jednostka"', "district": '"Okręg"', "list_no": '"Nr listy"', "position": '"Pozycja"',
@@ -236,9 +315,10 @@ def _build_sejmik(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     else:
         seats = sources.load("sejmik_seats", spec["sejmik_seats"])
         seat_filter = "WHERE \"Szczebel\" = 'Sejmik województwa'" if year == 2018 else ""
-        con.execute(f"CREATE OR REPLACE TABLE sejmik_seats AS SELECT sum(int_(\"Liczba mandatów\")) AS seats FROM {seats} {seat_filter}")
+        mandates = column(con, seats, "Liczba mandatów", "L. mand.")
+        con.execute(f"CREATE OR REPLACE TABLE sejmik_seats AS SELECT sum(int_({mandates})) AS seats FROM {seats} {seat_filter}")
 
-    gminas = sources.load("sejmik_gminas", spec["sejmik_gminas"])
+    gminas = _sejmik_gminas_2002(con, sources) if year == 2002 else sources.load("sejmik_gminas", spec["sejmik_gminas"])
     # 2010/2014 name gminas 'Bolesławiec, m.' (Warsaw districts without suffix); later years 'm. Bolesławiec'.
     gmina_name = (
         f"""regexp_replace({column(con, gminas, "Gmina/dzielnica", "Gmina (dzielnica)")}, '^(.*), (m\\. st\\.|m\\.|gm\\.)$', '\\2 \\1')"""
@@ -246,7 +326,7 @@ def _build_sejmik(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     )
     # 2010-2018 gmina files name the district of every row; a gmina split between districts (Łódź
     # 2010) has one row per district. 2024 has the district only per precinct.
-    district = f"CAST(int_({column(con, gminas, 'Nr okr.', 'Numer okręgu')}) AS INT)" if year < 2024 else "CAST(NULL AS INT)"
+    district = f"CAST(int_({column(con, gminas, 'Nr okr.', 'Numer okręgu', 'Okręg')}) AS INT)" if year < 2024 else "CAST(NULL AS INT)"
     parts = [(gminas, f"clean_teryt({column(con, gminas, *GEO_ALIASES['teryt'])})", gmina_name, district)]
     if year == 2024:
         # Cities with powiat rights (powiat code 61-99) are only in the powiat file; their gmina
@@ -375,6 +455,96 @@ def _vote_columns(con: duckdb.DuckDBPyConnection, source: str) -> list[str]:
     return [c for c in columns[columns.index(valid) + 1 :] if normalize_header(c) not in NOT_VOTE_COLUMNS]
 
 
+def _gmina_names_2002(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
+    """``gmina_names(teryt_gmina, gmina, powiat)`` of 2002 in the style of later years.
+
+    2002 files name gminas bare, a rural gmina named like its town with a suffix ('Bolesławiec gm.');
+    the gmina type of the mayor file (1 urban, 2 rural, 3 urban-rural) gives the prefix of later years
+    ('m. Bolesławiec', 'gm. Bolesławiec', 'gm. Nowogrodziec').
+    """
+    spec = SOURCES[2002]
+    gminas = sources.load("gminas", spec["gminas"])
+    wbp = sources.load("wbp_cand", spec["wbp_candidates"])
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE gmina_names AS
+        WITH types AS (SELECT clean_teryt("TERYT") AS teryt_gmina, any_value("Typ") AS typ, count(DISTINCT "Typ") AS n
+                       FROM {wbp} GROUP BY 1)
+        SELECT clean_teryt(g."TERYT gm.") AS teryt_gmina,
+               CASE WHEN clean_teryt(g."TERYT gm.") = '146501' THEN 'm. st. Warszawa'
+                    WHEN t.typ = '1' THEN 'm. ' || g."Gmina"
+                    WHEN t.typ IN ('2', '3') THEN 'gm. ' || regexp_replace(g."Gmina", ' gm\\.$', '') END AS gmina,
+               g."Powiat" AS powiat, t.n AS types
+        FROM {gminas} g LEFT JOIN types t ON t.teryt_gmina = clean_teryt(g."TERYT gm.")
+        """
+    )
+    run_checks(con, 2002, {
+        "gminas without exactly one gmina type or name": """
+            SELECT count(*) + (SELECT count(*) - count(DISTINCT teryt_gmina) FROM gmina_names)
+            FROM gmina_names WHERE types IS DISTINCT FROM 1 OR gmina IS NULL""",
+    })
+
+
+# 2002 gmina statistics: one column group per election under a two-row header, like 2010. Staging keeps
+# the group name as the header of its first column and generic names for the others; the second row
+# (first data row, "Gmina" = 'TERYT') labels them and is checked. Columns in PROTOCOL order: eligible,
+# ballots issued, votes cast (valid ballots), invalid votes, valid votes. Warsaw has rows per district.
+_STATS_2002 = {
+    "sejmik": ('"Sejmik województwa"', "column21", "column22", "column24", "column23"),
+    "wbp1": ('"Wójt (burmistrz, prezydent miasta) I tura"', "column39", "column40", "column42", "column41"),
+    "wbp2": ('"Wójt (burmistrz, prezydent miasta) II tura"', "column47", "column48", "column50", "column49"),
+}
+_STATS_2002_LABELS = ("upr.", "k. wyd.", "gł. odd.", "gł. niew.", "gł. ważne")
+
+
+def _stats_2002(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
+    """``stats_2002``: official 2002 gmina statistics of the sejmik and mayor elections (``<group>_<protocol>``)."""
+    stats = sources.load("stats", SOURCES[2002]["stats"])
+    for group, cols in _STATS_2002.items():
+        found = con.execute(f"""SELECT {', '.join(cols)} FROM {stats} WHERE "Gmina" = 'TERYT'""").fetchall()
+        if found != [_STATS_2002_LABELS]:
+            raise BuildError(f"year 2002: unexpected {group} statistics sub-headers {found}")
+    selects = ", ".join(
+        f"CAST(int_({c}) AS INT) AS {group}_{p}" for group, cols in _STATS_2002.items() for c, p in zip(cols, PROTOCOL)
+    )
+    con.execute(f"""CREATE OR REPLACE TABLE stats_2002 AS SELECT clean_teryt("Gmina") AS teryt, {selects}
+                    FROM {stats} WHERE "Gmina" <> 'TERYT'""")
+
+
+def _sejmik_gminas_2002(con: duckdb.DuckDBPyConnection, sources: YearSources) -> str:
+    """2002 sejmik results per gmina and district (``sejmik_gminas_2002``), summed from the precinct file.
+
+    The result has the headers of a gmina file: protocol columns, then one column per committee.
+    Invalid votes are not published per precinct: votes cast (valid ballots) minus valid votes.
+    """
+    prec = sources.load("sejmik_prec", SOURCES[2002]["sejmik_precincts"])
+    sums = ", ".join(f"CAST(sum(int_(p.{quote_ident(c)})) AS VARCHAR) AS {quote_ident(c)}" for c in _vote_columns(con, prec))
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE sejmik_gminas_2002 AS
+        SELECT clean_teryt(p."Kod gminy") AS "TERYT gminy", p."Nr okr.", any_value(n.gmina) AS "Gmina", any_value(n.powiat) AS "Powiat",
+               CAST(sum(int_(p."L. upr.")) AS VARCHAR) AS "Upr.", CAST(sum(int_(p."Frekw.")) AS VARCHAR) AS "Frekw.",
+               CAST(sum(int_(p."Odd.")) AS VARCHAR) AS "Odd.", CAST(sum(int_(p."Odd.")) - sum(int_(p."Ważne")) AS VARCHAR) AS "Niew.",
+               CAST(sum(int_(p."Ważne")) AS VARCHAR) AS "Ważne", {sums}
+        FROM {prec} p LEFT JOIN gmina_names n ON n.teryt_gmina = clean_teryt(p."Kod gminy")
+        GROUP BY clean_teryt(p."Kod gminy"), p."Nr okr."
+        """
+    )
+    # Every committee has a column in every precinct, with 0 where it had no list: such zeros are no
+    # result (left as 0 they would become empty lists). Non-zero votes without a list are kept and
+    # fail the checks.
+    for c in _vote_columns(con, prec):
+        con.execute(
+            f"""UPDATE sejmik_gminas_2002 g SET {quote_ident(c)} = NULL
+                WHERE int_(g.{quote_ident(c)}) = 0 AND NOT EXISTS (
+                    SELECT 1 FROM sejmik_candidates k JOIN sejmik_committees m USING (committee_id)
+                    WHERE k.wojewodztwo = voivodeship(g."TERYT gminy") AND k.district_no = int_(g."Nr okr.")
+                      AND m.committee_name = strip_signature(?))""",
+            [c],
+        )
+    return "sejmik_gminas_2002"
+
+
 # --- Mayors -----------------------------------------------------------------------------------
 
 
@@ -382,7 +552,11 @@ def _build_wbp(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     """Mayor candidates and gmina protocols of both rounds."""
     year = sources.year
     spec = SOURCES[year]
-    if year == 2010:
+    if year == 2002:
+        _wbp_2002(con, sources)
+    elif year == 2006:
+        _wbp_2006(con, sources)
+    elif year == 2010:
         _wbp_2010(con, sources)
     elif year == 2014:
         _wbp_2014(con, sources)
@@ -449,6 +623,175 @@ def _build_wbp(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
         FROM wbp_cand
         """
     )
+
+
+def _wbp_2002(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
+    """2002 mayor candidates (wbp_cand) and gmina protocols (wbp_prot) of both rounds.
+
+    The candidate file has both rounds (``Tura``); 'Wybrany' is T for the elected candidate only. The
+    protocols are the official gmina statistics (``stats_2002``; Warsaw, one mayor, as the sum of its
+    district rows). The files publish no percentages and no votes against a single candidate: ``pct``
+    is votes / valid votes, and as such a ballot offered only "za" / "przeciw", ``votes_against`` is
+    valid votes minus votes for. In the REPLACED_RUNOFF_CANDIDATES gminas a qualified candidate withdrew
+    before the run-off and the candidate with the next most votes took the place. Candidates are matched
+    across rounds by name and committee (Aleksandrów, 101001, had two candidates named Henryk MAŁECKI).
+    """
+    spec = SOURCES[2002]
+    raw = sources.load("wbp_cand", spec["wbp_candidates"])
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE wbp_cand AS
+        SELECT CAST(int_("Tura") AS INT) AS round, clean_teryt("TERYT") AS teryt_gmina,
+               concat_ws(' ', cap_("1. Imie"), cap_("2. Imie"), upper("Nazwisko")) AS name, "Plec" AS gender, int_("Wiek") AS age,
+               "Miejsce zamieszkania" AS residence, "Komitet wyborczy" AS committee, CAST(NULL AS VARCHAR) AS party,
+               int_("Gł. na kand.") AS votes, CAST(NULL AS BIGINT) AS votes_against,
+               CAST(round(100.0 * int_("Gł. na kand.") / NULLIF(int_("Ważne"), 0), 2) AS DECIMAL(6, 2)) AS pct,
+               coalesce("Wybrany" = 'T', false) AS elected, int_("Ważne") AS valid_votes, int_("Upr.") AS eligible_voters,
+               "Urząd" AS office_code
+        FROM {raw}
+        """
+    )
+    protocols = []
+    for round_no in (1, 2):
+        group = f"wbp{round_no}"
+        protocol = ", ".join(f"CAST(sum({group}_{p}) AS INT) AS {p}" for p in PROTOCOL)
+        protocols.append(
+            f"""SELECT {round_no} AS round, CASE WHEN left(teryt, 4) = '1465' THEN '146501' ELSE teryt END AS teryt_gmina, {protocol}
+                FROM stats_2002 WHERE {group}_eligible_voters IS NOT NULL GROUP BY 2"""
+        )
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE wbp_prot AS
+        SELECT p.round, p.teryt_gmina, n.gmina, n.powiat,
+               (SELECT {_office_case('any_value(c.office_code)')} FROM wbp_cand c
+                WHERE c.round = p.round AND c.teryt_gmina = p.teryt_gmina) AS office,
+               {', '.join(PROTOCOL)}
+        FROM ({' UNION ALL '.join(protocols)}) p LEFT JOIN gmina_names n USING (teryt_gmina)
+        """
+    )
+    con.execute(
+        """
+        UPDATE wbp_cand c SET votes_against = p.valid_votes - c.votes
+        FROM wbp_prot p
+        WHERE p.round = c.round AND p.teryt_gmina = c.teryt_gmina
+              AND (SELECT count(*) FROM wbp_cand o WHERE o.round = c.round AND o.teryt_gmina = c.teryt_gmina) = 1
+        """
+    )
+    replaced = ", ".join(map(sql_literal, REPLACED_RUNOFF_CANDIDATES[2002]))
+    run_checks(con, 2002, {
+        "wbp: candidate-file valid votes or eligible voters != gmina statistics": """
+            SELECT count(*) FROM wbp_cand c JOIN wbp_prot p USING (round, teryt_gmina)
+            WHERE c.valid_votes <> p.valid_votes OR c.eligible_voters <> p.eligible_voters""",
+        "wbp: single candidates with negative votes against, or elected != more than half of valid votes": """
+            SELECT count(*) FROM wbp_cand WHERE votes_against IS NOT NULL
+              AND (votes_against < 0 OR elected <> (2 * votes > votes + votes_against))""",
+        "wbp: run-off candidates outside the two with most round-1 votes (except named gminas), or named gminas without": f"""
+            WITH ranked AS (SELECT teryt_gmina, name_key(name) || '/' || committee AS k,
+                                   rank() OVER (PARTITION BY teryt_gmina ORDER BY votes DESC) AS r
+                            FROM wbp_cand WHERE round = 1),
+            outsiders AS (SELECT DISTINCT c.teryt_gmina FROM wbp_cand c
+                          JOIN ranked r ON r.teryt_gmina = c.teryt_gmina AND r.k = name_key(c.name) || '/' || c.committee
+                          WHERE c.round = 2 AND r.r > 2)
+            SELECT (SELECT count(*) FROM outsiders WHERE teryt_gmina NOT IN ({replaced}))
+                 + (SELECT count(*) FROM (VALUES {', '.join(f'({t})' for t in replaced.split(', '))}) v(t)
+                    WHERE t NOT IN (SELECT teryt_gmina FROM outsiders))
+                 + (SELECT count(*) FROM wbp_cand c WHERE round = 2
+                    AND NOT EXISTS (SELECT 1 FROM ranked r WHERE r.teryt_gmina = c.teryt_gmina AND r.k = name_key(c.name) || '/' || c.committee))""",
+    })
+
+
+# 2006 gmina statistics: both rounds side by side under a two-row header, like 2010 (other columns).
+_WBP_2006_PROTOCOL = {
+    # round: (eligible_voters, ballots_issued, valid_ballots (votes cast), invalid_votes, valid_votes)
+    1: ('"I tura"', "column6", "column8", "column11", "column9"),
+    2: ('"II tura"', "column16", "column18", "column21", "column19"),
+}
+
+
+def _wbp_2006(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
+    """2006 mayor candidates (wbp_cand) and gmina protocols (wbp_prot) of both rounds.
+
+    The candidate file has both rounds (``Tura``); in round 1 'Mandat' is T (elected), 2 (qualified for
+    the run-off) or N. It publishes no percentages: ``pct`` is votes / valid votes. In the 16
+    LATE_RUNOFFS gminas a qualified candidate withdrew (in Brześć Kujawski, Mszana Dolna and Dorohusk
+    a second one too) and the run-off took place on 10 December: in fifteen the candidate with the next
+    most votes took the place, in Dorohusk the remaining candidate faced a for/against vote. Withdrawn
+    candidates have no round-2 row. Votes against a single candidate are only in the per-precinct file.
+    Gręboszów had no candidate (no election); 'Urząd' of Rajgród's candidate is '42' in the candidate
+    file, so the office comes from the gmina statistics.
+    """
+    spec = SOURCES[2006]
+    raw = sources.load("wbp_cand", spec["wbp_candidates"])
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE wbp_cand AS
+        SELECT CAST(int_("Tura") AS INT) AS round, clean_teryt("TERYT") AS teryt_gmina,
+               concat_ws(' ', capw_("Imiona"), upper("Nazwisko")) AS name, "Płeć" AS gender, int_("Wiek") AS age,
+               "Miejsce zam." AS residence, "Komitet" AS committee, NULLIF(trim("Partia"), '') AS party,
+               int_("Kandydat") AS votes, CAST(NULL AS BIGINT) AS votes_against,
+               CAST(round(100.0 * int_("Kandydat") / NULLIF(int_("Ważne"), 0), 2) AS DECIMAL(6, 2)) AS pct,
+               coalesce("Mandat" = 'T', false) AS elected, int_("Ważne") AS valid_votes, int_("Upr.") AS eligible_voters
+        FROM {raw}
+        """
+    )
+    src = sources.load("wbp_prot", spec["wbp_protocols"])
+    for round_no, cols in _WBP_2006_PROTOCOL.items():
+        found = con.execute(f"""SELECT column1, column2, {', '.join(cols)} FROM {src} WHERE "Gmina" = 'TERYT'""").fetchall()
+        if [tuple(re.sub(r"\s+", " ", v or "") for v in row) for row in found] != [_WBP_2010_PROTOCOL_LABELS]:
+            raise BuildError(f"year 2006: unexpected mayor protocol sub-headers {found}")
+    protocols = []
+    for round_no, cols in _WBP_2006_PROTOCOL.items():
+        protocol = ", ".join(f"CAST(int_({c}) AS INT) AS {p}" for c, p in zip(cols, PROTOCOL))
+        protocols.append(
+            f"""SELECT {round_no} AS round, clean_teryt("Gmina") AS teryt_gmina, column1 AS gmina, column2 AS powiat,
+                   {_office_case('"Urząd"')} AS office, {protocol}
+            FROM {src} WHERE "Gmina" <> 'TERYT' AND {cols[0]} IS NOT NULL"""
+        )
+    con.execute(f"CREATE OR REPLACE TABLE wbp_prot AS {' UNION ALL '.join(protocols)}")
+
+    prec = sources.load("wbp_prec", spec["wbp_precincts"])
+    con.execute(
+        f"""CREATE OR REPLACE TABLE wbp_against AS
+            SELECT CAST(int_("Tura") AS INT) AS round, clean_teryt("TERYT") AS teryt_gmina, sum(int_("Gł. przeciw")) AS votes
+            FROM {prec} WHERE int_("Gł. przeciw") IS NOT NULL GROUP BY ALL"""
+    )
+    con.execute(
+        """
+        UPDATE wbp_cand c SET votes_against = a.votes
+        FROM wbp_against a
+        WHERE a.round = c.round AND a.teryt_gmina = c.teryt_gmina
+              AND (SELECT count(*) FROM wbp_cand o WHERE o.round = c.round AND o.teryt_gmina = c.teryt_gmina) = 1
+        """
+    )
+    late = ", ".join(map(sql_literal, LATE_RUNOFFS[2006]))
+    withdrawn = sources.load("wbp_withdrawn", spec["wbp_withdrawn"])
+    # Round-1 candidates who qualified (or replaced a qualified candidate) but have no round-2 row.
+    con.execute(
+        f"""CREATE OR REPLACE TABLE wbp_dropped AS
+            SELECT clean_teryt(r."TERYT") AS teryt_gmina, upper(trim(r."Nazwisko")) AS surname, r."Mandat" AS mark FROM {raw} r
+            WHERE r."Tura" = '1' AND clean_teryt(r."TERYT") IN (SELECT teryt_gmina FROM wbp_cand WHERE round = 2)
+              AND NOT EXISTS (SELECT 1 FROM {raw} o WHERE o."Tura" = '2' AND o."TERYT" = r."TERYT" AND o."Nazwisko" = r."Nazwisko"
+                              AND o."Imiona" = r."Imiona")"""
+    )
+    run_checks(con, 2006, {
+        "wbp: votes against in gminas with several candidates": """
+            SELECT count(*) FROM wbp_against a
+            WHERE (SELECT count(*) FROM wbp_cand c WHERE c.round = a.round AND c.teryt_gmina = a.teryt_gmina) <> 1""",
+        "wbp: candidate-file valid votes or eligible voters != gmina statistics": """
+            SELECT count(*) FROM wbp_cand c JOIN wbp_prot p USING (round, teryt_gmina)
+            WHERE c.valid_votes <> p.valid_votes OR c.eligible_voters <> p.eligible_voters""",
+        "wbp: qualified candidates without a run-off row, or run-off candidates who did not qualify, outside the named gminas": f"""
+            SELECT (SELECT count(*) FROM wbp_dropped WHERE mark = '2' AND teryt_gmina NOT IN ({late}))
+                 + (SELECT count(*) FROM {raw} o WHERE o."Tura" = '2' AND clean_teryt(o."TERYT") NOT IN ({late})
+                    AND NOT EXISTS (SELECT 1 FROM {raw} r WHERE r."Tura" = '1' AND r."Mandat" = '2' AND r."TERYT" = o."TERYT"
+                                    AND r."Nazwisko" = o."Nazwisko" AND r."Imiona" = o."Imiona"))""",
+        "wbp: named late run-offs without a withdrawn candidate listed in 2006-trzecia-tura, or listed ones elsewhere": f"""
+            WITH listed AS (SELECT upper(trim("Skreślony kandydat")) AS surname FROM {withdrawn} WHERE "Kod Gminy" IS NOT NULL)
+            SELECT (SELECT count(*) FROM (VALUES {', '.join(f'({t})' for t in late.split(', '))}) v(t)
+                    WHERE NOT EXISTS (SELECT 1 FROM wbp_dropped d JOIN listed l USING (surname) WHERE d.teryt_gmina = v.t))
+                 + (SELECT count(*) FROM listed l
+                    WHERE NOT EXISTS (SELECT 1 FROM wbp_dropped d WHERE d.surname = l.surname AND d.teryt_gmina IN ({late})))""",
+    })
 
 
 # 2010 candidate file and gmina statistics: both rounds side by side under a two-row header, like
@@ -664,6 +1007,38 @@ def _wbp_protocols_2024(con: duckdb.DuckDBPyConnection, sources: YearSources) ->
 # drops them, so those lists are named here. Verified against the 2018 per-precinct candidate files
 # (the struck-off candidate's column is empty). Documented in docs/MART.md under "Known gaps".
 STRUCK_OFF = {
+    # 2002: lists whose total in the per-precinct committee results exceeds the sum of their candidates'
+    # votes. The per-precinct candidate files (2002sejmiki-kand-obw) give the same list totals and
+    # candidate votes for all 1,122 lists, so the gap is in the published data. Eighteen have a missing
+    # list position (a struck-off candidate dropped from the files); the eight marked * have none.
+    2002: [
+        ("dolnośląskie", 4, "KRAJOWY KWW UNIA SAMORZĄDOWA"),
+        ("lubuskie", 2, "KRAJOWY KWW UNIA SAMORZĄDOWA"),
+        ("mazowieckie", 3, "KW LIGA POLSKICH RODZIN"),
+        ("mazowieckie", 5, "KW POLSKIEGO STRONNICTWA LUDOWEGO"),  # *
+        ("mazowieckie", 5, "KWW KONFEDERACJA RUCH OBRONY BEZROBOTNYCH RP"),  # *
+        ("mazowieckie", 6, "KW ALTERNATYWA PARTIA PRACY"),
+        ("mazowieckie", 7, "KW SAMOOBRONA RZECZYPOSPOLITEJ POLSKIEJ"),
+        ("mazowieckie", 7, "KWW RAZEM POLSCE"),
+        ("mazowieckie", 7, "KW KRAJOWEJ PARTII EMERYTÓW I RENCISTÓW"),  # *
+        ("małopolskie", 2, "KW KOMITETU OBRONY POLSKIEJ ZIEMI PLACÓWKA"),  # *
+        ("małopolskie", 5, "KW KRAJOWEJ PARTII EMERYTÓW I RENCISTÓW"),
+        ("opolskie", 3, "KW MNIEJSZOŚĆ NIEMIECKA"),
+        ("podkarpackie", 5, "KW POLSKIEGO STRONNICTWA LUDOWEGO"),  # *
+        ("podlaskie", 1, "KWW WSPÓLNA INICJATYWA - POLSKA PODLASIE"),
+        ("pomorskie", 5, "KW LIGA POLSKICH RODZIN"),  # *
+        ("zachodniopomorskie", 2, "KRAJOWY KWW UNIA SAMORZĄDOWA"),
+        ("zachodniopomorskie", 4, "KRAJOWY KWW UNIA SAMORZĄDOWA"),
+        ("zachodniopomorskie", 5, "KRAJOWY KWW UNIA SAMORZĄDOWA"),  # *
+        ("łódzkie", 6, "KOALICYJNY KW PLATFORMA OBYWATELSKA - PRAWO I SPRAWIEDLIWOŚĆ"),
+        ("śląskie", 3, "KW LIGA POLSKICH RODZIN"),
+        ("śląskie", 3, "KW KRAJOWEJ PARTII EMERYTÓW I RENCISTÓW"),
+        ("śląskie", 3, "KWW KONFEDERACJA RUCH OBRONY BEZROBOTNYCH RP"),  # *
+        ("śląskie", 5, "KW RUCHU AUTONOMII ŚLĄSKA"),
+        ("śląskie", 6, "KW ALTERNATYWA PARTIA PRACY"),
+        ("świętokrzyskie", 1, "KW KONSERWATYWNO-LIBERALNA PARTIA UNIA POLITYKI REALNEJ"),
+        ("świętokrzyskie", 5, "KWW RAZEM POLSCE"),
+    ],
     # 2014: lists whose total in the gmina results exceeds the sum of their candidates' votes. Seven
     # have a missing list position (a struck-off candidate dropped from the register). The other six
     # (mazowieckie 4: four lists 1-10 votes above; śląskie 2: PO 1 vote, Oburzeni 85) have no missing
@@ -700,7 +1075,7 @@ def _known_struck_off(year: int) -> str:
 
 def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
     """Local results must reconcile between candidates, lists and gmina protocols."""
-    run_checks(con, year, {
+    checks = {
         "sejmik: elected councillors != seats in the district register": """
             SELECT abs((SELECT count(*) FROM sejmik_candidates WHERE elected) - (SELECT seats FROM sejmik_seats))""",
         "sejmik: committee columns with votes not mapped to a committee": """
@@ -713,7 +1088,8 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
         "sejmik: gminas without a district or in several (except named split gminas)": f"""
             SELECT count(*) FROM sejmik_gmina_protocols p
             WHERE (SELECT count(*) FROM sejmik_gmina_district d WHERE d.teryt_gmina = p.teryt_gmina)
-                  <> CASE WHEN p.teryt_gmina IN ({', '.join(map(sql_literal, SEJMIK_SPLIT_GMINAS.get(year, [''])))}) THEN 2 ELSE 1 END""",
+                  <> CASE p.teryt_gmina {' '.join(f'WHEN {sql_literal(t)} THEN {n}' for t, n in SEJMIK_SPLIT_GMINAS.get(year, {'': 1}).items())}
+                     ELSE 1 END""",
         "sejmik: district lists without candidates": """
             SELECT count(*) FROM sejmik_district_lists WHERE candidate_votes IS NULL AND votes > 0""",
         "sejmik: candidate votes exceed list votes": """
@@ -744,6 +1120,40 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
         "wbp: round 2 in a gmina without round 1": """
             SELECT count(*) FROM wbp_gmina_protocols p WHERE round = 2
               AND NOT EXISTS (SELECT 1 FROM wbp_gmina_protocols q WHERE q.round = 1 AND q.teryt_gmina = p.teryt_gmina)""",
-    })
+    }
+    if year == 2002:
+        # Precinct sums against the official gmina statistics (Warsaw districts added up to 146501).
+        checks["sejmik: 2002 gmina sums of the precinct file != official gmina statistics"] = f"""
+            SELECT count(*) FROM sejmik_gmina_protocols p
+            FULL JOIN (SELECT CASE WHEN left(teryt, 4) = '1465' THEN '146501' ELSE teryt END AS teryt_gmina,
+                              {', '.join(f'sum(sejmik_{x}) AS {x}' for x in PROTOCOL)}
+                       FROM stats_2002 GROUP BY 1) s USING (teryt_gmina)
+            WHERE {' OR '.join(f'p.{x} IS DISTINCT FROM s.{x}' for x in PROTOCOL)}"""
+    if year == 2006:
+        # The candidate file repeats each list's district total and the register gives seats per district.
+        checks["sejmik: 2006 district list votes != list totals of the candidate file"] = """
+            SELECT count(*) FROM sejmik_district_lists l JOIN sejmik_committees c USING (committee_id)
+            FULL JOIN (SELECT lower("Jednostka") AS wojewodztwo, CAST(int_("Okręg") AS INT) AS district_no,
+                              strip_signature("Komitet") AS committee_name, min(int_("Gł. na listę")) AS lo, max(int_("Gł. na listę")) AS hi
+                       FROM sejmik_cand GROUP BY ALL) k USING (wojewodztwo, district_no, committee_name)
+            WHERE l.votes IS DISTINCT FROM k.lo OR k.lo <> k.hi"""
+        checks["sejmik: 2006 districts whose elected councillors != seats in the district register"] = """
+            SELECT count(*) FROM src_sejmik_seats r
+            FULL JOIN (SELECT wojewodztwo, district_no, count(*) FILTER (WHERE elected) AS elected FROM sejmik_candidates GROUP BY ALL) k
+              ON k.wojewodztwo = lower(r."Wojewóztwo") AND k.district_no = int_(r."Nr okr.")
+            WHERE k.elected IS DISTINCT FROM int_(r."L. mand.")"""
+        gaps = ", ".join(f"({sql_literal(w)}, {d})" for w, d in SEJMIK_ELIGIBLE_GAPS[2006])
+        checks["sejmik: 2006 district sums of the gmina file != district register (eligible voters: except named districts)"] = f"""
+            WITH g AS (SELECT voivodeship(teryt_gmina) AS wojewodztwo, district_no, {', '.join(f'sum({x}) AS {x}' for x in PROTOCOL)}
+                       FROM sejmik_prot_rows GROUP BY ALL),
+            r AS (SELECT lower("Wojewóztwo") AS wojewodztwo, CAST(int_("Nr okr.") AS INT) AS district_no, int_("L. upr.") AS eligible_voters,
+                         int_("Frekw.") AS ballots_issued, int_("Gł. odd.") AS valid_ballots, int_("Gł. niew.") AS invalid_votes,
+                         int_("Gł. ważne") AS valid_votes FROM src_sejmik_seats)
+            SELECT count(*) + (SELECT count(*) FROM g JOIN r USING (wojewodztwo, district_no)
+                               WHERE g.eligible_voters = r.eligible_voters AND (wojewodztwo, district_no) IN ({gaps}))
+            FROM g FULL JOIN r USING (wojewodztwo, district_no)
+            WHERE {' OR '.join(f'g.{x} IS DISTINCT FROM r.{x}' for x in PROTOCOL if x != 'eligible_voters')}
+               OR (g.eligible_voters IS DISTINCT FROM r.eligible_voters AND (wojewodztwo, district_no) NOT IN ({gaps}))"""
+    run_checks(con, year, checks)
     if con.execute("SELECT count(*) FROM wbp_gmina_protocols WHERE office IS NULL").fetchone()[0]:
         raise BuildError(f"year {year}: mayor protocols without an office")

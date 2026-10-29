@@ -278,6 +278,23 @@ class TestStrictStaging(unittest.TestCase):
         ])
         self.assertEqual(rows, [("711", "265", "265", "12", "12"), ("712", "266", "266", "0", "0")])
 
+    def test_excel_single_list_row_is_folded_not_skipped(self) -> None:
+        # A list row naming one list has one non-empty cell, but not in the first column: it is a
+        # group-header row, not a title row, so its label still prefixes the header cell below it.
+        book = Path(self.tmp.name) / "single_list.xlsx"
+        _xlsx(book, [("Arkusz1", "sheet1.xml", [
+            ["Wybory do Sejmu i Senatu 2011"],
+            ["", "Lista nr 1 — KW A", ""],
+            ["Nr obwodu głosowania", "Liczba głosów ważnych oddanych na listę", "KACZYŃSKI Jarosław"],
+            ["711", "265", "265"],
+        ])])
+        self.assertEqual(stage.excel_to_parquet(book, self.out), 1)
+        columns, rows = self.staged()
+        self.assertEqual(columns, [
+            "Nr obwodu głosowania", "Lista nr 1 — KW A - Liczba głosów ważnych oddanych na listę", "KACZYŃSKI Jarosław",
+        ])
+        self.assertEqual(rows, [("711", "265", "265")])
+
     def test_excel_unit_row_is_folded_into_the_header_above(self) -> None:
         # 2005 presidential run-off: each header cell spans a 'liczba' and a '%' column (unit row below).
         book = Path(self.tmp.name) / "obw2tura.xlsx"
@@ -438,6 +455,7 @@ class TestSourceCheck(unittest.TestCase):
         self.assertEqual(check_sources.affected(files), {"parliament": [2015], "pe": [2019], "samorzad": [2018, 2024]})
         self.assertEqual(check_sources.file_url("2010/samorzad/sejmik/2010-sejmiki-po-woj.xls"),
                          "https://danewyborcze.kbw.gov.pl/dane/2010/sejmik/2010-sejmiki-po-woj.xls")
+        self.assertEqual(check_sources.file_url("2002/samorzad/wbp/wbp2002.zip"), "https://danewyborcze.kbw.gov.pl/dane/2002/wbp/wbp2002.zip")
         self.assertEqual(check_sources.file_url("2014/samorzad/samo2014 wyniki.xls"),
                          "https://danewyborcze.kbw.gov.pl/dane/2014/samorzad/samo2014%20wyniki.xls")
 
@@ -468,13 +486,11 @@ class TestAnswerNumbers(unittest.TestCase):
 
     def test_caveats_follow_the_rows_and_sql(self) -> None:
         turnout = "SELECT election, year, round, turnout_pct FROM mart.v_turnout WHERE level = 'country'"
-        p2010 = [{"election": "prezydent", "year": 2010, "round": 1, "turnout_pct": 54.92}]
-        p2015 = [{"election": "prezydent", "year": 2015, "round": 1, "turnout_pct": 48.96}]
-        self.assertIn("2010", " ".join(answer.caveats(p2010, turnout)))
-        self.assertEqual(answer.caveats(p2015, turnout), [])
-        sejm_turnout = "SELECT year, turnout_pct FROM mart.v_sejm_turnout WHERE level = 'country'"
-        self.assertIn("2007", answer.caveats([{"year": 2007, "turnout_pct": 53.82}], sejm_turnout)[0])
-        self.assertEqual(answer.caveats([{"year": 2011, "turnout_pct": 48.92}], sejm_turnout), [])
+        pe2014 = [{"election": "pe", "year": 2014, "round": 1, "turnout_pct": 23.82}]
+        p2010 = [{"election": "prezydent", "year": 2010, "round": 1, "turnout_pct": 54.94}]
+        self.assertIn("2014", " ".join(answer.caveats(pe2014, turnout)))
+        # Turnout computed as PKW did (turnout_basis) needs no caveat.
+        self.assertEqual(answer.caveats(p2010, turnout), [])
         # Year and election only in the SQL (rows without those columns).
         self.assertEqual(len(answer.caveats([{"turnout_pct": 23.82}],
                                             "SELECT turnout_pct FROM mart.v_turnout WHERE election = 'pe' AND year = 2014")), 1)
@@ -483,7 +499,7 @@ class TestAnswerNumbers(unittest.TestCase):
         self.assertEqual(answer.caveats([{"family": "PiS", "comparable": True}], "SELECT * FROM mart.v_party_change"), [])
         self.assertEqual(answer.caveats([], turnout), [])
         with patch.object(answer, "OPENAI_API_KEY", ""):
-            self.assertEqual(len(answer.compose_answer("Frekwencja 2010?", p2010, turnout)["caveats"]), 1)
+            self.assertEqual(len(answer.compose_answer("Frekwencja PE 2014?", pe2014, turnout)["caveats"]), 1)
 
 
 class TestRateLimiter(unittest.TestCase):
@@ -696,7 +712,7 @@ class TestDynamicQueryFlow(unittest.TestCase):
 class TestPromptRelations(unittest.TestCase):
     AVAILABLE = [
         "elections", "persons", "v_turnout", "precincts", "sejm_lists", "senat_candidates",
-        "prezydent_results", "wbp_candidates", "sejmik_lists", "rada_candidates", "pe_lists",
+        "prezydent_results", "wbp_candidates", "sejmik_lists", "rada_candidates", "pe_lists", "v_seat_methods",
     ]
 
     def test_named_election_kind_limits_the_schema(self) -> None:
@@ -711,6 +727,12 @@ class TestPromptRelations(unittest.TestCase):
             dynamic_sql.relevant_relations("Frekwencja w wyborach do Parlamentu Europejskiego", self.AVAILABLE),
             ["elections", "persons", "v_turnout", "pe_lists"],
         )
+
+    def test_seat_method_questions_get_the_seat_view(self) -> None:
+        relations = dynamic_sql.relevant_relations("Ile mandatów miałby PiS metodą Sainte-Laguë?", self.AVAILABLE)
+        self.assertIn("v_seat_methods", relations)
+        self.assertNotIn("pe_lists", relations)
+        self.assertNotIn("v_seat_methods", dynamic_sql.relevant_relations("Kto wygrał wybory prezydenckie w 2020?", self.AVAILABLE))
 
     def test_no_kind_or_false_friend_sends_everything(self) -> None:
         # "Radom" is not "rada"; "województwie" is not the sejmik.

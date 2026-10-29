@@ -103,9 +103,9 @@ WHERE c.chamber = 'pe' AND c.year = k.year AND c.candidate_id = k.candidate_id;
 # in that local election (one sejmik candidate, mayor candidates of one gmina, or one council
 # candidate among all council candidates of the year). Local candidacies never create persons:
 # tens of thousands of local namesakes would merge strangers.
-# When several national persons share the name, the one whose published residence (residence_teryt,
-# national registers from 2019) lies in the local candidacy's powiat (sejmik: voivodeship) is taken,
-# if there is exactly one.
+# When several national persons share the name, the one whose residence lies in the local candidacy's
+# powiat (sejmik: voivodeship) is taken, if there is exactly one: residence_teryt where published
+# (national registers from 2019), else the residence text mapped through place names seen with a TERYT.
 # Local registers publish the candidate's age, national registers do not. All local candidacies
 # linked to one person must agree on the birth year (election year minus age; two candidacies of
 # one person differ by at most 1, because age is counted on election day). When they do not, the
@@ -138,19 +138,37 @@ FROM (SELECT year, full_name FROM mart.rada_candidates GROUP BY year, full_name 
 WHERE u.year = k.year AND u.full_name = k.full_name
   AND n.name_key = upper(regexp_replace(k.full_name, '\s+', ' ', 'g')) AND n.gender IS NOT DISTINCT FROM k.gender;
 
--- Names shared by several national persons: a local candidacy joins the one whose published
--- residence (residence_teryt, registers from 2019) is in the same powiat (sejmik: voivodeship),
--- when exactly one such person exists and the name occurs once there in that local election.
-CREATE TEMP TABLE national_residence ON COMMIT DROP AS
-SELECT DISTINCT i.name_key, i.gender, left(x.residence_teryt, 4) AS powiat, i.person_id
+-- Names shared by several national persons: a local candidacy joins the one whose residence is in
+-- the same powiat (sejmik: voivodeship), when exactly one such person exists and the name occurs once
+-- there in that local election. Residence is residence_teryt where published (registers from 2019);
+-- before 2019 the residence text is mapped to a powiat through residence_place.
+CREATE TEMP TABLE national_residence_raw ON COMMIT DROP AS
+SELECT i.name_key, i.gender, i.person_id, x.residence, x.residence_teryt
 FROM candidacy_ids i
-JOIN (SELECT 'sejm' AS chamber, year, 1 AS round, candidate_id, residence_teryt FROM mart.sejm_candidates
-      UNION ALL SELECT 'senat', year, 1, candidate_id, residence_teryt FROM mart.senat_candidates
-      UNION ALL SELECT 'prezydent', year, round, candidate_id, residence_teryt FROM mart.prezydent_candidates
-      UNION ALL SELECT 'pe', year, 1, candidate_id, residence_teryt FROM mart.pe_candidates) x
+JOIN (SELECT 'sejm' AS chamber, year, 1 AS round, candidate_id, residence, residence_teryt FROM mart.sejm_candidates
+      UNION ALL SELECT 'senat', year, 1, candidate_id, residence, residence_teryt FROM mart.senat_candidates
+      UNION ALL SELECT 'prezydent', year, round, candidate_id, residence, residence_teryt FROM mart.prezydent_candidates
+      UNION ALL SELECT 'pe', year, 1, candidate_id, residence, residence_teryt FROM mart.pe_candidates) x
   USING (chamber, year, round, candidate_id)
-WHERE x.residence_teryt IS NOT NULL
-  AND NOT EXISTS (SELECT 1 FROM national_name n WHERE n.name_key = i.name_key AND n.gender IS NOT DISTINCT FROM i.gender);
+WHERE NOT EXISTS (SELECT 1 FROM national_name n WHERE n.name_key = i.name_key AND n.gender IS NOT DISTINCT FROM i.gender);
+
+-- Place name (folded) -> powiat, learned from the residence text and residence_teryt pairs published
+-- since 2019; only place names that occur with one powiat. (97% of 2023-2025 places map to the right
+-- powiat when learned from 2019-2020; gmina names as a fallback reach only 86%, so they are not used.)
+CREATE TEMP TABLE residence_place ON COMMIT DROP AS
+SELECT mart.fold_name(residence) AS place, min(left(residence_teryt, 4)) AS powiat
+FROM (SELECT residence, residence_teryt FROM mart.sejm_candidates
+      UNION ALL SELECT residence, residence_teryt FROM mart.senat_candidates
+      UNION ALL SELECT residence, residence_teryt FROM mart.prezydent_candidates
+      UNION ALL SELECT residence, residence_teryt FROM mart.pe_candidates) c
+WHERE residence_teryt ~ '^[0-9]{6}$' AND residence IS NOT NULL
+GROUP BY 1 HAVING count(DISTINCT left(residence_teryt, 4)) = 1;
+
+CREATE TEMP TABLE national_residence ON COMMIT DROP AS
+SELECT DISTINCT r.name_key, r.gender, coalesce(left(r.residence_teryt, 4), p.powiat) AS powiat, r.person_id
+FROM national_residence_raw r
+LEFT JOIN residence_place p ON r.residence_teryt IS NULL AND p.place = mart.fold_name(r.residence)
+WHERE coalesce(left(r.residence_teryt, 4), p.powiat) IS NOT NULL;
 
 CREATE TEMP TABLE residence_powiat ON COMMIT DROP AS
 SELECT name_key, gender, powiat, min(person_id) AS person_id FROM national_residence
@@ -380,30 +398,67 @@ def link_persons(pg: psycopg.Connection, overrides: Path = PERSON_OVERRIDES) -> 
     pg.execute(LOCAL_PERSONS_SQL)
 
 # Colloquial party families for comparing elections: the first alias of a committee
-# (``COMMITTEE_ALIASES`` in build_common.py) mapped to a family. Committees without aliases (local
-# committees) fall into 'other'. Families group predecessor and successor committees (PO -> KO);
-# v_party_change marks such pairs as not directly comparable.
-PARTY_FAMILIES = {
-    "LiD": "Lewica",
-    "PiS": "PiS",
-    "KO": "KO",
-    "PO": "KO",
-    "KE": "KE",
-    "Lewica": "Lewica",
-    "SLD": "Lewica",
-    "ZL": "Lewica",
-    "NL": "Lewica",
-    "Lewica Razem": "Razem",
-    "Razem": "Razem",
-    "TD": "TD/PSL",
-    "PSL": "TD/PSL",
-    "Konfederacja": "Konfederacja",
+# (``COMMITTEE_ALIASES`` in build_common.py) -> (family, note shown in mart.party_families). Committees
+# without aliases (local committees) fall into 'other'; first aliases not listed are their own family.
+# Families group predecessor and successor committees (PO -> KO); v_party_change marks such pairs as
+# not directly comparable. Notes are Polish because they are shown to users.
+PARTY_FAMILIES: dict[str, tuple[str, str]] = {
+    "PiS": ("PiS", "Prawo i Sprawiedliwość; od 2015 lista Zjednoczonej Prawicy."),
+    "Solidarna Polska": ("PiS", "Solidarna Polska: osobna lista w 2014, od 2015 w Zjednoczonej Prawicy."),
+    "Polska Razem": ("PiS", "Polska Razem: osobna lista w 2014, od 2015 w Zjednoczonej Prawicy."),
+    "PO": ("KO", "Platforma Obywatelska; od 2018 trzon Koalicji Obywatelskiej."),
+    "KO": ("KO", "Koalicja Obywatelska (od 2018: PO, Nowoczesna i inni)."),
+    "Nowoczesna": ("KO", "Nowoczesna: osobna lista w 2015, od 2018 w Koalicji Obywatelskiej."),
+    "KE": ("KE", "Koalicja Europejska (PE 2019: PO, PSL, SLD, Nowoczesna, Zieloni)."),
+    "SLD": ("Lewica", "Sojusz Lewicy Demokratycznej (także SLD-UP)."),
+    "LiD": ("Lewica", "Lewica i Demokraci (2007: SLD, SDPL, PD, UP)."),
+    "ZL": ("Lewica", "Zjednoczona Lewica (2015: SLD, Twój Ruch i inni)."),
+    "Lewica": ("Lewica", "Lewica (od 2019: SLD/Nowa Lewica, Wiosna, w 2019 i 2023 także Razem)."),
+    "NL": ("Lewica", "Nowa Lewica (połączenie SLD i Wiosny)."),
+    "Wiosna": ("Lewica", "Wiosna: osobna lista w PE 2019, od 2019 w Lewicy."),
+    "Lewica Razem": ("Razem", "Lewica Razem (PE 2019: Razem, UP, RSS)."),
+    "Razem": ("Razem", "Partia Razem."),
+    "PSL": ("TD/PSL", "Polskie Stronnictwo Ludowe (2019: Koalicja Polska)."),
+    "TD": ("TD/PSL", "Trzecia Droga (2023: PSL i Polska 2050)."),
+    "Konfederacja": ("Konfederacja", "Konfederacja (od 2019: m.in. KORWiN, później Nowa Nadzieja, i Ruch Narodowy)."),
+    "KORWiN": ("Konfederacja", "Komitety Janusza Korwin-Mikkego: Platforma JKM (2005), Ruch Wyborców JKM (sejmiki 2010), KORWiN (2015); od 2019 w Konfederacji."),
+    "KNP": ("Konfederacja", "Kongres Nowej Prawicy / Nowa Prawica Janusza Korwin-Mikkego (2011-2014), poprzednik KORWiN."),
+    "RN": ("Konfederacja", "Ruch Narodowy, od 2019 w Konfederacji."),
+    "POPiS": ("POPiS", "Wspólne listy PO i PiS do sejmików w 2002 r."),
+    "AWSP": ("AWSP", "Akcja Wyborcza Solidarność Prawicy (Sejm 2001), następczyni AWS."),
+    "UW": ("UW/PD", "Unia Wolności; w 2005 przekształcona w Partię Demokratyczną."),
+    "PD": ("UW/PD", "Partia Demokratyczna (następczyni Unii Wolności)."),
 }
+
+
+# Elections for which PKW computed the official turnout from ballots issued; later PKW uses valid
+# ballots taken from the ballot box (both stored in the protocols). Checked against PKW's figures.
+TURNOUT_FROM_BALLOTS_ISSUED = (("sejm", 2001), ("sejm", 2005), ("sejm", 2007), ("senat", 2001), ("senat", 2005),
+                               ("senat", 2007), ("prezydent", 2000), ("prezydent", 2005), ("prezydent", 2010),
+                               ("sejmik", 2002), ("sejmik", 2006), ("wbp", 2002), ("wbp", 2006))
+
+TURNOUT_BASIS_COMMENT = (
+    "Numerator of the official turnout, as PKW computed it: ''ballots_issued'' (ballot papers issued to "
+    "voters; Sejm/Senate 2001, 2005 and 2007, president 2000, 2005 and 2010, sejmiki and mayors 2002 and 2006) or ''valid_ballots'' (valid ballot papers "
+    "taken from the ballot box; every other election). Both counts are columns of this view."
+)
+
+
+def _turnout_basis_sql(election: str, year: str) -> str:
+    """SQL expression: 'ballots_issued' or 'valid_ballots', PKW's turnout basis for that election-year."""
+    pairs = ", ".join(f"('{e}', {y})" for e, y in TURNOUT_FROM_BALLOTS_ISSUED)
+    return f"CASE WHEN ({election}, {year}) IN ({pairs}) THEN 'ballots_issued' ELSE 'valid_ballots' END"
+
+
+def _turnout_pct_sql(basis: str, issued: str, valid: str, eligible: str) -> str:
+    """SQL expression: turnout in percent on the given basis."""
+    return (f"round(100.0 * CASE WHEN {basis} = 'ballots_issued' THEN {issued} ELSE {valid} END"
+            f" / NULLIF({eligible}, 0), 2)")
 
 
 def _party_family_sql(aliases: str) -> str:
     """SQL expression mapping a committee's aliases array to its party family."""
-    cases = " ".join(f"WHEN '{alias}' THEN '{family}'" for alias, family in PARTY_FAMILIES.items())
+    cases = " ".join(f"WHEN '{alias}' THEN '{family}'" for alias, (family, _) in PARTY_FAMILIES.items())
     return f"coalesce(CASE ({aliases})[1] {cases} ELSE ({aliases})[1] END, 'other')"
 
 
@@ -450,8 +505,10 @@ LEVEL_COMMENT = "Aggregation level of the row: country, wojewodztwo, powiat or g
 DROP_SQL = r"""
 DROP VIEW IF EXISTS mart.v_person_history;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_gmina_continuity;
+DROP MATERIALIZED VIEW IF EXISTS mart.v_seat_methods;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_party_change;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_party_results;
+DROP TABLE IF EXISTS mart.party_families;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_turnout;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_sejmik_results;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_rada_results;
@@ -463,7 +520,7 @@ DROP MATERIALIZED VIEW IF EXISTS mart.v_sejm_list_results;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_sejm_turnout;
 """
 
-SEJM_VIEWS_SQL = r"""
+SEJM_VIEWS_SQL = rf"""
 CREATE MATERIALIZED VIEW mart.v_sejm_national_results AS
 WITH totals AS (
   SELECT year, committee_id, sum(votes) AS votes, sum(seats) AS seats
@@ -530,8 +587,10 @@ SELECT p.year,
        p.wojewodztwo, p.powiat, left(p.teryt_gmina, 4) AS teryt_powiat, p.gmina, p.teryt_gmina, p.sejm_district_no,
        count(*) AS precincts,
        sum(r.eligible_voters) AS eligible_voters,
+       sum(r.ballots_issued) AS ballots_issued,
        sum(r.valid_ballots) AS valid_ballots,
-       round(100.0 * sum(r.valid_ballots) / NULLIF(sum(r.eligible_voters), 0), 2) AS turnout_pct
+       {_turnout_basis_sql("'sejm'", "p.year")} AS turnout_basis,
+       {_turnout_pct_sql(_turnout_basis_sql("'sejm'", "p.year"), "sum(r.ballots_issued)", "sum(r.valid_ballots)", "sum(r.eligible_voters)")} AS turnout_pct
 FROM mart.precincts p JOIN mart.sejm_precinct_protocols r USING (year, precinct_id)
 GROUP BY GROUPING SETS (
   (p.year),
@@ -540,8 +599,9 @@ GROUP BY GROUPING SETS (
   (p.year, p.wojewodztwo, left(p.teryt_gmina, 4), p.powiat, p.teryt_gmina, p.gmina),
   (p.year, p.sejm_district_no)
 );
-COMMENT ON MATERIALIZED VIEW mart.v_sejm_turnout IS 'Official Sejm turnout (valid ballots / eligible voters) per territorial unit; level as in v_sejm_list_results. For single precincts use mart.sejm_precinct_protocols. For other elections use mart.v_turnout.';
-COMMENT ON COLUMN mart.v_sejm_turnout.turnout_pct IS 'Turnout in percent (0-100).';
+COMMENT ON MATERIALIZED VIEW mart.v_sejm_turnout IS 'Official Sejm turnout per territorial unit, computed as PKW did (see turnout_basis); level as in v_sejm_list_results. For single precincts use mart.sejm_precinct_protocols. For other elections use mart.v_turnout.';
+COMMENT ON COLUMN mart.v_sejm_turnout.turnout_basis IS '{TURNOUT_BASIS_COMMENT}';
+COMMENT ON COLUMN mart.v_sejm_turnout.turnout_pct IS 'Official turnout in percent (0-100): turnout_basis / eligible_voters.';
 """
 
 
@@ -681,21 +741,21 @@ CREATE INDEX ON mart.v_rada_results (teryt);
 def _cross_election_views_sql() -> str:
     """DDL of v_turnout, v_party_results, v_party_change and v_gmina_continuity."""
     turnout_source = f"""
-        SELECT 'sejm' AS election, p.year, 1 AS round, {GEO}, r.eligible_voters, r.valid_ballots
+        SELECT 'sejm' AS election, p.year, 1 AS round, {GEO}, r.eligible_voters, r.ballots_issued, r.valid_ballots
         FROM mart.precincts p JOIN mart.sejm_precinct_protocols r USING (year, precinct_id)
         UNION ALL
-        SELECT 'senat', p.year, 1, {GEO}, r.eligible_voters, r.valid_ballots
+        SELECT 'senat', p.year, 1, {GEO}, r.eligible_voters, r.ballots_issued, r.valid_ballots
         FROM mart.precincts p JOIN mart.senat_precinct_protocols r USING (year, precinct_id)
         UNION ALL
-        SELECT 'prezydent', p.year, p.round, {GEO}, p.eligible_voters, p.valid_ballots FROM mart.prezydent_precinct_protocols p
+        SELECT 'prezydent', p.year, p.round, {GEO}, p.eligible_voters, p.ballots_issued, p.valid_ballots FROM mart.prezydent_precinct_protocols p
         UNION ALL
-        SELECT 'pe', p.year, 1, {GEO}, p.eligible_voters, p.valid_ballots FROM mart.pe_precinct_protocols p
+        SELECT 'pe', p.year, 1, {GEO}, p.eligible_voters, p.ballots_issued, p.valid_ballots FROM mart.pe_precinct_protocols p
         UNION ALL
-        SELECT 'referendum', p.year, 1, {GEO}, p.eligible_voters, p.valid_ballots FROM mart.referendum_precinct_protocols p
+        SELECT 'referendum', p.year, 1, {GEO}, p.eligible_voters, p.ballots_issued, p.valid_ballots FROM mart.referendum_precinct_protocols p
         UNION ALL
-        SELECT 'sejmik', p.year, 1, {GEO}, p.eligible_voters, p.valid_ballots FROM mart.sejmik_gmina_protocols p
+        SELECT 'sejmik', p.year, 1, {GEO}, p.eligible_voters, p.ballots_issued, p.valid_ballots FROM mart.sejmik_gmina_protocols p
         UNION ALL
-        SELECT 'wbp', p.year, p.round, {GEO}, p.eligible_voters, p.valid_ballots FROM mart.wbp_gmina_protocols p"""
+        SELECT 'wbp', p.year, p.round, {GEO}, p.eligible_voters, p.ballots_issued, p.valid_ballots FROM mart.wbp_gmina_protocols p"""
     party = _party_family_sql("c.aliases")
     party_source = f"""
         SELECT 'sejm' AS election, p.year, {GEO}, {party} AS party, c.aliases[1] AS lead_alias, c.committee_name, v.votes
@@ -712,18 +772,30 @@ def _cross_election_views_sql() -> str:
     party_measures = """sum(votes) AS votes,
        array_to_string(array_agg(DISTINCT lead_alias ORDER BY lead_alias), '+') AS lead_aliases,
        count(DISTINCT committee_name) AS committees"""
-    families = ", ".join(f"{alias}→{family}" for alias, family in PARTY_FAMILIES.items())
+    families = ", ".join(f"{alias}→{family}" for alias, (family, _) in PARTY_FAMILIES.items())
+    family_rows = ", ".join(
+        "(" + ", ".join("'" + v.replace("'", "''") + "'" for v in (alias, family, note)) + ")"
+        for alias, (family, note) in PARTY_FAMILIES.items()
+    )
     return f"""
 CREATE MATERIALIZED VIEW mart.v_turnout AS
 SELECT election, year, round, level, wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina,
-       eligible_voters, valid_ballots, round(100.0 * valid_ballots / NULLIF(eligible_voters, 0), 2) AS turnout_pct
-FROM ({_rollup(turnout_source, "election, year, round", "sum(eligible_voters) AS eligible_voters, sum(valid_ballots) AS valid_ballots")}) t;
-COMMENT ON MATERIALIZED VIEW mart.v_turnout IS 'Turnout (valid ballots / eligible voters) of every loaded election per territorial unit: election in (sejm, senat, prezydent, pe, referendum, sejmik, wbp), year, round. Compare turnout across elections by joining on level + teryt_gmina / teryt_powiat / wojewodztwo. Mayor (wbp) round 2 covers only gminas with a run-off, so its country row is not a national turnout.';
+       eligible_voters, ballots_issued, valid_ballots, {_turnout_basis_sql("election", "year")} AS turnout_basis,
+       {_turnout_pct_sql(_turnout_basis_sql("election", "year"), "ballots_issued", "valid_ballots", "eligible_voters")} AS turnout_pct
+FROM ({_rollup(turnout_source, "election, year, round", "sum(eligible_voters) AS eligible_voters, sum(ballots_issued) AS ballots_issued, sum(valid_ballots) AS valid_ballots")}) t;
+COMMENT ON MATERIALIZED VIEW mart.v_turnout IS 'Official turnout (computed as PKW did, see turnout_basis) of every loaded election per territorial unit: election in (sejm, senat, prezydent, pe, referendum, sejmik, wbp), year, round. Compare turnout across elections by joining on level + teryt_gmina / teryt_powiat / wojewodztwo. Mayor (wbp) round 2 covers only gminas with a run-off, so its country row is not a national turnout.';
 COMMENT ON COLUMN mart.v_turnout.level IS '{LEVEL_COMMENT}';
-COMMENT ON COLUMN mart.v_turnout.turnout_pct IS 'Turnout in percent (0-100).';
+COMMENT ON COLUMN mart.v_turnout.turnout_basis IS '{TURNOUT_BASIS_COMMENT}';
+COMMENT ON COLUMN mart.v_turnout.turnout_pct IS 'Official turnout in percent (0-100): turnout_basis / eligible_voters.';
 CREATE INDEX ON mart.v_turnout (election, year, round, level);
 CREATE INDEX ON mart.v_turnout (teryt_gmina);
 
+CREATE TABLE mart.party_families (alias TEXT PRIMARY KEY, family TEXT NOT NULL, note TEXT NOT NULL);
+INSERT INTO mart.party_families VALUES {family_rows};
+COMMENT ON TABLE mart.party_families IS 'Party families used by v_party_results / v_party_change: the first alias of a committee (lead alias) -> family, with a Polish note on the lineage (which committees and years). First aliases not listed are their own family; committees without aliases are ''other''. Use for "jakie komitety należą do rodziny X", "z czego powstała Konfederacja".';
+COMMENT ON COLUMN mart.party_families.alias IS 'Lead alias of a committee (first element of *_committees.aliases), e.g. PO, KO, SLD, KNP.';
+COMMENT ON COLUMN mart.party_families.family IS 'Party family in v_party_results.party.';
+COMMENT ON COLUMN mart.party_families.note IS 'Polish note on the committee and its place in the family (years, coalition members).';
 CREATE MATERIALIZED VIEW mart.v_party_results AS
 WITH agg AS ({_rollup(party_source, "election, year, party", party_measures)})
 SELECT a.election, a.year, a.level, a.wojewodztwo, a.teryt_powiat, a.powiat, a.teryt_gmina, a.gmina,
@@ -901,6 +973,158 @@ ANALYZED = (
 )
 
 
+# Divisor method of each election-year where it is not D'Hondt (mart.allocate_seats).
+SEAT_METHODS = {("sejm", 2001): "sainte_lague_modified"}
+
+# Official seats per district recomputed from the list votes, in two stages: seats go by the
+# election's method (SEAT_METHODS, else D'Hondt) to the lists and to the list blocs (2006,
+# ``list_group``), then inside a bloc by Sainte-Laguë to its lists. Thresholds:
+# - Sejm: lists in seat allocation (``in_seat_allocation``, from PKW);
+# - sejmik and proportional councils: 5% of the voivodeship's / council's valid votes for a list;
+#   2002 gmina councils outside cities with powiat rights and Warsaw district councils had none;
+# - 2006 blocs: 15% (sejmik) or 10% (councils) for the bloc's lists together, counting members below
+#   5%; a bloc takes part in a district only if one of its lists there passed 5%; seats inside the
+#   bloc go to its members that passed 5%.
+# Councils with unknown list totals (build_rady.STRUCK_OFF_DISTRICTS) and uncontested districts are
+# skipped. The European Parliament (national D'Hondt, then Hare-Niemeyer between districts) is not
+# recomputed.
+SEAT_CHECK_SQL = """
+WITH lists AS (
+  SELECT 'sejm' AS election, l.year, '' AS unit, l.district_no, l.committee_id, NULL::int AS list_group, l.votes,
+         l.seats, d.seats AS district_seats, l.in_seat_allocation AS passed, NULL::numeric AS group_threshold
+  FROM mart.sejm_district_lists l JOIN mart.sejm_districts d USING (year, district_no)
+  UNION ALL
+  SELECT 'sejmik', l.year, l.wojewodztwo, l.district_no, l.committee_id, l.list_group, l.votes, l.seats,
+         sum(l.seats) OVER (PARTITION BY l.year, l.wojewodztwo, l.district_no),
+         sum(l.votes) OVER (PARTITION BY l.year, l.wojewodztwo, l.committee_id)
+           >= 0.05 * sum(l.votes) OVER (PARTITION BY l.year, l.wojewodztwo), 15
+  FROM mart.sejmik_district_lists l
+  UNION ALL
+  SELECT 'rada', l.year, l.council_level || ' ' || l.teryt, l.district_no, l.committee_id, l.list_group, l.votes, l.seats,
+         d.seats,
+         (l.year = 2002 AND (l.council_level = 'dzielnica' OR (l.council_level = 'gmina' AND substr(l.teryt, 3, 2) < '61')))
+         OR sum(l.votes) OVER (PARTITION BY l.year, l.council_level, l.teryt, l.committee_id)
+            >= 0.05 * sum(l.votes) OVER (PARTITION BY l.year, l.council_level, l.teryt), 10
+  FROM mart.rada_district_lists l JOIN mart.rada_districts d USING (year, council_level, teryt, district_no)
+  WHERE d.voting_system = 'proportional' AND d.contested
+    AND NOT EXISTS (SELECT 1 FROM mart.rada_district_lists u
+                    WHERE (u.year, u.council_level, u.teryt) = (l.year, l.council_level, l.teryt) AND u.votes IS NULL)
+), blocs AS (
+  SELECT *, list_group IS NOT NULL
+            AND 100 * sum(votes) OVER (PARTITION BY election, year, unit, list_group)
+                >= group_threshold * sum(votes) OVER (PARTITION BY election, year, unit) AS in_bloc
+  FROM lists
+), contenders AS (
+  SELECT election, year, unit, district_no, CASE WHEN in_bloc THEN 'B' || list_group ELSE 'L' || committee_id END AS contender,
+         sum(votes) AS votes, max(district_seats) AS district_seats
+  FROM blocs WHERE passed OR in_bloc
+  GROUP BY 1, 2, 3, 4, 5 HAVING bool_or(passed)
+), stage1 AS (
+  SELECT election, year, unit, district_no, unnest(array_agg(contender ORDER BY contender)) AS contender,
+         unnest(mart.allocate_seats(array_agg(votes ORDER BY contender), max(district_seats),
+                                    CASE (election, year) {methods} ELSE 'dhondt' END)) AS seats
+  FROM contenders GROUP BY 1, 2, 3, 4
+), stage2 AS (
+  SELECT b.election, b.year, b.unit, b.district_no, unnest(array_agg(b.committee_id ORDER BY b.committee_id)) AS committee_id,
+         unnest(mart.allocate_seats(array_agg(b.votes ORDER BY b.committee_id), max(s.seats), 'sainte_lague')) AS seats
+  FROM blocs b JOIN stage1 s ON (s.election, s.year, s.unit, s.district_no) = (b.election, b.year, b.unit, b.district_no)
+   AND s.contender = CASE WHEN b.in_bloc THEN 'B' || b.list_group ELSE 'L' || b.committee_id END
+  WHERE b.passed
+  GROUP BY 1, 2, 3, 4, s.contender
+), keyed AS (
+  SELECT b.*, CASE WHEN in_bloc THEN 'B' || list_group ELSE 'L' || committee_id END AS contender,
+         sum(votes) OVER (PARTITION BY election, year, unit, district_no,
+                          CASE WHEN in_bloc THEN 'B' || list_group ELSE 'L' || committee_id END) AS contender_votes
+  FROM blocs b
+), allocated AS (
+  SELECT k.election, k.year, k.unit, k.district_no, array_agg(k.votes ORDER BY k.committee_id) AS votes,
+         array_agg(k.contender ORDER BY k.committee_id) AS contenders,
+         array_agg(k.contender_votes ORDER BY k.committee_id) AS contender_votes,
+         array_agg(k.seats ORDER BY k.committee_id) AS official, array_agg(coalesce(s.seats, 0) ORDER BY k.committee_id) AS computed
+  FROM keyed k LEFT JOIN stage2 s USING (election, year, unit, district_no, committee_id)
+  GROUP BY 1, 2, 3, 4
+)
+SELECT election, year, unit, district_no, official, computed,
+       -- An exact tie for the last seat (equal votes of the competing lists or blocs; inside a bloc,
+       -- equal list votes) is decided by data not loaded (precincts won, lot).
+       (SELECT count(*) FILTER (WHERE official[i] <> computed[i]) >= 2 AND sum(official[i]) = sum(computed[i])
+               AND count(DISTINCT contender_votes[i]) FILTER (WHERE official[i] <> computed[i]) = 1
+               AND (count(DISTINCT contenders[i]) FILTER (WHERE official[i] <> computed[i]) > 1
+                    OR count(DISTINCT votes[i]) FILTER (WHERE official[i] <> computed[i]) = 1)
+        FROM generate_subscripts(official, 1) AS i) AS tie
+FROM allocated WHERE official <> computed
+ORDER BY election, year, unit, district_no
+"""
+
+
+# National seats per committee under each divisor method, with the official thresholds and district
+# magnitudes (Sejm: lists in seat allocation; sejmik: 5% of the voivodeship's valid votes).
+SEAT_METHODS_VIEW_SQL = r"""
+CREATE MATERIALIZED VIEW mart.v_seat_methods AS
+WITH sejmik_share AS (
+  SELECT year, wojewodztwo, committee_id,
+         sum(votes) >= 0.05 * sum(sum(votes)) OVER (PARTITION BY year, wojewodztwo) AS passed
+  FROM mart.sejmik_district_lists GROUP BY year, wojewodztwo, committee_id
+), lists AS (
+  SELECT 'sejm' AS election, l.year, l.district_no::text AS district, l.committee_id, l.votes, l.seats, d.seats AS district_seats
+  FROM mart.sejm_district_lists l JOIN mart.sejm_districts d USING (year, district_no)
+  WHERE l.in_seat_allocation
+  UNION ALL
+  SELECT 'sejmik', l.year, l.wojewodztwo || ' ' || l.district_no, l.committee_id, l.votes, l.seats,
+         sum(l.seats) OVER (PARTITION BY l.year, l.wojewodztwo, l.district_no)
+  FROM mart.sejmik_district_lists l JOIN sejmik_share s USING (year, wojewodztwo, committee_id)
+  WHERE s.passed AND l.year <> 2006  -- 2006 list blocs are not modelled here
+), districts AS (
+  SELECT election, year, array_agg(committee_id ORDER BY committee_id) AS ids, array_agg(votes ORDER BY committee_id) AS votes,
+         max(district_seats) AS seats
+  FROM lists GROUP BY election, year, district
+), allocated AS (
+  SELECT election, year, unnest(ids) AS committee_id,
+         unnest(mart.allocate_seats(votes, seats, 'dhondt')) AS dhondt,
+         unnest(mart.allocate_seats(votes, seats, 'sainte_lague')) AS sainte_lague,
+         unnest(mart.allocate_seats(votes, seats, 'sainte_lague_modified')) AS sainte_lague_modified
+  FROM districts
+), official AS (
+  SELECT election, year, committee_id, sum(votes) AS votes, sum(seats) AS seats FROM lists GROUP BY election, year, committee_id
+)
+SELECT a.election, a.year, a.committee_id, coalesce(sc.committee_name, kc.committee_name) AS committee_name,
+       coalesce(sc.aliases, kc.aliases) AS aliases, o.votes, CAST(o.seats AS INT) AS seats,
+       CAST(sum(a.dhondt) AS INT) AS seats_dhondt, CAST(sum(a.sainte_lague) AS INT) AS seats_sainte_lague,
+       CAST(sum(a.sainte_lague_modified) AS INT) AS seats_sainte_lague_modified
+FROM allocated a
+JOIN official o USING (election, year, committee_id)
+LEFT JOIN mart.sejm_committees sc ON a.election = 'sejm' AND sc.year = a.year AND sc.committee_id = a.committee_id
+LEFT JOIN mart.sejmik_committees kc ON a.election = 'sejmik' AND kc.year = a.year AND kc.committee_id = a.committee_id
+GROUP BY a.election, a.year, a.committee_id, sc.committee_name, kc.committee_name, sc.aliases, kc.aliases, o.votes, o.seats;
+COMMENT ON MATERIALIZED VIEW mart.v_seat_methods IS 'Seats per committee (whole country) in Sejm and sejmik (voivodeship assembly) elections under three divisor methods, with the official thresholds and district seat numbers: official seats, D''Hondt, Sainte-Laguë and modified Sainte-Laguë (first divisor 1.4). Use for "ile mandatów miałby PiS metodą Sainte-Laguë". Only committees that took part in seat allocation; sejmik 2006 (list blocs) is not included. For other thresholds or units call mart.allocate_seats(votes_array, seats, method) per district.';
+COMMENT ON COLUMN mart.v_seat_methods.election IS 'sejm or sejmik.';
+COMMENT ON COLUMN mart.v_seat_methods.votes IS 'Votes of the committee in the districts where it took part in seat allocation.';
+COMMENT ON COLUMN mart.v_seat_methods.seats IS 'Official seats.';
+COMMENT ON COLUMN mart.v_seat_methods.seats_dhondt IS 'Seats under D''Hondt (the official method for Sejm since 2005 and for sejmiki since 2002); ties for the last seat are broken by votes, so a few districts may differ from the official seats.';
+COMMENT ON COLUMN mart.v_seat_methods.seats_sainte_lague IS 'Seats under Sainte-Laguë (divisors 1, 3, 5, ...).';
+COMMENT ON COLUMN mart.v_seat_methods.seats_sainte_lague_modified IS 'Seats under modified Sainte-Laguë (divisors 1.4, 3, 5, ...; the official method of Sejm 2001).';
+"""
+
+
+def check_seat_allocation(pg: psycopg.Connection) -> None:
+    """Recompute official district seats with mart.allocate_seats; raise unless they match (ties aside)."""
+    methods = " ".join(f"WHEN ('{e}'::text, {y}) THEN '{m}'" for (e, y), m in SEAT_METHODS.items())
+    rows = pg.execute(SEAT_CHECK_SQL.format(methods=methods)).fetchall()
+    districts = pg.execute(
+        "SELECT (SELECT count(*) FROM mart.sejm_districts), (SELECT count(DISTINCT (year, wojewodztwo, district_no))"
+        " FROM mart.sejmik_district_lists), (SELECT count(*) FROM mart.rada_districts WHERE voting_system = 'proportional')"
+    ).fetchone()
+    ties = [r for r in rows if r[6]]
+    for election, year, unit, district_no, official, computed, _ in ties:
+        log.info("seat check: tie for the last seat in %s %s %s district %s (official %s, recomputed %s)",
+                 election, year, unit, district_no, official, computed)
+    errors = [r for r in rows if not r[6]]
+    log.info("seat check: sejm %s, sejmik %s, proportional council districts %s; %s ties, %s mismatches",
+             *districts, len(ties), len(errors))
+    if errors:
+        raise ValueError(f"official seats differ from the recomputed allocation in {len(errors)} districts: {errors[:5]}")
+
+
 def rebuild(pg: psycopg.Connection) -> None:
     """Rebuild persons, views and the entity lexicon from everything loaded (caller's transaction)."""
     link_persons(pg)
@@ -914,6 +1138,7 @@ def rebuild(pg: psycopg.Connection) -> None:
     pg.execute(_results_views_sql())
     pg.execute(_cross_election_views_sql())
     pg.execute(PERSON_HISTORY_SQL)
+    pg.execute(SEAT_METHODS_VIEW_SQL)
     linked = pg.execute(
         "SELECT (SELECT count(*) FROM mart.sejmik_candidates WHERE person_id IS NOT NULL),"
         " (SELECT count(*) FROM mart.wbp_candidates WHERE person_id IS NOT NULL)"
@@ -925,5 +1150,6 @@ def rebuild(pg: psycopg.Connection) -> None:
     )
     pg.execute(LEXICON_SQL)
     log.info("entity lexicon: %s names", pg.execute("SELECT count(*) FROM mart.entity_lexicon").fetchone()[0])
+    check_seat_allocation(pg)
     for relation in ANALYZED:
         pg.execute(f"ANALYZE mart.{relation}")

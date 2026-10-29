@@ -12,14 +12,14 @@ small, documented schema, and guards keep that SQL read-only and inside `mart` (
 
 | Election (`mart.elections.election`) | Years | Detail |
 | ------------------------------------ | ----- | ------ |
-| `sejm` | 2005, 2007, 2011, 2015, 2019, 2023 | precinct: lists, candidates, protocols (2005: no per-precinct candidate votes) |
-| `senat` | 2005, 2007, 2011, 2015, 2019, 2023 | precinct: candidates, protocols (2005: candidates with totals only, results published per powiat) |
-| `prezydent` (both rounds) | 2005, 2010, 2015, 2020, 2025 | precinct: candidates, protocols |
+| `sejm` | 2001, 2005, 2007, 2011, 2015, 2019, 2023 | precinct: lists, candidates, protocols (2001, 2005: no per-precinct candidate votes) |
+| `senat` | 2001, 2005, 2007, 2011, 2015, 2019, 2023 | precinct: candidates, protocols (2005: candidates with totals only, results published per powiat) |
+| `prezydent` (both rounds; 2000 one round) | 2000, 2005, 2010, 2015, 2020, 2025 | precinct: candidates, protocols |
 | `pe` (European Parliament) | 2004, 2009, 2014, 2019, 2024 | precinct: lists, candidates, protocols (2004, 2009: gmina rows, no candidate votes below district) |
-| `referendum` | 2015, 2023 | precinct: answers per question |
-| `sejmik` (voivodeship assembly) | 2010, 2014, 2018, 2024 | gmina: list votes, protocols; candidates with totals |
-| `wbp` (wójt / burmistrz / prezydent miasta, both rounds) | 2010, 2014, 2018, 2024 | gmina: candidates, protocols |
-| `rada` (councils: rada gminy / miasta, rada powiatu, rady dzielnic Warszawy) | 2010, 2014, 2018, 2024 | district: candidates with totals, lists, seats |
+| `referendum` | 2003, 2015, 2023 | precinct: answers per question |
+| `sejmik` (voivodeship assembly) | 2002, 2006, 2010, 2014, 2018, 2024 | gmina: list votes, protocols; candidates with totals |
+| `wbp` (wójt / burmistrz / prezydent miasta, both rounds) | 2002, 2006, 2010, 2014, 2018, 2024 | gmina: candidates, protocols |
+| `rada` (councils: rada gminy / miasta, rada powiatu, rady dzielnic Warszawy) | 2002, 2006, 2010, 2014, 2018, 2024 | district: candidates with totals, lists (2006: list blocs), seats |
 
 Councils are loaded at district level only (no per-precinct council results); list totals are the
 sum of their candidates' votes (see [Known gaps](#known-gaps-in-the-source-data)).
@@ -31,17 +31,20 @@ The build output matches the official results. Examples (from the built mart):
 | Check | Result |
 | ----- | ------ |
 | Sejm: PiS votes / seats | 2011: 4,295,016 / 157 · 2015: 5,711,687 / 235 · 2019: 8,051,935 / 235 · 2023: 7,640,854 / 194 |
+| Sejm 2001 | SLD-UP 5,342,519 (41.04%, 216), PO 65, Samoobrona 53, PiS 44, PSL 42, LPR 38, MN 2; AWSP 5.60% and UW 3.10% below the threshold; turnout 46.29% |
 | Sejm 2005 / 2007 | 2005: PiS 3,185,714 (26.99%, 155), PO 133, Samoobrona 56, SLD 55, LPR 34, PSL 25, MN 2 · 2007: PO 6,701,010 (41.51%, 209), PiS 166, LiD 53, PSL 31, MN 1 |
 | Sejm 2011 | PO 5,629,773 (39.18%, 207), RP 40, PSL 28, SLD 27, MN 1 |
-| Sejm turnout | 2005: 40.51% (PKW 40.57%) · 2007: 53.82% (PKW 53.88%) · 2011: 48.92% · 2015: 50.92% · 2019: 61.74% · 2023: 74.38% |
-| Senate seats | 2005: PiS 49, PO 34, LPR 7, Samoobrona 3, PSL 2, voters' committees 5 · 2007: PO 60, PiS 39, Cimoszewicz 1 · 2011: PO 63, PiS 31, PSL 2, independents 4 · 2015: PiS 61, PO 34 · 2019: PiS 48, KO 43 |
+| Sejm turnout | 2005: 40.57% · 2007: 53.88% · 2011: 48.92% · 2015: 50.92% · 2019: 61.74% · 2023: 74.38% |
+| Senate seats | 2001: SLD-UP 75, Blok Senat 2001 15, PSL 4, LPR 2, Samoobrona 2, voters' committees 2 · 2005: PiS 49, PO 34, LPR 7, Samoobrona 3, PSL 2, voters' committees 5 · 2007: PO 60, PiS 39, Cimoszewicz 1 · 2011: PO 63, PiS 31, PSL 2, independents 4 · 2015: PiS 61, PO 34 · 2019: PiS 48, KO 43 |
+| President | 2000: Kwaśniewski 53.90%, elected in round 1, turnout 61.12% |
 | President, round 2 | 2005: Kaczyński 54.04% · 2010: Komorowski 53.01% · 2015: Duda 51.55% · 2020: Duda 51.03% (turnout 68.18%) · 2025: Nawrocki 50.89% (turnout 71.63%) |
 | European Parliament | 2004: PO 24.10% / 15, LPR 15.92% / 10, 54 seats, turnout 20.87% · 2009: PO 44.43% / 25, PiS 27.40% / 15, 50 seats, turnout 24.53% · 2014: PO 32.13% / 19, PiS 31.78% / 19, 51 seats · 2019: PiS 45.38% / 27 seats, KE 38.47% / 22 · 2024: KO 37.06% / 21, PiS 36.16% / 20 |
-| Referendum | 2015: JOW "yes" 78.75%, turnout 7.80% · 2023: "no" 94.61–96.79%, turnout 40.91% |
+| Referendum | 2003 (EU accession): "yes" 77.45%, turnout 58.85% · 2015: JOW "yes" 78.75%, turnout 7.80% · 2023: "no" 94.61–96.79%, turnout 40.91% |
 | Sejmiki | 2018: PiS 34.13% / 254, KO 26.97% / 194, PSL 70 · 2024: PiS 34.27% / 239, KO 30.59% / 210, TD 80 (552 seats each) |
+| Sejmiki 2002 / 2006 | 2002: SLD-UP 189, Samoobrona 101, LPR 92, POPiS 79, PSL 58, PiS 10, MN 7 (561 seats), turnout 44.23% · 2006: PO 186, PiS 170, PSL 83, LiD 66, Samoobrona 37, LPR 11, MN 7 (561 seats), turnout 45.91% |
 | Sejmiki 2010 / 2014 | 2010: PO 222, PiS 141, PSL 93, SLD 85 (561 seats), turnout 47.26% · 2014: PO 179, PiS 171, PSL 157, SLD 28, MN 7 (555 seats), turnout 47.21% |
-| Mayors | 2010: 2,479 gminas, 738 run-offs (728 on 5 December + 10 on 19 December) · 2014: 2,477 gminas, 890 run-offs · 2018: 2,477 gminas, 649 run-offs · 2024: 2,477 gminas, 748 run-offs |
-| Councils, seats | 2010: ≤20k 32,280, >20k 5,568, cities 1,701, powiat 6,290, Warsaw districts 409 · 2014: gmina 37,842 + cities 1,694, powiat 6,276, Warsaw districts 423 · 2018: ≤20k 32,175, >20k 7,351, powiat 6,244, Warsaw districts 425 · 2024: ≤20k 32,370, >20k 7,046, powiat 6,170, Warsaw districts 420 |
+| Mayors | 2002: 2,478 gminas, 1,202 run-offs · 2006: 2,477 gminas, 843 run-offs (827 + 16 on 10 December) · 2010: 2,479 gminas, 738 run-offs (728 on 5 December + 10 on 19 December) · 2014: 2,477 gminas, 890 run-offs · 2018: 2,477 gminas, 649 run-offs · 2024: 2,477 gminas, 748 run-offs |
+| Councils, seats | 2002: ≤20k 32,205, >20k 5,629, cities incl. Warsaw 1,745, powiat 6,294, Warsaw districts 399 · 2006: ≤20k 32,265, >20k 5,566, cities 1,707, powiat 6,284, Warsaw districts 407 · 2010: ≤20k 32,280, >20k 5,568, cities 1,701, powiat 6,290, Warsaw districts 409 · 2014: gmina 37,842 + cities 1,694, powiat 6,276, Warsaw districts 423 · 2018: ≤20k 32,175, >20k 7,351, powiat 6,244, Warsaw districts 425 · 2024: ≤20k 32,370, >20k 7,046, powiat 6,170, Warsaw districts 420 |
 
 ## Data model
 
@@ -82,17 +85,23 @@ count only in `country`.
 | `v_referendum_results` | turnout, yes/no and percentages per question and level |
 | `v_sejmik_results` | sejmik committee support per level; seats at country and voivodeship level |
 | `v_rada_results` | council committee votes and seats per council, voivodeship and country (`council_level`; `votes_exact = false` where struck-off candidates make list totals unknown) |
-| `v_turnout` | turnout of **every** election per level (`election`, `year`, `round`) |
+| `v_turnout` | official turnout of **every** election per level (`election`, `year`, `round`; `turnout_basis` says whether PKW counted ballots issued or valid ballots) |
 | `v_party_results` | party families across Sejm, EP and sejmik per level (`unit_key` joins elections) |
 | `v_party_change` | change against the previous election of the same kind, with a `comparable` flag |
 | `v_gmina_continuity` | which gmina TERYT codes appear in which elections |
 | `v_person_history` | every candidacy of a person |
+| `v_seat_methods` | Sejm and sejmik seats per committee under D'Hondt, Sainte-Laguë and modified Sainte-Laguë, with the official thresholds |
+| `party_families` (table) | lead alias → party family, with a Polish note on the lineage |
 
 Cross-election rules:
 
-- **Party families** (`PARTY_FAMILIES` in `derived.py`): PO and KO are `KO`; SLD, ZL, NL and Lewica
-  are `Lewica`; PSL and TD are `TD/PSL`; KE (EP 2019 coalition) stays `KE`; committees without aliases
-  are `other`. `lead_aliases` shows which committees formed the family in that election.
+- **Party families** (`PARTY_FAMILIES` in `derived.py`, queryable as `mart.party_families` with a note
+  per alias): PO, KO and Nowoczesna are `KO`; PiS, Solidarna Polska and Polska Razem are `PiS`; SLD,
+  LiD, ZL, NL, Wiosna and Lewica are `Lewica`; Razem and Lewica Razem are `Razem`; PSL and TD are
+  `TD/PSL`; Konfederacja, KORWiN (Korwin-Mikke's committees 2005–2015), KNP and RN are
+  `Konfederacja`; UW and PD are `UW/PD`; KE (EP 2019 coalition) stays `KE`; other first aliases are
+  their own family; committees without aliases are `other`. `lead_aliases` shows which committees
+  formed the family in that election (e.g. `PiS+Polska Razem+Solidarna Polska` in EP 2014).
 - **`comparable`** in `v_party_change` is true only when the family ran under the same lead alias both
   times. PO 2015 → KO 2019 and PSL 2019 → TD 2023 are false: say so when reporting such a change.
 - **TERYT continuity.** Units are matched by TERYT. Warsaw is split into its 18 districts (1465xx)
@@ -116,10 +125,12 @@ candidacies with the same name when they agree. `persons.match_rule` records the
 Local candidates (sejmik, mayors, councils) join a national person only when exactly one national
 person has that name and gender and the name occurs once in that local election (once among all
 council candidates of the year). When several national persons share the name, a local candidacy
-joins the one whose published residence (`residence_teryt`, national registers from 2019) lies in
-the same powiat (sejmik: voivodeship), if exactly one does and the name occurs once in that powiat
-(voivodeship) in that local election. Before 2019 national registers give residence as text only,
-so these rules cannot use it. Local registers also publish the age on
+joins the one whose residence lies in the same powiat (sejmik: voivodeship), if exactly one does and
+the name occurs once in that powiat (voivodeship) in that local election. Residence is
+`residence_teryt` where published (national registers from 2019); before 2019 the residence text is
+mapped to a powiat through place names published with a TERYT since 2019, only where a place name
+occurs with one powiat (97% right on 2023–2025 places when learned from 2019–2020; gmina names as a
+fallback were 86% right and are not used). Local registers also publish the age on
 election day (`age`), national registers do not. All local candidacies linked to one person must
 agree on the birth year (year − age, at most 1 apart); otherwise the name belongs to several people
 and none of that person's local candidacies is linked. `v_person_history.age` shows the age.
@@ -155,9 +166,9 @@ the build. Overrides win over every automatic rule.
 Limits: national namesakes can still be merged (no age in national registers), and a person who
 changed surname is linked only by an override.
 
-Current build: 39,013 national and 582,457 local persons; the residence rule links 97 local
+Current build: 44,804 national and 951,259 local persons; the residence rule links 373 local
 candidacies to one of several national namesakes; every local candidacy with an age belongs to a person
-except 84 sejmik candidacies.
+except 287 sejmik candidacies.
 
 ## Building it
 
@@ -170,7 +181,7 @@ for d in data/pkw_all/sejmsenat*/zip; do
   python3 scripts/kbw_stage_duckdb.py --root "$d" --out data/pkw_stage_parquet
 done
 
-# 2. Build the mart (about 5 minutes for everything, of which about 2 for views and persons).
+# 2. Build the mart (about 7 minutes for everything, of which about 3 for persons, views and the seat check).
 DATABASE_URL=postgresql://plujka:plujka@localhost:5432/plujka python3 scripts/build_mart.py
 python3 scripts/build_mart.py --years 2023                  # every family of one year
 python3 scripts/build_mart.py --elections prezydent,pe      # some families, all years
@@ -215,15 +226,54 @@ A family-year is not loaded if any check fails. Among them:
 - president: precinct sums match the official per-gmina file; referendum: answers match territorial
   totals and yes + no = valid votes;
 - mayors: candidate votes add up to valid votes; with a single candidate, votes for + against do;
-  no gmina has two elected mayors; round 2 only where round 1 took place.
+  no gmina has two elected mayors; round 2 only where round 1 took place;
+- seats (`derived.check_seat_allocation`, after every load): official seats of every Sejm district
+  (lists in seat allocation), sejmik district and contested proportional council district (councils
+  with unknown list totals skipped) are recomputed with `mart.allocate_seats`: D'Hondt
+  (`SEAT_METHODS`: modified Sainte-Laguë for Sejm 2001) among lists with 5% of the voivodeship's /
+  council's valid votes (2002: no threshold in gmina councils outside cities with powiat rights and
+  in Warsaw district councils) and 2006 list blocs (`list_group`) with 15% (sejmik) / 10% (councils);
+  inside a bloc Sainte-Laguë among its lists that passed 5%. A difference is allowed only for an
+  exact tie in list votes for the last seat, which the Electoral Code decides by data not loaded
+  (precincts won); these districts are logged (five so far).
 
 ### Known gaps in the source data
 
 These are properties of the official files, not build errors. Each check names its exception.
 
-- **Turnout 2005/2007.** PKW computed turnout for Sejm 2005 and 2007 and president 2005 from ballots
-  issued; `v_turnout` uses valid ballots from the ballot box, 0.01–0.06 points lower (Sejm 2005:
-  40.51 vs 40.57; Sejm 2007: 53.82 vs 53.88; president 2005: 49.72 / 50.98 vs 49.74 / 50.99).
+- **Local elections 2002/2006.** No district register: seats are the elected candidates, checked
+  against PKW's national counts. 2002 eligible voters in the KBW files are 29,572,213 for sejmiki
+  (PKW: 29,572,225 in the announcement, 29,572,221 on its web pages) and for mayors round 1 (PKW web:
+  29,572,209). 2002 council list totals outside powiat councils are recovered from the candidates'
+  percentages (Warsaw district 7, list 18 set to PKW's 19,030, `build_rady.RESOLVED_LIST_TOTALS`).
+  2006 Markuszów district 4: 1 seat unfilled, no valid vote cast. Warsaw 2002 already has the
+  post-reform councils (Rada m.st. Warszawy and 18 district councils).
+- **List blocs 2006** (`list_group` in `sejmik_district_lists` / `rada_district_lists`) are not in the
+  KBW files; PKW published them only on its results pages. They are scraped by
+  `scripts/scrape_list_groups_2006.py` into `data/pkw_html/list_groups_2006.csv` (source URL per row).
+- **2000/2001 TERYT codes.** Files use the codes of that time: 37 gminas moved to powiats created in
+  2002 (e.g. Wschowa 080411 → 081203, Lesko 180104 → 182103), Wałbrzych is 026301, ships
+  229997/329997. Warsaw (powiat 1431 until 2002) is mapped to its districts 1465xx
+  (`build_precincts.WARSAW_GMINAS_2001`; 2001 splits Warszawa-Centrum by a letter), except president
+  2000, where Warszawa-Centrum (143104, seven of today's districts) is not split. Wesoła was a gmina
+  of powiat miński (141203).
+- **Sejm 2001** publishes no per-precinct candidate votes (no 2001 rows in
+  `sejm_precinct_candidate_votes`); candidate totals are checked against list totals. Seats were
+  allocated by modified Sainte-Laguë (`derived.SEAT_METHODS`).
+- **Senate 2001.** 40 multi-member districts; `valid_votes` / `invalid_votes` count ballots. In the
+  district 6 file, Łęczna precinct 6 is shifted two columns right (split address); the builder
+  realigns it (`build_senat.SHIFTED_ROWS_2001`), after which the district reproduces the official
+  totals.
+- **President 2000** had one round; `advanced_to_round2` is false for every candidate. In 2000/2001
+  precinct type Z means abroad (`build_precincts.PRECINCT_TYPES_2001`).
+- **Referendum 2003.** Voting on 7–8 June (`election_date` 2003-06-08). The Supreme Court annulled
+  precincts Ełk 14 and Wrocław 15; they are dropped (`build_referendum.ANNULLED_PRECINCTS`), so totals
+  are PKW's corrected result of 21 July 2003 (25,163 precincts, yes 13,514,872), not the 9 June
+  announcement (25,165, yes 13,516,612).
+- **Turnout basis.** PKW computed the official turnout of Sejm/Senate 2001, 2005 and 2007,
+  president 2000, 2005 and 2010, and sejmiki and mayors 2002 and 2006 from ballots issued, later from valid ballots taken from the ballot box.
+  `v_turnout.turnout_pct` and `v_sejm_turnout.turnout_pct` follow PKW per election
+  (`derived.TURNOUT_FROM_BALLOTS_ISSUED`, column `turnout_basis`) and match the official figures.
 - **Sejm 2005 and 2007 candidate votes.** 2005 has no per-precinct candidate votes
   (`sejm_precinct_candidate_votes` has no 2005 rows); candidate totals are checked against the list
   totals. 2007 candidate votes come from separate district × list files; invalid votes are votes cast
@@ -282,9 +332,9 @@ These are properties of the official files, not build errors. Each check names i
 - **EP 2014 has no list register.** Seats are the elected candidates; a committee took part in seat
   allocation if it won any seat. PKW's headline turnout 23.83% includes postal packets; the district
   tables and the mart give 23.82% (`ballots_issued` 7,295,481 without packets, PKW 7,301,650).
-- **President 2010 turnout.** The 2010 files have no count of valid ballots, so `valid_ballots` holds
-  votes cast ("Głosy oddane"): turnout 54.92% / 55.30% against PKW's 54.94% / 55.31%, which PKW
-  computes from ballots issued. Invalid votes are cast minus valid.
+- **President 2010 valid ballots.** The 2010 files have no count of valid ballots, so `valid_ballots`
+  holds votes cast ("Głosy oddane"); invalid votes are cast minus valid. Turnout uses ballots issued,
+  as PKW did (54.94% / 55.31%).
 - **TERYT changes before 2015.** Wałbrzych is 022109 in 2010/2011 and 026501 from 2013; gmina Zielona
   Góra (080910) exists until 2014 and was merged into the city in 2015. Ship precincts keep their
   codes (2011: 149801, 2010: 229901).
@@ -344,6 +394,8 @@ These are properties of the official files, not build errors. Each check names i
    family to `PARTY_FAMILIES` (`derived.py`).
 4. Run `build_mart.py --years <year> --elections <family>` until all checks pass, compare the
    national results with the official PKW page, then run `add_sql_example.py --check`.
+5. List the gmina/powiat codes of the new year that are missing from `streamlit_app/geo/gminy.json` /
+   `powiaty.json` and add each to `streamlit_app/geo/teryt_changes.json` with the act that changed it.
 
 ## Answering questions
 
@@ -411,7 +463,7 @@ in its text must appear in the rows (rounding and Polish formatting allowed) or 
 Otherwise, or without an OpenAI key, the answer is a deterministic summary of the rows.
 `answer.source` is `llm` or `fallback`; `rejected_numbers` lists numbers that failed the check.
 `answer.caveats` holds fixed Polish notes about data gaps that apply to the rows and SQL
-(`answer.CAVEATS`: `comparable = false`, `votes_exact = false`, president 2010, Sejm 2005/2007, president 2005 and EP 2014 turnout,
+(`answer.CAVEATS`: `comparable = false`, `votes_exact = false`, EP 2014 turnout,
 presidential precinct sums, person linking); the UI shows them under the answer. They contain no
 numbers of their own. When you document a new known gap that changes how a result reads, add a rule.
 

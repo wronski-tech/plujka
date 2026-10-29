@@ -81,6 +81,12 @@ class TestPersonLinking(unittest.TestCase):
             " VALUES (2023, %s, %s, 1, 1, 2, 'Tomasz WÓJCIK', 'WÓJCIK', 'Tomasz', 'Mężczyzna', %s, %s, 10, false)",
             [(5, 1, "Bolesławiec", "020101"), (6, 13, "Kraków", "126101")],
         )
+        conn.cursor().executemany(  # 2015: residence as text only, mapped to a powiat through the 2023 pairs
+            "INSERT INTO mart.sejm_candidates (year, candidate_id, district_no, committee_id, list_no, list_position,"
+            " full_name, last_name, first_names, gender, residence, votes, elected)"
+            " VALUES (2015, %s, %s, 1, 1, 2, 'Adam KRAWCZYK', 'KRAWCZYK', 'Adam', 'Mężczyzna', %s, 10, false)",
+            [(8, 1, "Bolesławiec"), (9, 13, "Kraków")],
+        )
         wbp = [(2018, 1, "020101", "Anna NOWAK", "NOWAK", "Anna", "Kobieta", 40),
                (2018, 2, "020102", "Marek LIS", "LIS", "Marek", "Mężczyzna", 50),
                (2024, 3, "020106", "Piotr ZIELIŃSKI", "ZIELIŃSKI", "Piotr", "Mężczyzna", 46)]
@@ -95,7 +101,8 @@ class TestPersonLinking(unittest.TestCase):
                 (2018, 4, "020107", "Piotr ZIELIŃSKI", "ZIELIŃSKI", "Piotr", "Mężczyzna", 40),
                 (2018, 5, "0301", "Piotr ZIELIŃSKI", "ZIELIŃSKI", "Piotr", "Mężczyzna", 40),
                 (2024, 6, "126105", "Tomasz WÓJCIK", "WÓJCIK", "Tomasz", "Mężczyzna", 40),
-                (2024, 7, "300101", "Tomasz WÓJCIK", "WÓJCIK", "Tomasz", "Mężczyzna", 52)]
+                (2024, 7, "300101", "Tomasz WÓJCIK", "WÓJCIK", "Tomasz", "Mężczyzna", 52),
+                (2024, 8, "126107", "Adam KRAWCZYK", "KRAWCZYK", "Adam", "Mężczyzna", 45)]
         conn.cursor().executemany(
             "INSERT INTO mart.rada_candidates (year, candidate_id, council_level, teryt, district_no, committee_id,"
             " full_name, last_name, first_names, gender, age, elected) VALUES (%s, %s, 'gmina', %s, 1, 1, %s, %s, %s, %s, %s, false)",
@@ -155,6 +162,12 @@ class TestPersonLinking(unittest.TestCase):
                 ).fetchall())
                 self.assertEqual(rada_tomasz["126105"], tomasz["126101"])
                 self.assertNotIn(rada_tomasz["300101"], tomasz.values())
+                # Adam KRAWCZYK (2015, residence text only): "Kraków" maps to powiat 1261 via the 2023 pairs.
+                adam = dict(conn.execute(
+                    "SELECT residence, person_id FROM mart.sejm_candidates WHERE full_name = 'Adam KRAWCZYK'"
+                ).fetchall())
+                self.assertNotEqual(adam["Kraków"], adam["Bolesławiec"])
+                self.assertEqual(self._person(conn, "rada_candidates", 2024, "Adam KRAWCZYK"), adam["Kraków"])
                 # Override links a local candidacy under another surname to the national person.
                 ewa = self._person(conn, "sejm_candidates", 2019, "Ewa MALINOWSKA")
                 self.assertEqual(self._person(conn, "rada_candidates", 2018, "Ewa WIŚNIEWSKA"), ewa)

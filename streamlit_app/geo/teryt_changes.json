@@ -1,0 +1,305 @@
+{
+  "note": "Old TERYT codes in the mart (2000-2025) that are not in the boundary files, mapped to the current unit that covers the old one. Candidates: distinct teryt_gmina/teryt_powiat in mart tables and v_gmina_continuity missing from gminy.json/powiaty.json. Each entry matched by name within the voivodeship (the powiat differs in every case) and checked against the cited act. Codes in 'unmapped' stay uncoloured on purpose.",
+  "gminy": {
+    "022109": {
+      "current": "026501",
+      "name": "Wałbrzych",
+      "years": "2004-2012",
+      "change": "The city left powiat wałbrzyski and regained powiat rights on 2013-01-01, new code 026501; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 10 lipca 2012 r. w sprawie przywrócenia miastu Wałbrzych statusu miasta na prawach powiatu oraz ustalenia granic powiatu wałbrzyskiego (Dz.U. 2012 poz. 853)"
+    },
+    "060608": {
+      "current": "060315",
+      "name": "Rejowiec",
+      "years": "1995-2005",
+      "change": "Gmina Rejowiec moved from powiat krasnostawski to powiat chełmski on 2006-01-01, new code 060315; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 26 lipca 2005 r. w sprawie ustalenia granic powiatów chełmskiego i krasnostawskiego oraz zmiany siedziby władz powiatu (Dz.U. 2005 nr 141 poz. 1187); GUS TERYT register: 0606082 (1995-2005) -> 0603152 (2006-2016)"
+    },
+    "080910": {
+      "current": "086201",
+      "name": "Zielona Góra (gmina wiejska)",
+      "years": "2004-2014",
+      "change": "Rural gmina Zielona Góra merged into the city of Zielona Góra (086201) on 2015-01-01; for older elections both old codes map to 086201.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 29 lipca 2014 r. w sprawie połączenia gmin, ustalenia granic niektórych gmin i miast, nadania niektórym miejscowościom statusu miasta oraz zmiany nazwy gminy (Dz.U. 2014 poz. 1023), § 1"
+    },
+    "080409": {
+      "current": "081201",
+      "name": "Sława",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat wschowski (from nowosolski) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "080410": {
+      "current": "081202",
+      "name": "Szlichtyngowa",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat wschowski (from nowosolski) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "080411": {
+      "current": "081203",
+      "name": "Wschowa",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat wschowski (from nowosolski) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "100601": {
+      "current": "102101",
+      "name": "Brzeziny (miasto)",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat brzeziński (from łódzki wschodni) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "100604": {
+      "current": "102102",
+      "name": "Brzeziny (gmina wiejska)",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat brzeziński (from łódzki wschodni) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "100605": {
+      "current": "102103",
+      "name": "Dmosin",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat brzeziński (from łódzki wschodni) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "100606": {
+      "current": "102104",
+      "name": "Jeżów",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat brzeziński (from łódzki wschodni) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "100609": {
+      "current": "102105",
+      "name": "Rogów",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat brzeziński (from łódzki wschodni) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "180101": {
+      "current": "182101",
+      "name": "Baligród",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat leski (from bieszczadzki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "180102": {
+      "current": "182102",
+      "name": "Cisna",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat leski (from bieszczadzki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "180104": {
+      "current": "182103",
+      "name": "Lesko",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat leski (from bieszczadzki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "180106": {
+      "current": "182104",
+      "name": "Olszanica",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat leski (from bieszczadzki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "180107": {
+      "current": "182105",
+      "name": "Solina",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat leski (from bieszczadzki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "220902": {
+      "current": "221601",
+      "name": "Dzierzgoń",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat sztumski (from malborski) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "220905": {
+      "current": "221602",
+      "name": "Mikołajki Pomorskie",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat sztumski (from malborski) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "220909": {
+      "current": "221603",
+      "name": "Stary Dzierzgoń",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat sztumski (from malborski) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "220910": {
+      "current": "221604",
+      "name": "Stary Targ",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat sztumski (from malborski) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "220911": {
+      "current": "221605",
+      "name": "Sztum",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat sztumski (from malborski) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "280602": {
+      "current": "281801",
+      "name": "Banie Mazurskie",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat gołdapski (from olecko-gołdapski and giżycki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "281301": {
+      "current": "281802",
+      "name": "Dubeninki",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat gołdapski (from olecko-gołdapski and giżycki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "281302": {
+      "current": "281803",
+      "name": "Gołdap",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat gołdapski (from olecko-gołdapski and giżycki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "280603": {
+      "current": "281901",
+      "name": "Budry",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat węgorzewski (from giżycki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "280607": {
+      "current": "281902",
+      "name": "Pozezdrze",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat węgorzewski (from giżycki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "280609": {
+      "current": "281903",
+      "name": "Węgorzewo",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat węgorzewski (from giżycki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "320401": {
+      "current": "321801",
+      "name": "Dobra",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat łobeski (from goleniowski, gryficki and stargardzki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "321407": {
+      "current": "321802",
+      "name": "Łobez",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat łobeski (from goleniowski, gryficki and stargardzki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "320505": {
+      "current": "321803",
+      "name": "Radowo Małe",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat łobeski (from goleniowski, gryficki and stargardzki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "320506": {
+      "current": "321804",
+      "name": "Resko",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat łobeski (from goleniowski, gryficki and stargardzki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "321412": {
+      "current": "321805",
+      "name": "Węgorzyno",
+      "years": "1999-2001",
+      "change": "Moved to the new powiat łobeski (from goleniowski, gryficki and stargardzki) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie utworzenia, ustalenia granic i zmiany nazw powiatów oraz zmiany siedziby władz powiatu (Dz.U. 2001 nr 62 poz. 631)"
+    },
+    "121202": {
+      "current": "240108",
+      "name": "Sławków",
+      "years": "1999-2001",
+      "change": "Moved from powiat olkuski (małopolskie) to powiat będziński (śląskie) on 2002-01-01; same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 31 maja 2001 r. w sprawie zmiany granic województw małopolskiego i śląskiego (Dz.U. 2001 nr 62 poz. 630); GUS TERYT register: 1212021 (1995-2001) -> 2401081 (2002-)"
+    },
+    "141202": {
+      "current": "141215",
+      "name": "Sulejówek",
+      "years": "1995-2001",
+      "change": "Renumbered within powiat miński in 2002 (Warsaw reform); same area.",
+      "source": "GUS TERYT register: 1412021 (1995-2001) -> 1412151 (2002-); Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361), art. 16"
+    },
+    "141203": {
+      "current": "146515",
+      "name": "Wesoła",
+      "years": "1999-2002",
+      "change": "Gmina Wesoła (powiat miński) became the Warsaw district Wesoła in 2002; same area.",
+      "source": "Ustawa z dnia 15 marca 2002 r. o ustroju miasta stołecznego Warszawy (Dz.U. 2002 nr 41 poz. 361), art. 13-15, as amended by Dz.U. 2002 nr 127 poz. 1087"
+    },
+    "026301": {
+      "current": "026501",
+      "name": "Wałbrzych",
+      "years": "1999-2002",
+      "change": "City with powiat rights (code 0263) merged into powiat wałbrzyski on 2003-01-01 (022109) and regained powiat rights in 2013 (026501); same area.",
+      "source": "Rozporządzenie Rady Ministrów z dnia 25 czerwca 2002 r. w sprawie połączenia miasta na prawach powiatu Wałbrzych z powiatem wałbrzyskim oraz ustalenia granic niektórych powiatów (Dz.U. 2002 nr 93 poz. 821); Dz.U. 2012 poz. 853"
+    },
+    "140610": {
+      "current": "141806",
+      "name": "Tarczyn",
+      "years": "1999-2002",
+      "change": "Moved from powiat grójecki to powiat piaseczyński on 2003-01-01; same area.",
+      "source": "Dz.U. 2002 nr 93 poz. 821, § 2 (powiat piaseczyński includes Tarczyn from 2003-01-01)"
+    },
+    "180510": {
+      "current": "121616",
+      "name": "Szerzyny",
+      "years": "1999-2002",
+      "change": "Moved from powiat jasielski (podkarpackie) to powiat tarnowski (małopolskie) on 2003-01-01; same area.",
+      "source": "Dz.U. 2002 nr 93 poz. 821, § 2 (powiat tarnowski includes Szerzyny from 2003-01-01)"
+    }
+  },
+  "powiaty": {
+    "0263": {
+      "current": "0265",
+      "name": "Wałbrzych",
+      "years": "1999-2002",
+      "change": "City with powiat rights; the same area has code 0265 since 2013 (in 2003-2012 it was part of powiat wałbrzyski 0221).",
+      "source": "Dz.U. 2002 nr 93 poz. 821; Dz.U. 2012 poz. 853"
+    }
+  },
+  "unmapped": {
+    "320304": "Gmina Ostrowice (2004-2018) was abolished on 2019-01-01 and split between Drawsko Pomorskie (320302) and Złocieniec (320306) (Dz.U. 2018 poz. 1527); no single current unit covers it, and the current polygons of both gminas already cover its area.",
+    "149801": "Ships (Warszawa); no territory.",
+    "229801": "Ships (Gdynia); no territory.",
+    "229901": "Ships (Gdańsk); no territory.",
+    "329901": "Ships (Szczecin); no territory.",
+    "1498": "Powiat part of the ship code 149801.",
+    "2298": "Powiat part of the ship code 229801.",
+    "2299": "Powiat part of the ship code 229901.",
+    "3299": "Powiat part of the ship code 329901.",
+    "229997": "Ships (Gdańsk) in 2000-2001; no territory.",
+    "329997": "Ships (Szczecin) in 2000-2001; no territory."
+  },
+  "former_extents": {
+    "note": "Documentation of the features with 'parts' in gminy.json/powiaty.json (not read by the code). Powiat extents are unions of current gmina polygons in the powiat's composition of the time, taken from the mart data (gmina codes under the powiat code of that year) and the gmina entries above.",
+    "gminy 146501": "Warszawa as one unit (rows with 146501 and no district codes, e.g. EP 2004).",
+    "gminy 143104": "Gmina Warszawa-Centrum (president 2000) = districts Mokotów, Ochota, Praga-Południe, Praga-Północ, Śródmieście, Wola, Żoliborz; Ustawa z dnia 15 marca 2002 r. o ustroju m.st. Warszawy (Dz.U. 2002 nr 41 poz. 361), art. 14.",
+    "gminy 120705 / 200209": "Kamienica and Supraśl before Szczawa and Grabówka were split off on 2025-01-01 (Dz.U. 2024 poz. 1453, 1454); years 2000-2024.",
+    "powiaty 0804 1006 1801 2209 2806 2813 3204 3205 3214": "Powiats that lost gminas to the powiats created on 2002-01-01 (Dz.U. 2001 nr 62 poz. 631); years 2000-2001.",
+    "powiaty 1212 / 2401": "Olkuski with Sławków and będziński without it, until 2001 (Dz.U. 2001 nr 62 poz. 630).",
+    "powiaty 1406 / 1418, 1805 / 1216": "Grójecki with Tarczyn and piaseczyński without it; jasielski with Szerzyny and tarnowski without it; until 2002 (Dz.U. 2002 nr 93 poz. 821).",
+    "powiaty 1431 / 1465 / 1412": "Powiat warszawski in 2000 as published (1431 = Warszawa-Centrum, 1465 = the other Warsaw gminas), Warsaw without Wesoła in 2000-2001, miński with Wesoła until 2001 (Dz.U. 2002 nr 41 poz. 361).",
+    "powiaty 0221": "Wałbrzyski including the city of Wałbrzych, 2003-2011 (Dz.U. 2002 nr 93 poz. 821; Dz.U. 2012 poz. 853).",
+    "powiaty 0603 / 0606": "Chełmski without Rejowiec and krasnostawski with it, until 2005 (Dz.U. 2005 nr 141 poz. 1187)."
+  }
+}

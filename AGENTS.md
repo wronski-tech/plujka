@@ -20,7 +20,7 @@ SQL safety), `docs/DATA.md` (sources), `docs/DEPLOYMENT.md` (API keys, Redis lim
 | `api/services/mart/schema.py` | `mart` DDL with English `COMMENT`s, read-only role, list of queryable relations |
 | `api/services/mart/build_common.py`, `build_precincts.py` | Shared DuckDB macros, header matching, loading; precinct geography/protocol columns |
 | `api/services/mart/build_<family>.py` | DuckDB build per family and year (`sejm`+`senat`, `prezydent`, `pe`, `referendum`, `samorzad`) with consistency checks; `build_rady.py` builds councils inside `samorzad` |
-| `api/services/mart/derived.py`, `person_overrides.csv` | Persons (name rules, birth-year check for local candidacies, manual overrides), result and cross-election views, party families, entity lexicon (rebuilt after every load) |
+| `api/services/mart/derived.py`, `person_overrides.csv` | Persons (name rules, birth-year check for local candidacies, manual overrides), result and cross-election views, party families (`party_families`), turnout basis, seat views and the seat-allocation check (`mart.allocate_seats`), entity lexicon (rebuilt after every load) |
 | `api/services/mart/examples.py`, `sql_examples.jsonl` | Verified question → SQL few-shot examples (curated file + thumbs-up, OpenSearch) |
 | `api/services/mart/safe_sql.py` | `validate_mart_sql` (sqlglot) and `run_readonly` |
 | `api/services/mart/entities.py` | Question → lexicon matches (inflected Polish names → TERYT / person_id / committee), narrowing, ambiguity |
@@ -29,7 +29,8 @@ SQL safety), `docs/DATA.md` (sources), `docs/DEPLOYMENT.md` (API keys, Redis lim
 | `scripts/add_sql_example.py` | Adds a curated SQL example after running it; `--check` runs them all |
 | `scripts/backup_db.sh` | `pg_dump` backup with retention |
 | `scripts/check_sources.py`, `data/source_manifest.json` | Detects republished KBW files (HEAD vs manifest), re-stages them, names the family-years to rebuild |
-| `streamlit_app/app.py`, `streamlit_app/geo/` | UI: answer, table, bar chart, choropleth (TERYT-keyed boundaries), SQL + source, follow-up toggle |
+| `scripts/scrape_list_groups_2006.py`, `data/pkw_html/` | 2006 list blocs scraped from PKW's results pages (not in KBW files), read by `build_rady.add_list_groups` |
+| `streamlit_app/app.py`, `streamlit_app/map_units.py`, `streamlit_app/geo/` | UI: answer, table, bar chart, choropleth (TERYT-keyed boundaries; old codes via `geo/teryt_changes.json`), SQL + source, follow-up toggle |
 | `tests/` | `unittest`. DB tests run only with `PLUJKA_RUN_DB_TESTS=1` |
 
 ## Rules

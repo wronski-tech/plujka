@@ -4,7 +4,7 @@
 
 The **API does not import** mirror files on startup. Use the **`loader` container** (Compose profile `tools`): it writes Parquet under `data/kbw_stage_parquet` and runs `scripts/import_kbw_facts.py` into `kbw_facts` / `kbw_election_runs`.
 
-As its last step the loader runs `scripts/build_mart.py`, which builds the relational model in the PostgreSQL schema **`mart`**: Sejm and Senate 2005/2007/2011/2015/2019/2023, president 2005/2010/2015/2020/2025 (both rounds), European Parliament 2004/2009/2014/2019/2024, referendums 2015/2023, and local elections 2010/2014/2018/2024 (voivodeship assemblies, wójt/burmistrz/prezydent miasta, and councils of gminas, powiats and Warsaw districts). The staged Parquet is committed so the mart can be rebuilt (and is, in CI) without the raw mirror; stage a subset with `scripts/kbw_stage_duckdb.py --prefix <path under --root>`. It reads the staged KBW mirror plus the staged PKW bundles (`data/pkw_stage_parquet`, preferred per dataset) and refuses to load an election whose votes do not add up to the official totals. Tables, sources, checks and known gaps in the official files are described in [MART.md](MART.md).
+As its last step the loader runs `scripts/build_mart.py`, which builds the relational model in the PostgreSQL schema **`mart`**: Sejm and Senate 2001/2005/2007/2011/2015/2019/2023, president 2000/2005/2010/2015/2020/2025 (two rounds from 2005), European Parliament 2004/2009/2014/2019/2024, referendums 2003/2015/2023, and local elections 2002/2006/2010/2014/2018/2024 (voivodeship assemblies, wójt/burmistrz/prezydent miasta, and councils of gminas, powiats and Warsaw districts). The staged Parquet is committed so the mart can be rebuilt (and is, in CI) without the raw mirror; stage a subset with `scripts/kbw_stage_duckdb.py --prefix <path under --root>`. It reads the staged KBW mirror plus the staged PKW bundles (`data/pkw_stage_parquet`, preferred per dataset) and refuses to load an election whose votes do not add up to the official totals. Tables, sources, checks and known gaps in the official files are described in [MART.md](MART.md).
 
 Staging (`scripts/kbw_stage_duckdb.py`) is strict: the delimiter is detected from the header, CP1250 files are transcoded, and a file fails instead of silently dropping malformed rows. XLS/XLSX tables are staged too; a workbook with several sheets becomes one Parquet file per sheet (`<stem>__sheetNN_<hash>.parquet`). ZIP member names in CP437/CP852 are decoded, and `__MACOSX/` entries are skipped.
 
@@ -44,6 +44,13 @@ python3 scripts/download_all_pkw_csv.py \
 ```
 
 Outputs are grouped by election prefix (e.g. `data/pkw_all/sejmsenat2023/`, `data/pkw_all/sejmsenat2019/`).
+
+## Data scraped from PKW pages
+
+One dataset is not in any KBW file: the 2006 list blocs (*grupy list*), published only on PKW's
+wybory2006.pkw.gov.pl results pages. `scripts/scrape_list_groups_2006.py` reads them (about 1,400
+pages, ~50 minutes with its default delay) into `data/pkw_html/list_groups_2006.csv`, one row per list
+with its source URL; the file is committed and read by the mart build (`build_rady.add_list_groups`).
 
 ## PKW data and attribution
 

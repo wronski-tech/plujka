@@ -37,6 +37,10 @@ COMMITTEE_ALIASES: list[tuple[str, list[str]]] = [
     # Small 2004/2005 committees that the broad needles below would mislabel as KO and Konfederacja.
     ("OGÓLNOPOLSKA KOALICJA OBYWATELSKA", ["OKO", "Ogólnopolska Koalicja Obywatelska"]),
     ("KONFEDERACJA RUCH OBRONY BEZROBOTNYCH", ["KROB"]),
+    # Local elections 2002/2006 committees that "KONFEDERACJA" below would mislabel.
+    ("KONFEDERACJA POLSKI NIEPODLEGŁEJ", ["KPN", "Konfederacja Polski Niepodległej"]),
+    ("KONFEDERACJI POLSKI NIEPODLEGŁEJ", ["KPN", "Konfederacja Polski Niepodległej"]),
+    ("KONFEDERACJA - GODNOŚĆ I PRACA", ["Godność i Praca"]),
     ("KOALICJA OBYWATELSKA", ["KO", "PO", "Platforma Obywatelska"]),
     ("PLATFORMA OBYWATELSKA", ["PO", "Platforma Obywatelska"]),
     # European Parliament 2019: PO-led coalition with PSL, SLD, .N and Zieloni.
@@ -72,6 +76,7 @@ COMMITTEE_ALIASES: list[tuple[str, list[str]]] = [
     ("RUCH NARODOWY", ["RN", "Ruch Narodowy"]),
     ("TWÓJ RUCH", ["TR", "Twój Ruch"]),
     ("RUCH AUTONOMII ŚLĄSKA", ["RAŚ", "Ruch Autonomii Śląska"]),
+    ("RUCHU AUTONOMII ŚLĄSKA", ["RAŚ", "Ruch Autonomii Śląska"]),
     ("PARTIA ZIELONI", ["Zieloni"]),
     ("WOLNOŚĆ W SAMORZĄDZIE", ["Wolność w Samorządzie"]),
     ("WOLNI I SOLIDARNI", ["WiS", "Wolni i Solidarni"]),
@@ -87,6 +92,9 @@ COMMITTEE_ALIASES: list[tuple[str, list[str]]] = [
     ("LEWICA I DEMOKRACI", ["LiD", "Lewica i Demokraci", "SLD"]),
     ("POLSKIEGO STRONNICTWA LUDOWEGO", ["PSL"]),
     ("SAMOOBRONA RZECZPOSPOLITEJ", ["Samoobrona"]),
+    # 2001 committees: Samoobrona spelled "RZECZYPOSPOLITEJ", and the AWS successor coalition.
+    ("SAMOOBRONA RZECZYPOSPOLITEJ", ["Samoobrona"]),
+    ("AKCJA WYBORCZA SOLIDARNOŚĆ", ["AWSP", "AWS", "Akcja Wyborcza Solidarność"]),
     ("LIGA POLSKICH RODZIN", ["LPR", "Liga Polskich Rodzin"]),
     ("SOCJALDEMOKRACJI POLSKIEJ", ["SDPL", "Socjaldemokracja Polska"]),
     ("PARTII DEMOKRATYCZNEJ", ["PD", "Partia Demokratyczna"]),
@@ -241,6 +249,9 @@ YEAR_COMMITTEE_ALIASES: dict[int, list[tuple[str, list[str]]]] = {
     # Local elections 2010: not SLD (which ran as its own committee) and not the 2024 Lewica committee
     # of the same name.
     2010: [("KOALICYJNY KOMITET WYBORCZY LEWICA", ["KKW Lewica"])],
+    # Local elections 2002: the joint PO-PiS sejmik committee (not PiS alone, which "PRAWO I
+    # SPRAWIEDLIWOŚĆ" would give it).
+    2002: [("PLATFORMA OBYWATELSKA - PRAWO I SPRAWIEDLIWOŚĆ", ["POPiS", "PO", "PiS"])],
 }
 
 
@@ -397,10 +408,10 @@ def parse_list_blocks(columns: list[str]) -> dict[str, ColumnRef]:
 
 def parse_numbered_names(columns: list[str], list_no: int | None = None) -> dict[str, ColumnRef]:
     """2007 Sejm and Senate candidate files: ``'3. Kowalski Jan Maria (T)'`` (ballot position, name,
-    elected T/N). With ``list_no`` (Sejm: from the file name) the position identifies the slot."""
+    elected T/N; 2001 Senate: W/N). With ``list_no`` (Sejm: from the file name) the position identifies the slot."""
     refs = {}
     for col in columns:
-        if m := re.match(r"^(\d+)\. (.+) \([TN]\)$", col):
+        if m := re.match(r"^(\d+)\. (.+) \([TNW]\)$", col):
             position = int(m[1]) if list_no is not None else None
             refs[col] = ColumnRef(name_key=python_name_key(m[2]), list_no=list_no, position=position)
     return refs
