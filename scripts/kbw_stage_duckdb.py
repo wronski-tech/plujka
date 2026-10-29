@@ -105,11 +105,54 @@ def detect_delimiter(header_line: str) -> str:
     return best
 
 
-def count_csv_records(text: str, delimiter: str) -> int:
+def count_csv_records(text: str, delimiter: str, quoting: int = csv.QUOTE_MINIMAL) -> int:
     """Number of non-empty data records (header excluded), honouring quoted newlines."""
-    reader = csv.reader(io.StringIO(text), delimiter=delimiter)
+    reader = csv.reader(io.StringIO(text), delimiter=delimiter, quoting=quoting)
     next(reader, None)
     return sum(1 for record in reader if any(cell.strip() for cell in record))
+
+
+def unwrap_excel_text(cell: str) -> str:
+    """``'="020101"'`` -> ``'020101'``: Excel's text guard, used by 2010-2014 CSV exports to keep leading zeros."""
+    match = re.match(r'^="(.*)"$', cell.strip(), re.S)
+    return match.group(1) if match else cell
+
+
+def fold_group_header(group: list[str], header: list[str]) -> list[str]:
+    """Header cells (``="..."`` unwrapped), prefixed with the non-empty cell of the group row above them."""
+    if group and len(group) != len(header):
+        raise StagingError(f"group-header row has {len(group)} fields, header has {len(header)}")
+    out = [unwrap_excel_text(cell) for cell in header]
+    for index, label in enumerate(group):
+        if label := unwrap_excel_text(label).strip():
+            out[index] = f"{label} - {out[index]}"
+    return out
+
+
+def strip_preamble(text: str) -> str:
+    """Drop title lines above the CSV header and fold a group-header row into the header.
+
+    2011/2014 per-precinct CSVs start with the election title, the commission name and a blank line
+    (lines without any delimiter). Candidate files then have a row naming each list above its first
+    column (``'Lista nr 1 — KW ...'``, first cell empty); such a cell is kept as a prefix of the
+    column name below it (``'Lista nr 1 — KW ... - Liczba głosów ważnych oddanych na listę'``).
+    Header cells written as ``="..."`` are unwrapped. Text without title lines is returned unchanged.
+    """
+    lines = text.splitlines(keepends=True)
+    start = 0
+    while start < len(lines) and not any(d in lines[start] for d in CANDIDATE_DELIMITERS):
+        start += 1
+    if start == 0 or start >= len(lines):
+        return text
+    delimiter = detect_delimiter(lines[start])
+    first = next(csv.reader([lines[start]], delimiter=delimiter))
+    group: list[str] = []
+    if not first[0].strip() and start + 1 < len(lines):
+        group, start = first, start + 1
+    header = fold_group_header(group, next(csv.reader([lines[start]], delimiter=delimiter)))
+    out = io.StringIO()
+    csv.writer(out, delimiter=delimiter, lineterminator="\n").writerow(header)
+    return out.getvalue() + "".join(lines[start + 1 :])
 
 
 def csv_to_parquet(con: duckdb.DuckDBPyConnection, data: bytes, parquet_path: Path) -> int:
@@ -121,6 +164,7 @@ def csv_to_parquet(con: duckdb.DuckDBPyConnection, data: bytes, parquet_path: Pa
     text, _encoding = decode_text(data)
     if not text.strip():
         raise StagingError("empty file")
+    text = strip_preamble(text)
     delimiter = detect_delimiter(text.splitlines()[0])
     expected = count_csv_records(text, delimiter)
 
@@ -129,18 +173,51 @@ def csv_to_parquet(con: duckdb.DuckDBPyConnection, data: bytes, parquet_path: Pa
         # DuckDB reads UTF-8 only, so always hand it a normalized UTF-8 copy.
         utf8_path = Path(tmp) / "source.csv"
         utf8_path.write_text(text, encoding="utf-8")
-        try:
+
+        def copy(quote: str) -> None:
+            # Values written as ="..." (Excel text guard) are unwrapped; everything else is kept as is.
             con.execute(
                 f"""
                 COPY (
-                  SELECT * FROM read_csv({_sql_literal(str(utf8_path))},
-                    delim = {_sql_literal(delimiter)}, quote = '"', escape = '"',
+                  SELECT regexp_replace(COLUMNS(*), '^="(.*)"$', '\\1', 's') FROM read_csv({_sql_literal(str(utf8_path))},
+                    delim = {_sql_literal(delimiter)}, quote = {_sql_literal(quote)}, escape = {_sql_literal(quote)},
                     header = true, all_varchar = true, sample_size = -1)
                 ) TO {_sql_literal(str(parquet_path))} (FORMAT PARQUET, COMPRESSION ZSTD)
                 """
             )
+
+        try:
+            copy('"')
         except duckdb.Error as exc:
-            raise StagingError(f"CSV parse failed (delimiter {delimiter!r}): {exc}") from exc
+            lines = [line for line in text.splitlines() if line.strip()]
+            if '"=""' in text:
+                # 2011/2014 files wrap text as "=""...""" but leave quotes inside unescaped
+                # ('"=""Dom Pomocy Społecznej "Kombatant", ..."""'). Re-encode such fields as standard
+                # quoted fields (the field ends at the first '"""' before a delimiter or line end).
+                quoting = csv.QUOTE_MINIMAL
+                text = re.sub(
+                    rf'"=""([^\n]*?)"""(?=[{re.escape(delimiter)}\r\n]|$)',
+                    lambda m: '"' + m.group(1).replace('"', '""') + '"',
+                    text,
+                    flags=re.M,
+                )
+                utf8_path.write_text(text, encoding="utf-8")
+                try:
+                    copy('"')
+                except duckdb.Error as exc2:
+                    raise StagingError(f"CSV parse failed (delimiter {delimiter!r}, re-encoded \"=\"\"...\"\"\" fields): {exc2}") from exc2
+            elif all(line.count(delimiter) == lines[0].count(delimiter) for line in lines):
+                # 2010 presidential files never quote fields but contain doubled quotes inside them
+                # ('Klub ""Sowa""'). Every line has as many fields as the header without quoting, so
+                # no quote protects a delimiter or a newline: read them without quoting.
+                quoting = csv.QUOTE_NONE
+                try:
+                    copy("")
+                except duckdb.Error as exc2:
+                    raise StagingError(f"CSV parse failed (delimiter {delimiter!r}, no quoting): {exc2}") from exc2
+            else:
+                raise StagingError(f"CSV parse failed (delimiter {delimiter!r}): {exc}") from exc
+            expected = count_csv_records(text, delimiter, quoting=quoting)
 
     staged = con.execute(f"SELECT count(*) FROM read_parquet({_sql_literal(str(parquet_path))})").fetchone()[0]
     if staged != expected:
@@ -191,9 +268,20 @@ def unique_headers(raw_headers: list[str]) -> list[str]:
 
 
 def _write_sheet(table: list[list[str]], parquet_path: Path) -> int:
-    """Write one worksheet (header in row 1) to Parquet; return the number of data rows."""
-    headers = unique_headers(table[0])
-    rows = [row for row in table[1:] if any(cell.strip() for cell in row)]
+    """Write one worksheet (header in row 1) to Parquet; return the number of data rows.
+
+    Title rows above the header (at most one non-empty cell, 2011 per-precinct workbooks) are
+    skipped, and a group-header row is folded into the header as in ``strip_preamble``.
+    """
+    filled = [sum(1 for cell in row if cell.strip()) for row in table[:5]]
+    start = next((i for i, n in enumerate(filled) if n > 1), 0)  # single-column sheets keep row 1
+    header = table[start]
+    if start > 0 and not header[0].strip() and start + 1 < len(table):
+        group, header = table[start], table[start + 1]
+        start += 1
+        header = fold_group_header(group + [""] * (len(header) - len(group)), header)
+    headers = unique_headers(header)
+    rows = [row for row in table[start + 1 :] if any(cell.strip() for cell in row)]
     columns = {
         name: pa.array([(row[i] if i < len(row) else "") or None for row in rows], type=pa.string())
         for i, name in enumerate(headers)
@@ -232,21 +320,27 @@ def stage_table(con: duckdb.DuckDBPyConnection, name: str, data: bytes, parquet_
         return excel_to_parquet(local, parquet_path)
 
 
-def stage_to_parquet(root: Path, out_dir: Path, years: set[int] | None = None) -> dict[str, int]:
-    """Stage every table under ``root`` into ``out_dir/year=<YYYY>/...``; return counters."""
+def stage_to_parquet(
+    root: Path, out_dir: Path, years: set[int] | None = None, prefixes: list[str] | None = None
+) -> dict[str, int]:
+    """Stage every table under ``root`` into ``out_dir/year=<YYYY>/...``; return counters.
+
+    ``prefixes`` limits staging to paths relative to ``root`` that start with one of them (e.g.
+    ``2014/parlament_eu``); output paths stay relative to ``root``.
+    """
     con = duckdb.connect(database=":memory:")
-    stats = {"files_seen": 0, "tables_staged": 0, "rows_staged": 0, "skipped_year": 0, "errors": 0}
+    stats = {"files_seen": 0, "tables_staged": 0, "rows_staged": 0, "skipped": 0, "errors": 0}
 
     paths = sorted(
         p for p in root.rglob("*") if p.is_file() and p.suffix.lower() in (*TABLE_SUFFIXES, ".zip")
     )
     for path in paths:
         year = year_from_path(path)
-        if years and year not in years:
-            stats["skipped_year"] += 1
+        rel = path.relative_to(root).as_posix()
+        if (years and year not in years) or (prefixes and not any(rel.startswith(p) for p in prefixes)):
+            stats["skipped"] += 1
             continue
         stats["files_seen"] += 1
-        rel = path.relative_to(root).as_posix()
         year_dir = out_dir / f"year={year or 'unknown'}"
 
         if path.suffix.lower() != ".zip":
@@ -299,9 +393,12 @@ def main() -> None:
     parser.add_argument("--root", type=Path, default=Path("data/kbw_mirror/dane"))
     parser.add_argument("--out", type=Path, default=Path("data/kbw_stage_parquet"))
     parser.add_argument("--years", type=str, default=None, help="Comma-separated years, e.g. 2015,2023")
+    parser.add_argument(
+        "--prefix", action="append", default=None, help="Only paths under --root starting with this (repeatable)"
+    )
     args = parser.parse_args()
 
-    stats = stage_to_parquet(root=args.root, out_dir=args.out, years=_parse_years(args.years))
+    stats = stage_to_parquet(root=args.root, out_dir=args.out, years=_parse_years(args.years), prefixes=args.prefix)
     print(f"[stage] summary {stats}", flush=True)
 
 
