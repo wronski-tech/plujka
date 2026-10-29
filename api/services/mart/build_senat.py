@@ -1,8 +1,12 @@
 """Build the Senate tables of one election year in DuckDB (loader side).
 
-Supported: the CSV layout of 2019 and 2023 (``kandydaci_senat``, ``okregi_senat`` and one wide
-``wyniki_gl_na_kand*_po_obwodach_senat`` file per district). The protocol comes from
-``protokoly_po_obwodach_senat`` (2023) or from the protocol columns of the district files (2019).
+Supported layouts:
+- CSV (2019, 2023): ``kandydaci_senat``, ``okregi_senat`` and one wide
+  ``wyniki_gl_na_kand*_po_obwodach_senat`` file per district. The protocol comes from
+  ``protokoly_po_obwodach_senat`` (2023) or from the protocol columns of the district files (2019).
+- Excel (2015): ``2015-kand-sen.xls`` and ``wyniki_okr_senat/NNN.xlsx`` (protocol columns prefixed
+  ``Senat - `` followed by one column per candidate). There is no district register, so
+  ``senat_districts`` only has district numbers.
 Requires the ``precincts`` table built by ``build_sejm`` in the same DuckDB connection.
 """
 
@@ -27,36 +31,67 @@ from api.services.mart.build_common import (
 
 CANDIDATE_RESULTS = "**/wyniki_gl_na_kand*_po_obwodach_senat_csv/*.parquet"
 PROTOCOLS = "**/protokoly_po_obwodach_senat_csv/*.parquet"
+EXCEL_CANDIDATES = "**/senat/2015-kand-sen.parquet"
+EXCEL_RESULTS = "**/senat/wyniki_okr_senat/*.parquet"
 
 PROTOCOL_ALIASES = {
-    "eligible_voters": ("Liczba wyborców uprawnionych do głosowania",),
+    "eligible_voters": ("Liczba wyborców uprawnionych do głosowania", "Senat - Liczba wyborców uprawnionych do głosowania"),
     "ballots_issued": (
         "Liczba wyborców, którym wydano karty do głosowania w lokalu wyborczym oraz w głosowaniu korespondencyjnym (łącznie)",
         "Liczba wyborców, którym wydano karty do głosowania",
+        "Senat - Liczba wyborców, którym wydano karty do głosowania",
     ),
-    "valid_ballots": ("Liczba kart ważnych",),
-    "invalid_votes": ("Liczba głosów nieważnych",),
+    "valid_ballots": ("Liczba kart ważnych", "Senat - Liczba kart ważnych"),
+    "invalid_votes": ("Liczba głosów nieważnych", "Senat - Liczba głosów nieważnych"),
     "valid_votes": (
         "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów",
         "Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów",
+        "Senat - Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów",
     ),
 }
-TERYT_ALIASES = ("TERYT Gminy", "Kod TERYT")
-NUMBER_ALIASES = ("Nr komisji", "Numer")
+TERYT_ALIASES = ("TERYT Gminy", "Kod TERYT", "TERYT gminy")
+NUMBER_ALIASES = ("Nr komisji", "Numer", "Numer obwodu")
 
 
 def available(sources: YearSources) -> bool:
     """Whether the year has staged Senate candidates and per-precinct results."""
-    return sources.has("**/kandydaci_senat_csv/*.parquet") and sources.has(CANDIDATE_RESULTS)
+    csv = sources.has("**/kandydaci_senat_csv/*.parquet") and sources.has(CANDIDATE_RESULTS)
+    return csv or (sources.has(EXCEL_CANDIDATES) and sources.has(EXCEL_RESULTS))
 
 
-def build_senat(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
-    """Build and check all Senate tables of ``sources.year``."""
-    year = sources.year
+def _build_excel_registers(con: duckdb.DuckDBPyConnection, year: int, candidates_src: str) -> None:
+    """2015: candidates from ``2015-kand-sen.xls``; districts only as numbers (no district register)."""
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE senat_candidates AS
+        SELECT {year} AS year,
+               CAST(row_number() OVER (ORDER BY int_(k."Nr okr."), k."Nazwisko", k."Imiona") AS INT) AS candidate_id,
+               CAST(int_(k."Nr okr.") AS INT) AS district_no,
+               strip_signature(k."Komitet") AS committee_name,
+               trim(k."Imiona") || ' ' || upper(trim(k."Nazwisko")) AS full_name,
+               upper(trim(k."Nazwisko")) AS last_name, trim(k."Imiona") AS first_names,
+               gender_(k."Płeć") AS gender, k."Zawód" AS occupation, k."Miejsce zam." AS residence,
+               k."Przynależność do partii politycznej" AS party_membership, NULL AS party_support,
+               int_(k."Głosy") AS votes,
+               {pct_expr(con, candidates_src, '"% w okr."')} AS pct_of_district,
+               yes_(k."Mandat") AS elected
+        FROM {candidates_src} k
+        """
+    )
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE senat_districts AS
+        SELECT DISTINCT {year} AS year, district_no, CAST(NULL AS VARCHAR) AS seat_city,
+               CAST(NULL AS INT) AS eligible_voters, CAST(NULL AS VARCHAR) AS description
+        FROM senat_candidates
+        """
+    )
+
+
+def _build_csv_registers(con: duckdb.DuckDBPyConnection, year: int, sources: YearSources) -> None:
+    """2019/2023: candidates and districts from ``kandydaci_senat`` and ``okregi_senat``."""
     candidates_src = sources.load("senat_candidates", "**/kandydaci_senat_csv/*.parquet")
     districts_src = sources.load("senat_districts", "**/okregi_senat_csv/*.parquet")
-    by_district = district_files(sources.files(CANDIDATE_RESULTS), r"(?:okreg|okr)_(\d+)_")
-
     if column(con, candidates_src, "Nazwisko i imiona", required=False):
         full_name = '"Nazwisko i imiona"'
     else:
@@ -68,7 +103,7 @@ def build_senat(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
                CAST(row_number() OVER (ORDER BY int_(k."Nr okręgu"), int_(k."Pozycja na liście"), {full_name}) AS INT) AS candidate_id,
                CAST(int_(k."Nr okręgu") AS INT) AS district_no,
                strip_signature(k."Nazwa komitetu") AS committee_name,
-               trim(regexp_replace({full_name}, '\\s+', ' ', 'g')) AS full_name,
+               display_name({full_name}) AS full_name,
                surname({full_name}) AS last_name,
                given_names({full_name}) AS first_names,
                gender_(k."Płeć") AS gender,
@@ -93,6 +128,17 @@ def build_senat(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
         FROM {districts_src} d
         """
     )
+
+
+def build_senat(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
+    """Build and check all Senate tables of ``sources.year``."""
+    year = sources.year
+    if sources.has(EXCEL_CANDIDATES) and not sources.has(CANDIDATE_RESULTS):
+        _build_excel_registers(con, year, sources.load("senat_candidates", EXCEL_CANDIDATES))
+        by_district = district_files(sources.files(EXCEL_RESULTS), r"^(\d+)\.parquet$")
+    else:
+        _build_csv_registers(con, year, sources)
+        by_district = district_files(sources.files(CANDIDATE_RESULTS), r"(?:okreg|okr)_(\d+)_")
 
     if sources.has(PROTOCOLS):
         protocol_sources = [sources.load("senat_protocols", PROTOCOLS)]

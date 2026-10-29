@@ -2,8 +2,8 @@
 
 A year is built in an in-memory DuckDB database from staged Parquet (``scripts/kbw_stage_duckdb.py``):
 source tables are loaded as ``src_*`` (all VARCHAR), transformed into tables named exactly like the
-PostgreSQL mart tables, checked against official totals, and then copied to PostgreSQL in one
-transaction by ``load_year``.
+PostgreSQL mart tables, checked against official totals, and then copied to PostgreSQL by
+``load_tables`` (one transaction per election family and year, see ``scripts/build_mart.py``).
 """
 
 from __future__ import annotations
@@ -18,7 +18,6 @@ from pathlib import Path
 import duckdb
 import psycopg
 
-from api.services.mart.schema import BASE_TABLES
 
 log = logging.getLogger("mart")
 
@@ -36,12 +35,18 @@ COMMITTEE_ALIASES: list[tuple[str, list[str]]] = [
     ("PRAWO I SPRAWIEDLIWOŚĆ", ["PiS", "Zjednoczona Prawica"]),
     ("KOALICJA OBYWATELSKA", ["KO", "PO", "Platforma Obywatelska"]),
     ("PLATFORMA OBYWATELSKA", ["PO", "Platforma Obywatelska"]),
+    # European Parliament 2019: PO-led coalition with PSL, SLD, .N and Zieloni.
+    ("KOALICJA EUROPEJSKA", ["KE", "Koalicja Europejska", "PO"]),
     ("TRZECIA DROGA", ["TD", "Trzecia Droga", "Polska 2050", "PSL"]),
     ("NOWA LEWICA", ["Lewica", "NL"]),
     ("SOJUSZ LEWICY DEMOKRATYCZNEJ", ["Lewica", "SLD"]),
+    ("SLD LEWICA RAZEM", ["Lewica", "SLD"]),
     ("ZJEDNOCZONA LEWICA", ["ZL", "Zjednoczona Lewica"]),
+    ("LEWICA RAZEM", ["Lewica Razem", "Razem"]),
+    ("WIOSNA", ["Wiosna"]),
     ("KONFEDERACJA", ["Konfederacja"]),
     ("POLSKIE STRONNICTWO LUDOWE", ["PSL", "Koalicja Polska"]),
+    ("WYBORCZY PSL", ["PSL"]),
     ("KUKIZ", ["Kukiz'15", "Kukiz"]),
     ("NOWOCZESNA", ["Nowoczesna"]),
     ("KORWIN", ["KORWiN"]),
@@ -52,6 +57,8 @@ COMMITTEE_ALIASES: list[tuple[str, list[str]]] = [
     ("MNIEJSZOŚĆ NIEMIECKA", ["MN", "Mniejszość Niemiecka"]),
     ("SKUTECZNI", ["Skuteczni"]),
     ("AKCJA ZAWIEDZIONYCH EMERYTÓW", ["AZER"]),
+    # Generic last: 2024 committees named just "... LEWICA" (after the specific Lewica rules above).
+    ("WYBORCZY LEWICA", ["Lewica"]),
 ]
 
 MACROS = r"""
@@ -71,6 +78,10 @@ CREATE MACRO name_key(n) AS array_to_string(list_sort(str_split(upper(trim(regex
 CREATE MACRO is_surname_token(t) AS upper(t) = t AND lower(t) <> t;
 CREATE MACRO surname(n) AS array_to_string(list_filter(str_split(trim(n), ' '), t -> is_surname_token(t)), ' ');
 CREATE MACRO given_names(n) AS array_to_string(list_filter(str_split(trim(n), ' '), t -> NOT is_surname_token(t)), ' ');
+-- 'KLESZCZ Paweł Piotr' -> 'Paweł Piotr KLESZCZ' (registers publish both orders).
+CREATE MACRO display_name(n) AS concat_ws(' ',
+    NULLIF(given_names(regexp_replace(trim(n), '\s+', ' ', 'g')), ''),
+    NULLIF(surname(regexp_replace(trim(n), '\s+', ' ', 'g')), ''));
 CREATE MACRO gender_(g) AS CASE upper(trim(g)) WHEN 'K' THEN 'Kobieta' WHEN 'M' THEN 'Mężczyzna' ELSE NULLIF(trim(g), '') END;
 CREATE MACRO yes_(x) AS coalesce(upper(trim(x)) IN ('TAK', 'T'), false);
 -- Canonical committee name: no " - ZPOW-..." registration signature (2019), single spaces, upper
@@ -143,15 +154,23 @@ def columns_of(con: duckdb.DuckDBPyConnection, relation: str) -> list[str]:
     return [row[0] for row in con.execute(f"DESCRIBE SELECT * FROM {relation}").fetchall()]
 
 
+def normalize_header(name: str) -> str:
+    """Header comparison key: no-break spaces and runs of whitespace become one space, lower case."""
+    return re.sub(r"\s+", " ", name.replace("\u00a0", " ")).strip().lower()
+
+
 def column(con: duckdb.DuckDBPyConnection, table: str, *aliases: str, required: bool = True) -> str | None:
     """Quoted name of the first alias present in ``table`` (headers differ between years).
 
     Raises BuildError listing the available columns when none matches and ``required`` is set.
     """
     available = columns_of(con, table)
+    normalized = {normalize_header(c): c for c in available}
     for alias in aliases:
         if alias in available:
             return quote_ident(alias)
+        if normalize_header(alias) in normalized:
+            return quote_ident(normalized[normalize_header(alias)])
     if required:
         raise BuildError(f"{table}: none of {aliases} found; columns are {available}")
     return None
@@ -172,6 +191,9 @@ def open_duckdb() -> duckdb.DuckDBPyConnection:
     """In-memory DuckDB connection with the shared parsing macros."""
     con = duckdb.connect(database=":memory:")
     con.execute(MACROS)
+    cases = " ".join(f"WHEN {sql_literal(code)} THEN {sql_literal(name)}" for code, name in VOIVODESHIPS.items())
+    # Voivodeship name from a gmina TERYT code (NULL abroad).
+    con.execute(f"CREATE MACRO voivodeship(t) AS CASE left(t, 2) {cases} END")
     return con
 
 
@@ -451,15 +473,15 @@ def run_checks(con: duckdb.DuckDBPyConnection, year: int, checks: dict[str, str]
         raise BuildError(f"year {year}: consistency checks failed: {'; '.join(failures)}")
 
 
-def load_year(pg: psycopg.Connection, con: duckdb.DuckDBPyConnection, year: int) -> None:
-    """Replace one year in every mart base table with the DuckDB tables of the same name.
+def load_tables(pg: psycopg.Connection, con: duckdb.DuckDBPyConnection, year: int, tables: tuple[str, ...]) -> None:
+    """Replace one year of the given mart tables with the DuckDB tables of the same name.
 
-    Runs in the caller's transaction. Base tables that the year did not produce (e.g. Senate tables
-    for 2015) are only cleared for that year.
+    Runs in the caller's transaction. Tables the build did not produce (e.g. Senate tables when no
+    Senate files are staged) are only cleared for that year. Other election families are untouched.
     """
     produced = {row[0] for row in con.execute("SELECT table_name FROM information_schema.tables").fetchall()}
     with pg.cursor() as cur, tempfile.TemporaryDirectory(prefix="mart_") as tmp:
-        for table in BASE_TABLES:
+        for table in tables:
             cur.execute(f"DELETE FROM mart.{table} WHERE year = %s", (year,))
             if table not in produced:
                 continue
@@ -481,3 +503,24 @@ def load_year(pg: psycopg.Connection, con: duckdb.DuckDBPyConnection, year: int)
                 while chunk := fh.read(1 << 20):
                     copy.write(chunk)
             log.info("year %s loaded mart.%s: %s rows", year, table, cur.rowcount)
+
+
+@dataclass(frozen=True)
+class Election:
+    """One row of ``mart.elections``: what was loaded, for which round, and when it took place."""
+
+    election: str
+    year: int
+    round: int
+    election_date: str
+    description: str
+
+
+def record_elections(pg: psycopg.Connection, families: tuple[str, ...], year: int, elections: list[Election]) -> None:
+    """Replace the ``mart.elections`` rows of the given election kinds and year (caller's transaction)."""
+    pg.execute("DELETE FROM mart.elections WHERE year = %s AND election = ANY(%s)", (year, list(families)))
+    for e in elections:
+        pg.execute(
+            "INSERT INTO mart.elections (election, year, round, election_date, description) VALUES (%s, %s, %s, %s, %s)",
+            (e.election, e.year, e.round, e.election_date, e.description),
+        )

@@ -53,6 +53,14 @@ INTENT_TEXT = {
     ),
 }
 
+# Elections that only the mart covers. The legacy templates answer from Sejm data, so a question
+# naming one of these goes to dynamic SQL first instead of being matched to a Sejm template.
+_MART_ONLY_ELECTION_RE = re.compile(
+    r"prezydent|referend|sejmik|samorz[aą]d|w[oó]jt|burmistrz|europarlament|parlament\w* europejsk|"
+    r"europos[lł]|senat",
+    re.IGNORECASE,
+)
+
 _KBW_FALLBACK_STOPWORDS_RE = (
     r"(głos(y|ow)?\b|kart|frekw|uprawn|wydan|ważn|wazn|nieważ|niewaz|"
     r"obw(ó|o)d|okr(ę|e)g|numer|nr\b|powiat|gmina|wojew|teryt|siedziba|"
@@ -60,8 +68,35 @@ _KBW_FALLBACK_STOPWORDS_RE = (
 )
 
 
-def route_question(question: str) -> dict:
-    """Route question."""
+def route_question(question: str, entity_refs: list[dict] | None = None) -> dict:
+    """Route a question to a SQL template, falling back to LLM-written SQL over ``mart``.
+
+    ``entity_refs`` are explicit entity choices (answers to a clarification); they skip the
+    templates and go straight to ``dynamic_sql``.
+    """
+    if entity_refs:
+        dyn_rows, dyn_sql, dyn_err, dyn_meta = try_dynamic_query(question, entity_refs)
+        response = _dynamic_response(question, None, _extract_years(question), dyn_rows, dyn_sql, dyn_meta)
+        if response:
+            return response
+        return {
+            "question": question,
+            "intent": "dynamic_sql",
+            "entity": None,
+            "year": None,
+            "years": _extract_years(question),
+            "sql": dyn_sql or "",
+            "params": {"_dynamic_sql_meta": dyn_meta, **({"_dynamic_sql_error": dyn_err} if dyn_err else {})},
+            "result": [],
+        }
+    tried_dynamic = False
+    if _MART_ONLY_ELECTION_RE.search(question):
+        tried_dynamic = True
+        dyn_rows, dyn_sql, dyn_err, dyn_meta = try_dynamic_query(question)
+        response = _dynamic_response(question, None, _extract_years(question), dyn_rows, dyn_sql, dyn_meta)
+        if response:
+            return response
+
     question_embedding = embed_text(question)
     llm_intent, llm_entity = extract_intent_and_entity(question)
     year = _extract_year(question)
@@ -416,19 +451,11 @@ def route_question(question: str) -> dict:
             }
 
     # Safe dynamic SQL fallback for broader KBW/legacy datasets or when template path returns empty.
-    if _should_try_dynamic_sql(question, intent, result):
+    if not tried_dynamic and _should_try_dynamic_sql(question, intent, result):
         dyn_rows, dyn_sql, dyn_err, dyn_meta = try_dynamic_query(question)
-        if dyn_rows:
-            return {
-                "question": question,
-                "intent": "dynamic_sql",
-                "entity": llm_entity,
-                "year": None,
-                "years": years,
-                "sql": dyn_sql,
-                "params": {"_dynamic_sql_meta": dyn_meta},
-                "result": dyn_rows,
-            }
+        response = _dynamic_response(question, llm_entity, years, dyn_rows, dyn_sql, dyn_meta)
+        if response:
+            return response
         # Surface dynamic generation telemetry while preserving deterministic fallback result.
         telemetry = {"_dynamic_sql_meta": dyn_meta}
         if dyn_err:
@@ -445,6 +472,36 @@ def route_question(question: str) -> dict:
         "sql": sql,
         "params": params,
         "result": result,
+    }
+
+
+def _dynamic_response(
+    question: str, entity: str | None, years: list[int], rows: list[dict], sql: str | None, meta: dict
+) -> dict | None:
+    """Response for a dynamic SQL result with rows or a clarification request; None otherwise."""
+    if meta.get("status") == "clarify":
+        return {
+            "question": question,
+            "intent": "clarification",
+            "entity": entity,
+            "year": None,
+            "years": years,
+            "sql": "",
+            "params": {"_dynamic_sql_meta": meta},
+            "result": [],
+            "clarification": meta["clarification"],
+        }
+    if not rows:
+        return None
+    return {
+        "question": question,
+        "intent": "dynamic_sql",
+        "entity": entity,
+        "year": None,
+        "years": years,
+        "sql": sql,
+        "params": {"_dynamic_sql_meta": meta},
+        "result": rows,
     }
 
 

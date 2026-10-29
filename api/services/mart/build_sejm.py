@@ -192,7 +192,7 @@ def _build_csv_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> N
                c.committee_id,
                CAST(int_(k.{k_list}) AS INT) AS list_no,
                CAST(int_(k."Pozycja na liście") AS INT) AS list_position,
-               trim(regexp_replace({full_name}, '\\s+', ' ', 'g')) AS full_name,
+               display_name({full_name}) AS full_name,
                surname({full_name}) AS last_name,
                given_names({full_name}) AS first_names,
                gender_(k."Płeć") AS gender,

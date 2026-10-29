@@ -15,7 +15,7 @@ from api.services.config import MART_DATABASE_URL
 
 SCHEMA = "mart"
 
-BASE_TABLES = (
+PARLIAMENT_TABLES = (
     "precincts",
     "sejm_districts",
     "sejm_committees",
@@ -29,7 +29,28 @@ BASE_TABLES = (
     "senat_precinct_protocols",
     "senat_precinct_candidate_votes",
 )
-"""Tables filled per election year by the loader (delete + insert of one year at a time)."""
+PREZYDENT_TABLES = ("prezydent_candidates", "prezydent_precinct_protocols", "prezydent_precinct_candidate_votes")
+PE_TABLES = (
+    "pe_districts",
+    "pe_committees",
+    "pe_district_lists",
+    "pe_candidates",
+    "pe_precinct_protocols",
+    "pe_precinct_list_votes",
+    "pe_precinct_candidate_votes",
+)
+REFERENDUM_TABLES = ("referendum_questions", "referendum_precinct_protocols", "referendum_precinct_answers")
+SEJMIK_TABLES = (
+    "sejmik_committees",
+    "sejmik_district_lists",
+    "sejmik_candidates",
+    "sejmik_gmina_protocols",
+    "sejmik_gmina_list_votes",
+)
+WBP_TABLES = ("wbp_gmina_protocols", "wbp_candidates")
+
+BASE_TABLES = PARLIAMENT_TABLES + PREZYDENT_TABLES + PE_TABLES + REFERENDUM_TABLES + SEJMIK_TABLES + WBP_TABLES
+"""Tables filled by the loader: each election family replaces its own tables one year at a time."""
 
 DERIVED_RELATIONS = (
     "persons",
@@ -38,16 +59,24 @@ DERIVED_RELATIONS = (
     "v_sejm_list_results",
     "v_sejm_turnout",
     "v_person_history",
+    "v_prezydent_results",
+    "v_pe_national_results",
+    "v_referendum_results",
+    "v_sejmik_results",
+    "v_turnout",
+    "v_party_results",
+    "v_party_change",
+    "v_gmina_continuity",
 )
 """Relations rebuilt from all loaded years after every load (see ``derived.py``)."""
 
-QUERYABLE_RELATIONS = frozenset(BASE_TABLES + DERIVED_RELATIONS)
+QUERYABLE_RELATIONS = frozenset(BASE_TABLES + DERIVED_RELATIONS + ("elections",))
 """Everything the read-only role may select from; also the allowlist for LLM-generated SQL."""
 
 TABLES_DDL = r"""
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE SCHEMA IF NOT EXISTS mart;
-COMMENT ON SCHEMA mart IS 'Relational model of Polish parliamentary elections (Sejm and Senate) built from official PKW/KBW files. Every analytical answer must come from these relations.';
+COMMENT ON SCHEMA mart IS 'Relational model of Polish elections (Sejm, Senate, President, European Parliament, referendums, voivodeship assemblies, mayors) built from official PKW/KBW files. Every analytical answer must come from these relations.';
 
 -- Folding used by entity resolution: lower case, no Polish diacritics, no "m. " / "gm. " prefix.
 CREATE OR REPLACE FUNCTION mart.fold_name(t text) RETURNS text
@@ -204,6 +233,7 @@ CREATE TABLE IF NOT EXISTS mart.sejm_precinct_candidate_votes (
 );
 COMMENT ON TABLE mart.sejm_precinct_candidate_votes IS 'Votes for each Sejm candidate in each precinct of the candidate''s district (zeros included). Join mart.precincts to aggregate by gmina etc.';
 CREATE INDEX IF NOT EXISTS idx_sejm_pcv_precinct ON mart.sejm_precinct_candidate_votes (year, precinct_id);
+CREATE INDEX IF NOT EXISTS idx_precincts_teryt ON mart.precincts (teryt_gmina);
 
 CREATE TABLE IF NOT EXISTS mart.senat_districts (
     year INT NOT NULL,
@@ -264,6 +294,346 @@ CREATE TABLE IF NOT EXISTS mart.senat_precinct_candidate_votes (
 );
 COMMENT ON TABLE mart.senat_precinct_candidate_votes IS 'Votes for each Senate candidate in each precinct of the district.';
 
+CREATE TABLE IF NOT EXISTS mart.elections (
+    election TEXT NOT NULL,
+    year INT NOT NULL,
+    round INT NOT NULL,
+    election_date DATE,
+    description TEXT,
+    loaded_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (election, year, round)
+);
+COMMENT ON TABLE mart.elections IS 'Elections loaded into the mart. election: sejm, senat, prezydent, pe (European Parliament), referendum, sejmik (voivodeship assembly), wbp (wójt/burmistrz/prezydent miasta = mayor). round is 1, or 2 for run-offs (prezydent, wbp).';
+COMMENT ON COLUMN mart.elections.loaded_at IS 'When the election was last loaded by scripts/build_mart.py.';
+
+-- President ------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS mart.prezydent_candidates (
+    year INT NOT NULL,
+    round INT NOT NULL,
+    candidate_id INT NOT NULL,
+    full_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    first_names TEXT NOT NULL,
+    gender TEXT,
+    occupation TEXT,
+    residence TEXT,
+    party_membership TEXT,
+    committee_name TEXT,
+    votes BIGINT NOT NULL,
+    pct NUMERIC(6, 2),
+    elected BOOLEAN NOT NULL,
+    advanced_to_round2 BOOLEAN,
+    person_id INT,
+    PRIMARY KEY (year, round, candidate_id)
+);
+COMMENT ON TABLE mart.prezydent_candidates IS 'Presidential candidates per election year and round with national vote totals. Round 2 (run-off) has the two leading candidates. For results per gmina/powiat/voivodeship use mart.v_prezydent_results.';
+COMMENT ON COLUMN mart.prezydent_candidates.full_name IS 'Given names and SURNAME, e.g. ''Andrzej Sebastian DUDA''.';
+COMMENT ON COLUMN mart.prezydent_candidates.last_name IS 'Surname in upper case.';
+COMMENT ON COLUMN mart.prezydent_candidates.gender IS '''Kobieta'' or ''Mężczyzna''; NULL in 2015 (not published).';
+COMMENT ON COLUMN mart.prezydent_candidates.votes IS 'Valid votes for the candidate nationwide in this round (= sum over precincts).';
+COMMENT ON COLUMN mart.prezydent_candidates.pct IS 'Percent of valid votes nationwide (0-100).';
+COMMENT ON COLUMN mart.prezydent_candidates.elected IS 'True for the candidate elected President in this round.';
+COMMENT ON COLUMN mart.prezydent_candidates.advanced_to_round2 IS 'Round 1 only: the candidate advanced to the run-off.';
+COMMENT ON COLUMN mart.prezydent_candidates.person_id IS 'Same person in other elections (mart.persons).';
+
+CREATE TABLE IF NOT EXISTS mart.prezydent_precinct_protocols (
+    year INT NOT NULL,
+    round INT NOT NULL,
+    precinct_id INT NOT NULL,
+    teryt_gmina TEXT,
+    gmina TEXT,
+    powiat TEXT,
+    wojewodztwo TEXT,
+    precinct_no INT NOT NULL,
+    address TEXT,
+    eligible_voters INT,
+    ballots_issued INT,
+    valid_ballots INT,
+    invalid_votes INT,
+    valid_votes INT,
+    PRIMARY KEY (year, round, precinct_id)
+);
+COMMENT ON TABLE mart.prezydent_precinct_protocols IS 'Presidential election precincts with their geography and protocol numbers, per year and round. Turnout = SUM(valid_ballots) / SUM(eligible_voters); or use mart.v_turnout.';
+COMMENT ON COLUMN mart.prezydent_precinct_protocols.teryt_gmina IS '6-digit gmina TERYT (first 2 digits voivodeship, first 4 powiat); NULL abroad and on ships.';
+COMMENT ON COLUMN mart.prezydent_precinct_protocols.gmina IS 'Gmina name as published, e.g. ''m. Kraków'', ''gm. Izabelin''.';
+COMMENT ON COLUMN mart.prezydent_precinct_protocols.wojewodztwo IS 'Voivodeship in lower case; NULL abroad and on ships.';
+COMMENT ON COLUMN mart.prezydent_precinct_protocols.valid_ballots IS 'Valid ballots (karty ważne); numerator of turnout.';
+COMMENT ON COLUMN mart.prezydent_precinct_protocols.valid_votes IS 'Valid votes for all candidates; denominator of candidate support.';
+CREATE INDEX IF NOT EXISTS idx_prez_pp_teryt ON mart.prezydent_precinct_protocols (teryt_gmina);
+
+CREATE TABLE IF NOT EXISTS mart.prezydent_precinct_candidate_votes (
+    year INT NOT NULL,
+    round INT NOT NULL,
+    precinct_id INT NOT NULL,
+    candidate_id INT NOT NULL,
+    votes INT NOT NULL,
+    PRIMARY KEY (year, round, candidate_id, precinct_id)
+);
+COMMENT ON TABLE mart.prezydent_precinct_candidate_votes IS 'Votes for each presidential candidate in each precinct; join prezydent_precinct_protocols on (year, round, precinct_id).';
+
+-- European Parliament ----------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS mart.pe_districts (
+    year INT NOT NULL,
+    district_no INT NOT NULL,
+    seat_city TEXT,
+    seats INT NOT NULL,
+    eligible_voters INT,
+    description TEXT,
+    PRIMARY KEY (year, district_no)
+);
+COMMENT ON TABLE mart.pe_districts IS 'European Parliament constituencies 1-13 (one or two voivodeships each). Seats per district follow from the national allocation.';
+COMMENT ON COLUMN mart.pe_districts.seats IS 'Seats won in the district (sum of mart.pe_district_lists.seats).';
+COMMENT ON COLUMN mart.pe_districts.description IS 'Official description of the district area (voivodeships).';
+
+CREATE TABLE IF NOT EXISTS mart.pe_committees (
+    year INT NOT NULL,
+    committee_id INT NOT NULL,
+    committee_name TEXT NOT NULL,
+    aliases TEXT[] NOT NULL DEFAULT '{}',
+    is_coalition BOOLEAN NOT NULL,
+    PRIMARY KEY (year, committee_id)
+);
+COMMENT ON TABLE mart.pe_committees IS 'Committees running in a European Parliament election. Compare parties across elections by aliases (same aliases as mart.sejm_committees).';
+COMMENT ON COLUMN mart.pe_committees.aliases IS 'Colloquial short names, e.g. {PiS}, {KO,PO}. Filter with ''KO'' = ANY(aliases).';
+COMMENT ON COLUMN mart.pe_committees.is_coalition IS 'Coalition committee (KKW).';
+
+CREATE TABLE IF NOT EXISTS mart.pe_district_lists (
+    year INT NOT NULL,
+    district_no INT NOT NULL,
+    committee_id INT NOT NULL,
+    list_no INT NOT NULL,
+    votes BIGINT NOT NULL,
+    pct_of_district NUMERIC(6, 2),
+    in_seat_allocation BOOLEAN NOT NULL,
+    seats INT NOT NULL,
+    PRIMARY KEY (year, district_no, committee_id)
+);
+COMMENT ON TABLE mart.pe_district_lists IS 'Official result of a committee list in a European Parliament district: votes and seats. National totals: mart.v_pe_national_results.';
+COMMENT ON COLUMN mart.pe_district_lists.in_seat_allocation IS 'The committee passed the 5% national threshold.';
+
+CREATE TABLE IF NOT EXISTS mart.pe_candidates (
+    year INT NOT NULL,
+    candidate_id INT NOT NULL,
+    district_no INT NOT NULL,
+    committee_id INT NOT NULL,
+    list_no INT NOT NULL,
+    list_position INT NOT NULL,
+    full_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    first_names TEXT NOT NULL,
+    gender TEXT,
+    occupation TEXT,
+    residence TEXT,
+    party_membership TEXT,
+    votes BIGINT NOT NULL,
+    pct_of_list NUMERIC(6, 2),
+    elected BOOLEAN NOT NULL,
+    person_id INT,
+    PRIMARY KEY (year, candidate_id)
+);
+COMMENT ON TABLE mart.pe_candidates IS 'European Parliament candidates with official vote totals; elected = MEP (europoseł).';
+COMMENT ON COLUMN mart.pe_candidates.full_name IS 'Given names and SURNAME.';
+COMMENT ON COLUMN mart.pe_candidates.last_name IS 'Surname in upper case.';
+COMMENT ON COLUMN mart.pe_candidates.person_id IS 'Same person in other elections (mart.persons).';
+
+CREATE TABLE IF NOT EXISTS mart.pe_precinct_protocols (
+    year INT NOT NULL,
+    precinct_id INT NOT NULL,
+    district_no INT,
+    teryt_gmina TEXT,
+    gmina TEXT,
+    powiat TEXT,
+    wojewodztwo TEXT,
+    precinct_no INT NOT NULL,
+    address TEXT,
+    eligible_voters INT,
+    ballots_issued INT,
+    valid_ballots INT,
+    invalid_votes INT,
+    valid_votes INT,
+    PRIMARY KEY (year, precinct_id)
+);
+COMMENT ON TABLE mart.pe_precinct_protocols IS 'European Parliament precincts with geography and protocol numbers. district_no is the EP constituency.';
+COMMENT ON COLUMN mart.pe_precinct_protocols.teryt_gmina IS '6-digit gmina TERYT; NULL abroad and on ships.';
+COMMENT ON COLUMN mart.pe_precinct_protocols.valid_votes IS 'Valid votes for all lists.';
+CREATE INDEX IF NOT EXISTS idx_pe_pp_teryt ON mart.pe_precinct_protocols (teryt_gmina);
+
+CREATE TABLE IF NOT EXISTS mart.pe_precinct_list_votes (
+    year INT NOT NULL,
+    precinct_id INT NOT NULL,
+    committee_id INT NOT NULL,
+    votes INT NOT NULL,
+    PRIMARY KEY (year, precinct_id, committee_id)
+);
+COMMENT ON TABLE mart.pe_precinct_list_votes IS 'Votes for each committee list in each European Parliament precinct.';
+
+CREATE TABLE IF NOT EXISTS mart.pe_precinct_candidate_votes (
+    year INT NOT NULL,
+    precinct_id INT NOT NULL,
+    candidate_id INT NOT NULL,
+    votes INT NOT NULL,
+    PRIMARY KEY (year, candidate_id, precinct_id)
+);
+COMMENT ON TABLE mart.pe_precinct_candidate_votes IS 'Votes for each European Parliament candidate in each precinct of the candidate''s district.';
+CREATE INDEX IF NOT EXISTS idx_pe_pcv_precinct ON mart.pe_precinct_candidate_votes (year, precinct_id);
+
+-- Nationwide referendums ---------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS mart.referendum_questions (
+    year INT NOT NULL,
+    question_no INT NOT NULL,
+    topic TEXT NOT NULL,
+    question_text TEXT NOT NULL,
+    PRIMARY KEY (year, question_no)
+);
+COMMENT ON TABLE mart.referendum_questions IS 'Questions of nationwide referendums (2015: 3 questions, 2023: 4). Texts come from the referendum orders, not from the PKW data files. A referendum is binding only with turnout above 50%.';
+COMMENT ON COLUMN mart.referendum_questions.topic IS 'Short Polish label, e.g. ''jednomandatowe okręgi wyborcze (JOW)'', ''wiek emerytalny''.';
+
+CREATE TABLE IF NOT EXISTS mart.referendum_precinct_protocols (
+    year INT NOT NULL,
+    precinct_id INT NOT NULL,
+    teryt_gmina TEXT,
+    gmina TEXT,
+    powiat TEXT,
+    wojewodztwo TEXT,
+    precinct_no INT NOT NULL,
+    eligible_voters INT,
+    ballots_issued INT,
+    valid_ballots INT,
+    PRIMARY KEY (year, precinct_id)
+);
+COMMENT ON TABLE mart.referendum_precinct_protocols IS 'Referendum precincts with geography and ballot numbers. Turnout = SUM(valid_ballots) / SUM(eligible_voters).';
+COMMENT ON COLUMN mart.referendum_precinct_protocols.teryt_gmina IS '6-digit gmina TERYT; NULL abroad and on ships.';
+
+CREATE TABLE IF NOT EXISTS mart.referendum_precinct_answers (
+    year INT NOT NULL,
+    precinct_id INT NOT NULL,
+    question_no INT NOT NULL,
+    valid_votes INT,
+    invalid_votes INT,
+    yes_votes INT,
+    no_votes INT,
+    PRIMARY KEY (year, question_no, precinct_id)
+);
+COMMENT ON TABLE mart.referendum_precinct_answers IS 'Answers per referendum question and precinct. For national or territorial results use mart.v_referendum_results.';
+COMMENT ON COLUMN mart.referendum_precinct_answers.yes_votes IS 'Votes "TAK" (yes).';
+COMMENT ON COLUMN mart.referendum_precinct_answers.no_votes IS 'Votes "NIE" (no).';
+
+-- Voivodeship assemblies (sejmiki wojewódzkie) ------------------------------------------------------
+CREATE TABLE IF NOT EXISTS mart.sejmik_committees (
+    year INT NOT NULL,
+    committee_id INT NOT NULL,
+    committee_name TEXT NOT NULL,
+    aliases TEXT[] NOT NULL DEFAULT '{}',
+    PRIMARY KEY (year, committee_id)
+);
+COMMENT ON TABLE mart.sejmik_committees IS 'Committees running for voivodeship assemblies (sejmiki województw) in local elections. Nationwide parties use the same aliases as mart.sejm_committees.';
+COMMENT ON COLUMN mart.sejmik_committees.aliases IS 'Colloquial short names, e.g. {PiS}, {KO,PO}; empty for local committees.';
+
+CREATE TABLE IF NOT EXISTS mart.sejmik_district_lists (
+    year INT NOT NULL,
+    wojewodztwo TEXT NOT NULL,
+    district_no INT NOT NULL,
+    committee_id INT NOT NULL,
+    list_no INT,
+    votes BIGINT NOT NULL,
+    seats INT,
+    PRIMARY KEY (year, wojewodztwo, district_no, committee_id)
+);
+COMMENT ON TABLE mart.sejmik_district_lists IS 'Result of a committee list in a voivodeship assembly district: votes and seats won. District numbers restart in every voivodeship.';
+COMMENT ON COLUMN mart.sejmik_district_lists.seats IS 'Seats won by the list in the district (count of elected candidates).';
+
+CREATE TABLE IF NOT EXISTS mart.sejmik_candidates (
+    year INT NOT NULL,
+    candidate_id INT NOT NULL,
+    wojewodztwo TEXT NOT NULL,
+    district_no INT NOT NULL,
+    committee_id INT NOT NULL,
+    list_no INT,
+    list_position INT,
+    full_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    first_names TEXT NOT NULL,
+    gender TEXT,
+    residence TEXT,
+    votes BIGINT,
+    elected BOOLEAN NOT NULL,
+    person_id INT,
+    PRIMARY KEY (year, candidate_id)
+);
+COMMENT ON TABLE mart.sejmik_candidates IS 'Candidates for voivodeship assemblies; elected = radny sejmiku (regional councillor).';
+COMMENT ON COLUMN mart.sejmik_candidates.full_name IS 'Given names and SURNAME.';
+COMMENT ON COLUMN mart.sejmik_candidates.votes IS 'Votes for the candidate; NULL when struck off after the ballots were printed (such votes count for the list only, so list votes in sejmik_district_lists can exceed the candidate sum).';
+COMMENT ON COLUMN mart.sejmik_candidates.person_id IS 'Same person in national elections (mart.persons); only set when the name is unambiguous, see docs.';
+
+CREATE TABLE IF NOT EXISTS mart.sejmik_gmina_protocols (
+    year INT NOT NULL,
+    teryt_gmina TEXT NOT NULL,
+    gmina TEXT,
+    powiat TEXT,
+    wojewodztwo TEXT,
+    eligible_voters INT,
+    ballots_issued INT,
+    valid_ballots INT,
+    invalid_votes INT,
+    valid_votes INT,
+    PRIMARY KEY (year, teryt_gmina)
+);
+COMMENT ON TABLE mart.sejmik_gmina_protocols IS 'Voivodeship assembly ballot totals per gmina (local elections have no precincts abroad). Turnout = valid_ballots / eligible_voters.';
+
+CREATE TABLE IF NOT EXISTS mart.sejmik_gmina_list_votes (
+    year INT NOT NULL,
+    teryt_gmina TEXT NOT NULL,
+    committee_id INT NOT NULL,
+    votes INT NOT NULL,
+    PRIMARY KEY (year, teryt_gmina, committee_id)
+);
+COMMENT ON TABLE mart.sejmik_gmina_list_votes IS 'Votes for each committee in voivodeship assembly elections per gmina; percentages in mart.v_sejmik_results.';
+
+-- Mayors: wójt / burmistrz / prezydent miasta -------------------------------------------------------
+CREATE TABLE IF NOT EXISTS mart.wbp_gmina_protocols (
+    year INT NOT NULL,
+    round INT NOT NULL,
+    teryt_gmina TEXT NOT NULL,
+    gmina TEXT,
+    powiat TEXT,
+    wojewodztwo TEXT,
+    office TEXT,
+    eligible_voters INT,
+    ballots_issued INT,
+    valid_ballots INT,
+    invalid_votes INT,
+    valid_votes INT,
+    PRIMARY KEY (year, round, teryt_gmina)
+);
+COMMENT ON TABLE mart.wbp_gmina_protocols IS 'Mayor elections (wójt, burmistrz, prezydent miasta) per gmina and round: ballot totals. Round 2 only in gminas where nobody got over 50% in round 1.';
+COMMENT ON COLUMN mart.wbp_gmina_protocols.office IS 'Office: ''wójt'', ''burmistrz'' or ''prezydent miasta''.';
+
+CREATE TABLE IF NOT EXISTS mart.wbp_candidates (
+    year INT NOT NULL,
+    round INT NOT NULL,
+    candidate_id INT NOT NULL,
+    teryt_gmina TEXT NOT NULL,
+    full_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    first_names TEXT NOT NULL,
+    gender TEXT,
+    age INT,
+    residence TEXT,
+    committee_name TEXT,
+    party_membership TEXT,
+    votes INT,
+    votes_against INT,
+    pct NUMERIC(6, 2),
+    elected BOOLEAN NOT NULL,
+    person_id INT,
+    PRIMARY KEY (year, round, candidate_id)
+);
+COMMENT ON TABLE mart.wbp_candidates IS 'Mayor candidates (wójt, burmistrz, prezydent miasta) per gmina and round with votes; elected = won the office. Join wbp_gmina_protocols on (year, round, teryt_gmina) for the gmina name.';
+COMMENT ON COLUMN mart.wbp_candidates.votes IS 'Votes for the candidate (with a single candidate: votes "za" / for). NULL when the candidate withdrew or was struck off after the ballots were printed (in a run-off the remaining candidate then faced a for/against vote).';
+COMMENT ON COLUMN mart.wbp_candidates.votes_against IS 'Only when there was a single candidate: votes "przeciw" (against).';
+COMMENT ON COLUMN mart.wbp_candidates.pct IS 'Percent of valid votes in the gmina and round (0-100).';
+COMMENT ON COLUMN mart.wbp_candidates.person_id IS 'Same person in national elections (mart.persons); only set when the name is unambiguous, see docs.';
+
 CREATE TABLE IF NOT EXISTS mart.persons (
     person_id INT PRIMARY KEY,
     full_name TEXT NOT NULL,
@@ -273,9 +643,9 @@ CREATE TABLE IF NOT EXISTS mart.persons (
     match_rule TEXT NOT NULL,
     candidacies INT NOT NULL
 );
-COMMENT ON TABLE mart.persons IS 'People who ran for the Sejm or Senate in any loaded year. Candidacies are linked through sejm_candidates.person_id / senat_candidates.person_id; mart.v_person_history lists them. person_id is rebuilt on every load (not stable across loads).';
+COMMENT ON TABLE mart.persons IS 'People who ran in any loaded national election (Sejm, Senate, President, European Parliament); local candidates (sejmik, wbp) are linked only when their name is unambiguous. Candidacies carry person_id; mart.v_person_history lists them. person_id is rebuilt on every load (not stable across loads).';
 COMMENT ON COLUMN mart.persons.match_rule IS '''name+gender'': same full name and gender in every year; ''name+gender+residence'': the name was shared by several candidates in one election, so residence was also required. Different people with identical names can still be merged; people who changed surname are not linked.';
-COMMENT ON COLUMN mart.persons.candidacies IS 'Number of candidacies (Sejm + Senate, all loaded years).';
+COMMENT ON COLUMN mart.persons.candidacies IS 'Number of candidacies in all loaded elections.';
 
 CREATE TABLE IF NOT EXISTS mart.entity_lexicon (
     kind TEXT NOT NULL,
@@ -331,3 +701,15 @@ def grant_reader_select(conn: psycopg.Connection) -> None:
     role = sql.Identifier(reader_credentials()[0])
     conn.execute(sql.SQL("GRANT SELECT ON ALL TABLES IN SCHEMA mart TO {}").format(role))
     conn.execute(sql.SQL("GRANT EXECUTE ON FUNCTION mart.fold_name(text) TO {}").format(role))
+
+
+def loaded_elections() -> list[dict]:
+    """Elections present in ``mart.elections`` (empty list when the mart is not built or unreachable)."""
+    try:
+        with psycopg.connect(MART_DATABASE_URL, connect_timeout=3) as conn:
+            rows = conn.execute(
+                "SELECT election, year, round, loaded_at FROM mart.elections ORDER BY election, year, round"
+            ).fetchall()
+    except psycopg.Error:
+        return []
+    return [{"election": e, "year": y, "round": r, "loaded_at": str(t)} for e, y, r, t in rows]

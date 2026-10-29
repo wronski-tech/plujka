@@ -41,6 +41,13 @@ def ensure_index() -> None:
                 "sql": {"type": "text"},
                 "params": {"type": "object"},
                 "created_at": {"type": "date"},
+                "status": {"type": "keyword"},
+                "latency_ms": {"type": "long"},
+                "row_count": {"type": "integer"},
+                "answer_source": {"type": "keyword"},
+                "prompt_tokens": {"type": "integer"},
+                "completion_tokens": {"type": "integer"},
+                "error": {"type": "text"},
                 "question_embedding": {
                     "type": "knn_vector",
                     "dimension": 128,
@@ -56,18 +63,25 @@ def ensure_index() -> None:
     client.indices.create(index=INDEX_NAME, body=mapping)
 
 
-def log_question(question: str, detected_intent: str, sql: str, params: dict) -> None:
-    """Log question."""
-    client = _client()
+def log_question(question: str, detected_intent: str, sql: str, params: dict, telemetry: dict | None = None) -> None:
+    """Index one answered question with routing details and telemetry; never raises.
+
+    ``telemetry`` holds flat fields such as status, latency_ms, row_count, answer_source,
+    prompt_tokens, completion_tokens and error (see ``api.main.ask``).
+    """
     payload = {
         "question": question,
         "detected_intent": detected_intent,
         "sql": sql,
         "params": params,
         "created_at": datetime.now(timezone.utc).isoformat(),
-        "question_embedding": _embedding_for_knn(question),
+        **(telemetry or {}),
     }
-    client.index(index=INDEX_NAME, body=payload)
+    try:
+        payload["question_embedding"] = _embedding_for_knn(question)
+        _client().index(index=INDEX_NAME, body=payload)
+    except Exception:
+        logger.exception("OpenSearch question log failed")
 
 
 def search_hints_text(query: str, limit: int) -> list[dict[str, str]]:

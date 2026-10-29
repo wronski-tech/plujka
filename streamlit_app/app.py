@@ -53,6 +53,60 @@ def _fetch_health_with_kb_stats() -> dict | None:
         return None
 
 
+def _ask(question: str, entity_refs: list[dict] | None = None) -> dict | None:
+    """POST /ask; shows an error and returns None on failure."""
+    payload: dict = {"question": question}
+    if entity_refs:
+        payload["entity_refs"] = entity_refs
+    try:
+        response = requests.post(f"{API_URL}/ask", json=payload, timeout=60)
+        if response.status_code == 429:
+            st.warning("Za dużo pytań w krótkim czasie. Spróbuj ponownie za minutę.")
+            return None
+        response.raise_for_status()
+        return response.json()
+    except requests.RequestException as error:
+        st.error(f"Coś poszło nie tak z API: {error}")
+        return None
+
+
+def _code_columns(rows: list[dict]) -> dict:
+    """Show years, rounds, numbers and ids without thousand separators (2015, not 2,015)."""
+    if not rows:
+        return {}
+    return {
+        name: st.column_config.NumberColumn(format="%d")
+        for name in rows[0]
+        if name in ("year", "round", "prev_year") or name.endswith(("_no", "_id"))
+    }
+
+
+def _render_answer(data: dict) -> None:
+    """Polish answer text; LLM text is shown only after its numbers were checked against the rows."""
+    answer = data.get("answer") or {}
+    if not answer.get("text"):
+        return
+    st.markdown(f"**{answer['text']}**")
+    if answer.get("source") == "llm":
+        st.caption("✓ Każda liczba w tej odpowiedzi występuje w wyniku zapytania SQL.")
+    else:
+        st.caption("Podsumowanie złożone bezpośrednio z wyników zapytania.")
+
+
+def _render_clarification(question: str, data: dict) -> None:
+    """Buttons for the options of an ambiguous question; a click re-asks with the chosen entity."""
+    clarification = data["clarification"]
+    st.info(clarification.get("prompt") or "Doprecyzuj pytanie.")
+    for i, option in enumerate(clarification.get("options") or []):
+        if st.button(option["label"], key=f"clarify_{i}_{option['ref']}", use_container_width=True):
+            with st.spinner("Szukam odpowiedzi…"):
+                chosen = _ask(question, [{"kind": option["kind"], "ref": str(option["ref"])}])
+            if chosen is not None:
+                st.session_state["last_ask"] = {"question": question, "data": chosen}
+                st.session_state.pop("_feedback_ack_fp", None)
+                st.rerun()
+
+
 def _render_result_emotes(data: dict) -> None:
     """Small visual summary for the first row in results."""
     rows = data.get("result") or []
@@ -215,13 +269,9 @@ if submitted:
         st.warning("Wpisz treść pytania.")
     else:
         with st.spinner("Szukam odpowiedzi…"):
-            try:
-                response = requests.post(f"{API_URL}/ask", json={"question": q_val}, timeout=60)
-                response.raise_for_status()
-                data = response.json()
-            except requests.RequestException as error:
-                st.error(f"Coś poszło nie tak z API: {error}")
-                st.stop()
+            data = _ask(q_val)
+        if data is None:
+            st.stop()
 
         st.session_state["last_ask"] = {"question": q_val, "data": data}
         st.session_state.pop("_feedback_ack_fp", None)
@@ -233,9 +283,15 @@ if last:
     fp = _feedback_fingerprint(q, data)
 
     st.markdown("##### Wynik")
+    if data.get("clarification"):
+        _render_clarification(q, data)
+        st.stop()
+    _render_answer(data)
     _render_result_emotes(data)
     with st.container(border=True):
-        st.dataframe(data["result"], use_container_width=True, hide_index=True)
+        st.dataframe(
+            data["result"], use_container_width=True, hide_index=True, column_config=_code_columns(data["result"])
+        )
 
     with st.expander("Co zrozumiał system", expanded=False):
         c1, c2 = st.columns(2)
@@ -273,10 +329,22 @@ if last:
             "Dane: KBW · Odpowiedzi mogą być przybliżone do poziomu okręgu sejmowego, nie do gminy."
         )
 
-    st.markdown("###### Zgłoś odpowiedź do poprawy")
+    st.markdown("###### Oceń odpowiedź")
     if st.session_state.get("_feedback_ack_fp") == fp:
-        st.caption("Dziękujemy — zgłoszenie zostało zapisane do poprawy.")
+        st.caption("Dziękujemy — ocena została zapisana.")
     else:
+        if st.button("👍 Dobra odpowiedź", key=f"fb_up_{fp}", use_container_width=True):
+            try:
+                fb = requests.post(
+                    f"{API_URL}/feedback",
+                    json={"rating": "thumbs_up", "question": q, "ask_response": data},
+                    timeout=30,
+                )
+                fb.raise_for_status()
+                st.session_state["_feedback_ack_fp"] = fp
+                st.rerun()
+            except requests.RequestException as err:
+                st.warning(f"Nie udało się zapisać oceny: {err}")
         st.caption(
             "Jeśli wynik jest błędny, niepełny albo nie na temat, wyślij go do poprawy. "
             "Zapiszemy pytanie, SQL i odpowiedź, żeby poprawić logikę systemu."

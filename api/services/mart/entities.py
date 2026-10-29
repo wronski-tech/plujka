@@ -106,7 +106,10 @@ def score_entry(kind: str, folded: str, stems: set[str], exact: set[str]) -> boo
 
 
 def resolve_entities(question: str, conn: psycopg.Connection | None = None) -> list[EntityMatch]:
-    """Lexicon entries mentioned in ``question``, at most MAX_PER_KIND per kind (most recent first)."""
+    """Lexicon entries mentioned in ``question``, at most MAX_PER_KIND per kind.
+
+    Places are ordered by recency; persons as described in the sort key below.
+    """
     stems, exact = question_terms(question)
     if not stems and not exact:
         return []
@@ -135,20 +138,28 @@ def resolve_entities(question: str, conn: psycopg.Connection | None = None) -> l
             by_kind.setdefault(kind, []).append(EntityMatch(kind, name, ref, detail, list(years)))
     matches: list[EntityMatch] = []
     for kind in sorted(by_kind):
-        entries = sorted(by_kind[kind], key=lambda m: (-max(m.years), m.name))
-        matches.extend(entries[:MAX_PER_KIND])
+        if kind == "person":
+            # Before the cut: people whose given name is in the question, then those elected more
+            # often (a bare "Kaczyński" most likely means the long-serving MP), then recency.
+            def key(m: EntityMatch) -> tuple:
+                named = any(_word_matches(g, stems) for g in _given_names(m))
+                return (not named, -(m.detail or "").count("elected"), -max(m.years), m.name)
+        else:
+            def key(m: EntityMatch) -> tuple:
+                return (-max(m.years), m.name)
+        matches.extend(sorted(by_kind[kind], key=key)[:MAX_PER_KIND])
     return matches
 
 
 def format_entity_hints(matches: list[EntityMatch]) -> str:
     """Human/LLM readable list of matches with the key to use in SQL."""
     key_hint = {
-        "gmina": "mart.precincts.teryt_gmina",
-        "powiat": "left(mart.precincts.teryt_gmina, 4)",
-        "wojewodztwo": "mart.precincts.wojewodztwo",
+        "gmina": "teryt_gmina",
+        "powiat": "teryt_powiat (or left(teryt_gmina, 4))",
+        "wojewodztwo": "wojewodztwo",
         "sejm_district": "sejm_district_no",
         "person": "person_id",
-        "committee": "sejm_committees.committee_name",
+        "committee": "committee_name (alias in aliases)",
     }
     lines = []
     for m in matches:
@@ -156,3 +167,91 @@ def format_entity_hints(matches: list[EntityMatch]) -> str:
         detail = f" — {m.detail}" if m.detail else ""
         lines.append(f"- {m.kind}: {m.name} ({ref}; years {m.years}){detail}")
     return "\n".join(lines)
+
+
+# --- Narrowing and ambiguity ------------------------------------------------------------------
+
+PLACE_KINDS = ("gmina", "powiat", "wojewodztwo", "sejm_district")
+# Same prefix rule as mart.fold_name: 'gm. X', 'm. X' and 'm. st. X' are all 'x'.
+_PLACE_PREFIX = re.compile(r"^(m\.\s?st\.\s|m\.\s|gm\.\s)")
+
+
+def _given_names(match: EntityMatch) -> list[str]:
+    """Folded given names of a person match (``name`` is 'Given Names SURNAME')."""
+    return [fold(w) for w in match.name.split() if not (w.isupper() and len(w) > 1)]
+
+
+def narrow_matches(question: str, matches: list[EntityMatch]) -> list[EntityMatch]:
+    """Drop matches the question rules out.
+
+    - Persons whose given name is not in the question, when another person with the same surname has
+      one there ("Jarosław Kaczyński" keeps only Jarosław).
+    - Persons whose surname is really a matched place name ("w Krakowie" also matches surname KRAK).
+    - Places named like the given name of a person in the question ("Jarosław Kaczyński" also
+      matches the gminas Jarosław).
+    """
+    stems, _ = question_terms(question)
+    persons = [m for m in matches if m.kind == "person"]
+    named = [m for m in persons if any(_word_matches(g, stems) for g in _given_names(m))]
+    given = {g for m in named for g in _given_names(m)}
+    places = [fold(m.name) for m in matches if m.kind in PLACE_KINDS]
+    out = []
+    for m in matches:
+        if m.kind in PLACE_KINDS and _PLACE_PREFIX.sub("", fold(m.name)) in given:
+            continue
+        if m.kind == "person":
+            if named and m not in named:
+                continue
+            surname = fold(m.name.split()[-1])
+            if any(p.split()[-1].startswith(surname[:4]) for p in places if len(surname) >= 4):
+                continue
+        out.append(m)
+    return out
+
+
+def find_ambiguity(matches: list[EntityMatch]) -> dict | None:
+    """A clarification request when the question names several different people or same-name gminas.
+
+    Returns ``{"prompt", "kind", "options": [{"label", "kind", "ref"}]}`` or None. Places of different
+    kinds that share a name (gmina Kraków, powiat Kraków, Sejm district Kraków) are not ambiguous:
+    the SQL generator picks the level from the question.
+    """
+    persons = [m for m in matches if m.kind == "person"]
+    if len(persons) > 1:
+        return {
+            "prompt": "Pytanie pasuje do kilku osób. O którą chodzi?",
+            "kind": "person",
+            "options": [{"label": f"{m.name} — {m.detail}", "kind": "person", "ref": m.ref} for m in persons],
+        }
+    gminas_by_name: dict[str, list[EntityMatch]] = {}
+    for m in matches:
+        if m.kind == "gmina":
+            gminas_by_name.setdefault(_PLACE_PREFIX.sub("", fold(m.name)), []).append(m)
+    for same_name in gminas_by_name.values():
+        if len({m.ref for m in same_name}) > 1:
+            return {
+                "prompt": "Jest kilka gmin o tej nazwie. O którą chodzi?",
+                "kind": "gmina",
+                "options": [{"label": f"{m.name} ({m.detail})", "kind": "gmina", "ref": m.ref} for m in same_name],
+            }
+    return None
+
+
+def lookup_refs(refs: list[dict], conn: psycopg.Connection | None = None) -> list[EntityMatch]:
+    """Lexicon entries for explicit ``{"kind", "ref"}`` choices (e.g. answers to a clarification)."""
+    if not refs:
+        return []
+    own = conn is None
+    conn = conn or psycopg.connect(MART_DATABASE_URL)
+    try:
+        rows = conn.execute(
+            """
+            SELECT kind, name, ref, detail, years FROM mart.entity_lexicon
+            WHERE (kind, ref) IN (SELECT * FROM unnest(%(kinds)s::text[], %(refs)s::text[]))
+            """,
+            {"kinds": [r["kind"] for r in refs], "refs": [str(r["ref"]) for r in refs]},
+        ).fetchall()
+    finally:
+        if own:
+            conn.close()
+    return [EntityMatch(kind, name, ref, detail, list(years)) for kind, name, ref, detail, years in rows]

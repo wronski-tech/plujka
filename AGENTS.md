@@ -12,16 +12,21 @@ SQL safety), `docs/DATA.md` (sources). Read `docs/MART.md` before touching `api/
 | Path | What it is |
 | ---- | ---------- |
 | `api/main.py` | FastAPI app: `/ask`, `/health`, `/question-hints`, `/feedback`, `/kbw/*` |
-| `api/services/router.py` | `route_question`: SQL templates first, then `dynamic_sql` as fallback |
+| `api/services/router.py` | `route_question`: mart-only elections → `dynamic_sql`; otherwise SQL templates, then `dynamic_sql` |
 | `api/services/sql_templates.py` | Legacy SQL templates over `kbw_facts` (JSONB rows) |
-| `api/services/dynamic_sql.py` | LLM-written SQL over `mart`: entity hints, sqlglot guard, read-only run, one repair |
+| `api/services/dynamic_sql.py` | LLM-written SQL over `mart`: entities/clarification, examples, sqlglot guard, read-only run, one repair, SQL cache |
+| `api/services/answer.py` | Polish answer text; every number must appear in the SQL rows, else a deterministic summary |
+| `api/services/rate_limit.py` | Sliding-window limit for `POST /ask` |
 | `api/services/mart/schema.py` | `mart` DDL with English `COMMENT`s, read-only role, list of queryable relations |
-| `api/services/mart/build_*.py` | DuckDB build per year (Sejm, Senate) from staged Parquet, with consistency checks |
-| `api/services/mart/derived.py` | Persons, materialized views, entity lexicon (rebuilt after every load) |
+| `api/services/mart/build_common.py`, `build_precincts.py` | Shared DuckDB macros, header matching, loading; precinct geography/protocol columns |
+| `api/services/mart/build_<family>.py` | DuckDB build per family and year (`sejm`+`senat`, `prezydent`, `pe`, `referendum`, `samorzad`) with consistency checks |
+| `api/services/mart/derived.py` | Persons, result and cross-election views, party families, entity lexicon (rebuilt after every load) |
+| `api/services/mart/examples.py`, `sql_examples.jsonl` | Verified question → SQL few-shot examples (curated file + thumbs-up, OpenSearch) |
 | `api/services/mart/safe_sql.py` | `validate_mart_sql` (sqlglot) and `run_readonly` |
-| `api/services/mart/entities.py` | Question → lexicon matches (inflected Polish names → TERYT / person_id / committee) |
+| `api/services/mart/entities.py` | Question → lexicon matches (inflected Polish names → TERYT / person_id / committee), narrowing, ambiguity |
 | `scripts/kbw_stage_duckdb.py` | Strict CSV/XLS/XLSX → Parquet staging |
-| `scripts/build_mart.py` | Builds `mart` for 2015/2019/2023 |
+| `scripts/build_mart.py` | Builds `mart`: every family-year that is staged (`--years`, `--elections`) |
+| `scripts/add_sql_example.py` | Adds a curated SQL example after running it; `--check` runs them all |
 | `streamlit_app/app.py` | UI |
 | `tests/` | `unittest`. DB tests run only with `PLUJKA_RUN_DB_TESTS=1` |
 
@@ -41,6 +46,13 @@ SQL safety), `docs/DATA.md` (sources). Read `docs/MART.md` before touching `api/
 - **Never weaken a consistency check to make a build pass.** If official totals do not reconcile, find
   the cause in the source files. When the gap is real (for example unpublished precincts or struck-off
   candidates), name it explicitly in the check and document it in `docs/MART.md` under "Known gaps".
+- **Answer text is checked.** `answer.compose_answer` accepts LLM text only when every number in it
+  appears in the SQL rows or the question. Do not bypass it or let the LLM compute new numbers.
+- **Mart-only elections skip the Sejm templates.** The legacy templates know only Sejm data; questions
+  naming president, referendum, sejmik, mayors, EP or Senate must reach `dynamic_sql`
+  (`router._MART_ONLY_ELECTION_RE`).
+- **Curated SQL examples must run.** After changing views or rebuilding, run
+  `scripts/add_sql_example.py --check`; fix or remove examples that fail.
 - **Staging must not lose rows.** No `ignore_errors`, no guessed delimiters.
 - **Prefer PKW bundles over the KBW mirror per dataset.** KBW's 2023 Senate precinct file has empty votes.
 - PostgreSQL in CI is 16 and local images may be 15: avoid `any_value` and other 16-only functions in
@@ -56,7 +68,8 @@ make compile                      # byte-compile api, scripts, streamlit_app, te
 
 python3 scripts/kbw_stage_duckdb.py --root data/kbw_mirror/dane --out data/kbw_stage_parquet
 for d in data/pkw_all/sejmsenat*/zip; do python3 scripts/kbw_stage_duckdb.py --root "$d" --out data/pkw_stage_parquet; done
-DATABASE_URL=postgresql://plujka:plujka@localhost:5432/plujka python3 scripts/build_mart.py [--years 2023]
+DATABASE_URL=postgresql://plujka:plujka@localhost:5432/plujka python3 scripts/build_mart.py [--years 2023] [--elections prezydent,pe]
+MART_DATABASE_URL=postgresql://plujka_mart_reader:plujka_mart_reader@localhost:5432/plujka python3 scripts/add_sql_example.py --check
 
 docker compose up -d                                  # postgres, opensearch, api, streamlit
 docker compose --profile tools run --rm loader        # stage + import + build mart
@@ -67,15 +80,22 @@ pyarrow, polars; needed by the mart build and its tests).
 
 ## Checklists
 
-**Changing the mart schema.** Edit the DDL and its comments in `schema.py`. Update the build in
-`build_sejm.py` / `build_senat.py`, and `derived.py` if views use the column. Rebuild with
+**Changing the mart schema.** Edit the DDL and its comments in `schema.py`. Update the family's
+`build_<family>.py` (and its `TABLES`), and `derived.py` if views use the column. Rebuild with
 `build_mart.py`; every check must pass. Update `docs/MART.md`.
 
 **Adding an election year.** Follow "Adding an election year" in `docs/MART.md`. Compare the national
 results with the official PKW page before you finish.
 
-**Changing dynamic SQL or its guards.** Extend `tests/test_mart.py`: accepted and rejected queries, and
-entity matches including false positives. Run `tests/test_integration_mart_db.py` against a real
+**Adding an election family.** Write `build_<family>.py` with `TABLES`, `FAMILY`, `available()` and a
+build function returning `Election` rows; add the tables to `schema.py` (a `*_TABLES` group in
+`BASE_TABLES`), the family to `FAMILIES` in `scripts/build_mart.py`, result views and lexicon or
+person sources to `derived.py`, its keywords to `router._MART_ONLY_ELECTION_RE`, and a few curated
+examples to `sql_examples.jsonl`.
+
+**Changing dynamic SQL or its guards.** Extend `tests/test_mart.py`: accepted and rejected queries,
+entity matches including false positives, clarification, and the `try_dynamic_query` flow
+(`TestDynamicQueryFlow` stubs the LLM and the database). Run `tests/test_integration_mart_db.py` against a real
 PostgreSQL to confirm the role still denies writes, reads outside `mart`, and long queries.
 
 **Testing without an OpenAI key.** Stub `dynamic_sql._llm_sql` and call `try_dynamic_query` against a

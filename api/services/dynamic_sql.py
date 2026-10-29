@@ -2,12 +2,17 @@
 
 Flow for one question:
 1. ``entities.resolve_entities`` maps inflected names in the question to exact keys (TERYT, person_id,
-   committee name) found in ``mart.entity_lexicon``.
+   committee name) found in ``mart.entity_lexicon``; ``narrow_matches`` drops matches the question
+   rules out. If several people or same-name gminas remain, the caller gets a clarification request
+   instead of a guess. Explicit choices (``entity_refs``) replace matches of their kind.
 2. The prompt carries the mart schema description (table/column ``COMMENT``s read from PostgreSQL),
-   the loaded years with their committees, the entity matches and the SQL rules.
+   the loaded elections, the entity matches, similar verified examples (``examples.py``) and rules.
 3. The model returns one SELECT; ``safe_sql.validate_mart_sql`` checks it with sqlglot and caps LIMIT.
 4. ``safe_sql.run_readonly`` runs it as the read-only mart role. On a database error the model gets
    one repair attempt with the failing SQL and the error message.
+
+A validated SQL that ran successfully is cached per (question, entity choices, mart load) so a
+repeated question skips the LLM. ``meta`` records status, timings and token usage for telemetry.
 
 Answers therefore always come from SQL over official data; the LLM only writes the query.
 """
@@ -16,34 +21,90 @@ from __future__ import annotations
 
 import json
 import logging
+import threading
+import time
+from collections import OrderedDict
 from functools import lru_cache
 from typing import Any
 
 import psycopg
 from openai import OpenAI
 
-from api.services.config import MART_DATABASE_URL, MART_MAX_ROWS, OPENAI_API_KEY, OPENAI_CHAT_MODEL
-from api.services.mart import entities, safe_sql
+from api.services.config import (
+    MART_DATABASE_URL,
+    MART_MAX_ROWS,
+    OPENAI_API_KEY,
+    OPENAI_CHAT_MODEL,
+    SQL_CACHE_MAX_ENTRIES,
+    SQL_CACHE_TTL_SECONDS,
+)
+from api.services.mart import entities, examples, safe_sql
 
 log = logging.getLogger(__name__)
 
 SQL_RULES = f"""Rules:
 - Write exactly one PostgreSQL SELECT (WITH ... SELECT allowed). No other statements.
 - Use only relations of schema mart listed below; qualify them as mart.<name>.
-- Prefer the views: v_sejm_national_results (national results, thresholds, seats), v_sejm_list_results
-  (list support per country/wojewodztwo/powiat/gmina/sejm_district), v_sejm_turnout (turnout per unit),
-  v_person_history (all candidacies of a person).
-- Always filter by year; when the question gives no year, use the latest loaded year.
+- Prefer the v_* views: they already define percentages, thresholds, turnout and aggregation levels.
+- Always filter by election year (and round for two-round elections); when the question gives no
+  year, use the latest loaded election of that kind.
 - Use the matched entities' keys (teryt_gmina, person_id, committee name) instead of guessing names.
   Committees: filter with '<alias>' = ANY(aliases). Names in questions are inflected Polish forms.
+- Comparisons across elections: mart.v_turnout (turnout of every election), mart.v_party_results
+  and mart.v_party_change (party families; return the comparable column so the answer can say
+  when the committees differed). Join units by teryt_gmina / teryt_powiat / wojewodztwo.
 - Percentages in the mart are already 0-100. Order results deterministically.
 - Include LIMIT {MART_MAX_ROWS} or less.
 Return JSON: {{"sql": "..."}}"""
 
 
-@lru_cache(maxsize=1)
-def schema_description() -> str:
-    """Mart relations with their table/column comments, as plain text for the prompt (cached)."""
+class _SqlCache:
+    """Small thread-safe LRU of validated SQL with a time-to-live."""
+
+    def __init__(self, max_entries: int, ttl_seconds: int) -> None:
+        self.max_entries = max_entries
+        self.ttl = ttl_seconds
+        self._data: OrderedDict[tuple, tuple[float, str]] = OrderedDict()
+        self._lock = threading.Lock()
+
+    def get(self, key: tuple) -> str | None:
+        """Cached SQL for ``key`` or None (expired entries are dropped)."""
+        with self._lock:
+            hit = self._data.get(key)
+            if hit is None:
+                return None
+            if hit[0] < time.monotonic():
+                del self._data[key]
+                return None
+            self._data.move_to_end(key)
+            return hit[1]
+
+    def put(self, key: tuple, sql: str) -> None:
+        """Store ``sql`` (no-op when the cache is disabled)."""
+        if self.ttl <= 0 or self.max_entries <= 0:
+            return
+        with self._lock:
+            self._data[key] = (time.monotonic() + self.ttl, sql)
+            self._data.move_to_end(key)
+            while len(self._data) > self.max_entries:
+                self._data.popitem(last=False)
+
+    def drop(self, key: tuple) -> None:
+        """Forget ``key``."""
+        with self._lock:
+            self._data.pop(key, None)
+
+
+SQL_CACHE = _SqlCache(SQL_CACHE_MAX_ENTRIES, SQL_CACHE_TTL_SECONDS)
+
+
+@lru_cache(maxsize=2)
+def schema_description(version: str = "") -> str:
+    """Mart relations with their table/column comments, as plain text for the prompt.
+
+    Cached per mart load ``version`` (from ``data_context``), so a rebuilt mart is picked up
+    without restarting the API.
+    """
     with psycopg.connect(MART_DATABASE_URL) as conn:
         rows = conn.execute(
             """
@@ -63,21 +124,30 @@ def schema_description() -> str:
     return "\n\n".join(f"mart.{name} -- {doc}\n" + "\n".join(cols) for name, (doc, cols) in relations.items())
 
 
-def data_context() -> str:
-    """Loaded years and the main committees of each year (small, fetched per question)."""
+def data_context() -> tuple[str, str]:
+    """Loaded elections and the main Sejm committees, plus a version string of the last mart load."""
     with psycopg.connect(MART_DATABASE_URL) as conn:
+        elections = conn.execute(
+            "SELECT election, year, round, description, loaded_at FROM mart.elections ORDER BY election, year, round"
+        ).fetchall()
         committees = conn.execute(
             """
             SELECT year, string_agg(coalesce(aliases[1], committee_name) || ' (seats ' || seats || ')', ', ' ORDER BY votes DESC)
             FROM mart.v_sejm_national_results WHERE pct >= 1 GROUP BY year ORDER BY year
             """
         ).fetchall()
-    lines = [f"- {year}: {names}" for year, names in committees]
-    return "Loaded Sejm elections and main committees:\n" + "\n".join(lines)
+    version = max((str(e[4]) for e in elections), default="")
+    lines = [f"- {e[0]} {e[1]}" + (f" round {e[2]}" if e[2] else "") + f": {e[3]}" for e in elections]
+    sejm = [f"- {year}: {names}" for year, names in committees]
+    text = "Loaded elections (election, year, round):\n" + "\n".join(lines)
+    text += "\n\nMain Sejm committees per year:\n" + "\n".join(sejm)
+    return text, version
 
 
-def _llm_sql(question: str, context: str, previous_sql: str | None = None, previous_error: str | None = None) -> str:
-    """Ask the chat model for one SQL query; raise ValueError on an unusable answer."""
+def _llm_sql(
+    question: str, context: str, previous_sql: str | None = None, previous_error: str | None = None
+) -> tuple[str, dict[str, int]]:
+    """Ask the chat model for one SQL query; return (sql, token usage). Raise ValueError when unusable."""
     if not OPENAI_API_KEY:
         raise ValueError("OPENAI_API_KEY is missing.")
     repair = ""
@@ -96,41 +166,93 @@ def _llm_sql(question: str, context: str, previous_sql: str | None = None, previ
             {"role": "user", "content": question},
         ],
     )
+    usage = response.usage
+    tokens = {"prompt_tokens": usage.prompt_tokens, "completion_tokens": usage.completion_tokens} if usage else {}
     try:
         sql = (json.loads(response.choices[0].message.content or "{}").get("sql") or "").strip()
     except json.JSONDecodeError as exc:
         raise ValueError("Model response was not valid JSON.") from exc
     if not sql:
         raise ValueError("Model returned no SQL.")
-    return sql
+    return sql, tokens
 
 
-def build_context(question: str) -> tuple[str, list[dict[str, Any]]]:
-    """Prompt context (schema, data, entity matches) and the matches as dicts for telemetry."""
-    matches = entities.resolve_entities(question)
+def resolve_question_entities(question: str, entity_refs: list[dict] | None = None) -> tuple[list[entities.EntityMatch], dict | None]:
+    """Entity matches for the prompt and an optional clarification request.
+
+    Kinds chosen explicitly in ``entity_refs`` replace the automatic matches of that kind and are
+    never reported as ambiguous.
+    """
+    matches = entities.narrow_matches(question, entities.resolve_entities(question))
+    if entity_refs:
+        pinned = entities.lookup_refs(entity_refs)
+        pinned_kinds = {m.kind for m in pinned}
+        matches = [m for m in matches if m.kind not in pinned_kinds] + pinned
+        return matches, None
+    return matches, entities.find_ambiguity(matches)
+
+
+def build_context(question: str, matches: list[entities.EntityMatch]) -> tuple[str, str, list[dict[str, Any]]]:
+    """Prompt context, mart version, and the examples used (for telemetry)."""
     hints = entities.format_entity_hints(matches) or "- none"
-    context = f"Schema:\n{schema_description()}\n\n{data_context()}\n\nEntities matched in the question:\n{hints}"
-    return context, [m.__dict__ for m in matches]
+    elections, version = data_context()
+    similar = examples.similar_examples(question)
+    context = (
+        f"Schema:\n{schema_description(version)}\n\n{elections}\n\nEntities matched in the question:\n{hints}"
+        + (f"\n\n{examples.format_examples(similar)}" if similar else "")
+    )
+    return context, version, [{"question": e["question"], "source": e.get("source")} for e in similar]
 
 
-def try_dynamic_query(question: str) -> tuple[list[dict], str | None, str | None, dict]:
+def _ms(started: float) -> int:
+    """Milliseconds since ``started`` (time.monotonic)."""
+    return int((time.monotonic() - started) * 1000)
+
+
+def try_dynamic_query(question: str, entity_refs: list[dict] | None = None) -> tuple[list[dict], str | None, str | None, dict]:
     """Generate, validate and run SQL for ``question``.
 
-    Returns ``(rows, sql, error, meta)``; ``meta["status"]`` is one of skipped / rejected / failed /
-    first_pass / repaired, and ``meta["entities"]`` lists the entity matches used in the prompt.
+    Returns ``(rows, sql, error, meta)``. ``meta["status"]`` is one of skipped / clarify / rejected /
+    failed / cached / first_pass / repaired. ``meta`` also holds ``entities``, ``examples``,
+    ``timings_ms`` and ``tokens``; for ``clarify`` it holds ``clarification`` (see
+    ``entities.find_ambiguity``).
     """
+    timings: dict[str, int] = {}
+    tokens = {"prompt_tokens": 0, "completion_tokens": 0}
+    started = time.monotonic()
     try:
-        context, matched = build_context(question)
+        matches, clarification = resolve_question_entities(question, entity_refs)
+        meta: dict[str, Any] = {"entities": [m.__dict__ for m in matches], "timings_ms": timings, "tokens": tokens}
+        if clarification:
+            timings["entities"] = _ms(started)
+            return [], None, None, {**meta, "status": "clarify", "clarification": clarification}
+        context, version, used_examples = build_context(question, matches)
     except psycopg.Error as exc:
         log.warning("dynamic SQL skipped: mart not reachable (%s)", exc)
         return [], None, str(exc), {"status": "skipped", "phase": "context", "error": str(exc)}
-    meta: dict[str, Any] = {"entities": matched}
+    timings["context"] = _ms(started)
+    meta["examples"] = used_examples
+
+    cache_key = (" ".join(entities.fold(question).split()), json.dumps(entity_refs or [], sort_keys=True), version)
+    cached = SQL_CACHE.get(cache_key)
+    if cached:
+        try:
+            phase = time.monotonic()
+            rows = safe_sql.run_readonly(cached)
+            timings["execute"] = _ms(phase)
+            return rows, cached, None, {**meta, "status": "cached"}
+        except psycopg.Error:
+            SQL_CACHE.drop(cache_key)
 
     sql: str | None = None
     error: str | None = None
     for attempt in ("first_pass", "repaired"):
         try:
-            raw = _llm_sql(question, context, previous_sql=sql, previous_error=error)
+            phase = time.monotonic()
+            raw, used = _llm_sql(question, context, previous_sql=sql, previous_error=error)
+            timings[f"llm_{attempt}"] = _ms(phase)
+            for name, value in used.items():
+                tokens[name] = tokens.get(name, 0) + value
             sql = safe_sql.validate_mart_sql(raw)
         except safe_sql.UnsafeSqlError as exc:
             log.warning("dynamic SQL rejected: %s", exc)
@@ -138,7 +260,10 @@ def try_dynamic_query(question: str) -> tuple[list[dict], str | None, str | None
         except ValueError as exc:
             return [], sql, str(exc), {**meta, "status": "skipped", "phase": attempt, "error": str(exc)}
         try:
+            phase = time.monotonic()
             rows = safe_sql.run_readonly(sql)
+            timings[f"execute_{attempt}"] = _ms(phase)
+            SQL_CACHE.put(cache_key, sql)
             return rows, sql, None, {**meta, "status": attempt}
         except psycopg.Error as exc:
             error = str(exc).splitlines()[0]
