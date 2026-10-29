@@ -6,27 +6,23 @@ Plujka answers Polish election (PKW-style) questions with SQL against **PostgreS
 
 ```mermaid
 flowchart LR
-  Q[Question] --> E[embed_text]
-  Q --> L[extract_intent_and_entity]
-  E --> R[route_question]
-  L --> R
-  R -->|president, referendum, sejmik, mayors, EP, Senate| D
-  R --> T[SQL template + params]
-  T --> DB[(PostgreSQL)]
-  T -->|no rows| D[dynamic_sql: entities, clarification, examples, LLM SQL, cache]
+  Q[Question + optional previous turn] --> D[dynamic_sql: entities, clarification, relevant schema, examples, LLM SQL, cache]
   D --> G[sqlglot guard] --> RO[read-only role] --> M[(mart schema)]
+  D -->|no rows, plain Sejm question| T[legacy SQL template + params]
+  T --> DB[(PostgreSQL kbw_facts)]
   M --> A[answer text: numbers checked against rows]
   DB --> A
   A --> OS[OpenSearch log + telemetry]
 ```
 
-1. **Embedding** — `embed_text(question)` for semantic fallback routing (and OpenSearch logging).
-2. **LLM** — `extract_intent_and_entity(question)` proposes an intent and entity when OpenAI is configured; unknown intents fall back to semantic matching against predefined intent phrases.
-3. **Router** — `route_question` in `api/services/router.py`. A question naming an election only the mart covers (president, referendum, sejmik, wójt/burmistrz, European Parliament, Senate) goes to `dynamic_sql` first. Otherwise the router resolves year(s) and location hints, picks `SQL_TEMPLATES[intent]`, binds parameters and runs `db.run_sql`; when the template returns nothing, `dynamic_sql.try_dynamic_query` takes over. It resolves entities against `mart.entity_lexicon` (returning `intent = "clarification"` with options when several people or same-name gminas match), adds similar verified examples, asks the LLM for one SELECT over `mart`, validates it with sqlglot and runs it as `plujka_mart_reader` (one repair attempt on error; validated SQL is cached per mart load). Telemetry is in `params._dynamic_sql_meta`.
-4. **Answer** — `answer.compose_answer` turns the rows into Polish text. LLM text is used only when every number in it appears in the rows or the question; otherwise the answer is a summary built from the rows.
-5. **Persistence and telemetry** — Results come from PostgreSQL only. Each request logs one line and one OpenSearch document with status, latency, row count, answer source and token usage (`api/services/opensearch_store.py`). `POST /ask` is rate-limited per client IP (`ASK_RATE_LIMIT_PER_MINUTE`, HTTP 429).
+1. **Access** — when `API_KEYS` is set, `POST /ask` and `POST /feedback` require an `X-API-Key` header (401 otherwise). `POST /ask` is rate-limited per API key or client IP (`ASK_RATE_LIMIT_PER_MINUTE`, HTTP 429); with `REDIS_URL` the limit is shared by all workers.
+2. **Dynamic SQL first** — `route_question` in `api/services/router.py` calls `dynamic_sql.try_dynamic_query` for every question. It resolves entities against `mart.entity_lexicon` (returning `intent = "clarification"` with options when several people or same-name gminas match), describes only the mart relations of the election kinds the question names, adds similar verified examples, asks the LLM for one SELECT over `mart`, validates it with sqlglot and runs it as `plujka_mart_reader` (one repair attempt on error; validated SQL is cached per mart load). Telemetry is in `params._dynamic_sql_meta`.
+3. **Follow-ups** — a request may carry `previous: {question, sql, entity_refs}`. Entity kinds the new question does not name (person, place, committee) are inherited from the previous question, and the previous question and SQL go into the prompt, so "A w 2019?" after "Frekwencja w Krakowie w 2023?" asks about Kraków in 2019.
+4. **Template fallback** — only when dynamic SQL returned no rows (no OpenAI key, failed or empty query), and the request is not a clarification answer, not a follow-up and does not name an election only the mart covers, the legacy path runs: `extract_intent_and_entity` and embeddings pick one of `SQL_TEMPLATES` (Sejm data in `kbw_facts`).
+5. **Answer** — `answer.compose_answer` turns the rows into Polish text. LLM text is used only when every number in it appears in the rows or the question; otherwise the answer is a summary built from the rows. Numeric values in `result` are JSON numbers (PostgreSQL `numeric` 34.27 is sent as `34.27`, not `"34.27"`).
+6. **Persistence and telemetry** — Results come from PostgreSQL only. Each request logs one line and one OpenSearch document with status, latency, row count, answer source and token usage (`api/services/opensearch_store.py`); OpenSearch Dashboards (Compose profile `observability`) charts them ([DEPLOYMENT.md](DEPLOYMENT.md)).
 
-A clarification answer is sent back as `POST /ask` with `entity_refs: [{"kind": "person", "ref": "<person_id>"}]`; the Streamlit UI shows the options as buttons and does this for the user.
+A clarification answer is sent back as `POST /ask` with `entity_refs: [{"kind": "person", "ref": "<person_id>"}]`; the Streamlit UI shows the options as buttons and does this for the user. The UI also keeps the last answered turn and sends it as `previous` when the "Dopytaj o poprzedni wynik" toggle is on (on by default for questions such as "a w 2019?"). It draws a bar chart when each row is one labelled unit with a number, a choropleth when rows carry `teryt_gmina`, `teryt_powiat` or `wojewodztwo` (boundaries in `streamlit_app/geo/`), and shows the SQL with the PKW/KBW source.
 
 ## Startup and data loading
 
@@ -52,7 +48,7 @@ The Streamlit UI sends thumbs-up/down after each answer. A thumbs-up on a `dynam
 
 ## Configuration
 
-Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `MART_DATABASE_URL`, `MART_STATEMENT_TIMEOUT_MS`, `MART_MAX_ROWS`, `SQL_CACHE_*`, `SQL_EXAMPLES_*`, `ANSWER_SUMMARY_ENABLED`, `ASK_RATE_LIMIT_PER_MINUTE`, `PLUJKA_ENV`, `OPENSEARCH_URL`, OpenAI models, `EMBEDDING_DIM`, `FEEDBACK_JSONL_PATH`). See the table in [MART.md](MART.md#configuration). Docker Compose wires these for containers (see `docker-compose.yml`).
+Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `MART_DATABASE_URL`, `MART_STATEMENT_TIMEOUT_MS`, `MART_MAX_ROWS`, `SQL_CACHE_*`, `SQL_EXAMPLES_*`, `ANSWER_SUMMARY_ENABLED`, `ASK_RATE_LIMIT_PER_MINUTE`, `REDIS_URL`, `API_KEYS`, `PLUJKA_ENV`, `OPENSEARCH_URL`, OpenAI models, `EMBEDDING_DIM`, `FEEDBACK_JSONL_PATH`). See the table in [MART.md](MART.md#configuration). Docker Compose wires these for containers (see `docker-compose.yml`).
 
 ## Where to change behavior
 
@@ -60,6 +56,7 @@ Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `
 | -------------------- | --------------------------------- |
 | Intents / SQL shapes | `api/services/sql_templates.py`   |
 | Routing rules        | `api/services/router.py`          |
+| Rate limit / API keys| `api/services/rate_limit.py`, `require_api_key` in `api/main.py` |
 | LLM SQL over `mart`  | `api/services/dynamic_sql.py`, `api/services/mart/safe_sql.py`, `api/services/mart/entities.py`, `api/services/mart/examples.py` |
 | Answer text          | `api/services/answer.py`          |
 | `mart` schema / build| `api/services/mart/`, `scripts/build_mart.py` |
@@ -67,5 +64,5 @@ Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `
 | Embeddings           | `api/services/embeddings.py`      |
 | KBW import           | `api/services/kbw_import.py`, `scripts/import_kbw_facts.py`, `loader` service |
 | Legacy PKW helpers   | `api/services/seed.py`            |
-| UI                   | `streamlit_app/app.py`            |
+| UI (charts, map, follow-ups) | `streamlit_app/app.py`, `streamlit_app/geo/` |
 | Feedback JSONL       | `api/services/feedback_store.py`  |

@@ -1,22 +1,25 @@
 from __future__ import annotations
 
 import logging
+import secrets
 import time
 from contextlib import asynccontextmanager
+from datetime import date, datetime
+from decimal import Decimal
 from typing import Any, Literal
 
-from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Query, Request
 from psycopg.conninfo import conninfo_to_dict
 from pydantic import BaseModel, ConfigDict, Field
 
 from api.services import answer, config, db, feedback_store, opensearch_store, router
 from api.services.mart import examples as sql_examples
 from api.services.mart import schema as mart_schema
-from api.services.rate_limit import SlidingWindowLimiter
+from api.services.rate_limit import make_limiter
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 log = logging.getLogger("plujka.api")
-ask_limiter = SlidingWindowLimiter(config.ASK_RATE_LIMIT_PER_MINUTE)
+ask_limiter = make_limiter(config.ASK_RATE_LIMIT_PER_MINUTE, config.REDIS_URL)
 
 OPENAPI_TAGS: list[dict[str, str]] = [
     {"name": "health", "description": "Liveness probe and approximate KBW table stats"},
@@ -71,10 +74,21 @@ class EntityRef(BaseModel):
     ref: str
 
 
+class PreviousTurn(BaseModel):
+    """The preceding question of a conversation, for follow-ups such as "a w 2019?"."""
+
+    question: str = Field(max_length=1000, description="Previous question (may hold several earlier turns)")
+    sql: str | None = Field(default=None, max_length=8000, description="SQL that answered it")
+    entity_refs: list[EntityRef] | None = Field(default=None, description="Entity choices used for it")
+
+
 class AskRequest(BaseModel):
-    question: str
+    question: str = Field(max_length=1000)
     entity_refs: list[EntityRef] | None = Field(
         default=None, description="Entity choices from a previous clarification (kind + ref from its options)"
+    )
+    previous: PreviousTurn | None = Field(
+        default=None, description="Previous turn when this question follows up on it; its filters carry over"
     )
 
 
@@ -193,20 +207,41 @@ def _telemetry(result: dict[str, Any], started: float) -> dict[str, Any]:
     }
 
 
+def require_api_key(x_api_key: str | None = Header(default=None)) -> str | None:
+    """Reject the request unless it carries one of ``API_KEYS`` (no keys configured: open API)."""
+    if not config.API_KEYS:
+        return None
+    if not x_api_key or not any(secrets.compare_digest(x_api_key, k) for k in config.API_KEYS):
+        raise HTTPException(status_code=401, detail="Missing or invalid X-API-Key.")
+    return x_api_key
+
+
+def _json_value(value: Any) -> Any:
+    """JSON-friendly scalar: numbers stay numbers (Decimal 34.27 -> 34.27, not "34.27"), dates as ISO text."""
+    if isinstance(value, Decimal):
+        return int(value) if value == value.to_integral_value() else float(value)
+    if isinstance(value, (date, datetime)):
+        return value.isoformat()
+    return value
+
+
 @app.post("/ask", response_model=AskResponse, tags=["ask"])
-def ask(request: AskRequest, http_request: Request) -> AskResponse:
+def ask(request: AskRequest, http_request: Request, api_key: str | None = Depends(require_api_key)) -> AskResponse:
     """Answer a question: route it to SQL, run it, and describe the rows in Polish."""
     if not request.question.strip():
         raise HTTPException(status_code=400, detail="Question is required.")
     client = http_request.client.host if http_request.client else "unknown"
-    if not ask_limiter.allow(client):
+    # With API keys each key has its own limit; otherwise each client IP.
+    if not ask_limiter.allow(f"key:{api_key}" if api_key else client):
         raise HTTPException(status_code=429, detail="Too many questions; try again in a minute.")
 
     started = time.monotonic()
     refs = [r.model_dump() for r in request.entity_refs] if request.entity_refs else None
-    result = router.route_question(request.question, entity_refs=refs)
+    previous = request.previous.model_dump() if request.previous else None
+    result = router.route_question(request.question, entity_refs=refs, previous=previous)
     if not result.get("clarification"):
         result["answer"] = answer.compose_answer(request.question, result.get("result") or [])
+    result["result"] = [{k: _json_value(v) for k, v in row.items()} for row in result.get("result") or []]
     telemetry = _telemetry(result, started)
     log.info(
         "ask intent=%s status=%s rows=%s latency_ms=%s answer=%s tokens=%s/%s",
@@ -223,7 +258,7 @@ def ask(request: AskRequest, http_request: Request) -> AskResponse:
     return AskResponse.model_validate(result)
 
 
-@app.post("/feedback", response_model=FeedbackOkResponse, tags=["feedback"])
+@app.post("/feedback", response_model=FeedbackOkResponse, tags=["feedback"], dependencies=[Depends(require_api_key)])
 def feedback(request: FeedbackRequest) -> FeedbackOkResponse:
     """Feedback."""
     if request.rating == "thumbs_down":

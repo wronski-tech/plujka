@@ -1,10 +1,14 @@
 """Build the local-election tables of one year in DuckDB (loader side): voivodeship assemblies
-(sejmiki) and mayors (wójt / burmistrz / prezydent miasta, "wbp").
-
-Councils of gminas and powiats are not loaded: they have tens of thousands of districts and are
-rarely asked about.
+(sejmiki), mayors (wójt / burmistrz / prezydent miasta, "wbp") and, through ``build_rady``, the
+councils of gminas, powiats and Warsaw districts.
 
 Sources (KBW mirror):
+- 2014 sejmik: ``2014-kand-rady`` (candidates of every council; ``Szczebel = 'województwo'``) and the
+  gmina results ``1461143032_a1c2…`` (full committee names, mixed case). There is no district
+  register; the 555 seats are checked against the PKW total (``SEJMIK_SEATS``).
+- 2014 wbp: ``1579520736_samo2014_kandydaci_na_WBP`` (both rounds side by side; the staged headers of
+  the per-round columns are generic, see ``_WBP_2014``) and the per-round gmina statistics in
+  ``samo2014-statystyki-według-gmin``.
 - 2018 sejmik: ``2018-kand-rady`` (candidates of every council; ``Szczebel = 'województwo'``),
   ``okregi`` (seats), ``2018-sejmiki-po-gminach`` (gmina results; committee columns carry the SHORT
   committee name, mapped through the ``komitety`` register).
@@ -34,6 +38,7 @@ from api.services.mart.build_common import (
     column,
     columns_of,
     create_committee_aliases,
+    normalize_header,
     pct_expr,
     python_name_key,
     quote_ident,
@@ -41,16 +46,24 @@ from api.services.mart.build_common import (
     sql_list,
     sql_literal,
 )
-from api.services.mart.build_precincts import GEO_ALIASES, PROTOCOL_ALIASES, vote_columns
-from api.services.mart.schema import SEJMIK_TABLES, WBP_TABLES
+from api.services.mart import build_rady
+from api.services.mart.build_precincts import GEO_ALIASES, NOT_VOTE_COLUMNS, PROTOCOL_ALIASES
+from api.services.mart.schema import RADA_TABLES, SEJMIK_TABLES, WBP_TABLES
 
 log = logging.getLogger("mart")
 
-TABLES = SEJMIK_TABLES + WBP_TABLES
-FAMILY = ("sejmik", "wbp")
+TABLES = SEJMIK_TABLES + WBP_TABLES + RADA_TABLES
+FAMILY = ("sejmik", "wbp", "rada")
 
-DATES = {2018: ("2018-10-21", "2018-11-04"), 2024: ("2024-04-07", "2024-04-21")}
+DATES = {2014: ("2014-11-16", "2014-11-30"), 2018: ("2018-10-21", "2018-11-04"), 2024: ("2024-04-07", "2024-04-21")}
 SOURCES = {
+    2014: {
+        "sejmik_candidates": "**/samorzad/2014-kand-rady.parquet",
+        "sejmik_gminas": "**/samorzad/1461143032_a1c242476ecfd74febac7beef6a12fcb.parquet",
+        "wbp_candidates": "**/samorzad/1579520736_samo2014_kandydaci_na_WBP.parquet",
+        "wbp_protocols_1": "**/samorzad/samo2014-statystyki-według-gmin/samo2014 WBP I tura w gminach__*.parquet",
+        "wbp_protocols_2": "**/samorzad/samo2014-statystyki-według-gmin/samo2014 WBP II tura w gminach__*.parquet",
+    },
     2018: {
         "sejmik_candidates": "**/samorzad/2018-kand-rady.parquet",
         "sejmik_seats": "**/samorzad/okregi/*.parquet",
@@ -73,6 +86,20 @@ SOURCES = {
     },
 }
 PROTOCOL = ("eligible_voters", "ballots_issued", "valid_ballots", "invalid_votes", "valid_votes")
+# 2014 gmina statistics use short headers; they come after the shared aliases, so later years are unaffected.
+LOCAL_PROTOCOL_ALIASES = {
+    name: PROTOCOL_ALIASES[name] + extra
+    for name, extra in {
+        "eligible_voters": ("Liczba wyborców",),
+        "ballots_issued": ("Wydane karty",),
+        "valid_ballots": ("Karty ważne",),
+        "invalid_votes": ("Głosy nieważne",),
+        "valid_votes": ("Głosy ważne",),
+    }.items()
+}
+# 2014 has no sejmik district register: PKW total of seats ("Wybory samorządowe 2014 - statystyki",
+# pkw.gov.pl: 555 radnych województw).
+SEJMIK_SEATS = {2014: 555}
 OFFICES = {"W": "wójt", "B": "burmistrz", "P": "prezydent miasta"}
 _AGAINST = re.compile(r"^Głosy przeciw wyborowi kandydata - (.+?) zarejestrowanego przez ")
 
@@ -87,19 +114,30 @@ def available(sources: YearSources) -> bool:
 
 
 def build_samorzad(con: duckdb.DuckDBPyConnection, sources: YearSources) -> list[Election]:
-    """Build and check sejmik and mayor tables of ``sources.year``; return the loaded elections."""
+    """Build and check sejmik, mayor and council tables of ``sources.year``; return the loaded elections."""
     year = sources.year
     # 2018 registers have separate name columns, some rows in capitals: 'WITOLD' -> 'Witold'.
     con.execute("CREATE OR REPLACE MACRO cap_(x) AS CASE WHEN upper(x) = x THEN upper(left(x, 1)) || lower(substr(x, 2)) ELSE x END")
+    # 2014 registers have all given names in one column, some in capitals: 'JAN MARIA' -> 'Jan Maria'.
+    con.execute(
+        "CREATE OR REPLACE MACRO capw_(x) AS CASE WHEN upper(x) = x THEN array_to_string("
+        "list_transform(str_split(x, ' '), w -> upper(left(w, 1)) || lower(substr(w, 2))), ' ') ELSE x END"
+    )
     _build_sejmik(con, sources)
     _build_wbp(con, sources)
     _check(con, year)
     first, second = DATES[year]
-    return [
+    elections = [
         Election("sejmik", year, 1, first, f"Voivodeship assembly (sejmik) elections {year}"),
         Election("wbp", year, 1, first, f"Mayor (wójt/burmistrz/prezydent miasta) elections {year}, round 1"),
         Election("wbp", year, 2, second, f"Mayor (wójt/burmistrz/prezydent miasta) elections {year}, round 2"),
     ]
+    if build_rady.available(sources):
+        build_rady.build_rady(con, sources)
+        elections.append(Election("rada", year, 1, first, f"Gmina, powiat and Warsaw district council elections {year}"))
+    else:
+        log.info("year %s: no staged council files, council tables stay empty", year)
+    return elections
 
 
 # --- Voivodeship assemblies -----------------------------------------------------------------
@@ -111,19 +149,26 @@ def _build_sejmik(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     spec = SOURCES[year]
     create_committee_aliases(con)
     raw = sources.load("sejmik_cand", spec["sejmik_candidates"])
-    if year == 2018:
+    if year == 2014:
+        con.execute(f"CREATE OR REPLACE TABLE sejmik_cand AS SELECT * FROM {raw} WHERE \"Szczebel\" = 'województwo'")
+        f = {
+            "woj": '"Jednostka"', "district": '"Nr okr."', "list_no": '"Nr listy"', "position": '"Poz."',
+            "name": """concat_ws(' ', capw_("Imiona"), upper("Nazwisko"))""", "committee": '"Komitet"',
+            "residence": '"Miejsce zam."', "elected": '"Mandat"', "votes": '"Głosy"',
+        }
+    elif year == 2018:
         con.execute(f"CREATE OR REPLACE TABLE sejmik_cand AS SELECT * FROM {raw} WHERE \"Szczebel\" = 'województwo'")
         f = {
             "woj": '"Jednostka"', "district": '"Nr okr."', "list_no": '"Nr listy"', "position": '"Poz."',
             "name": """concat_ws(' ', cap_("Imię"), cap_("Drugie imię"), upper("Nazwisko"))""", "committee": '"Komitet"',
-            "residence": '"Miejsce zam."', "elected": '"Mandat"',
+            "residence": '"Miejsce zam."', "elected": '"Mandat"', "votes": '"Liczba głosów"',
         }
     else:
         con.execute(f"CREATE OR REPLACE TABLE sejmik_cand AS SELECT * FROM {raw}")
         f = {
             "woj": '"Województwo"', "district": '"Nr okręgu"', "list_no": '"Nr listy"', "position": '"Pozycja na liście"',
             "name": '"Nazwisko i imiona"', "committee": '"Nazwa komitetu"',
-            "residence": '"Miejsce zamieszkania"', "elected": '"Czy uzyskał mandat"',
+            "residence": '"Miejsce zamieszkania"', "elected": '"Czy uzyskał mandat"', "votes": '"Liczba głosów"',
         }
     con.execute(
         f"""
@@ -144,17 +189,25 @@ def _build_sejmik(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
                lower(k.{f['woj']}) AS wojewodztwo, CAST(int_(k.{f['district']}) AS INT) AS district_no, c.committee_id,
                CAST(int_(k.{f['list_no']}) AS INT) AS list_no, CAST(int_(k.{f['position']}) AS INT) AS list_position,
                display_name({f['name']}) AS full_name, surname({f['name']}) AS last_name, given_names({f['name']}) AS first_names,
-               gender_(k."Płeć") AS gender, k.{f['residence']} AS residence, int_(k."Liczba głosów") AS votes,
+               gender_(k."Płeć") AS gender, CAST(int_(k."Wiek") AS INT) AS age, k.{f['residence']} AS residence,
+               int_(k.{f['votes']}) AS votes,
                yes_(k.{f['elected']}) AS elected
         FROM sejmik_cand k JOIN sejmik_committees c ON c.committee_name = strip_signature(k.{f['committee']})
         """
     )
-    seats = sources.load("sejmik_seats", spec["sejmik_seats"])
-    seat_filter = "WHERE \"Szczebel\" = 'Sejmik województwa'" if year == 2018 else ""
-    con.execute(f"CREATE OR REPLACE TABLE sejmik_seats AS SELECT sum(int_(\"Liczba mandatów\")) AS seats FROM {seats} {seat_filter}")
+    if year in SEJMIK_SEATS:
+        con.execute(f"CREATE OR REPLACE TABLE sejmik_seats AS SELECT {SEJMIK_SEATS[year]} AS seats")
+    else:
+        seats = sources.load("sejmik_seats", spec["sejmik_seats"])
+        seat_filter = "WHERE \"Szczebel\" = 'Sejmik województwa'" if year == 2018 else ""
+        con.execute(f"CREATE OR REPLACE TABLE sejmik_seats AS SELECT sum(int_(\"Liczba mandatów\")) AS seats FROM {seats} {seat_filter}")
 
     gminas = sources.load("sejmik_gminas", spec["sejmik_gminas"])
-    parts = [(gminas, f"clean_teryt({column(con, gminas, *GEO_ALIASES['teryt'])})", '"Gmina"')]
+    # 2014 names gminas 'Bolesławiec, m.' (Warsaw districts without suffix); later years 'm. Bolesławiec'.
+    gmina_name = (
+        """regexp_replace("Gmina/dzielnica", '^(.*), (m\\. st\\.|m\\.|gm\\.)$', '\\2 \\1')""" if year == 2014 else '"Gmina"'
+    )
+    parts = [(gminas, f"clean_teryt({column(con, gminas, *GEO_ALIASES['teryt'])})", gmina_name)]
     if year == 2024:
         # Cities with powiat rights (powiat code 61-99) are only in the powiat file; their gmina
         # TERYT is the powiat code with '01'. Warsaw (1465xx) is already listed by district.
@@ -168,15 +221,15 @@ def _build_sejmik(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     selects, list_selects = [], []
     con.execute("CREATE OR REPLACE TABLE sejmik_unmapped (source VARCHAR, header VARCHAR, votes BIGINT)")
     for source, teryt, gmina in parts:
-        protocol = ", ".join(f"CAST(int_({column(con, source, *PROTOCOL_ALIASES[p])}) AS INT) AS {p}" for p in PROTOCOL)
+        protocol = ", ".join(f"CAST(int_({column(con, source, *LOCAL_PROTOCOL_ALIASES[p])}) AS INT) AS {p}" for p in PROTOCOL)
         selects.append(f"SELECT {teryt} AS teryt_gmina, {gmina} AS gmina, \"Powiat\" AS powiat, {protocol} FROM {source}")
-        headers = [h for h in vote_columns(con, source) if h in committee_by_header]
+        headers = [h for h in _vote_columns(con, source) if h in committee_by_header]
         cols = ", ".join(quote_ident(h) for h in headers)
         list_selects.append(
             f"SELECT teryt_gmina, header, votes FROM (UNPIVOT (SELECT {teryt} AS teryt_gmina, {cols} FROM {source}) "
             f"ON {cols} INTO NAME header VALUE votes)"
         )
-        unmapped = [h for h in vote_columns(con, source) if h not in committee_by_header]
+        unmapped = [h for h in _vote_columns(con, source) if h not in committee_by_header]
         for h in unmapped:
             con.execute(
                 f"INSERT INTO sejmik_unmapped SELECT ?, ?, coalesce(sum(int_({quote_ident(h)})), 0) FROM {source}", [source, h]
@@ -200,10 +253,12 @@ def _build_sejmik(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
         """
     )
     # Gmina -> district: sejmik districts consist of whole powiats, so every gmina (and every
-    # Warsaw district) lies in exactly one. 2018 lists it in the gmina file, 2024 only per precinct.
-    if year == 2018:
+    # Warsaw district) lies in exactly one. 2014/2018 list it in the gmina file, 2024 only per precinct.
+    if year in (2014, 2018):
         con.execute(f"""CREATE OR REPLACE TABLE sejmik_gmina_district AS
-            SELECT DISTINCT clean_teryt("TERYT gminy") AS teryt_gmina, CAST(int_("Nr okr.") AS INT) AS district_no FROM {gminas}""")
+            SELECT DISTINCT clean_teryt({column(con, gminas, *GEO_ALIASES['teryt'])}) AS teryt_gmina,
+                   CAST(int_("Nr okr.") AS INT) AS district_no
+            FROM {gminas}""")
     else:
         files = sources.files(spec["sejmik_precincts"])
         con.execute(f"""CREATE OR REPLACE TABLE sejmik_gmina_district AS
@@ -245,7 +300,7 @@ def _sejmik_header_map(con: duckdb.DuckDBPyConnection, sources: YearSources, gmi
             if full in by_name:
                 short_to_ids.setdefault(short, set()).add(by_name[full])
     mapping = {}
-    headers = vote_columns(con, gminas)
+    headers = _vote_columns(con, gminas)
     for header in headers:
         # Two committees with the same name (2024: "... RUCH OBRONY POLSKI" in two voivodeships)
         # give a duplicate header that staging suffixes with "_1"; both mean the same name.
@@ -258,6 +313,13 @@ def _sejmik_header_map(con: duckdb.DuckDBPyConnection, sources: YearSources, gmi
     return mapping
 
 
+def _vote_columns(con: duckdb.DuckDBPyConnection, source: str) -> list[str]:
+    """Headers after the valid-votes column (committees), without totals; ``vote_columns`` with 2014 headers."""
+    columns = columns_of(con, source)
+    valid = column(con, source, *LOCAL_PROTOCOL_ALIASES["valid_votes"]).strip('"').replace('""', '"')
+    return [c for c in columns[columns.index(valid) + 1 :] if normalize_header(c) not in NOT_VOTE_COLUMNS]
+
+
 # --- Mayors -----------------------------------------------------------------------------------
 
 
@@ -265,7 +327,9 @@ def _build_wbp(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     """Mayor candidates and gmina protocols of both rounds."""
     year = sources.year
     spec = SOURCES[year]
-    if year == 2018:
+    if year == 2014:
+        _wbp_2014(con, sources)
+    elif year == 2018:
         raw = sources.load("wbp_cand", spec["wbp_candidates"])
         con.execute(
             f"""
@@ -326,6 +390,60 @@ def _build_wbp(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
                strip_signature(committee) AS committee_name, NULLIF(trim(party), '') AS party_membership,
                CAST(votes AS INT) AS votes, CAST(votes_against AS INT) AS votes_against, pct, elected
         FROM wbp_cand
+        """
+    )
+
+
+# 2014 candidate file: both rounds side by side under a two-row header. Staging keeps the first row
+# as headers, so the per-round columns are 'I tura' / 'II tura' (valid votes in the gmina) followed by
+# generic names; the second header row (first data row) labels them and is checked here.
+_WBP_2014 = {
+    1: {"valid": '"I tura"', "votes": "column18", "against": "column19", "pct": "column20", "elected": "column21"},
+    2: {"valid": '"II tura"', "votes": "column23", "against": "column24", "pct": "column25", "elected": "column26"},
+}
+_WBP_2014_LABELS = ("Gł. wazne", "Gł. na kand.", "Gł. przeciw", "% głosów", "Mandat")
+
+
+def _wbp_2014(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
+    """2014 mayor candidates (wbp_cand) and gmina protocols (wbp_prot) of both rounds."""
+    spec = SOURCES[2014]
+    raw = sources.load("wbp_cand", spec["wbp_candidates"])
+    for cols in _WBP_2014.values():
+        labels = con.execute(
+            f"SELECT {', '.join(cols[k] for k in ('valid', 'votes', 'against', 'pct', 'elected'))} FROM {raw} WHERE \"TERYT\" IS NULL"
+        ).fetchall()
+        if [tuple(re.sub(r"\s+", " ", v or "") for v in row) for row in labels] != [_WBP_2014_LABELS]:
+            raise BuildError(f"year 2014: unexpected mayor candidate sub-headers {labels}")
+    cands = []
+    for round_no, c in _WBP_2014.items():
+        cands.append(
+            f"""SELECT {round_no} AS round, clean_teryt("TERYT") AS teryt_gmina,
+                   concat_ws(' ', capw_("Imiona"), upper("Nazwisko")) AS name, "Płeć" AS gender, int_("Wiek") AS age,
+                   "Miejscowość" AS residence, "Komitet" AS committee, NULLIF(trim("Członek"), '') AS party,
+                   int_({c['votes']}) AS votes, int_({c['against']}) AS votes_against,
+                   {pct_expr(con, raw, c['pct'])} AS pct, coalesce({c['elected']} = 'T', false) AS elected,
+                   int_({c['valid']}) AS valid_votes, "Urząd" AS office_code
+            FROM {raw} WHERE "TERYT" IS NOT NULL AND {c['valid']} IS NOT NULL"""
+        )
+    con.execute(f"CREATE OR REPLACE TABLE wbp_cand AS {' UNION ALL '.join(cands)}")
+    protocols = []
+    for round_no in (1, 2):
+        src = sources.load(f"wbp_prot{round_no}", spec[f"wbp_protocols_{round_no}"])
+        protocol = ", ".join(f"CAST(int_({column(con, src, *LOCAL_PROTOCOL_ALIASES[p])}) AS INT) AS {p}" for p in PROTOCOL)
+        protocols.append(
+            f"""SELECT {round_no} AS round, clean_teryt("TERYT") AS teryt_gmina,
+                   CASE WHEN clean_teryt("TERYT") = '146501' THEN 'm. st. Warszawa'
+                        ELSE regexp_replace("Gmina", '^(.*), (m\\.|gm\\.)$', '\\2 \\1') END AS gmina,
+                   "Powiat" AS powiat, {protocol} FROM {src} WHERE "TERYT" IS NOT NULL"""
+        )
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE wbp_prot AS
+        SELECT p.round, p.teryt_gmina, p.gmina, p.powiat,
+               (SELECT {_office_case('any_value(c.office_code)')} FROM wbp_cand c
+                WHERE c.round = p.round AND c.teryt_gmina = p.teryt_gmina) AS office,
+               {', '.join(PROTOCOL)}
+        FROM ({' UNION ALL '.join(protocols)}) p
         """
     )
 
@@ -394,6 +512,26 @@ def _wbp_protocols_2024(con: duckdb.DuckDBPyConnection, sources: YearSources) ->
 # drops them, so those lists are named here. Verified against the 2018 per-precinct candidate files
 # (the struck-off candidate's column is empty). Documented in docs/MART.md under "Known gaps".
 STRUCK_OFF = {
+    # 2014: lists whose total in the gmina results exceeds the sum of their candidates' votes. Seven
+    # have a missing list position (a struck-off candidate dropped from the register). The other six
+    # (mazowieckie 4: four lists 1-10 votes above; śląskie 2: PO 1 vote, Oburzeni 85) have no missing
+    # position; the per-precinct candidate file of mazowieckie confirms the register's candidate votes,
+    # so the published files differ by these few votes. Named so that no other list may differ.
+    2014: [
+        ("dolnośląskie", 1, "KOMITET WYBORCZY WYBORCÓW BEZPARTYJNI SAMORZĄDOWCY"),
+        ("dolnośląskie", 3, "KOMITET WYBORCZY PRAWO I SPRAWIEDLIWOŚĆ"),
+        ("mazowieckie", 4, "KOMITET WYBORCZY PRAWO I SPRAWIEDLIWOŚĆ"),
+        ("mazowieckie", 4, "KOALICYJNY KOMITET WYBORCZY SLD LEWICA RAZEM"),
+        ("mazowieckie", 4, "KOMITET WYBORCZY NOWA PRAWICA — JANUSZA KORWIN-MIKKE"),
+        ("mazowieckie", 4, "KOMITET WYBORCZY PLATFORMA OBYWATELSKA RP"),
+        ("mazowieckie", 4, "KOMITET WYBORCZY MAZOWIECKA WSPÓLNOTA SAMORZĄDOWA"),
+        ("pomorskie", 1, "KOMITET WYBORCZY TWÓJ RUCH"),
+        ("pomorskie", 4, "KOMITET WYBORCZY TWÓJ RUCH"),
+        ("warmińsko-mazurskie", 3, "KOMITET WYBORCZY DEMOKRACJA BEZPOŚREDNIA"),
+        ("łódzkie", 3, "KOMITET WYBORCZY DEMOKRACJA BEZPOŚREDNIA"),
+        ("śląskie", 2, "KOMITET WYBORCZY OBURZENI"),
+        ("śląskie", 2, "KOMITET WYBORCZY PLATFORMA OBYWATELSKA RP"),
+    ],
     2018: [
         ("mazowieckie", 7, "KOMITET WYBORCZY WYBORCÓW WOLNOŚĆ W SAMORZĄDZIE"),
         ("świętokrzyskie", 3, "KOMITET WYBORCZY PARTII RAZEM"),

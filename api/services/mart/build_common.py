@@ -9,6 +9,7 @@ PostgreSQL mart tables, checked against official totals, and then copied to Post
 from __future__ import annotations
 
 import logging
+import os
 import re
 import tempfile
 from collections import Counter, defaultdict
@@ -49,10 +50,28 @@ COMMITTEE_ALIASES: list[tuple[str, list[str]]] = [
     ("WYBORCZY PSL", ["PSL"]),
     ("KUKIZ", ["Kukiz'15", "Kukiz"]),
     ("NOWOCZESNA", ["Nowoczesna"]),
+    # Sejm 2011 and European Parliament 2014 ("POLSKA RAZEM" must precede "RAZEM", "NOWA PRAWICA - JANUSZA
+    # KORWIN-MIKKE" must precede "KORWIN").
+    ("NOWA PRAWICA", ["KNP", "Nowa Prawica", "Kongres Nowej Prawicy", "KORWiN"]),
+    ("RUCH PALIKOTA", ["Ruch Palikota"]),
+    ("POLSKA JEST NAJWAŻNIEJSZA", ["PJN", "Polska Jest Najważniejsza"]),
+    ("SOLIDARNA POLSKA", ["Solidarna Polska", "SP"]),
+    ("POLSKA RAZEM", ["Polska Razem"]),
+    ("EUROPA PLUS", ["Europa Plus Twój Ruch", "Twój Ruch"]),
     ("KORWIN", ["KORWiN"]),
-    ("RAZEM", ["Razem"]),
+    # Only the party: local committees such as "ZAWSZE RAZEM" or "ŚLONZOKI RAZEM" are not Razem.
+    ("PARTIA RAZEM", ["Razem"]),
+    ("PARTII RAZEM", ["Razem"]),
     ("JOW BEZPARTYJNI", ["JOW"]),
-    ("BEZPARTYJNI", ["Bezpartyjni", "BS"]),
+    # Only the Bezpartyjni Samorządowcy movement, not every committee calling itself non-partisan.
+    ("BEZPARTYJNI SAMORZĄDOWCY", ["Bezpartyjni", "BS"]),
+    ("KOALICJA BEZPARTYJNI I SAMORZĄDOWCY", ["Bezpartyjni", "BS"]),
+    ("RUCH NARODOWY", ["RN", "Ruch Narodowy"]),
+    ("TWÓJ RUCH", ["TR", "Twój Ruch"]),
+    ("RUCH AUTONOMII ŚLĄSKA", ["RAŚ", "Ruch Autonomii Śląska"]),
+    ("PARTIA ZIELONI", ["Zieloni"]),
+    ("WOLNOŚĆ W SAMORZĄDZIE", ["Wolność w Samorządzie"]),
+    ("WOLNI I SOLIDARNI", ["WiS", "Wolni i Solidarni"]),
     ("POLSKA JEST JEDNA", ["PJJ"]),
     ("MNIEJSZOŚĆ NIEMIECKA", ["MN", "Mniejszość Niemiecka"]),
     ("SKUTECZNI", ["Skuteczni"]),
@@ -190,6 +209,9 @@ def pct_expr(con: duckdb.DuckDBPyConnection, table: str, col: str) -> str:
 def open_duckdb() -> duckdb.DuckDBPyConnection:
     """In-memory DuckDB connection with the shared parsing macros."""
     con = duckdb.connect(database=":memory:")
+    # Optional cap (e.g. "3GB") for small machines and CI; DuckDB spills to its temp directory.
+    if limit := os.getenv("MART_DUCKDB_MEMORY_LIMIT"):
+        con.execute(f"SET memory_limit = {sql_literal(limit)}")
     con.execute(MACROS)
     cases = " ".join(f"WHEN {sql_literal(code)} THEN {sql_literal(name)}" for code, name in VOIVODESHIPS.items())
     # Voivodeship name from a gmina TERYT code (NULL abroad).
@@ -322,6 +344,28 @@ def parse_list_position(columns: list[str]) -> dict[str, ColumnRef]:
             refs[col] = ColumnRef(
                 name_key=python_name_key(candidate.group(1)), list_no=current_list, position=int(candidate.group(2))
             )
+    return refs
+
+
+# Patronymic that tells namesakes apart in 2011 registers ('Andrzej Stefan syn Józefa', 'Mieczysław s.
+# Stanisława'); result headers carry only the bare name.
+PATRONYMIC = r" (?:s\.|c\.|syn|córka) \S+"
+
+
+def parse_list_blocks(columns: list[str]) -> dict[str, ColumnRef]:
+    """2011 Sejm and 2014 EP candidate files: per list a block of
+    ``'Lista nr 4 — KW ... - Liczba głosów ważnych oddanych na listę'`` (list total), its candidates
+    (``'SURNAME Given Names'``) and ``'Razem'``. DuckDB suffixes repeated headers (``'Razem_1'``, a
+    namesake on another list ``'SZTORC Andrzej Stefan_1'``); the suffix is not part of the name.
+    """
+    refs, current_list = {}, None
+    for col in columns:
+        if list_header := re.match(r"^Lista nr (\d+) — ", col):
+            current_list = int(list_header.group(1))
+        elif re.match(r"^Razem(_\d+)?$", col):
+            current_list = None
+        elif current_list is not None:
+            refs[col] = ColumnRef(name_key=python_name_key(re.sub(r"_\d+$", "", col)), list_no=current_list)
     return refs
 
 

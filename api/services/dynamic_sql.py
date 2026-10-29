@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import threading
 import time
 from collections import OrderedDict
@@ -99,8 +100,8 @@ SQL_CACHE = _SqlCache(SQL_CACHE_MAX_ENTRIES, SQL_CACHE_TTL_SECONDS)
 
 
 @lru_cache(maxsize=2)
-def schema_description(version: str = "") -> str:
-    """Mart relations with their table/column comments, as plain text for the prompt.
+def schema_description(version: str = "") -> dict[str, str]:
+    """Prompt text per mart relation: table/column comments read from PostgreSQL.
 
     Cached per mart load ``version`` (from ``data_context``), so a rebuilt mart is picked up
     without restarting the API.
@@ -121,7 +122,35 @@ def schema_description(version: str = "") -> str:
     for relation, table_doc, column, col_type, column_doc in rows:
         doc, columns = relations.setdefault(relation, (table_doc or "", []))
         columns.append(f"  {column} {col_type}" + (f" -- {column_doc}" if column_doc else ""))
-    return "\n\n".join(f"mart.{name} -- {doc}\n" + "\n".join(cols) for name, (doc, cols) in relations.items())
+    return {name: f"mart.{name} -- {doc}\n" + "\n".join(cols) for name, (doc, cols) in relations.items()}
+
+
+# Words that name an election kind (folded, no diacritics) -> relation name prefixes of that kind.
+# A question naming at least one kind gets only those relations plus SHARED_RELATIONS in the
+# prompt; a question naming none gets the whole schema.
+FAMILY_KEYWORDS: dict[str, tuple[str, ...]] = {
+    r"\bsejm(?!ik)|posel|posl|poslank|parlament(?!\w*\s+europ)": ("sejm_", "v_sejm_", "precincts"),
+    r"senat|senac|parlament(?!\w*\s+europ)": ("senat_", "precincts"),
+    r"prezyden": ("prezydent_", "v_prezydent_", "wbp_"),
+    r"europ|\bpe\b": ("pe_", "v_pe_"),
+    r"referend": ("referendum_", "v_referendum_"),
+    r"sejmik|wojewodzk": ("sejmik_", "v_sejmik_"),
+    r"samorzad": ("sejmik_", "v_sejmik_", "wbp_", "rada_", "v_rada_"),
+    r"wojt|burmistrz|mayor": ("wbp_",),
+    r"\brad(a|y|e|zie|ach|ami)\b|radn": ("rada_", "v_rada_"),
+}
+SHARED_RELATIONS = (
+    "elections", "persons", "v_person_history", "v_turnout", "v_party_results", "v_party_change", "v_gmina_continuity",
+)
+
+
+def relevant_relations(question: str, available: list[str]) -> list[str]:
+    """Relations to describe in the prompt for ``question`` (all of them when no kind is named)."""
+    folded = entities.fold(question)
+    prefixes = [p for pattern, group in FAMILY_KEYWORDS.items() if re.search(pattern, folded) for p in group]
+    if not prefixes:
+        return list(available)
+    return [r for r in available if r in SHARED_RELATIONS or r.startswith(tuple(prefixes))]
 
 
 def data_context() -> tuple[str, str]:
@@ -177,31 +206,58 @@ def _llm_sql(
     return sql, tokens
 
 
-def resolve_question_entities(question: str, entity_refs: list[dict] | None = None) -> tuple[list[entities.EntityMatch], dict | None]:
+def resolve_question_entities(
+    question: str, entity_refs: list[dict] | None = None, previous: dict | None = None
+) -> tuple[list[entities.EntityMatch], dict | None]:
     """Entity matches for the prompt and an optional clarification request.
 
     Kinds chosen explicitly in ``entity_refs`` replace the automatic matches of that kind and are
-    never reported as ambiguous.
+    never reported as ambiguous. In a follow-up (``previous`` turn), kinds the new question does
+    not mention are inherited from the previous question ("a w 2019?" keeps the person or gmina).
     """
     matches = entities.narrow_matches(question, entities.resolve_entities(question))
+    clarification = None if entity_refs else entities.find_ambiguity(matches)
     if entity_refs:
         pinned = entities.lookup_refs(entity_refs)
         pinned_kinds = {m.kind for m in pinned}
         matches = [m for m in matches if m.kind not in pinned_kinds] + pinned
-        return matches, None
-    return matches, entities.find_ambiguity(matches)
+    if previous and not clarification:
+        earlier = entities.narrow_matches(previous["question"], entities.resolve_entities(previous["question"]))
+        if previous.get("entity_refs"):
+            pinned = entities.lookup_refs(previous["entity_refs"])
+            earlier = [m for m in earlier if m.kind not in {p.kind for p in pinned}] + pinned
+        present = {m.kind for m in matches}
+        matches += [m for m in earlier if m.kind not in present]
+    return matches, clarification
 
 
-def build_context(question: str, matches: list[entities.EntityMatch]) -> tuple[str, str, list[dict[str, Any]]]:
-    """Prompt context, mart version, and the examples used (for telemetry)."""
+def build_context(
+    question: str, matches: list[entities.EntityMatch], previous: dict | None = None
+) -> tuple[str, str, dict[str, Any]]:
+    """Prompt context, mart version, and what went into the prompt (for telemetry)."""
     hints = entities.format_entity_hints(matches) or "- none"
     elections, version = data_context()
+    described = schema_description(version)
+    scope = f"{previous['question']} {question}" if previous else question
+    relations = relevant_relations(scope, list(described))
     similar = examples.similar_examples(question)
     context = (
-        f"Schema:\n{schema_description(version)}\n\n{elections}\n\nEntities matched in the question:\n{hints}"
+        "Schema:\n" + "\n\n".join(described[r] for r in relations)
+        + f"\n\n{elections}\n\nEntities matched in the question:\n{hints}"
         + (f"\n\n{examples.format_examples(similar)}" if similar else "")
     )
-    return context, version, [{"question": e["question"], "source": e.get("source")} for e in similar]
+    if previous:
+        context += (
+            "\n\nThis question follows up the previous one in the conversation; keep its filters "
+            f"(election, year, place, person, party) unless the new question changes them.\n"
+            f"Previous question: {previous['question']}\nPrevious SQL: {previous.get('sql') or '-'}"
+        )
+    used = {
+        "examples": [{"question": e["question"], "source": e.get("source")} for e in similar],
+        "schema_relations": len(relations),
+        "prompt_chars": len(context),
+    }
+    return context, version, used
 
 
 def _ms(started: float) -> int:
@@ -209,31 +265,35 @@ def _ms(started: float) -> int:
     return int((time.monotonic() - started) * 1000)
 
 
-def try_dynamic_query(question: str, entity_refs: list[dict] | None = None) -> tuple[list[dict], str | None, str | None, dict]:
+def try_dynamic_query(
+    question: str, entity_refs: list[dict] | None = None, previous: dict | None = None
+) -> tuple[list[dict], str | None, str | None, dict]:
     """Generate, validate and run SQL for ``question``.
 
     Returns ``(rows, sql, error, meta)``. ``meta["status"]`` is one of skipped / clarify / rejected /
     failed / cached / first_pass / repaired. ``meta`` also holds ``entities``, ``examples``,
-    ``timings_ms`` and ``tokens``; for ``clarify`` it holds ``clarification`` (see
-    ``entities.find_ambiguity``).
+    ``timings_ms``, ``tokens``, ``schema_relations`` and ``prompt_chars``; for ``clarify`` it holds
+    ``clarification`` (see ``entities.find_ambiguity``). ``previous`` is the preceding turn of the
+    conversation (``{"question", "sql", "entity_refs"}``) for follow-up questions.
     """
     timings: dict[str, int] = {}
     tokens = {"prompt_tokens": 0, "completion_tokens": 0}
     started = time.monotonic()
     try:
-        matches, clarification = resolve_question_entities(question, entity_refs)
+        matches, clarification = resolve_question_entities(question, entity_refs, previous)
         meta: dict[str, Any] = {"entities": [m.__dict__ for m in matches], "timings_ms": timings, "tokens": tokens}
         if clarification:
             timings["entities"] = _ms(started)
             return [], None, None, {**meta, "status": "clarify", "clarification": clarification}
-        context, version, used_examples = build_context(question, matches)
+        context, version, used = build_context(question, matches, previous)
     except psycopg.Error as exc:
         log.warning("dynamic SQL skipped: mart not reachable (%s)", exc)
         return [], None, str(exc), {"status": "skipped", "phase": "context", "error": str(exc)}
     timings["context"] = _ms(started)
-    meta["examples"] = used_examples
+    meta.update(used)
 
-    cache_key = (" ".join(entities.fold(question).split()), json.dumps(entity_refs or [], sort_keys=True), version)
+    turn = json.dumps({k: previous.get(k) for k in ("question", "sql")}, sort_keys=True) if previous else ""
+    cache_key = (" ".join(entities.fold(question).split()), json.dumps(entity_refs or [], sort_keys=True), turn, version)
     cached = SQL_CACHE.get(cache_key)
     if cached:
         try:

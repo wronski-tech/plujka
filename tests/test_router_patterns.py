@@ -44,5 +44,26 @@ class TestMartOnlyElections(unittest.TestCase):
         dyn.assert_called_once()
 
 
+class TestTemplateFallback(unittest.TestCase):
+    SKIPPED = ([], None, "OPENAI_API_KEY is not set", {"status": "skipped"})
+
+    def test_templates_answer_when_dynamic_sql_has_nothing(self) -> None:
+        legacy = {"intent": "sejm_votes_by_gmina", "params": {"year": 2023}, "result": [{"votes": 1}]}
+        with patch.object(router, "try_dynamic_query", return_value=self.SKIPPED), \
+                patch.object(router, "_route_templates", return_value=legacy):
+            response = router.route_question("Wyniki list według gmin 2023")
+        self.assertEqual((response["intent"], response["result"]), ("sejm_votes_by_gmina", [{"votes": 1}]))
+        self.assertEqual(response["params"]["year"], 2023)
+        self.assertEqual(response["params"]["_dynamic_sql_meta"], {"status": "skipped"})
+
+    def test_follow_up_never_falls_back_to_templates(self) -> None:
+        previous = {"question": "Frekwencja w Krakowie w 2023?", "sql": "SELECT 1"}
+        with patch.object(router, "try_dynamic_query", return_value=self.SKIPPED) as dyn, \
+                patch.object(router, "_route_templates", side_effect=AssertionError("template routing used")):
+            response = router.route_question("A w 2019?", previous=previous)
+        self.assertEqual((response["intent"], response["result"]), ("dynamic_sql", []))
+        self.assertEqual(dyn.call_args.args[2], previous)
+
+
 if __name__ == "__main__":
     unittest.main()

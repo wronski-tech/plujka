@@ -2,13 +2,29 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
+import unicodedata
 from datetime import timedelta
+from functools import lru_cache
+from pathlib import Path
 
+import altair as alt
+import pandas as pd
+import pydeck as pdk
 import requests
 import streamlit as st
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
+# Sent as X-API-Key when the API requires keys (API_KEYS on the API side).
+API_KEY = os.getenv("PLUJKA_API_KEY", "")
+API_HEADERS = {"X-API-Key": API_KEY} if API_KEY else {}
+# Simplified boundaries keyed by TERYT (see streamlit_app/geo/README.md).
+GEO_DIR = Path(__file__).resolve().parent / "geo"
+# Result column that identifies a unit -> boundary file (gminy/powiaty by TERYT, voivodeships by name).
+MAP_LEVELS = (("teryt_gmina", "gminy"), ("teryt_powiat", "powiaty"), ("wojewodztwo", "wojewodztwa"))
+# Charts and maps are drawn only for results that fit on screen.
+MAX_CHART_ROWS = 40
 
 # How often the readiness fragment may refresh while data is still loading (avoid hammering /health).
 _READINESS_POLL_INTERVAL = timedelta(seconds=15)
@@ -53,21 +69,175 @@ def _fetch_health_with_kb_stats() -> dict | None:
         return None
 
 
-def _ask(question: str, entity_refs: list[dict] | None = None) -> dict | None:
-    """POST /ask; shows an error and returns None on failure."""
+def _ask(question: str, entity_refs: list[dict] | None = None, previous: dict | None = None) -> dict | None:
+    """POST /ask; shows an error and returns None on failure.
+
+    ``previous`` is the preceding turn ({question, sql, entity_refs}) for a follow-up question.
+    """
     payload: dict = {"question": question}
     if entity_refs:
         payload["entity_refs"] = entity_refs
+    if previous:
+        payload["previous"] = previous
     try:
-        response = requests.post(f"{API_URL}/ask", json=payload, timeout=60)
+        response = requests.post(f"{API_URL}/ask", json=payload, headers=API_HEADERS, timeout=60)
         if response.status_code == 429:
             st.warning("Za dużo pytań w krótkim czasie. Spróbuj ponownie za minutę.")
+            return None
+        if response.status_code == 401:
+            st.error("API wymaga klucza (ustaw PLUJKA_API_KEY dla interfejsu).")
             return None
         response.raise_for_status()
         return response.json()
     except requests.RequestException as error:
         st.error(f"Coś poszło nie tak z API: {error}")
         return None
+
+
+def _looks_like_follow_up(question: str) -> bool:
+    """Heuristic default for the follow-up toggle: "a w 2019?", "i w Gdańsku?", very short questions."""
+    words = question.lower().split()
+    return bool(words) and (words[0] in ("a", "i", "oraz", "to", "tam", "tylko") or len(words) <= 3)
+
+
+def _remember(question: str, data: dict, entity_refs: list[dict] | None, previous: dict | None) -> None:
+    """Store the answered turn; a follow-up keeps the earlier questions in its context text."""
+    context = f"{previous['question']} {question}" if previous else question
+    st.session_state["last_ask"] = {
+        "question": question,
+        "data": data,
+        # Context sent with the next follow-up (tail only, so a long conversation stays short).
+        "previous": {"question": context[-600:], "sql": data.get("sql") or None, "entity_refs": entity_refs},
+    }
+    st.session_state.pop("_feedback_ack_fp", None)
+
+
+def _numeric_columns(rows: list[dict]) -> list[str]:
+    """Columns with numbers that are values, not codes (years, rounds, numbers, ids)."""
+    first = rows[0]
+    return [
+        name for name, value in first.items()
+        if isinstance(value, (int, float)) and not isinstance(value, bool)
+        and name not in ("year", "round", "prev_year") and not name.endswith(("_no", "_id"))
+        and not name.startswith("teryt")
+    ]
+
+
+def _value_column(rows: list[dict]) -> str | None:
+    """Column to chart: a percentage first, then votes, then any other number."""
+    numeric = _numeric_columns(rows)
+    for pattern in ("pct", "votes", "seats", "mandat"):
+        for name in numeric:
+            if pattern in name:
+                return name
+    return numeric[0] if numeric else None
+
+
+def _fold(text: str) -> str:
+    """Lowercase without Polish diacritics (for matching voivodeship names)."""
+    return unicodedata.normalize("NFKD", text.lower().replace("ł", "l")).encode("ascii", "ignore").decode()
+
+
+@lru_cache(maxsize=3)
+def _boundaries(level: str) -> dict:
+    """GeoJSON FeatureCollection for ``gminy``, ``powiaty`` or ``wojewodztwa``."""
+    return json.loads((GEO_DIR / f"{level}.json").read_text(encoding="utf-8"))
+
+
+def _render_chart(rows: list[dict]) -> None:
+    """Horizontal bar chart when each row is one labelled unit with a number (e.g. results by party)."""
+    if not 2 <= len(rows) <= MAX_CHART_ROWS:
+        return
+    value = _value_column(rows)
+    labels = [n for n, v in rows[0].items() if isinstance(v, str) and not n.startswith("teryt")]
+    if not value or not labels:
+        return
+    label = labels[0]
+    frame = pd.DataFrame(rows)[[label, value]].dropna()
+    if frame[label].duplicated().any():
+        return
+    chart = (
+        alt.Chart(frame)
+        .mark_bar(color="#6366f1")
+        .encode(
+            x=alt.X(f"{value}:Q", title=value),
+            y=alt.Y(f"{label}:N", sort="-x", title=None, axis=alt.Axis(labelOverlap=False, labelLimit=240)),
+            tooltip=[label, value],
+        )
+        .properties(height=max(120, 26 * len(frame)))
+    )
+    st.altair_chart(chart, use_container_width=True)
+
+
+def _points(coordinates: list) -> list[list[float]]:
+    """Flatten (Multi)Polygon coordinates to [lon, lat] points."""
+    if isinstance(coordinates[0], (int, float)):
+        return [coordinates]
+    return [p for part in coordinates for p in _points(part)]
+
+
+def _view_of(points: list[list[float]]) -> pdk.ViewState:
+    """Map view centred on the coloured units, zoomed so they fit (all of Poland at most)."""
+    if not points:
+        return pdk.ViewState(latitude=52.0, longitude=19.4, zoom=5.1)
+    lons, lats = [p[0] for p in points], [p[1] for p in points]
+    # At zoom z the map shows about 360 / 2**z * (width / 512) degrees of longitude. A degree of
+    # latitude in Poland is about 1.6 degrees of longitude on screen, and the map is about half as
+    # tall as it is wide, hence the factor 3 for latitude.
+    span = max(max(lons) - min(lons), 3.0 * (max(lats) - min(lats)), 0.05)
+    zoom = min(10.0, max(4.8, math.log2(360 / span) + 0.6))
+    return pdk.ViewState(latitude=(min(lats) + max(lats)) / 2, longitude=(min(lons) + max(lons)) / 2, zoom=zoom)
+
+
+def _render_map(rows: list[dict]) -> None:
+    """Choropleth of a number per gmina, powiat or voivodeship when the rows carry the unit code."""
+    value = _value_column(rows) if rows else None
+    if not value:
+        return
+    for column, level in MAP_LEVELS:
+        codes = [r.get(column) for r in rows]
+        if len(rows) >= 2 and all(codes) and len(set(codes)) == len(codes):
+            break
+    else:
+        return
+    key = _fold if level == "wojewodztwa" else str
+    values = {key(r[column]): r[value] for r in rows if r.get(value) is not None}
+    if not values:
+        return
+    low, high = min(values.values()), max(values.values())
+    geo = _boundaries(level)
+    features, matched_points = [], []
+    for feature in geo["features"]:
+        props = feature["properties"]
+        found = values.get(key(props["name"] if level == "wojewodztwa" else props["teryt"]))
+        if found is None:
+            fill = [226, 232, 240, 90]
+        else:
+            share = (found - low) / (high - low) if high > low else 1.0
+            # Light indigo (#e0e7ff) for the lowest value to dark indigo (#4338ca) for the highest.
+            fill = [int(224 - 157 * share), int(231 - 175 * share), int(255 - 53 * share), 230]
+            matched_points.extend(_points(feature["geometry"]["coordinates"]))
+        features.append({**feature, "properties": {**props, "fill": fill, "value": "—" if found is None else found}})
+    layer = pdk.Layer(
+        "GeoJsonLayer",
+        {"type": "FeatureCollection", "features": features},
+        pickable=True,
+        stroked=True,
+        filled=True,
+        get_fill_color="properties.fill",
+        get_line_color=[100, 116, 139, 120],
+        line_width_min_pixels=0.5,
+    )
+    st.pydeck_chart(
+        pdk.Deck(
+            layers=[layer],
+            initial_view_state=_view_of(matched_points),
+            map_style=None,
+            tooltip={"text": f"{{name}}\n{value}: {{value}}"},
+        ),
+        use_container_width=True,
+    )
+    st.caption(f"Kolor: {value} (jaśniej {low:g} → ciemniej {high:g}). Szare jednostki nie występują w wyniku.")
 
 
 def _code_columns(rows: list[dict]) -> dict:
@@ -77,7 +247,8 @@ def _code_columns(rows: list[dict]) -> dict:
     return {
         name: st.column_config.NumberColumn(format="%d")
         for name in rows[0]
-        if name in ("year", "round", "prev_year") or name.endswith(("_no", "_id"))
+        if (name in ("year", "round", "prev_year") or name.endswith(("_no", "_id")))
+        and isinstance(rows[0][name], (int, float))
     }
 
 
@@ -99,11 +270,12 @@ def _render_clarification(question: str, data: dict) -> None:
     st.info(clarification.get("prompt") or "Doprecyzuj pytanie.")
     for i, option in enumerate(clarification.get("options") or []):
         if st.button(option["label"], key=f"clarify_{i}_{option['ref']}", use_container_width=True):
+            refs = [{"kind": option["kind"], "ref": str(option["ref"])}]
+            previous = st.session_state["last_ask"].get("asked_with")
             with st.spinner("Szukam odpowiedzi…"):
-                chosen = _ask(question, [{"kind": option["kind"], "ref": str(option["ref"])}])
+                chosen = _ask(question, refs, previous)
             if chosen is not None:
-                st.session_state["last_ask"] = {"question": question, "data": chosen}
-                st.session_state.pop("_feedback_ack_fp", None)
+                _remember(question, chosen, refs, previous)
                 st.rerun()
 
 
@@ -260,21 +432,29 @@ with st.container(border=True):
         label_visibility="visible",
         key="plujka_question_input",
     )
+    q_val = (question or "").strip()
+    earlier = st.session_state.get("last_ask")
+    # A follow-up ("a w 2019?") reuses the previous answered question and its SQL.
+    can_follow = bool(earlier and earlier["data"].get("intent") == "dynamic_sql" and earlier["data"].get("sql"))
+    follow_up = can_follow and st.toggle(
+        "Dopytaj o poprzedni wynik",
+        value=_looks_like_follow_up(q_val),
+        help=f"Poprzednie pytanie: {earlier['question']}" if can_follow else None,
+    )
     submitted = st.button("Wyślij zapytanie", type="primary", use_container_width=True)
-
-q_val = (question or "").strip()
 
 if submitted:
     if not q_val:
         st.warning("Wpisz treść pytania.")
     else:
+        previous = earlier["previous"] if follow_up else None
         with st.spinner("Szukam odpowiedzi…"):
-            data = _ask(q_val)
+            data = _ask(q_val, previous=previous)
         if data is None:
             st.stop()
-
-        st.session_state["last_ask"] = {"question": q_val, "data": data}
-        st.session_state.pop("_feedback_ack_fp", None)
+        _remember(q_val, data, None, previous)
+        # A clarification re-asks the same turn, so it keeps the same previous turn.
+        st.session_state["last_ask"]["asked_with"] = previous
 
 last = st.session_state.get("last_ask")
 if last:
@@ -292,6 +472,9 @@ if last:
         st.dataframe(
             data["result"], use_container_width=True, hide_index=True, column_config=_code_columns(data["result"])
         )
+    if data.get("result"):
+        _render_chart(data["result"])
+        _render_map(data["result"])
 
     with st.expander("Co zrozumiał system", expanded=False):
         c1, c2 = st.columns(2)
@@ -312,13 +495,20 @@ if last:
                 meta_lines.append(f"`mandate_extremes_source` → **{mand_src}**")
             st.markdown(" · ".join(meta_lines))
 
-    with st.expander("Szczegóły SQL (debug)", expanded=False):
-        st.code(data["sql"], language="sql")
-        st.caption("Parametry")
+    with st.expander("Zapytanie SQL i źródło danych", expanded=False):
+        st.caption("Każda liczba w wyniku pochodzi z tego zapytania do bazy:")
+        st.code(data["sql"], language="sql", wrap_lines=True)
+        st.markdown(
+            "Źródło: oficjalne wyniki [PKW](https://wybory.gov.pl) i "
+            "[KBW — dane wyborcze](https://danewyborcze.kbw.gov.pl), wczytane do bazy bez zmian."
+        )
+        st.caption("Parametry (diagnostyka)")
         st.json(data["params"])
 
     _intent = data.get("intent") or ""
-    if _intent == "kbw_candidate_geo_votes_detail":
+    if _intent == "dynamic_sql":
+        st.caption("Dane: PKW/KBW · zapytanie SQL napisane do pytania i sprawdzone przed uruchomieniem (tylko odczyt).")
+    elif _intent == "kbw_candidate_geo_votes_detail":
         st.caption(
             "Dane: KBW — głosy imienne/poziom gminy lub obwodu z plików kandydackich; "
             "`candidate_geo_source` w sekcji „Co zrozumiał system” mówi, czy użyto indeksu "
@@ -337,6 +527,7 @@ if last:
             try:
                 fb = requests.post(
                     f"{API_URL}/feedback",
+                    headers=API_HEADERS,
                     json={"rating": "thumbs_up", "question": q, "ask_response": data},
                     timeout=30,
                 )
@@ -353,6 +544,7 @@ if last:
             try:
                 fb = requests.post(
                     f"{API_URL}/feedback",
+                    headers=API_HEADERS,
                     json={
                         "rating": "thumbs_down",
                         "question": q,

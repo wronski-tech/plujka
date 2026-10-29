@@ -20,10 +20,10 @@ import psycopg
 
 from api.services import answer, dynamic_sql
 from api.services.mart import entities, examples
-from api.services.mart.build_common import parse_blocks_2015, parse_list_position, python_name_key
+from api.services.mart.build_common import parse_blocks_2015, parse_list_blocks, parse_list_position, python_name_key
 from api.services.mart.build_referendum import answer_columns
 from api.services.mart.safe_sql import UnsafeSqlError, validate_mart_sql
-from api.services.rate_limit import SlidingWindowLimiter
+from api.services.rate_limit import RedisWindowLimiter, SlidingWindowLimiter
 
 _spec = importlib.util.spec_from_file_location(
     "kbw_stage_duckdb", Path(__file__).resolve().parents[1] / "scripts" / "kbw_stage_duckdb.py"
@@ -106,6 +106,101 @@ class TestStrictStaging(unittest.TestCase):
     def test_unique_headers(self) -> None:
         self.assertEqual(stage.unique_headers(["Typ", "Nr okr.\nSejm", "Typ", ""]), ["Typ", "Nr okr. Sejm", "Typ_1", "column3"])
 
+    def staged(self) -> tuple[list[str], list[tuple]]:
+        """Column names and rows (in file order) of the staged Parquet."""
+        rel = self.con.execute(f"SELECT * FROM read_parquet('{self.out}')")
+        return [d[0] for d in rel.description], rel.fetchall()
+
+    def test_title_lines_above_header_are_skipped(self) -> None:
+        # 2011/2014 layout: election title, commission name and a blank line before the header.
+        data = (
+            "Wybory do Sejmu i Senatu w dniu 9 października 2011 r.\r\n"
+            "Okręgowa Komisja Wyborcza w Legnicy\r\n\r\n"
+            "Lp.;Gmina;Wyborcy\r\n1;Bolesławiec;10\r\n2;Gromadka;20\r\n3;Nowogrodziec;30\r\n"
+        ).encode("cp1250")
+        self.assertEqual(stage.csv_to_parquet(self.con, data, self.out), 3)
+        columns, rows = self.staged()
+        self.assertEqual(columns, ["Lp.", "Gmina", "Wyborcy"])
+        self.assertEqual(rows, [("1", "Bolesławiec", "10"), ("2", "Gromadka", "20"), ("3", "Nowogrodziec", "30")])
+
+    def test_list_row_is_folded_into_the_columns_below(self) -> None:
+        # Without folding both list totals would be one repeated header ('..._1') and the list numbers lost.
+        data = (
+            "Wybory posłów do Parlamentu Europejskiego\n\n"
+            ';;"=""Lista nr 1 — KW A""";;Lista nr 12 — KW B; \n'
+            "Lp.;Gmina;Liczba głosów ważnych oddanych na listę;KOWALSKI Jan;Liczba głosów ważnych oddanych na listę;NOWAK Anna\n"
+            "1;Gdańsk;5;5;3;3\n2;Sopot;7;7;0;0\n"
+        ).encode("utf-8")
+        self.assertEqual(stage.csv_to_parquet(self.con, data, self.out), 2)
+        columns, rows = self.staged()
+        self.assertEqual(columns, [
+            "Lp.", "Gmina",
+            "Lista nr 1 — KW A - Liczba głosów ważnych oddanych na listę", "KOWALSKI Jan",
+            "Lista nr 12 — KW B - Liczba głosów ważnych oddanych na listę", "NOWAK Anna",
+        ])
+        self.assertEqual(rows, [("1", "Gdańsk", "5", "5", "3", "3"), ("2", "Sopot", "7", "7", "0", "0")])
+
+    def test_excel_text_wrapper_is_unwrapped_in_headers_and_values(self) -> None:
+        data = (
+            "Wybory 2011\n\n"
+            'Lp.;Kod terytorialny gminy;"=""KOWALSKI Jan""";Siedziba\n'
+            '1;"=""020101""";4;"=""Szkoła Podstawowa nr 3"""\n'
+            '2;"=""146502""";0;zwykły tekst\n'
+        ).encode("utf-8")
+        self.assertEqual(stage.csv_to_parquet(self.con, data, self.out), 2)
+        columns, rows = self.staged()
+        self.assertEqual(columns, ["Lp.", "Kod terytorialny gminy", "KOWALSKI Jan", "Siedziba"])
+        # The leading zero of the TERYT code survives; plain text is untouched.
+        self.assertEqual(rows, [("1", "020101", "4", "Szkoła Podstawowa nr 3"), ("2", "146502", "0", "zwykły tekst")])
+
+    def test_wrapped_fields_with_unescaped_quotes_are_reencoded(self) -> None:
+        # 2014: '"=""Dom "Kombatant", ..."""' is not valid CSV; the address keeps its inner quotes and
+        # the semicolon of an HTML entity inside a wrapped field does not split it.
+        data = (
+            "Lp.;Kod;Siedziba;Głosy\n"
+            '1;"=""140801""";"=""Dom Pomocy Społecznej "Kombatant", Legionowo""";54\n'
+            '2;"=""149901""";"=""Luanda, Rua Dami&#227;o de Góis 64""";27\n'
+        ).encode("utf-8")
+        self.assertEqual(stage.csv_to_parquet(self.con, data, self.out), 2)
+        _columns, rows = self.staged()
+        self.assertEqual(rows, [
+            ("1", "140801", 'Dom Pomocy Społecznej "Kombatant", Legionowo', "54"),
+            ("2", "149901", "Luanda, Rua Dami&#227;o de Góis 64", "27"),
+        ])
+
+    def test_unquoted_fallback_keeps_doubled_quotes_when_field_counts_match(self) -> None:
+        # 2010: fields are never quoted but contain doubled quotes; every line has the header's field count.
+        data = 'Nr;Adres;Głosy\n7;Klub ""Sowa"", ul. Sobieskiego 17;1087\n8;""Kasztel"", Rościszów 71;282\n'.encode("cp1250")
+        self.assertEqual(stage.csv_to_parquet(self.con, data, self.out), 2)
+        _columns, rows = self.staged()
+        self.assertEqual(rows, [("7", 'Klub ""Sowa"", ul. Sobieskiego 17', "1087"), ("8", '""Kasztel"", Rościszów 71', "282")])
+
+    def test_unquoted_fallback_refused_when_a_line_has_another_field_count(self) -> None:
+        data = 'Nr;Adres;Głosy\n7;Klub ""Sowa"";1087\n8;""Kasztel""; Rościszów 71;282\n'.encode("cp1250")
+        with self.assertRaises(stage.StagingError):
+            stage.csv_to_parquet(self.con, data, self.out)
+        self.assertFalse(self.out.exists())
+
+    def test_excel_title_rows_skipped_and_list_row_folded(self) -> None:
+        # 2011 p19.xlsx layout: two one-cell title rows, a list row (first cell empty), the header, data.
+        book = Path(self.tmp.name) / "p19.xlsx"
+        _xlsx(book, [("Arkusz1", "sheet1.xml", [
+            ["Wybory do Sejmu i Senatu 2011"],
+            ["Okręgowa Komisja Wyborcza w Warszawie I"],
+            ["", "Lista nr 1 — KW A", "", "Lista nr 2 — KW B", ""],
+            ["Nr obwodu głosowania", "Liczba głosów ważnych oddanych na listę", "KACZYŃSKI Jarosław",
+             "Liczba głosów ważnych oddanych na listę", "KAMIŃSKI Mariusz"],
+            ["711", "265", "265", "12", "12"],
+            ["712", "266", "266", "0", "0"],
+        ])])
+        self.assertEqual(stage.excel_to_parquet(book, self.out), 2)
+        columns, rows = self.staged()
+        self.assertEqual(columns, [
+            "Nr obwodu głosowania", "Lista nr 1 — KW A - Liczba głosów ważnych oddanych na listę", "KACZYŃSKI Jarosław",
+            "Lista nr 2 — KW B - Liczba głosów ważnych oddanych na listę", "KAMIŃSKI Mariusz",
+        ])
+        self.assertEqual(rows, [("711", "265", "265", "12", "12"), ("712", "266", "266", "0", "0")])
+
 
 class TestHeaderParsers(unittest.TestCase):
     def test_list_position_headers(self) -> None:
@@ -123,6 +218,21 @@ class TestHeaderParsers(unittest.TestCase):
         self.assertEqual(totals, {"Razem KW B": 7, "Razem KW A": 1})
         self.assertEqual(refs["Jan KOWALSKI"].list_no, 1)
         self.assertNotIn("Gmina", refs)
+
+    def test_2011_list_blocks(self) -> None:
+        columns = [
+            "Lp.", "Gmina", "Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów",
+            "Lista nr 2 — KW A - Liczba głosów ważnych oddanych na listę", "SZTORC Andrzej Stefan", "NOWAK Anna", "Razem",
+            "Lista nr 12 — KW B - Liczba głosów ważnych oddanych na listę", "SZTORC Andrzej Stefan_1", "Razem_1",
+            "column10",
+        ]
+        refs = parse_list_blocks(columns)
+        # List totals, 'Razem' columns and anything outside a block are not candidates.
+        self.assertEqual(list(refs), ["SZTORC Andrzej Stefan", "NOWAK Anna", "SZTORC Andrzej Stefan_1"])
+        self.assertEqual([r.list_no for r in refs.values()], [2, 2, 12])
+        # DuckDB's '_1' suffix for a repeated header is not part of the name; no positions are guessed.
+        self.assertEqual(refs["SZTORC Andrzej Stefan_1"].name_key, python_name_key("Andrzej Stefan SZTORC"))
+        self.assertEqual({r.position for r in refs.values()}, {None})
 
     def test_referendum_answer_columns_both_layouts(self) -> None:
         # 2023: named columns in any order; 2015: "Pytanie N" then valid, yes, no without names.
@@ -202,6 +312,43 @@ class TestRateLimiter(unittest.TestCase):
         self.assertTrue(limiter.allow("a", now=60.5))  # the event at t=0 left the window
         self.assertFalse(limiter.allow("a", now=61))
 
+    def test_redis_window_is_shared_and_falls_back_when_redis_fails(self) -> None:
+        class FakeRedis:
+            """Counters shared by every limiter using this client, like one Redis server."""
+
+            def __init__(self) -> None:
+                self.counts: dict[str, int] = {}
+                self.down = False
+
+            def pipeline(self):
+                client, ops = self, []
+
+                class Pipe:
+                    def incr(self, key):
+                        ops.append(key)
+
+                    def expire(self, key, seconds):
+                        pass
+
+                    def execute(self):
+                        if client.down:
+                            raise ConnectionError("redis down")
+                        client.counts[ops[0]] = client.counts.get(ops[0], 0) + 1
+                        return [client.counts[ops[0]], True]
+
+                return Pipe()
+
+        server = FakeRedis()
+        worker_1, worker_2 = RedisWindowLimiter(server, 2), RedisWindowLimiter(server, 2)
+        self.assertTrue(worker_1.allow("ip", now=0))
+        self.assertTrue(worker_2.allow("ip", now=1))
+        self.assertFalse(worker_1.allow("ip", now=2))  # the third request in the window, from any worker
+        self.assertTrue(worker_2.allow("ip", now=60))  # next window
+        server.down = True
+        self.assertTrue(worker_1.allow("ip", now=61))
+        self.assertTrue(worker_1.allow("ip", now=62))
+        self.assertFalse(worker_1.allow("ip", now=63))  # in-process limit still applies
+
 
 def _person(name: str, ref: str) -> entities.EntityMatch:
     return entities.EntityMatch("person", name, ref, "sejm 2023", [2023])
@@ -265,7 +412,7 @@ class TestDynamicQueryFlow(unittest.TestCase):
     def setUp(self) -> None:
         dynamic_sql.SQL_CACHE._data.clear()
         self.patches = [
-            patch.object(dynamic_sql, "build_context", return_value=("ctx", "load-1", [])),
+            patch.object(dynamic_sql, "build_context", return_value=("ctx", "load-1", {"examples": []})),
             patch.object(entities, "resolve_entities", return_value=[]),
         ]
         for p in self.patches:
@@ -316,6 +463,52 @@ class TestDynamicQueryFlow(unittest.TestCase):
             _, _, _, meta = dynamic_sql.try_dynamic_query("Ile głosów dostał Kaczyński?", [{"kind": "person", "ref": "3"}])
         self.assertEqual(meta["status"], "first_pass")
         self.assertEqual([m["ref"] for m in meta["entities"]], ["3"])
+
+    def test_follow_up_inherits_entities_and_previous_sql(self) -> None:
+        city = entities.EntityMatch("gmina", "m. Kraków", "126101", "powiat Kraków", [2019, 2023])
+        previous = {"question": "Frekwencja w Krakowie w 2023?", "sql": self.GOOD}
+        found = {previous["question"]: [city], "A w 2019?": []}
+        with patch.object(entities, "resolve_entities", side_effect=lambda q: found[q]):
+            matches, clarification = dynamic_sql.resolve_question_entities("A w 2019?", None, previous)
+            self.assertEqual((matches, clarification), ([city], None))
+            # A place named in the new question replaces the inherited one.
+            gdansk = entities.EntityMatch("gmina", "m. Gdańsk", "226101", "powiat Gdańsk", [2019])
+            found["A w Gdańsku?"] = [gdansk]
+            self.assertEqual(dynamic_sql.resolve_question_entities("A w Gdańsku?", None, previous)[0], [gdansk])
+        with patch.object(dynamic_sql, "build_context", wraps=lambda q, m, prev: ("ctx", "load-1", {})) as ctx, \
+                patch.object(dynamic_sql, "_llm_sql", return_value=(self.GOOD, {})), \
+                patch.object(dynamic_sql.safe_sql, "run_readonly", return_value=[{"turnout_pct": 1}]):
+            first = dynamic_sql.try_dynamic_query("A w 2019?", None, previous)
+            other = dynamic_sql.try_dynamic_query("A w 2019?", None, {"question": "Frekwencja w Gdańsku?", "sql": "x"})
+        self.assertIs(ctx.call_args_list[0].args[2], previous)
+        # The same words after a different previous turn are a different question: no cache hit.
+        self.assertEqual((first[3]["status"], other[3]["status"]), ("first_pass", "first_pass"))
+
+
+class TestPromptRelations(unittest.TestCase):
+    AVAILABLE = [
+        "elections", "persons", "v_turnout", "precincts", "sejm_lists", "senat_candidates",
+        "prezydent_results", "wbp_candidates", "sejmik_lists", "rada_candidates", "pe_lists",
+    ]
+
+    def test_named_election_kind_limits_the_schema(self) -> None:
+        self.assertEqual(
+            dynamic_sql.relevant_relations("Kto wygrał wybory prezydenckie w 2020?", self.AVAILABLE),
+            ["elections", "persons", "v_turnout", "prezydent_results", "wbp_candidates"],
+        )
+        self.assertIn("rada_candidates", dynamic_sql.relevant_relations("Ilu radnych ma gmina Zakopane?", self.AVAILABLE))
+        self.assertNotIn("sejm_lists", dynamic_sql.relevant_relations("Ile mandatów w sejmikach zdobyło PiS?", self.AVAILABLE))
+        self.assertIn("precincts", dynamic_sql.relevant_relations("Ile głosów dostał poseł Nowak?", self.AVAILABLE))
+        self.assertEqual(
+            dynamic_sql.relevant_relations("Frekwencja w wyborach do Parlamentu Europejskiego", self.AVAILABLE),
+            ["elections", "persons", "v_turnout", "pe_lists"],
+        )
+
+    def test_no_kind_or_false_friend_sends_everything(self) -> None:
+        # "Radom" is not "rada"; "województwie" is not the sejmik.
+        for question in ("Frekwencja w Radomiu", "Wynik PiS w województwie śląskim"):
+            with self.subTest(question=question):
+                self.assertEqual(dynamic_sql.relevant_relations(question, self.AVAILABLE), self.AVAILABLE)
 
 
 if __name__ == "__main__":

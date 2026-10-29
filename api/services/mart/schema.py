@@ -48,8 +48,11 @@ SEJMIK_TABLES = (
     "sejmik_gmina_list_votes",
 )
 WBP_TABLES = ("wbp_gmina_protocols", "wbp_candidates")
+RADA_TABLES = ("rada_committees", "rada_districts", "rada_district_lists", "rada_candidates")
 
-BASE_TABLES = PARLIAMENT_TABLES + PREZYDENT_TABLES + PE_TABLES + REFERENDUM_TABLES + SEJMIK_TABLES + WBP_TABLES
+BASE_TABLES = (
+    PARLIAMENT_TABLES + PREZYDENT_TABLES + PE_TABLES + REFERENDUM_TABLES + SEJMIK_TABLES + WBP_TABLES + RADA_TABLES
+)
 """Tables filled by the loader: each election family replaces its own tables one year at a time."""
 
 DERIVED_RELATIONS = (
@@ -63,6 +66,7 @@ DERIVED_RELATIONS = (
     "v_pe_national_results",
     "v_referendum_results",
     "v_sejmik_results",
+    "v_rada_results",
     "v_turnout",
     "v_party_results",
     "v_party_change",
@@ -76,7 +80,7 @@ QUERYABLE_RELATIONS = frozenset(BASE_TABLES + DERIVED_RELATIONS + ("elections",)
 TABLES_DDL = r"""
 CREATE EXTENSION IF NOT EXISTS pg_trgm;
 CREATE SCHEMA IF NOT EXISTS mart;
-COMMENT ON SCHEMA mart IS 'Relational model of Polish elections (Sejm, Senate, President, European Parliament, referendums, voivodeship assemblies, mayors) built from official PKW/KBW files. Every analytical answer must come from these relations.';
+COMMENT ON SCHEMA mart IS 'Relational model of Polish elections (Sejm, Senate, President, European Parliament, referendums, voivodeship assemblies, mayors, councils) built from official PKW/KBW files. Every analytical answer must come from these relations.';
 
 -- Folding used by entity resolution: lower case, no Polish diacritics, no "m. " / "gm. " prefix.
 CREATE OR REPLACE FUNCTION mart.fold_name(t text) RETURNS text
@@ -303,7 +307,7 @@ CREATE TABLE IF NOT EXISTS mart.elections (
     loaded_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (election, year, round)
 );
-COMMENT ON TABLE mart.elections IS 'Elections loaded into the mart. election: sejm, senat, prezydent, pe (European Parliament), referendum, sejmik (voivodeship assembly), wbp (wójt/burmistrz/prezydent miasta = mayor). round is 1, or 2 for run-offs (prezydent, wbp).';
+COMMENT ON TABLE mart.elections IS 'Elections loaded into the mart. election: sejm, senat, prezydent, pe (European Parliament), referendum, sejmik (voivodeship assembly), wbp (wójt/burmistrz/prezydent miasta = mayor), rada (councils of gminas, powiats and Warsaw districts). round is 1, or 2 for run-offs (prezydent, wbp).';
 COMMENT ON COLUMN mart.elections.loaded_at IS 'When the election was last loaded by scripts/build_mart.py.';
 
 -- President ------------------------------------------------------------------------------------
@@ -554,16 +558,20 @@ CREATE TABLE IF NOT EXISTS mart.sejmik_candidates (
     last_name TEXT NOT NULL,
     first_names TEXT NOT NULL,
     gender TEXT,
+    age INT,
     residence TEXT,
     votes BIGINT,
     elected BOOLEAN NOT NULL,
     person_id INT,
     PRIMARY KEY (year, candidate_id)
 );
+-- Added after the first release; existing databases get the column here.
+ALTER TABLE mart.sejmik_candidates ADD COLUMN IF NOT EXISTS age INT;
 COMMENT ON TABLE mart.sejmik_candidates IS 'Candidates for voivodeship assemblies; elected = radny sejmiku (regional councillor).';
 COMMENT ON COLUMN mart.sejmik_candidates.full_name IS 'Given names and SURNAME.';
+COMMENT ON COLUMN mart.sejmik_candidates.age IS 'Age in years on election day, as published in the candidate register (birth year is year - age or one less).';
 COMMENT ON COLUMN mart.sejmik_candidates.votes IS 'Votes for the candidate; NULL when struck off after the ballots were printed (such votes count for the list only, so list votes in sejmik_district_lists can exceed the candidate sum).';
-COMMENT ON COLUMN mart.sejmik_candidates.person_id IS 'Same person in national elections (mart.persons); only set when the name is unambiguous, see docs.';
+COMMENT ON COLUMN mart.sejmik_candidates.person_id IS 'Same person in national elections (mart.persons); only set when the name is unambiguous and all linked local candidacies agree on the birth year, see docs.';
 
 CREATE TABLE IF NOT EXISTS mart.sejmik_gmina_protocols (
     year INT NOT NULL,
@@ -632,7 +640,95 @@ COMMENT ON TABLE mart.wbp_candidates IS 'Mayor candidates (wójt, burmistrz, pre
 COMMENT ON COLUMN mart.wbp_candidates.votes IS 'Votes for the candidate (with a single candidate: votes "za" / for). NULL when the candidate withdrew or was struck off after the ballots were printed (in a run-off the remaining candidate then faced a for/against vote).';
 COMMENT ON COLUMN mart.wbp_candidates.votes_against IS 'Only when there was a single candidate: votes "przeciw" (against).';
 COMMENT ON COLUMN mart.wbp_candidates.pct IS 'Percent of valid votes in the gmina and round (0-100).';
-COMMENT ON COLUMN mart.wbp_candidates.person_id IS 'Same person in national elections (mart.persons); only set when the name is unambiguous, see docs.';
+COMMENT ON COLUMN mart.wbp_candidates.age IS 'Age in years on election day, as published in the candidate register (birth year is year - age or one less).';
+COMMENT ON COLUMN mart.wbp_candidates.person_id IS 'Same person in national elections (mart.persons); only set when the name is unambiguous and all linked local candidacies agree on the birth year, see docs.';
+
+-- Councils: rady gmin (incl. city councils), rady powiatów, rady dzielnic m.st. Warszawy ---------------
+CREATE TABLE IF NOT EXISTS mart.rada_committees (
+    year INT NOT NULL,
+    committee_id INT NOT NULL,
+    committee_name TEXT NOT NULL,
+    aliases TEXT[] NOT NULL DEFAULT '{}',
+    PRIMARY KEY (year, committee_id)
+);
+COMMENT ON TABLE mart.rada_committees IS 'Committees running for councils (rady gmin, rady powiatów, rady dzielnic) in local elections, identified by name within a year (local committees with identical names share one row).';
+COMMENT ON COLUMN mart.rada_committees.aliases IS 'Colloquial short names, e.g. {PiS}, {KO,PO}; only for committees that also ran for a voivodeship assembly that year under the same name (otherwise empty, also for local committees).';
+
+CREATE TABLE IF NOT EXISTS mart.rada_districts (
+    year INT NOT NULL,
+    council_level TEXT NOT NULL,
+    teryt TEXT NOT NULL,
+    district_no INT NOT NULL,
+    council_name TEXT,
+    unit_name TEXT,
+    teryt_powiat TEXT,
+    wojewodztwo TEXT,
+    city_with_powiat_rights BOOLEAN NOT NULL,
+    voting_system TEXT NOT NULL,
+    seats INT NOT NULL,
+    candidates INT NOT NULL,
+    contested BOOLEAN NOT NULL,
+    valid_votes INT,
+    PRIMARY KEY (year, council_level, teryt, district_no)
+);
+COMMENT ON TABLE mart.rada_districts IS 'Electoral districts (okręgi wyborcze) of councils: rady gmin/miast, rady powiatów and rady dzielnic m.st. Warszawy, with seats. A council is (year, council_level, teryt); district numbers restart in every council. Per-precinct results are not loaded.';
+COMMENT ON COLUMN mart.rada_districts.council_level IS '''gmina'' (rada gminy / rada miasta, including cities with powiat rights and Rada m.st. Warszawy), ''powiat'' (rada powiatu) or ''dzielnica'' (rada dzielnicy m.st. Warszawy).';
+COMMENT ON COLUMN mart.rada_districts.teryt IS 'Council unit: 6-digit gmina TERYT for gmina councils (Warsaw city council 146501), 6-digit Warsaw district TERYT (1465xx) for dzielnica councils, 4-digit powiat TERYT for powiat councils (same as teryt_powiat in other relations).';
+COMMENT ON COLUMN mart.rada_districts.council_name IS 'Official council name, e.g. ''Rada Miasta Bolesławiec'', ''Rada Powiatu Bolesławieckiego''; NULL in 2014 (not published in the 2014 files).';
+COMMENT ON COLUMN mart.rada_districts.unit_name IS 'Name of the gmina (''m. Kraków'', ''gm. Bolesławiec''), powiat (''bolesławiecki'') or Warsaw district (''Bemowo'').';
+COMMENT ON COLUMN mart.rada_districts.teryt_powiat IS '4-digit TERYT of the powiat the council unit lies in (for cities with powiat rights the city itself).';
+COMMENT ON COLUMN mart.rada_districts.city_with_powiat_rights IS 'Gmina council of a city with powiat rights (miasto na prawach powiatu); such a city has no separate rada powiatu.';
+COMMENT ON COLUMN mart.rada_districts.voting_system IS '''majoritarian'': single-member districts, the candidate with most votes wins (gminas that are not cities with powiat rights in 2014; gminas up to 20,000 inhabitants since 2018). ''proportional'': multi-member districts with committee lists (D''Hondt among lists that passed 5% in the council).';
+COMMENT ON COLUMN mart.rada_districts.seats IS 'Seats to fill in the district (2014: number of elected councillors, the 2014 files have no district register; every 2014 seat was filled).';
+COMMENT ON COLUMN mart.rada_districts.candidates IS 'Registered candidates in the district.';
+COMMENT ON COLUMN mart.rada_districts.contested IS 'False when no vote took place: the number of candidates did not exceed the seats, so they were elected without voting (or nobody ran and the seat stayed empty).';
+COMMENT ON COLUMN mart.rada_districts.valid_votes IS 'Valid votes cast in the district for all lists / candidates; NULL when no vote took place.';
+
+CREATE TABLE IF NOT EXISTS mart.rada_district_lists (
+    year INT NOT NULL,
+    council_level TEXT NOT NULL,
+    teryt TEXT NOT NULL,
+    district_no INT NOT NULL,
+    committee_id INT NOT NULL,
+    list_no INT,
+    candidates INT NOT NULL,
+    seats INT NOT NULL,
+    votes BIGINT,
+    candidate_votes BIGINT,
+    PRIMARY KEY (year, council_level, teryt, district_no, committee_id)
+);
+COMMENT ON TABLE mart.rada_district_lists IS 'Result of a committee in a council district: votes and seats. In majoritarian districts a "list" is the committee''s single candidate. Aggregates per council, voivodeship and country are in mart.v_rada_results.';
+COMMENT ON COLUMN mart.rada_district_lists.list_no IS 'List number on the ballot (NULL for 2024 majoritarian districts, whose ballots have no list numbers).';
+COMMENT ON COLUMN mart.rada_district_lists.seats IS 'Seats won by the list in the district (count of elected candidates).';
+COMMENT ON COLUMN mart.rada_district_lists.votes IS 'Votes for the list. A vote marked next to a candidate struck off after the ballots were printed counts for the list only, so it can exceed candidate_votes. NULL when no vote took place, and in the few districts where such votes cannot be assigned to one list (see docs, "Known gaps").';
+COMMENT ON COLUMN mart.rada_district_lists.candidate_votes IS 'Sum of the votes of the list''s candidates (NULL when no vote took place).';
+
+CREATE TABLE IF NOT EXISTS mart.rada_candidates (
+    year INT NOT NULL,
+    candidate_id INT NOT NULL,
+    council_level TEXT NOT NULL,
+    teryt TEXT NOT NULL,
+    district_no INT NOT NULL,
+    committee_id INT NOT NULL,
+    list_no INT,
+    list_position INT,
+    full_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    first_names TEXT NOT NULL,
+    gender TEXT,
+    age INT,
+    residence TEXT,
+    votes INT,
+    elected BOOLEAN NOT NULL,
+    person_id INT,
+    PRIMARY KEY (year, candidate_id)
+);
+COMMENT ON TABLE mart.rada_candidates IS 'Candidates for councils (rady gmin/miast, rady powiatów, rady dzielnic m.st. Warszawy); elected = radny (councillor). Join mart.rada_districts on (year, council_level, teryt, district_no) for the council and mart.rada_committees on (year, committee_id) for the committee.';
+COMMENT ON COLUMN mart.rada_candidates.full_name IS 'Given names and SURNAME.';
+COMMENT ON COLUMN mart.rada_candidates.list_position IS 'Position on the list (NULL for 2024 majoritarian districts).';
+COMMENT ON COLUMN mart.rada_candidates.votes IS 'Votes for the candidate; NULL when elected without voting (uncontested district) or when struck off after the ballots were printed (2024; the 2014 and 2018 files omit such candidates).';
+COMMENT ON COLUMN mart.rada_candidates.age IS 'Age in years on election day, as published in the candidate register (birth year is year - age or one less).';
+COMMENT ON COLUMN mart.rada_candidates.person_id IS 'Same person in national elections (mart.persons); only set when the name is unambiguous and all linked local candidacies agree on the birth year, see docs.';
 
 CREATE TABLE IF NOT EXISTS mart.persons (
     person_id INT PRIMARY KEY,
@@ -643,8 +739,8 @@ CREATE TABLE IF NOT EXISTS mart.persons (
     match_rule TEXT NOT NULL,
     candidacies INT NOT NULL
 );
-COMMENT ON TABLE mart.persons IS 'People who ran in any loaded national election (Sejm, Senate, President, European Parliament); local candidates (sejmik, wbp) are linked only when their name is unambiguous. Candidacies carry person_id; mart.v_person_history lists them. person_id is rebuilt on every load (not stable across loads).';
-COMMENT ON COLUMN mart.persons.match_rule IS '''name+gender'': same full name and gender in every year; ''name+gender+residence'': the name was shared by several candidates in one election, so residence was also required. Different people with identical names can still be merged; people who changed surname are not linked.';
+COMMENT ON TABLE mart.persons IS 'People who ran in any loaded national election (Sejm, Senate, President, European Parliament); local candidates (sejmik, wbp, councils) are linked only when their name is unambiguous. Candidacies carry person_id; mart.v_person_history lists them. person_id is rebuilt on every load (not stable across loads).';
+COMMENT ON COLUMN mart.persons.match_rule IS '''name+gender'': same full name and gender in every year; ''name+gender+residence'': the name was shared by several candidates in one election, so residence was also required; ''manual'': set by api/services/mart/person_overrides.csv. Different people with identical names can still be merged; people who changed surname are not linked.';
 COMMENT ON COLUMN mart.persons.candidacies IS 'Number of candidacies in all loaded elections.';
 
 CREATE TABLE IF NOT EXISTS mart.entity_lexicon (

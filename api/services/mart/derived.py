@@ -4,7 +4,7 @@
 - Result views with the domain logic defined once (thresholds, percentages, turnout, rollups to
   country / voivodeship / powiat / gmina), so SQL authors and the LLM reuse it:
   ``v_sejm_*``, ``v_prezydent_results``, ``v_pe_national_results``, ``v_referendum_results``,
-  ``v_sejmik_results``, ``v_turnout`` (all elections).
+  ``v_sejmik_results``, ``v_rada_results`` (councils), ``v_turnout`` (all elections).
 - Cross-election views: ``v_party_results`` (parties grouped into families across Sejm, European
   Parliament and sejmik elections), ``v_party_change`` (change against the previous election of the
   same kind) and ``v_gmina_continuity`` (which gmina TERYT codes exist in which election).
@@ -14,7 +14,9 @@
 
 from __future__ import annotations
 
+import csv
 import logging
+from pathlib import Path
 
 import psycopg
 
@@ -26,7 +28,7 @@ log = logging.getLogger("mart")
 # election); then residence must match too. A missing gender (2015 presidential files) is taken
 # from other candidacies of the same name when they agree. This is a deliberate, explainable
 # heuristic: PKW files carry no personal identifier, so namesakes in different years can be merged
-# and changed surnames are not linked.
+# and changed surnames are not linked. Manual corrections come from PERSON_OVERRIDES (see below).
 PERSONS_SQL = r"""
 CREATE TEMP TABLE candidacy_raw ON COMMIT DROP AS
 SELECT 'sejm' AS chamber, year, 1 AS round, candidate_id, full_name, last_name, first_names, gender, residence
@@ -57,11 +59,14 @@ GROUP BY name_key, gender, event HAVING count(DISTINCT (chamber, candidate_id)) 
 
 CREATE TEMP TABLE candidacy_person ON COMMIT DROP AS
 SELECT c.*,
-       CASE WHEN s.name_key IS NULL THEN 'name+gender' ELSE 'name+gender+residence' END AS match_rule,
-       c.name_key || '|' || coalesce(c.gender, '') ||
-         CASE WHEN s.name_key IS NULL THEN '' ELSE '|' || upper(coalesce(c.residence, '')) END AS person_key
+       CASE WHEN h.grp IS NOT NULL THEN 'manual'
+            WHEN s.name_key IS NULL THEN 'name+gender' ELSE 'name+gender+residence' END AS match_rule,
+       CASE WHEN h.grp IS NOT NULL THEN 'override|' || h.grp
+            ELSE c.name_key || '|' || coalesce(c.gender, '') ||
+                 CASE WHEN s.name_key IS NULL THEN '' ELSE '|' || upper(coalesce(c.residence, '')) END END AS person_key
 FROM candidacy c
-LEFT JOIN shared_name s ON s.name_key = c.name_key AND s.gender IS NOT DISTINCT FROM c.gender;
+LEFT JOIN shared_name s ON s.name_key = c.name_key AND s.gender IS NOT DISTINCT FROM c.gender
+LEFT JOIN override_hit h ON (h.chamber, h.year, h.round, h.candidate_id) = (c.chamber, c.year, c.round, c.candidate_id);
 
 CREATE TEMP TABLE person_ids ON COMMIT DROP AS
 SELECT person_key, CAST(dense_rank() OVER (ORDER BY person_key) AS INT) AS person_id
@@ -78,7 +83,7 @@ SELECT i.person_id,
        (array_agg(c.last_name ORDER BY c.year DESC))[1],
        (array_agg(c.first_names ORDER BY c.year DESC))[1],
        (array_agg(c.gender ORDER BY c.year DESC))[1],
-       min(c.match_rule),
+       CASE WHEN bool_or(c.match_rule = 'manual') THEN 'manual' ELSE min(c.match_rule) END,
        count(*)
 FROM candidacy_person c JOIN person_ids i USING (person_key)
 GROUP BY i.person_id;
@@ -93,10 +98,16 @@ UPDATE mart.pe_candidates k SET person_id = c.person_id FROM candidacy_ids c
 WHERE c.chamber = 'pe' AND c.year = k.year AND c.candidate_id = k.candidate_id;
 """
 
-# Local candidates (sejmik, mayors) are linked to a national person only when the link is
+# Local candidates (sejmik, mayors, councils) are linked to a national person only when the link is
 # unambiguous: exactly one national person has that full name and gender, and the name occurs once
-# in that local election (one sejmik candidate, or mayor candidates of one gmina). Local
-# candidacies never create persons: tens of thousands of local namesakes would merge strangers.
+# in that local election (one sejmik candidate, mayor candidates of one gmina, or one council
+# candidate among all council candidates of the year). Local candidacies never create persons:
+# tens of thousands of local namesakes would merge strangers.
+# Local registers publish the candidate's age, national registers do not. All local candidacies
+# linked to one person must agree on the birth year (election year minus age; two candidacies of
+# one person differ by at most 1, because age is counted on election day). When they do not, the
+# name belongs to several people and none of that person's local candidacies stays linked.
+# Overrides (PERSON_OVERRIDES) are applied last and win over every rule.
 LOCAL_PERSONS_SQL = r"""
 CREATE TEMP TABLE national_name ON COMMIT DROP AS
 SELECT name_key, gender, min(person_id) AS person_id FROM candidacy_ids
@@ -114,7 +125,96 @@ FROM (SELECT year, full_name FROM mart.wbp_candidates GROUP BY year, full_name H
      national_name n
 WHERE u.year = k.year AND u.full_name = k.full_name
   AND n.name_key = upper(regexp_replace(k.full_name, '\s+', ' ', 'g')) AND n.gender IS NOT DISTINCT FROM k.gender;
+
+UPDATE mart.rada_candidates SET person_id = NULL;
+UPDATE mart.rada_candidates k SET person_id = n.person_id
+FROM (SELECT year, full_name FROM mart.rada_candidates GROUP BY year, full_name HAVING count(*) = 1) u, national_name n
+WHERE u.year = k.year AND u.full_name = k.full_name
+  AND n.name_key = upper(regexp_replace(k.full_name, '\s+', ' ', 'g')) AND n.gender IS NOT DISTINCT FROM k.gender;
+
+CREATE TEMP TABLE birth_conflict ON COMMIT DROP AS
+SELECT person_id FROM (
+  SELECT person_id, year - age AS birth_year FROM mart.sejmik_candidates WHERE person_id IS NOT NULL AND age IS NOT NULL
+  UNION ALL
+  SELECT person_id, year - age FROM mart.wbp_candidates WHERE person_id IS NOT NULL AND age IS NOT NULL
+  UNION ALL
+  SELECT person_id, year - age FROM mart.rada_candidates WHERE person_id IS NOT NULL AND age IS NOT NULL
+) b
+GROUP BY person_id HAVING max(birth_year) - min(birth_year) > 1;
+
+UPDATE mart.sejmik_candidates SET person_id = NULL WHERE person_id IN (SELECT person_id FROM birth_conflict);
+UPDATE mart.wbp_candidates SET person_id = NULL WHERE person_id IN (SELECT person_id FROM birth_conflict);
+UPDATE mart.rada_candidates SET person_id = NULL WHERE person_id IN (SELECT person_id FROM birth_conflict);
+
+-- Overrides: a local candidacy joins the person of the national candidacies in its group, or is
+-- unlinked when the group has none.
+CREATE TEMP TABLE override_person ON COMMIT DROP AS
+SELECT h.grp, min(i.person_id) AS person_id
+FROM override_hit h JOIN candidacy_ids i USING (chamber, year, round, candidate_id) GROUP BY h.grp;
+
+UPDATE mart.sejmik_candidates k SET person_id = (SELECT person_id FROM override_person o WHERE o.grp = h.grp)
+FROM override_hit h WHERE h.chamber = 'sejmik' AND h.year = k.year AND h.candidate_id = k.candidate_id;
+UPDATE mart.wbp_candidates k SET person_id = (SELECT person_id FROM override_person o WHERE o.grp = h.grp)
+FROM override_hit h WHERE h.chamber = 'wbp' AND h.year = k.year AND h.round = k.round AND h.candidate_id = k.candidate_id;
+UPDATE mart.rada_candidates k SET person_id = (SELECT person_id FROM override_person o WHERE o.grp = h.grp)
+FROM override_hit h WHERE h.chamber = 'rada' AND h.year = k.year AND h.candidate_id = k.candidate_id;
 """
+
+# Manual person corrections, one row per candidacy (or set of candidacies): columns election, year,
+# full_name, place, person, note. All candidacies with the same ``person`` label are one person; a
+# label used by one candidacy splits it from its namesakes. ``place`` narrows the match: district
+# number (sejm, senat, pe), voivodeship (sejmik), TERYT (wbp: gmina, rada: council unit); empty
+# matches every candidacy of that name in that election and year. Every row must match at least one
+# candidacy, otherwise the build fails.
+PERSON_OVERRIDES = Path(__file__).with_name("person_overrides.csv")
+
+OVERRIDE_HITS_SQL = r"""
+CREATE TEMP TABLE override_hit ON COMMIT DROP AS
+SELECT o.line, x.chamber, x.year, x.round, x.candidate_id, o.grp
+FROM person_override o
+JOIN (
+  SELECT 'sejm' AS chamber, year, 1 AS round, candidate_id, full_name, district_no::text AS place FROM mart.sejm_candidates
+  UNION ALL SELECT 'senat', year, 1, candidate_id, full_name, district_no::text FROM mart.senat_candidates
+  UNION ALL SELECT 'prezydent', year, round, candidate_id, full_name, NULL FROM mart.prezydent_candidates
+  UNION ALL SELECT 'pe', year, 1, candidate_id, full_name, district_no::text FROM mart.pe_candidates
+  UNION ALL SELECT 'sejmik', year, 1, candidate_id, full_name, wojewodztwo FROM mart.sejmik_candidates
+  UNION ALL SELECT 'wbp', year, round, candidate_id, full_name, teryt_gmina FROM mart.wbp_candidates
+  UNION ALL SELECT 'rada', year, 1, candidate_id, full_name, teryt FROM mart.rada_candidates
+) x ON x.chamber = o.election AND x.year = o.year AND x.full_name = o.full_name
+   AND (o.place IS NULL OR x.place = o.place);
+"""
+
+
+def load_person_overrides(pg: psycopg.Connection, path: Path = PERSON_OVERRIDES) -> int:
+    """Load ``path`` into the ``person_override`` / ``override_hit`` temp tables; return its row count.
+
+    Raises ValueError when a row matches no candidacy (a typo would otherwise be ignored silently).
+    """
+    with path.open(encoding="utf-8", newline="") as fh:
+        rows = [
+            (line, r["election"].strip(), int(r["year"]), r["full_name"].strip(), r["place"].strip() or None, r["person"].strip())
+            for line, r in enumerate(csv.DictReader(fh), start=2)
+        ]
+    pg.execute(
+        "CREATE TEMP TABLE person_override (line INT, election TEXT, year INT, full_name TEXT, place TEXT, grp TEXT)"
+        " ON COMMIT DROP"
+    )
+    with pg.cursor() as cur:
+        cur.executemany("INSERT INTO person_override VALUES (%s, %s, %s, %s, %s, %s)", rows)
+    pg.execute(OVERRIDE_HITS_SQL)
+    missing = pg.execute(
+        "SELECT line FROM person_override WHERE line NOT IN (SELECT line FROM override_hit) ORDER BY line"
+    ).fetchall()
+    if missing:
+        raise ValueError(f"{path.name}: lines {[m[0] for m in missing]} match no candidacy")
+    return len(rows)
+
+
+def link_persons(pg: psycopg.Connection, overrides: Path = PERSON_OVERRIDES) -> None:
+    """Rebuild ``mart.persons`` and every ``person_id`` from the candidate tables (caller's transaction)."""
+    log.info("person overrides: %s rows", load_person_overrides(pg, overrides))
+    pg.execute(PERSONS_SQL)
+    pg.execute(LOCAL_PERSONS_SQL)
 
 # Colloquial party families for comparing elections: the first alias of a committee
 # (``COMMITTEE_ALIASES`` in build_common.py) mapped to a family. Committees without aliases (local
@@ -190,6 +290,7 @@ DROP MATERIALIZED VIEW IF EXISTS mart.v_party_change;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_party_results;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_turnout;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_sejmik_results;
+DROP MATERIALIZED VIEW IF EXISTS mart.v_rada_results;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_referendum_results;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_pe_national_results;
 DROP MATERIALIZED VIEW IF EXISTS mart.v_prezydent_results;
@@ -281,7 +382,7 @@ COMMENT ON COLUMN mart.v_sejm_turnout.turnout_pct IS 'Turnout in percent (0-100)
 
 
 def _results_views_sql() -> str:
-    """DDL of the per-election result views (president, EP, referendum, sejmik)."""
+    """DDL of the per-election result views (president, EP, referendum, sejmik, councils)."""
     prez_source = f"""
         SELECT p.year, p.round, {GEO}, v.candidate_id, v.votes
         FROM mart.prezydent_precinct_candidate_votes v
@@ -359,6 +460,57 @@ COMMENT ON MATERIALIZED VIEW mart.v_sejmik_results IS 'Voivodeship assembly (sej
 COMMENT ON COLUMN mart.v_sejmik_results.level IS '{LEVEL_COMMENT}';
 COMMENT ON COLUMN mart.v_sejmik_results.seats IS 'Seats won; only at level country and wojewodztwo (NULL below).';
 CREATE INDEX ON mart.v_sejmik_results (year, level);
+""" + RADA_VIEW_SQL
+
+
+# Council results: one row per committee and council, plus voivodeship and country totals per
+# council level. List votes unknown in a few districts (struck-off candidates, see build_rady) are
+# replaced by the candidates' votes and flagged with votes_exact = false.
+RADA_VIEW_SQL = r"""
+CREATE MATERIALIZED VIEW mart.v_rada_results AS
+WITH lists AS (
+  SELECT l.year, l.council_level, d.wojewodztwo, l.teryt, l.committee_id, l.candidates, l.seats,
+         coalesce(l.votes, l.candidate_votes) AS votes, l.votes IS NULL AND l.candidate_votes IS NOT NULL AS unknown
+  FROM mart.rada_district_lists l JOIN mart.rada_districts d USING (year, council_level, teryt, district_no)
+), agg AS (
+  SELECT year, council_level,
+         CASE WHEN GROUPING(teryt) = 0 THEN 'council' WHEN GROUPING(wojewodztwo) = 0 THEN 'wojewodztwo' ELSE 'country' END AS level,
+         wojewodztwo, teryt, committee_id, sum(candidates) AS candidates, sum(seats) AS seats, sum(votes) AS votes,
+         bool_or(unknown) AS incomplete
+  FROM lists
+  GROUP BY GROUPING SETS ((year, council_level, committee_id), (year, council_level, committee_id, wojewodztwo),
+                          (year, council_level, committee_id, wojewodztwo, teryt))
+), units AS (
+  SELECT year, council_level,
+         CASE WHEN GROUPING(teryt) = 0 THEN 'council' WHEN GROUPING(wojewodztwo) = 0 THEN 'wojewodztwo' ELSE 'country' END AS level,
+         wojewodztwo, teryt, min(unit_name) AS unit_name, min(council_name) AS council_name, count(DISTINCT teryt) AS councils,
+         sum(seats) AS seats, sum(valid_votes) AS valid_votes
+  FROM mart.rada_districts
+  GROUP BY GROUPING SETS ((year, council_level), (year, council_level, wojewodztwo), (year, council_level, wojewodztwo, teryt))
+)
+SELECT a.year, a.council_level, a.level, a.wojewodztwo, a.teryt,
+       CASE WHEN a.level = 'council' THEN u.unit_name END AS unit_name,
+       CASE WHEN a.level = 'council' THEN u.council_name END AS council_name,
+       u.councils, a.committee_id, c.committee_name, c.aliases, CAST(a.candidates AS INT) AS candidates,
+       CAST(a.seats AS INT) AS seats, CAST(u.seats AS INT) AS unit_seats, a.votes, NOT a.incomplete AS votes_exact,
+       u.valid_votes AS unit_valid_votes, round(100.0 * a.votes / NULLIF(u.valid_votes, 0), 2) AS pct
+FROM agg a
+JOIN units u ON u.year = a.year AND u.council_level = a.council_level AND u.level = a.level
+            AND u.wojewodztwo IS NOT DISTINCT FROM a.wojewodztwo AND u.teryt IS NOT DISTINCT FROM a.teryt
+JOIN mart.rada_committees c ON c.year = a.year AND c.committee_id = a.committee_id;
+COMMENT ON MATERIALIZED VIEW mart.v_rada_results IS 'Council results (rady gmin/miast, rady powiatów, rady dzielnic m.st. Warszawy) per committee: seats, votes and percent of valid votes, per council (level ''council'', teryt = council unit), voivodeship and country, separately for each council_level. Use for "ile mandatów PiS zdobył w radach powiatów", "kto wygrał wybory do rady miasta Krakowa". Committees are matched by name, so at wojewodztwo/country level local committees with identical names are added up; compare parties by aliases.';
+COMMENT ON COLUMN mart.v_rada_results.council_level IS 'gmina, powiat or dzielnica (as in mart.rada_districts).';
+COMMENT ON COLUMN mart.v_rada_results.level IS 'Aggregation level: council (one council, identified by teryt), wojewodztwo or country.';
+COMMENT ON COLUMN mart.v_rada_results.teryt IS 'Council unit (level council only): 6-digit gmina / Warsaw district TERYT or 4-digit powiat TERYT.';
+COMMENT ON COLUMN mart.v_rada_results.councils IS 'Number of councils in the unit.';
+COMMENT ON COLUMN mart.v_rada_results.seats IS 'Seats won by the committee.';
+COMMENT ON COLUMN mart.v_rada_results.unit_seats IS 'All seats in the unit (council, voivodeship or country) at this council level.';
+COMMENT ON COLUMN mart.v_rada_results.votes IS 'Votes for the committee''s lists (in majoritarian councils: for its candidates).';
+COMMENT ON COLUMN mart.v_rada_results.votes_exact IS 'False when some district list totals are unknown (struck-off candidates, see docs) and their candidates'' votes were used instead, so votes is a slight lower bound.';
+COMMENT ON COLUMN mart.v_rada_results.unit_valid_votes IS 'Valid votes in all districts of the unit where a vote took place.';
+COMMENT ON COLUMN mart.v_rada_results.pct IS 'votes / unit_valid_votes in percent (0-100).';
+CREATE INDEX ON mart.v_rada_results (year, council_level, level);
+CREATE INDEX ON mart.v_rada_results (teryt);
 """
 
 
@@ -470,40 +622,51 @@ COMMENT ON COLUMN mart.v_gmina_continuity.elections IS 'Elections with results f
 PERSON_HISTORY_SQL = r"""
 CREATE VIEW mart.v_person_history AS
 SELECT p.person_id, p.full_name, p.gender, p.match_rule, x.year, x.chamber, x.round, x.district_no, x.area,
-       x.committee_name, x.committee_aliases, x.list_no, x.list_position, x.votes, x.elected
+       x.committee_name, x.committee_aliases, x.list_no, x.list_position, x.votes, x.elected, x.age
 FROM mart.persons p
 JOIN (
   SELECT k.person_id, k.year, 'sejm' AS chamber, 1 AS round, k.district_no, NULL::text AS area, c.committee_name,
-         c.aliases AS committee_aliases, k.list_no, k.list_position, k.votes::bigint AS votes, k.elected
+         c.aliases AS committee_aliases, k.list_no, k.list_position, k.votes::bigint AS votes, k.elected,
+         NULL::int AS age
   FROM mart.sejm_candidates k JOIN mart.sejm_committees c USING (year, committee_id)
   UNION ALL
   SELECT s.person_id, s.year, 'senat', 1, s.district_no, NULL, s.committee_name,
          (SELECT c.aliases FROM mart.sejm_committees c WHERE c.year = s.year AND c.committee_name = s.committee_name),
-         NULL, NULL, s.votes, s.elected
+         NULL, NULL, s.votes, s.elected, NULL
   FROM mart.senat_candidates s
   UNION ALL
-  SELECT k.person_id, k.year, 'prezydent', k.round, NULL, NULL, k.committee_name, NULL, NULL, NULL, k.votes, k.elected
+  SELECT k.person_id, k.year, 'prezydent', k.round, NULL, NULL, k.committee_name, NULL, NULL, NULL, k.votes, k.elected,
+         NULL
   FROM mart.prezydent_candidates k
   UNION ALL
   SELECT k.person_id, k.year, 'pe', 1, k.district_no, NULL, c.committee_name, c.aliases, k.list_no, k.list_position,
-         k.votes, k.elected
+         k.votes, k.elected, NULL
   FROM mart.pe_candidates k JOIN mart.pe_committees c USING (year, committee_id)
   UNION ALL
   SELECT k.person_id, k.year, 'sejmik', 1, k.district_no, k.wojewodztwo, c.committee_name, c.aliases, k.list_no,
-         k.list_position, k.votes, k.elected
+         k.list_position, k.votes, k.elected, k.age
   FROM mart.sejmik_candidates k JOIN mart.sejmik_committees c USING (year, committee_id)
   WHERE k.person_id IS NOT NULL
   UNION ALL
   SELECT k.person_id, k.year, 'wbp', k.round, NULL, g.gmina, k.committee_name,
          (SELECT c.aliases FROM mart.sejmik_committees c WHERE c.year = k.year AND c.committee_name = k.committee_name),
-         NULL, NULL, k.votes, k.elected
+         NULL, NULL, k.votes, k.elected, k.age
   FROM mart.wbp_candidates k
   LEFT JOIN mart.wbp_gmina_protocols g USING (year, round, teryt_gmina)
   WHERE k.person_id IS NOT NULL
+  UNION ALL
+  SELECT k.person_id, k.year,
+         CASE k.council_level WHEN 'gmina' THEN 'rada_gminy' WHEN 'powiat' THEN 'rada_powiatu' ELSE 'rada_dzielnicy' END,
+         1, k.district_no, coalesce(d.council_name, d.unit_name), c.committee_name, c.aliases, k.list_no, k.list_position,
+         k.votes, k.elected, k.age
+  FROM mart.rada_candidates k JOIN mart.rada_committees c USING (year, committee_id)
+  LEFT JOIN mart.rada_districts d USING (year, council_level, teryt, district_no)
+  WHERE k.person_id IS NOT NULL
 ) x USING (person_id);
-COMMENT ON VIEW mart.v_person_history IS 'Every candidacy of a person (one row per candidacy and round): Sejm, Senate, President, European Parliament, and sejmik/mayor candidacies linked to the same person. Use for "w których wyborach startował X", "kto zmienił komitet", "kto przeszedł z Sejmu do Senatu".';
-COMMENT ON COLUMN mart.v_person_history.chamber IS 'Election: sejm, senat, prezydent, pe, sejmik or wbp (mayor).';
-COMMENT ON COLUMN mart.v_person_history.area IS 'sejmik: voivodeship; wbp: gmina. NULL otherwise.';
+COMMENT ON VIEW mart.v_person_history IS 'Every candidacy of a person (one row per candidacy and round): Sejm, Senate, President, European Parliament, and sejmik/mayor/council candidacies linked to the same person. Use for "w których wyborach startował X", "kto zmienił komitet", "kto przeszedł z Sejmu do Senatu".';
+COMMENT ON COLUMN mart.v_person_history.age IS 'Age on election day; only local registers (sejmik, wbp, councils) publish it, NULL for national candidacies.';
+COMMENT ON COLUMN mart.v_person_history.chamber IS 'Election: sejm, senat, prezydent, pe, sejmik, wbp (mayor), rada_gminy, rada_powiatu or rada_dzielnicy (councils).';
+COMMENT ON COLUMN mart.v_person_history.area IS 'sejmik: voivodeship; wbp: gmina; councils: council name (2014: unit name). NULL otherwise.';
 COMMENT ON COLUMN mart.v_person_history.committee_aliases IS 'Aliases of the committee (Senate and mayor rows: only when a Sejm / sejmik committee of that year has the same name). Compare aliases, not committee_name, to find party switches across years.';
 
 UPDATE mart.persons p SET candidacies = h.n
@@ -561,6 +724,7 @@ ANALYZED = (
     "v_pe_national_results",
     "v_referendum_results",
     "v_sejmik_results",
+    "v_rada_results",
     "v_turnout",
     "v_party_results",
     "v_party_change",
@@ -570,8 +734,7 @@ ANALYZED = (
 
 def rebuild(pg: psycopg.Connection) -> None:
     """Rebuild persons, views and the entity lexicon from everything loaded (caller's transaction)."""
-    pg.execute(PERSONS_SQL)
-    pg.execute(LOCAL_PERSONS_SQL)
+    link_persons(pg)
     persons = pg.execute("SELECT count(*), count(*) FILTER (WHERE candidacies > 1) FROM mart.persons").fetchone()
     log.info("persons: %s (with more than one national candidacy: %s)", *persons)
     pg.execute(DROP_SQL)
@@ -584,6 +747,10 @@ def rebuild(pg: psycopg.Connection) -> None:
         " (SELECT count(*) FROM mart.wbp_candidates WHERE person_id IS NOT NULL)"
     ).fetchone()
     log.info("local candidacies linked to persons: sejmik %s, wbp %s", *linked)
+    log.info(
+        "council candidacies linked to persons: %s",
+        pg.execute("SELECT count(*) FROM mart.rada_candidates WHERE person_id IS NOT NULL").fetchone()[0],
+    )
     pg.execute(LEXICON_SQL)
     log.info("entity lexicon: %s names", pg.execute("SELECT count(*) FROM mart.entity_lexicon").fetchone()[0])
     for relation in ANALYZED:

@@ -53,11 +53,11 @@ INTENT_TEXT = {
     ),
 }
 
-# Elections that only the mart covers. The legacy templates answer from Sejm data, so a question
-# naming one of these goes to dynamic SQL first instead of being matched to a Sejm template.
+# Elections the legacy templates do not know (they answer from Sejm data). When LLM SQL over the
+# mart finds nothing for such a question, the router returns that instead of a Sejm template answer.
 _MART_ONLY_ELECTION_RE = re.compile(
     r"prezydent|referend|sejmik|samorz[aą]d|w[oó]jt|burmistrz|europarlament|parlament\w* europejsk|"
-    r"europos[lł]|senat",
+    r"europos[lł]|senat|radn|rad[ayz]i? (gmin|powiat|miasta|dzielnic)",
     re.IGNORECASE,
 )
 
@@ -68,35 +68,38 @@ _KBW_FALLBACK_STOPWORDS_RE = (
 )
 
 
-def route_question(question: str, entity_refs: list[dict] | None = None) -> dict:
-    """Route a question to a SQL template, falling back to LLM-written SQL over ``mart``.
+def route_question(question: str, entity_refs: list[dict] | None = None, previous: dict | None = None) -> dict:
+    """Answer with LLM-written SQL over ``mart`` first; fall back to the legacy SQL templates.
 
-    ``entity_refs`` are explicit entity choices (answers to a clarification); they skip the
-    templates and go straight to ``dynamic_sql``.
+    The templates run only when dynamic SQL produced no rows (no OpenAI key, mart unreachable,
+    failed or empty query) and the question is one they can answer: not an explicit entity choice
+    (``entity_refs``, the answer to a clarification), not a follow-up (``previous`` turn), and not
+    about an election only the mart covers.
     """
-    if entity_refs:
-        dyn_rows, dyn_sql, dyn_err, dyn_meta = try_dynamic_query(question, entity_refs)
-        response = _dynamic_response(question, None, _extract_years(question), dyn_rows, dyn_sql, dyn_meta)
-        if response:
-            return response
+    years = _extract_years(question)
+    dyn_rows, dyn_sql, dyn_err, dyn_meta = try_dynamic_query(question, entity_refs, previous)
+    response = _dynamic_response(question, None, years, dyn_rows, dyn_sql, dyn_meta)
+    if response:
+        return response
+    telemetry = {"_dynamic_sql_meta": dyn_meta, **({"_dynamic_sql_error": dyn_err} if dyn_err else {})}
+    if entity_refs or previous or _MART_ONLY_ELECTION_RE.search(question):
         return {
             "question": question,
             "intent": "dynamic_sql",
             "entity": None,
             "year": None,
-            "years": _extract_years(question),
+            "years": years,
             "sql": dyn_sql or "",
-            "params": {"_dynamic_sql_meta": dyn_meta, **({"_dynamic_sql_error": dyn_err} if dyn_err else {})},
+            "params": telemetry,
             "result": [],
         }
-    tried_dynamic = False
-    if _MART_ONLY_ELECTION_RE.search(question):
-        tried_dynamic = True
-        dyn_rows, dyn_sql, dyn_err, dyn_meta = try_dynamic_query(question)
-        response = _dynamic_response(question, None, _extract_years(question), dyn_rows, dyn_sql, dyn_meta)
-        if response:
-            return response
+    result = _route_templates(question)
+    result["params"] = {**(result.get("params") or {}), **telemetry}
+    return result
 
+
+def _route_templates(question: str) -> dict:
+    """Legacy path: intent detection and fixed SQL templates (mostly Sejm over ``kbw_facts``)."""
     question_embedding = embed_text(question)
     llm_intent, llm_entity = extract_intent_and_entity(question)
     year = _extract_year(question)
@@ -450,18 +453,6 @@ def route_question(question: str, entity_refs: list[dict] | None = None) -> dict
                 "result": kbw_rows,
             }
 
-    # Safe dynamic SQL fallback for broader KBW/legacy datasets or when template path returns empty.
-    if not tried_dynamic and _should_try_dynamic_sql(question, intent, result):
-        dyn_rows, dyn_sql, dyn_err, dyn_meta = try_dynamic_query(question)
-        response = _dynamic_response(question, llm_entity, years, dyn_rows, dyn_sql, dyn_meta)
-        if response:
-            return response
-        # Surface dynamic generation telemetry while preserving deterministic fallback result.
-        telemetry = {"_dynamic_sql_meta": dyn_meta}
-        if dyn_err:
-            telemetry["_dynamic_sql_error"] = dyn_err
-        params = {**params, **telemetry}
-
     response_year = None if intent == "votes_for_candidate_all_years" else default_year
     return {
         "question": question,
@@ -810,31 +801,3 @@ def _is_year_comparison_question(question: str, years: list[int]) -> bool:
     lowered = question.lower()
     return len(years) >= 2 and (" vs " in lowered or "versus" in lowered or "porówn" in lowered)
 
-
-def _should_try_dynamic_sql(question: str, intent: str, result: list[dict]) -> bool:
-    """Should try dynamic sql."""
-    lowered = question.lower()
-    broad_tokens = (
-        "prezydent",
-        "referendum",
-        "rw",
-        "rejestr wyborcow",
-        "rejestr wyborców",
-        "samorzad",
-        "samorząd",
-        "parlament eu",
-        "senat",
-        "kbw",
-    )
-    asks_broad_domain = any(t in lowered for t in broad_tokens)
-    # If template path has no rows or the question targets broader families, try dynamic query.
-    if asks_broad_domain:
-        return True
-    if not result and intent in (
-        "total_votes_by_candidate",
-        "votes_for_candidate",
-        "trend_by_district_for_candidate",
-        "votes_for_candidate_all_years",
-    ):
-        return True
-    return False

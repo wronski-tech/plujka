@@ -1,4 +1,5 @@
-# Unit tests (no DB) + optional integration against PostgreSQL (pgvector).
+# Unit tests (no DB), then integration against PostgreSQL 16 (pgvector): DB tests, a full mart
+# build from the committed parquet files, and a check that every curated SQL example still runs.
 name: CI
 
 on:
@@ -47,6 +48,7 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://plujka:plujka@localhost:5432/plujka
+      MART_DATABASE_URL: postgresql://plujka_mart_reader:plujka_mart_reader@localhost:5432/plujka
       PLUJKA_RUN_DB_TESTS: "1"
 
     steps:
@@ -65,3 +67,10 @@ jobs:
 
       - name: Run tests (including DB integration)
         run: PYTHONPATH=. python -m unittest discover -s tests -p 'test*.py' -v
+
+      # Every consistency check in the builders must pass on PostgreSQL 16 with the committed data.
+      - name: Build the mart from committed parquet
+        run: PYTHONPATH=. python -u scripts/build_mart.py
+
+      - name: Check curated SQL examples against the built mart
+        run: PYTHONPATH=. python scripts/add_sql_example.py --check

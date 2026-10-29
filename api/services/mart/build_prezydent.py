@@ -4,6 +4,8 @@ Sources per round:
 - 2020, 2025: one per-precinct file with geography, protocol and one column per candidate
   (``wyniki_gl_na_kand_po_obwodach`` / ``protokoly_po_obwodach``) plus the candidate register
   ``kandydaci`` with official totals.
+- 2010: per-precinct files ``pzt2010-wyn-obw`` (domestic, abroad and ships; candidates as 'SURNAME
+  Given' headers; no invalid-votes column) and per-gmina totals ``pzt2010-wyn-gmn``, otherwise like 2015.
 - 2015: per-precinct files only (``prezydent_2015_tura1.csv``, ``wyniki_tura2.xls``) and per-gmina
   totals (``prez2015_N_tura_gm.xls``); there is no candidate register, so candidates come from the
   column headers. The round 2 file publishes TERYT as 0: its precincts get the TERYT of the round 1
@@ -21,7 +23,7 @@ import logging
 import duckdb
 
 from api.services.mart.build_common import Election, YearSources, column, python_name_key, run_checks
-from api.services.mart.build_precincts import precinct_select, unpivot_votes, vote_columns
+from api.services.mart.build_precincts import PROTOCOL_ALIASES, precinct_select, unpivot_votes, vote_columns
 
 log = logging.getLogger("mart")
 
@@ -29,6 +31,10 @@ TABLES = ("prezydent_candidates", "prezydent_precinct_protocols", "prezydent_pre
 FAMILY = ("prezydent",)
 
 SOURCES = {
+    2010: {
+        r: {"results": f"**/prezydent/{r}/pzt2010-wyn-obw/*.parquet", "gmina_totals": f"**/prezydent/{r}/pzt2010-wyn-gmn.parquet"}
+        for r in (1, 2)
+    },
     2015: {
         1: {"results": "**/prezydent/1/prezydent_2015_tura1/prezydent_2015_tura1__*.parquet",
             "gmina_totals": "**/prezydent/1/prez2015_1_tura_gm.parquet"},
@@ -49,6 +55,7 @@ SOURCES = {
 }
 
 DATES = {
+    (2010, 1): "2010-06-20", (2010, 2): "2010-07-04",
     (2015, 1): "2015-05-10", (2015, 2): "2015-05-24",
     (2020, 1): "2020-06-28", (2020, 2): "2020-07-12",
     (2025, 1): "2025-05-18", (2025, 2): "2025-06-01",
@@ -86,9 +93,10 @@ def _candidates_from_register(con: duckdb.DuckDBPyConnection, year: int, rnd: in
 
 
 def _candidates_from_headers(con: duckdb.DuckDBPyConnection, year: int, rnd: int, headers: list[str]) -> None:
-    """``cand_<rnd>`` from 'Given Names Surname' headers (2015); votes are filled from precinct sums.
+    """``cand_<rnd>`` from 'Given Names Surname' (2015) or 'SURNAME Given Names' (2010) headers.
 
-    DuckDB list slices are inclusive, so ``parts[:-2]`` is every word but the last (the surname).
+    Votes are filled from precinct sums. DuckDB list slices are inclusive, so ``parts[:-2]`` is every
+    word but the last (the 2015 surname); 2010 surnames are the upper-case words.
     """
     con.execute(f"CREATE OR REPLACE TABLE cand_{rnd}_names (header VARCHAR)")
     con.executemany(f"INSERT INTO cand_{rnd}_names VALUES (?)", [[h] for h in headers])
@@ -96,13 +104,17 @@ def _candidates_from_headers(con: duckdb.DuckDBPyConnection, year: int, rnd: int
         f"""
         CREATE OR REPLACE TABLE cand_{rnd} AS
         SELECT {year} AS year, {rnd} AS round,
-               CAST(row_number() OVER (ORDER BY parts[-1], header) AS INT) AS candidate_id,
-               array_to_string(parts[:-2], ' ') || ' ' || upper(parts[-1]) AS full_name,
-               upper(parts[-1]) AS last_name, array_to_string(parts[:-2], ' ') AS first_names,
+               CAST(row_number() OVER (ORDER BY last_name, header) AS INT) AS candidate_id,
+               first_names || ' ' || last_name AS full_name, last_name, first_names,
                NULL AS gender, NULL AS occupation, NULL AS residence, NULL AS party_membership,
                NULL AS committee_name, CAST(NULL AS BIGINT) AS votes, CAST(NULL AS DECIMAL(6, 2)) AS pct,
                false AS elected, name_key(header) AS nkey
-        FROM (SELECT header, str_split(trim(header), ' ') AS parts FROM cand_{rnd}_names)
+        FROM (
+          SELECT header,
+                 CASE WHEN surname(header) <> '' THEN surname(header) ELSE upper(parts[-1]) END AS last_name,
+                 CASE WHEN surname(header) <> '' THEN given_names(header) ELSE array_to_string(parts[:-2], ' ') END AS first_names
+          FROM (SELECT header, str_split(trim(header), ' ') AS parts FROM cand_{rnd}_names)
+        )
         """
     )
 
@@ -162,7 +174,14 @@ def build_prezydent(con: duckdb.DuckDBPyConnection, sources: YearSources) -> lis
         con.execute(f"CREATE OR REPLACE TABLE cand_{rnd}_unmapped AS SELECT unnest(?::VARCHAR[]) AS header",
                     [[h for h in headers if h not in mapping]])
         con.execute(f"CREATE OR REPLACE TABLE cand_{rnd}_columns AS SELECT unnest(?::INT[]) AS candidate_id", [list(mapping.values())])
-        con.execute(f"CREATE OR REPLACE TABLE prot_{rnd} AS SELECT {precinct_select(con, src)} FROM {src}")
+        if column(con, src, *PROTOCOL_ALIASES["invalid_votes"], required=False):
+            con.execute(f"CREATE OR REPLACE TABLE prot_{rnd} AS SELECT {precinct_select(con, src)} FROM {src}")
+        else:  # 2010 publishes votes cast and valid votes only; invalid votes are the difference.
+            protocol = tuple(name for name in PROTOCOL_ALIASES if name != "invalid_votes")
+            con.execute(
+                f"""CREATE OR REPLACE TABLE prot_{rnd} AS
+                    SELECT *, valid_ballots - valid_votes AS invalid_votes FROM (SELECT {precinct_select(con, src, protocol)} FROM {src})"""
+            )
         unpivot_votes(con, src, mapping, f"votes_{rnd}", "candidate_id")
         if "gmina_totals" in spec:
             _fill_2015_totals(con, rnd, sources.load(f"prez_gmina_{rnd}", spec["gmina_totals"]))
@@ -173,7 +192,7 @@ def build_prezydent(con: duckdb.DuckDBPyConnection, sources: YearSources) -> lis
 
 
 def _fill_2015_totals(con: duckdb.DuckDBPyConnection, rnd: int, gmina_src: str) -> None:
-    """2015: candidate totals from precinct sums; keep the per-gmina file's totals for the check."""
+    """2010/2015: candidate totals from precinct sums; keep the per-gmina file's totals for the check."""
     headers = vote_columns(con, gmina_src)
     keys = dict(con.execute(f"SELECT nkey, candidate_id FROM cand_{rnd}").fetchall())
     selects = [
@@ -193,7 +212,7 @@ def _fill_2015_totals(con: duckdb.DuckDBPyConnection, rnd: int, gmina_src: str) 
     con.execute(
         f"""
         UPDATE prot_{rnd} p SET powiat = g."Powiat"
-        FROM {gmina_src} g WHERE lpad(trim(g."TERYT"), 6, '0') = p.teryt_gmina AND p.powiat IS NULL
+        FROM {gmina_src} g WHERE lpad(trim(g.{column(con, gmina_src, "TERYT", "Kod gm.")}), 6, '0') = p.teryt_gmina AND p.powiat IS NULL
         """
     )
     # Elected: over 50% of valid votes (round 1) or the most votes in the run-off (round 2).

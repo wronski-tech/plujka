@@ -10,15 +10,18 @@ from __future__ import annotations
 
 import duckdb
 
-from api.services.mart.build_common import BuildError, column, columns_of, normalize_header, quote_ident
+from api.services.mart.build_common import BuildError, column, columns_of, normalize_header, quote_ident, sql_literal
+
+# Address text of the combined row that stands for several precincts (see ``rows_without_number``).
+COMBINED_PRECINCTS = "%w ujęciu łącznym%"
 
 GEO_ALIASES = {
-    "teryt": ("TERYT gminy", "Kod TERYT", "TERYT Gminy", "Teryt Gminy", "Kod terytorialny gminy", "TERYT"),
-    "precinct_no": ("Numer obwodu", "Nr komisji", "Nr obwodu głosowania", "Nr obw.", "Numer"),
+    "teryt": ("TERYT gminy", "Kod TERYT", "TERYT Gminy", "Teryt Gminy", "Kod terytorialny gminy", "TERYT", "Kod gm."),
+    "precinct_no": ("Numer obwodu", "Nr komisji", "Nr obwodu głosowania", "Nr obw.", "Numer", "Nr obwodu"),
     "gmina": ("Gmina",),
     "powiat": ("Powiat",),
     "wojewodztwo": ("Województwo",),
-    "address": ("Siedziba", "Siedziba komisji", "Siedziba Obwodowej Komisji Wyborczej", "Adres"),
+    "address": ("Siedziba", "Siedziba komisji", "Siedziba Obwodowej Komisji Wyborczej", "Adres", "Adres obwodu"),
 }
 
 PROTOCOL_ALIASES = {
@@ -26,14 +29,18 @@ PROTOCOL_ALIASES = {
         "Liczba wyborców uprawnionych do głosowania",
         "Liczba osób uprawnionych do głosowania",
         "Liczba wyborców uprawnionych do głosowania (umieszczonych w spisie, z uwzględnieniem dodatkowych formularzy) w chwili zakończenia głosowania",
+        "Liczba uprawnionych do głosowania",  # EP 2014
+        "Uprawnieni do głosowania",  # president 2010
     ),
     "ballots_issued": (
         "Liczba wyborców, którym wydano karty do głosowania w lokalu wyborczym oraz w głosowaniu korespondencyjnym (łącznie)",
         "Liczba wyborców, którym wydano karty do głosowania",
         "Liczba osób, którym wydano karty do głosowania",
+        "Wydane karty do głosowania",  # EP 2014, president 2010
     ),
-    "valid_ballots": ("Liczba kart ważnych",),
-    "invalid_votes": ("Liczba głosów nieważnych", "Liczba głosów nieważnych (z kart ważnych)"),
+    # President 2010 has no separate count of valid ballots: 'Głosy oddane' (votes cast) = valid + invalid votes.
+    "valid_ballots": ("Liczba kart ważnych", "Karty ważne (głosy oddane)", "Głosy oddane"),
+    "invalid_votes": ("Liczba głosów nieważnych", "Liczba głosów nieważnych (z kart ważnych)", "Głosy nieważne"),
     "valid_votes": (
         "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów",
         "Liczba głosów ważnych oddanych łącznie na wszystkich kandydatów (z kart ważnych)",
@@ -41,6 +48,7 @@ PROTOCOL_ALIASES = {
         "Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów",
         "Liczba głosów ważnych oddanych łącznie na wszystkie listy kandydatów (z kart ważnych)",
         "Liczba głosów ważnych",
+        "Głosy ważne",  # EP 2014, president 2010
     ),
 }
 
@@ -69,6 +77,22 @@ def precinct_select(con: duckdb.DuckDBPyConnection, source: str, protocol: tuple
     for name in protocol:
         parts.append(f"CAST(int_({column(con, source, *PROTOCOL_ALIASES[name])}) AS INT) AS {name}")
     return ",\n".join(parts)
+
+
+def rows_without_number(con: duckdb.DuckDBPyConnection, files_by_district: dict[int, str], target: str) -> None:
+    """Create ``target(district_no, address)`` from rows of per-district result files without a precinct number.
+
+    The 2011 Sejm and Senate candidate files publish the military precincts abroad (numbers 1-8, 29,
+    116 and 264) as one combined row ('Wybrane obwody głosowania o numerach ..., w ujęciu łącznym').
+    Such rows have no precinct; builders count their votes towards the official totals only, and a
+    check fails on any other row without a number.
+    """
+    con.execute(f"CREATE OR REPLACE TABLE {target} (district_no INT, address VARCHAR)")
+    for district, path in files_by_district.items():
+        source = f"read_parquet({sql_literal(path)}, hive_partitioning = false)"
+        number = column(con, source, *GEO_ALIASES["precinct_no"])
+        address = column(con, source, *GEO_ALIASES["address"])
+        con.execute(f"INSERT INTO {target} SELECT {district}, {address} FROM {source} WHERE int_({number}) IS NULL")
 
 
 def vote_columns(con: duckdb.DuckDBPyConnection, source: str) -> list[str]:
