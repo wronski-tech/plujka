@@ -61,38 +61,75 @@ def fold(text: str) -> str:
     return text.lower().translate(_FOLD)
 
 
+def _word_stems(word: str) -> set[str]:
+    """Stems of one folded question word: the word and the word without one case ending."""
+    if len(word) < 3 or word in _STOPWORDS or word.isdigit():
+        return set()
+    stems = {word}
+    for ending in _ENDINGS:
+        if word.endswith(ending) and len(word) - len(ending) >= 3:
+            stems.add(word[: -len(ending)])
+            break
+    return stems
+
+
 def question_terms(question: str) -> tuple[set[str], set[str]]:
     """Return (stems for name matching, exact folded words for alias matching)."""
     words = [w for w in re.findall(r"[a-z0-9']+", fold(question).replace("-", " "))]
-    exact = set(words)
-    stems: set[str] = set()
-    for word in words:
-        if len(word) < 3 or word in _STOPWORDS or word.isdigit():
-            continue
-        stems.add(word)
-        for ending in _ENDINGS:
-            if word.endswith(ending) and len(word) - len(ending) >= 3:
-                stems.add(word[: -len(ending)])
-                break
-    return stems, exact
+    return {s for word in words for s in _word_stems(word)}, set(words)
 
 
-def _word_matches(word: str, stems: set[str]) -> bool:
-    """A name word matches when a stem is its prefix and leaves only a short ending uncovered.
+def _match_rest(word: str, stems: set[str]) -> int | None:
+    """Letters of ``word`` a stem leaves uncovered when it matches (None: no match).
 
     Stems of 4+ letters may leave up to 3 letters ("warszaw" -> "warszawa"); 3-letter stems at most
     one ("now" -> "nowy", but not "nowak"). Long words also match near-identical stems (ratio >= 0.88).
     """
+    best = None
     for stem in stems:
         if word.startswith(stem):
             rest = len(word) - len(stem)
             if rest <= 1 or (len(stem) >= 4 and rest <= 3):
-                return True
+                best = rest if best is None else min(best, rest)
         # Stem alternations that suffix stripping cannot undo ("bialymstok" -> "bialystok").
         # The shared 4-letter prefix keeps "krakowie" away from "krapkowice".
         elif len(word) >= 6 and word[:4] == stem[:4] and SequenceMatcher(None, word, stem).ratio() >= 0.88:
+            best = 3 if best is None else best
+    return best
+
+
+def _word_matches(word: str, stems: set[str]) -> bool:
+    """A name word matches when a stem is its prefix and leaves only a short ending uncovered."""
+    return _match_rest(word, stems) is not None
+
+
+def surname_mentioned(name: str, question: str, alias_words: set[str] = frozenset()) -> bool:
+    """Whether ``question`` names the person ``name`` ('Given Names SURNAME'), not a look-alike word.
+
+    Each surname word must be matched by a question word other than the one naming a given name
+    ("Rafał Trzaskowski" is not Rafał RAFALSKI). When the question has none of the person's given
+    names, that word must also be capitalized ("w gminach" is not GMIŃSKI, "turę" is not TUR) and
+    closer to the surname than to any committee alias word ("Lewicy" is Lewica, not LEWICKI); on a
+    tie it must be written like a name ("Kukiz" is the person too, "PiS" only the party, not PIŚ).
+    """
+    parts = name.split()
+    given = [fold(w) for w in parts if not (w.isupper() and len(w) > 1)]
+    surname = [fold(p) for w in parts if w.isupper() and len(w) > 1 for p in w.split("-") if p]
+    words = [(raw, _word_stems(fold(raw))) for raw in re.findall(r"[^\W_]+", question)]
+    named = any(_word_matches(g, stems) for g in given for _, stems in words)
+
+    def names(part: str, raw: str, stems: set[str]) -> bool:
+        rest = _match_rest(part, stems)
+        if rest is None or any(_word_matches(g, stems) for g in given):
+            return False
+        if named:
             return True
-    return False
+        alias_rest = min((r for a in alias_words if (r := _match_rest(a, stems)) is not None), default=None)
+        # A tie with an alias keeps the person only when written like a name ("Kukiz", not "PiS").
+        closer = alias_rest is None or rest < alias_rest or (rest == alias_rest and raw[1:].islower())
+        return raw[:1].isupper() and closer
+
+    return bool(surname) and all(any(names(part, raw, stems) for raw, stems in words) for part in surname)
 
 
 def score_entry(kind: str, folded: str, stems: set[str], exact: set[str]) -> bool:
@@ -132,9 +169,10 @@ def resolve_entities(question: str, conn: psycopg.Connection | None = None) -> l
         if own:
             conn.close()
 
+    alias_words = {w for kind, _, folded, *_ in rows if kind == "committee" for w in re.split(r"[\s\-]+", folded) if w}
     by_kind: dict[str, list[EntityMatch]] = {}
     for kind, name, folded, ref, detail, years in rows:
-        if score_entry(kind, folded, stems, exact):
+        if score_entry(kind, folded, stems, exact) and (kind != "person" or surname_mentioned(name, question, alias_words)):
             by_kind.setdefault(kind, []).append(EntityMatch(kind, name, ref, detail, list(years)))
     matches: list[EntityMatch] = []
     for kind in sorted(by_kind):

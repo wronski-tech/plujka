@@ -497,8 +497,12 @@ would answer it from Sejm data.
 
 1. **Entity resolution** (`mart/entities.py`). Question words are folded (lower case, no diacritics),
    common Polish endings are stripped, and the result is matched against `entity_lexicon`: "w
-   Krakowie" becomes `m. Kraków (teryt_gmina = '126101')`. Persons whose given name appears in the
-   question are kept first; then those elected more often. `narrow_matches` drops matches the
+   Krakowie" becomes `m. Kraków (teryt_gmina = '126101')`. A person needs a question word that
+   names the surname (`entities.surname_mentioned`): not the word that matched a given name, and,
+   without a given name in the question, a capitalized word closer to the surname than to any
+   committee alias ("w gminach" is not GMIŃSKI, "turę" not TUR, "PiS" not PIŚ, "Lewicy" not
+   LEWICKI; "Kukiz" is both). A lower-case surname alone ("tusk") is left to SQL on `full_name`.
+   Persons whose given name appears in the question are kept first; then those elected more often. `narrow_matches` drops matches the
    question rules out (other given names, surnames that are matched places, places named like the
    given name of a matched person).
 2. **Clarification.** If several persons or same-name gminas remain, the API returns

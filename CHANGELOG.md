@@ -60,6 +60,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Entity resolution: a person matches only through a word that names the surname (capitalized and not a party name when no given name is given, never the given-name word), so common words such as "w gminach", "turę", "zdobyły" or "PiS" no longer suggest persons (Gmiński, Tur, Zdobylak, Piś).
+- Persons: the EP 2014 candidate and local candidate from Głowaczów is no longer merged with former president Aleksander Kwaśniewski (`person_overrides.csv`).
 - `v_person_history` is a materialized view with indexes on `person_id` and `full_name` (trigram): person questions take milliseconds instead of 1.4 s.
 - SQL guard also rejects quoted system functions (`"pg_read_file"(...)`) and sequence functions (`nextval`, `setval`, ...).
 

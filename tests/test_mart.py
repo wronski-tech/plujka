@@ -159,6 +159,25 @@ class TestEntityTerms(unittest.TestCase):
         self.assertTrue(self.matches("Ile głosów miał PiS?", "committee", "PiS"))
         self.assertFalse(self.matches("gmina Pisz", "committee", "PiS"))
 
+    def test_surname_needs_a_word_that_names_the_person(self) -> None:
+        aliases = {"pis", "lewica", "kukiz", "kukiz'15", "ko"}
+        named = lambda name, question: entities.surname_mentioned(name, question, aliases)  # noqa: E731
+        # Lower-case common words only look like surnames.
+        self.assertFalse(named("Jakub Marek GMIŃSKI", "W których gminach KO wygrała?"))
+        self.assertFalse(named("Zbigniew TUR", "Kto wygrał drugą turę w 2010?"))
+        self.assertFalse(named("Robert ZDOBYLAK", "Ile mandatów zdobyły komitety?"))
+        # A party name is the party: "PiS" is not PIŚ, "Lewicy" is Lewica, not LEWICKI.
+        self.assertFalse(named("Jerzy PIŚ", "Wynik PiS w powiatach"))
+        self.assertFalse(named("Jan LEWICKI", "Wynik Lewicy na wsi"))
+        # The word naming the given name does not also name the surname.
+        self.assertFalse(named("Rafał RAFALSKI", "Ile głosów dostał Rafał Trzaskowski?"))
+        self.assertTrue(named("Rafał Kazimierz TRZASKOWSKI", "Ile głosów dostał Rafał Trzaskowski?"))
+        # Real surnames still match: capitalized, lower case with a given name, hyphenated, party namesakes.
+        self.assertTrue(named("Donald TUSK", "W których wyborach startował Tusk?"))
+        self.assertTrue(named("Jarosław Aleksander KACZYŃSKI", "ile głosów dostał jarosław kaczyński"))
+        self.assertTrue(named("Hanna GRONKIEWICZ-WALTZ", "Gdzie startowała Gronkiewicz-Waltz?"))
+        self.assertTrue(named("Paweł KUKIZ", "Ile głosów dostał Kukiz?"))
+
 
 class TestStrictStaging(unittest.TestCase):
     def setUp(self) -> None:
