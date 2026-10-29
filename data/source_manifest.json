@@ -1,4 +1,235 @@
 {
+ "1990/prezydent/1990-zagranica.xls": {
+  "bytes": 77312,
+  "etag": "\"4eb27bc8-12e00\"",
+  "last_modified": "Thu, 03 Nov 2011 11:32:24 GMT",
+  "sha256": "3b53af61b4bd30afc8194453e50b5009e2bdd1c24ca555f231a8f4d8d387a77a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1990/prezydent/1990-zagranica.xls"
+ },
+ "1990/prezydent/prez1990gm-proc.xls": {
+  "bytes": 768000,
+  "etag": "\"58b05bd8-bb800\"",
+  "last_modified": "Fri, 24 Feb 2017 16:14:16 GMT",
+  "sha256": "c16257941e928490aebcded30ba09759ee74a4ca65b263f7cc2c3912461a1f2f",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1990/prezydent/prez1990gm-proc.xls"
+ },
+ "1990/prezydent/prez1990gm.xls": {
+  "bytes": 510464,
+  "etag": "\"58b05bfa-7ca00\"",
+  "last_modified": "Fri, 24 Feb 2017 16:14:50 GMT",
+  "sha256": "1679558b2bfe21390891f492452db06bac7c1a61d85db85f1e5e68e083c66514",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1990/prezydent/prez1990gm.xls"
+ },
+ "1990/prezydent/prez1990obwody.zip": {
+  "bytes": 2779279,
+  "etag": "\"61c374a4-2a688f\"",
+  "last_modified": "Wed, 22 Dec 2021 18:55:32 GMT",
+  "sha256": "b8c4720ebb5ff2afef211380935fe9ff44a504849f0b208ee20a0a46ddee77e0",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1990/prezydent/prez1990obwody.zip"
+ },
+ "1990/prezydent/prez90kraj.zip": {
+  "bytes": 1816810,
+  "etag": "\"61e6c0b2-1bb8ea\"",
+  "last_modified": "Tue, 18 Jan 2022 13:29:22 GMT",
+  "sha256": "da728b3190ad8ecd34c00aacc288b89335178cd0808b40ff6955d9c9950394f8",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1990/prezydent/prez90kraj.zip"
+ },
+ "1990/prezydent/zagr-i-statki90.xls": {
+  "bytes": 83968,
+  "etag": "\"44a3b7d3-14800\"",
+  "last_modified": "Thu, 29 Jun 2006 11:21:55 GMT",
+  "sha256": "fcbbcc8c183846942acbcb0e5d64c38c6499a07aee09f3e6289f68970838f8b3",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1990/prezydent/zagr-i-statki90.xls"
+ },
+ "1991/sejm/1991-listy-obwody.xls": {
+  "bytes": 12413440,
+  "etag": "\"4d4a94a9-bd6a00\"",
+  "last_modified": "Thu, 03 Feb 2011 11:42:33 GMT",
+  "sha256": "7d23e2385fb95e3724c061692b2ba956ae7a190d89fb6ab86b0fc8cb218a3049",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1991/sejm/1991-listy-obwody.xls"
+ },
+ "1991/sejm/kandsejm1991kom.xls": {
+  "bytes": 1708544,
+  "etag": "\"6103f558-1a1200\"",
+  "last_modified": "Fri, 30 Jul 2021 12:49:28 GMT",
+  "sha256": "66076ecc9e6637d2d4cb9d83687882992f4a65bb30114eb7fa3c5863d02bf0bf",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1991/sejm/kandsejm1991kom.xls"
+ },
+ "1991/sejm/okreg1991sejm.xls": {
+  "bytes": 49152,
+  "etag": "\"60e846ff-c000\"",
+  "last_modified": "Fri, 09 Jul 2021 12:54:23 GMT",
+  "sha256": "73a3fa42136bee508046b200ae5add9d599542df43036101bf99c619ecdebe69",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1991/sejm/okreg1991sejm.xls"
+ },
+ "1991/sejm/sejm1991.zip": {
+  "bytes": 1150899,
+  "etag": "\"61c35f88-118fb3\"",
+  "last_modified": "Wed, 22 Dec 2021 17:25:28 GMT",
+  "sha256": "2e3a6d6394e033fe16d2ae5188948c35f6fef0157ddebbbc07e5f7bd50a26094",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1991/sejm/sejm1991.zip"
+ },
+ "1991/senat/KANSEN1991.xls": {
+  "bytes": 230912,
+  "etag": "\"5f77040e-38600\"",
+  "last_modified": "Fri, 02 Oct 2020 10:42:22 GMT",
+  "sha256": "d1ec1b46dcac4b5889b328a4fdd036deb11dfcd345d3006afd76d9e62f3fe3b4",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1991/senat/KANSEN1991.xls"
+ },
+ "1993/sejm/1993-listy-obw.zip": {
+  "bytes": 2750222,
+  "etag": "\"62066224-29f70e\"",
+  "last_modified": "Fri, 11 Feb 2022 13:18:28 GMT",
+  "sha256": "aec04242b6eccca0ea1d7ab9dcd93940e8f03073b7d0b7eaae881b6e91cb35bd",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1993/sejm/1993-listy-obw.zip"
+ },
+ "1993/sejm/kandsejm1993kom.xls": {
+  "bytes": 2162176,
+  "etag": "\"5d8891d6-20fe00\"",
+  "last_modified": "Mon, 23 Sep 2019 09:35:18 GMT",
+  "sha256": "c54cc2de6876a311e1a2149eb2b9a8eaa08d395a13e0eb94dcca41c280ee38c3",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1993/sejm/kandsejm1993kom.xls"
+ },
+ "1993/sejm/okregi1993.xls": {
+  "bytes": 50176,
+  "etag": "\"6107e64b-c400\"",
+  "last_modified": "Mon, 02 Aug 2021 12:34:19 GMT",
+  "sha256": "a040c3d86576380e3330924f4596edf7a1176345be296f2e21e6703efe7699ba",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1993/sejm/okregi1993.xls"
+ },
+ "1993/senat/1993-frekw-gm.xls": {
+  "bytes": 444928,
+  "etag": "\"4d9af998-6ca00\"",
+  "last_modified": "Tue, 05 Apr 2011 11:14:32 GMT",
+  "sha256": "95efd711af72cb2bc4ba5dec401fcf4e56dd2edc4e01b599e07eeace45145f67",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1993/senat/1993-frekw-gm.xls"
+ },
+ "1993/senat/KANSEN1993.xls": {
+  "bytes": 227840,
+  "etag": "\"5da9af1e-37a00\"",
+  "last_modified": "Fri, 18 Oct 2019 12:25:02 GMT",
+  "sha256": "59b8887e44f1390d2bec5726dcfad4b72882348b815b026a777dc8629323e322",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1993/senat/KANSEN1993.xls"
+ },
+ "1993/senat/senat1993.zip": {
+  "bytes": 3711787,
+  "etag": "\"61c3716f-38a32b\"",
+  "last_modified": "Wed, 22 Dec 2021 18:41:51 GMT",
+  "sha256": "c8a83e7e4dc3ae8a7786bbd902c307296b60e63fdffe8e6314a6b6d58a5cfe6c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1993/senat/senat1993.zip"
+ },
+ "1995/prezydent/Prez1995.zip": {
+  "bytes": 3637772,
+  "etag": "\"61c37312-37820c\"",
+  "last_modified": "Wed, 22 Dec 2021 18:48:50 GMT",
+  "sha256": "7e346c2c059a84eab1ca0ea1ff960d8b8d473f27a922fdca733903f01cdafb40",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1995/prezydent/Prez1995.zip"
+ },
+ "1996/referendum/ref96gm.xlsx": {
+  "bytes": 595834,
+  "etag": "\"61f3ea24-9177a\"",
+  "last_modified": "Fri, 28 Jan 2022 13:05:40 GMT",
+  "sha256": "a6205c42fb710d4c34d9fe1d5bdf8feac9dd8359623d5bfd0630e447dcafac69",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1996/ref96gm.xlsx"
+ },
+ "1996/referendum/ref96obw.xlsx": {
+  "bytes": 5379107,
+  "etag": "\"61f3ea49-521423\"",
+  "last_modified": "Fri, 28 Jan 2022 13:06:17 GMT",
+  "sha256": "dc05a460bf6cee4bb3f678bbbafaf605af5e8c0b8c84b9bc03e5a444938168b2",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1996/ref96obw.xlsx"
+ },
+ "1997/referendum/Ref1997.zip": {
+  "bytes": 1710886,
+  "etag": "\"6005536b-1a1b26\"",
+  "last_modified": "Mon, 18 Jan 2021 09:22:51 GMT",
+  "sha256": "fd01024a225b198c5544394c03769bd2f8f7961dcc978fc3b9385978df3dadea",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/referendum/Ref1997.zip"
+ },
+ "1997/sejm/kandsejm1997pop.xls": {
+  "bytes": 1781760,
+  "etag": "\"61c378f8-1b3000\"",
+  "last_modified": "Wed, 22 Dec 2021 19:14:00 GMT",
+  "sha256": "c4f3b097859154c831fdb4b78dfbd05a195603cffb9befc3f3183975ab2cfc88",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/sejm/kandsejm1997pop.xls"
+ },
+ "1997/sejm/sejm1997obw.xls": {
+  "bytes": 8088064,
+  "etag": "\"58de225f-7b6a00\"",
+  "last_modified": "Fri, 31 Mar 2017 09:33:19 GMT",
+  "sha256": "b57213b901c56ac9e59a8e6377bf1c42fc8323013500893eeec27402f53be0a0",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/sejm/sejm1997obw.xls"
+ },
+ "1997/sejm/sejm1997okregi.xls": {
+  "bytes": 85504,
+  "etag": "\"61ea61b9-14e00\"",
+  "last_modified": "Fri, 21 Jan 2022 07:33:13 GMT",
+  "sha256": "412e5b58454ecdf70b974a0464e4164b29147430fe7e4ab8ba5b79bc5c0da491",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/sejm/sejm1997okregi.xls"
+ },
+ "1997/senat/ksenat1997pop.xls": {
+  "bytes": 232960,
+  "etag": "\"61c37a3c-38e00\"",
+  "last_modified": "Wed, 22 Dec 2021 19:19:24 GMT",
+  "sha256": "a275fa0c19827ceaa3baff936e7499ee7895106642c422e58f8669485379d2be",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/senat/ksenat1997pop.xls"
+ },
+ "1997/senat/obwsenat97.zip": {
+  "bytes": 2631736,
+  "etag": "\"61c37026-282838\"",
+  "last_modified": "Wed, 22 Dec 2021 18:36:22 GMT",
+  "sha256": "6cc8cad738c6b8ee58e1019551f6211283261915761a2bb9e2683cc4532ccb7c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/senat/obwsenat97.zip"
+ },
+ "1997/senat/senat1997okr.xls": {
+  "bytes": 33792,
+  "etag": "\"63ce6e3a-8400\"",
+  "last_modified": "Mon, 23 Jan 2023 11:23:38 GMT",
+  "sha256": "d0ce13f2672477bec99e7bf8eb37d880e370fd98d38134484704afaa2e89435d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/senat/senat1997okr.xls"
+ },
+ "1998/samorzad/1998-kand-rady.xlsx": {
+  "bytes": 29072640,
+  "etag": "\"62065757-1bb9d00\"",
+  "last_modified": "Fri, 11 Feb 2022 12:32:23 GMT",
+  "sha256": "87cc1c39a98bc986dfdcd69edd01ffad658d037abea525d64d14f62be07ac4de",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1998/1998-kand-rady.xlsx"
+ },
+ "1998/samorzad/rada_gminy/1998_rady_gmin.zip": {
+  "bytes": 18292579,
+  "etag": "\"63075d4f-1171f63\"",
+  "last_modified": "Thu, 25 Aug 2022 11:30:23 GMT",
+  "sha256": "e041a5a6fed258d1f8daa3b4758a3c8b1d4ce59f67f29c8a287d75828fe37de6",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1998/rada_gminy/1998_rady_gmin.zip"
+ },
+ "1998/samorzad/rada_powiatu/1998pow.zip": {
+  "bytes": 8131530,
+  "etag": "\"61dc2611-7c13ca\"",
+  "last_modified": "Mon, 10 Jan 2022 12:26:57 GMT",
+  "sha256": "fb0a95dc46be8304213cd86667af85e2cb3003e516e57a9e019505bdde77f7d8",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1998/rada_powiatu/1998pow.zip"
+ },
+ "1998/samorzad/sejmik/1998.zip": {
+  "bytes": 1898859,
+  "etag": "\"61c3642c-1cf96b\"",
+  "last_modified": "Wed, 22 Dec 2021 17:45:16 GMT",
+  "sha256": "905e6b209b9b56330cefcaf5aec9be94458354858bc7c8bc21241cfd8a845eb9",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1998/sejmik/1998.zip"
+ },
+ "1998/samorzad/sejmik/1998mazowieckie.xls": {
+  "bytes": 209408,
+  "etag": "\"61e55be7-33200\"",
+  "last_modified": "Mon, 17 Jan 2022 12:07:03 GMT",
+  "sha256": "4b941dac37a287b458461f3e151d11cabbac4328dcb6fec1be1338f544580f8c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1998/sejmik/1998mazowieckie.xls"
+ },
+ "1998/samorzad/sejmik/1998woj.zip": {
+  "bytes": 5285876,
+  "etag": "\"61dc258a-50a7f4\"",
+  "last_modified": "Mon, 10 Jan 2022 12:24:42 GMT",
+  "sha256": "216aeebba58a872bec8c7b23d40da97f639e432acebaef2f46c6e58aadf32b61",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1998/sejmik/1998woj.zip"
+ },
  "2000/prezydent/gm-kraj2000-proc.xls": {
   "bytes": 906240,
   "etag": "\"5412ff1a-dd400\"",
