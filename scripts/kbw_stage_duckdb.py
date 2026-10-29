@@ -267,11 +267,37 @@ def unique_headers(raw_headers: list[str]) -> list[str]:
     return out
 
 
+def is_unit_row(row: list[str]) -> bool:
+    """Whether a row only names units (``'liczba'``, ``'%'``, ``'% (frekwencja)'``) under the header."""
+    cells = [re.sub(r"\s+", " ", cell).strip() for cell in row if cell.strip()]
+    return bool(cells) and all(re.fullmatch(r"liczba|%.*", cell) for cell in cells)
+
+
+def fold_unit_row(header: list[str], units: list[str]) -> list[str]:
+    """Header cells with the unit row below them folded in (2005 tables with numbers and percents).
+
+    ``['Głosy ważne', '']`` over ``['liczba', '%']`` -> ``['Głosy ważne - liczba', 'Głosy ważne - %']``:
+    the header cell spans its unit columns, so a unit under an empty header cell belongs to the
+    nearest labelled column on its left. Columns without a unit keep their header.
+    """
+    if len(units) > len(header):
+        raise StagingError(f"unit row has {len(units)} fields, header has {len(header)}")
+    out, label = [], ""
+    for index, cell in enumerate(header):
+        unit = re.sub(r"\s+", " ", units[index]).strip() if index < len(units) else ""
+        label = cell.strip() or label
+        if unit and not label:
+            raise StagingError(f"unit {unit!r} in column {index} has no header cell on its left")
+        out.append(f"{label} - {unit}" if unit else cell)
+    return out
+
+
 def _write_sheet(table: list[list[str]], parquet_path: Path) -> int:
     """Write one worksheet (header in row 1) to Parquet; return the number of data rows.
 
     Title rows above the header (at most one non-empty cell, 2011 per-precinct workbooks) are
-    skipped, and a group-header row is folded into the header as in ``strip_preamble``.
+    skipped, a group-header row is folded into the header as in ``strip_preamble``, and a unit row
+    below the header (2005: ``'liczba'`` / ``'%'``) is folded into it with ``fold_unit_row``.
     """
     filled = [sum(1 for cell in row if cell.strip()) for row in table[:5]]
     start = next((i for i, n in enumerate(filled) if n > 1), 0)  # single-column sheets keep row 1
@@ -280,6 +306,9 @@ def _write_sheet(table: list[list[str]], parquet_path: Path) -> int:
         group, header = table[start], table[start + 1]
         start += 1
         header = fold_group_header(group + [""] * (len(header) - len(group)), header)
+    if start + 1 < len(table) and is_unit_row(table[start + 1]):
+        header = fold_unit_row(header, table[start + 1])
+        start += 1
     headers = unique_headers(header)
     rows = [row for row in table[start + 1 :] if any(cell.strip() for cell in row)]
     columns = {
