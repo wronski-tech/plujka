@@ -206,6 +206,108 @@ class TestPersonLinking(unittest.TestCase):
             finally:
                 conn.rollback()
 
+    def test_national_namesakes_and_abbreviated_names(self) -> None:
+        import psycopg
+
+        from api.services.config import DATABASE_URL
+
+        with psycopg.connect(DATABASE_URL) as conn:
+            try:
+                self._fixture(conn)
+                sejm = [  # year, id, district, full name, first names, residence, residence_teryt, occupation, age
+                    # 1991 gives only the first given name; birth years 1957 link Gdańsk to Sopot.
+                    (1991, 100, 25, "Donald TUSK", "Donald", "Gdańsk", None, "dziennikarz", 34),
+                    (1993, 100, 25, "Donald Franciszek TUSK", "Donald Franciszek", "Sopot", None, "historyk", 36),
+                    # Same place, no ages: linked. No evidence: not linked. Birth years 20 apart: not linked.
+                    (1991, 101, 10, "Marek WRONA", "Marek", "Kłodzko", None, "rolnik", None),
+                    (2005, 101, 10, "Marek Jan WRONA", "Marek Jan", "Kłodzko", None, "rolnik", None),
+                    # From 2011 one given name is the full name: a namesake beside Marek Jan in 2011.
+                    (2011, 101, 10, "Marek Jan WRONA", "Marek Jan", "Kłodzko", None, "rolnik", None),
+                    (2011, 102, 26, "Marek WRONA", "Marek", "Gdynia", None, "kierowca", None),
+                    (1991, 102, 11, "Jan NOWICKI", "Jan", "Lublin", None, "lekarz", None),
+                    (2005, 102, 11, "Jan Piotr NOWICKI", "Jan Piotr", "Radom", None, "lekarz", None),
+                    (1991, 103, 12, "Ewa LIS", "Ewa", "Opole", None, "nauczyciel", 30),
+                    (1993, 103, 12, "Ewa Maria LIS", "Ewa Maria", "Opole", None, "nauczyciel", 52),
+                    # One given name, residences in voivodeships 02 and 12, unlike occupations: two persons.
+                    (2011, 104, 1, "Andrzej KOT", "Andrzej", "Bolesławiec", None, "rolnik", None),
+                    (2015, 104, 1, "Andrzej KOT", "Andrzej", "Bolesławiec", None, "rolnik", None),
+                    (2019, 104, 13, "Andrzej KOT", "Andrzej", "Kraków", "126101", "informatyk", None),
+                    # The same, but alike occupations: one person (moved).
+                    (2015, 105, 1, "Anna KOT", "Anna", "Bolesławiec", None, "lekarz", None),
+                    (2019, 105, 13, "Anna KOT", "Anna", "Kraków", "126101", "lekarz weterynarii", None),
+                    # Birth years 1931 and 1963 in different places: two persons; 1997 joins by place.
+                    (1991, 106, 13, "Jerzy MAZUR", "Jerzy", "Kraków", None, "emeryt", 60),
+                    (1993, 106, 13, "Jerzy MAZUR", "Jerzy", "Wieliczka", None, "student", 30),
+                    (1997, 106, 13, "Jerzy MAZUR", "Jerzy", "Wieliczka", None, "prawnik", None),
+                    # Birth years 7 apart in the same place: a register error, one person.
+                    (1991, 107, 13, "Jerzy GAJ", "Jerzy", "Kraków", None, "prawnik", 50),
+                    (1993, 107, 13, "Jerzy GAJ", "Jerzy", "Kraków", None, "prawnik", 45),
+                    # Namesakes of one election with the same residence: a person each.
+                    (1991, 108, 1, "Jan KAMIŃSKI", "Jan", "Warszawa", None, "inżynier", None),
+                    (1991, 109, 2, "Jan KAMIŃSKI", "Jan", "Warszawa", None, "inżynier", None),
+                    # Local candidacies below: born 1984 (too young for the Sejm in 1991), born 1966 (1957 here).
+                    (1991, 110, 5, "Lech ROGALA", "Lech", "Opole", None, "rolnik", None),
+                    (1997, 111, 5, "Zofia BUK", "Zofia", "Opole", None, "rolnik", 40),
+                ]
+                conn.cursor().executemany(
+                    "INSERT INTO mart.sejm_candidates (year, candidate_id, district_no, committee_id, list_no, list_position,"
+                    " full_name, last_name, first_names, gender, residence, residence_teryt, occupation, age, votes, elected)"
+                    " VALUES (%s, %s, %s, 1, 1, 3, %s, upper(split_part(%s, ' ', -1)), %s,"
+                    " CASE WHEN %s ~ '^(Ewa|Anna|Zofia) ' THEN 'Kobieta' ELSE 'Mężczyzna' END, %s, %s, %s, %s, 10, false)",
+                    [(y, i, d, n, n, f, n, r, t, o, a) for y, i, d, n, f, r, t, o, a in sejm],
+                )
+                conn.execute(
+                    "INSERT INTO mart.senat_candidates (year, candidate_id, district_no, committee_name, full_name, last_name,"
+                    " first_names, gender, residence, votes, elected)"
+                    " VALUES (2001, 100, 30, 'X', 'Donald Franciszek TUSK', 'TUSK', 'Donald Franciszek', 'Mężczyzna', 'Sopot', 10, true)"
+                )
+                conn.cursor().executemany(
+                    "INSERT INTO mart.rada_candidates (year, candidate_id, council_level, teryt, district_no, committee_id,"
+                    " full_name, last_name, first_names, gender, age, elected) VALUES (%s, %s, 'gmina', '160101', 1, 1, %s, %s, %s, %s, %s, false)",
+                    [(2024, 100, "Lech ROGALA", "ROGALA", "Lech", "Mężczyzna", 40),
+                     (2018, 101, "Zofia BUK", "BUK", "Zofia", "Kobieta", 52)],
+                )
+                self._link(conn, "")
+
+                def ids(year: int, name: str) -> list:
+                    return [r[0] for r in conn.execute(
+                        "SELECT person_id FROM mart.sejm_candidates WHERE year = %s AND full_name = %s ORDER BY candidate_id",
+                        (year, name)).fetchall()]
+
+                def rule(person_id: int) -> str:
+                    return conn.execute("SELECT match_rule FROM mart.persons WHERE person_id = %s", (person_id,)).fetchone()[0]
+
+                tusk = self._person(conn, "sejm_candidates", 1991, "Donald TUSK")
+                self.assertEqual(self._person(conn, "sejm_candidates", 1993, "Donald Franciszek TUSK"), tusk)
+                self.assertEqual(self._person(conn, "senat_candidates", 2001, "Donald Franciszek TUSK"), tusk)
+                self.assertEqual(rule(tusk), "surname+first given name+gender")
+                self.assertEqual(conn.execute("SELECT full_name FROM mart.persons WHERE person_id = %s", (tusk,)).fetchone()[0],
+                                 "Donald Franciszek TUSK")
+                self.assertEqual(ids(1991, "Marek WRONA"), ids(2005, "Marek Jan WRONA"))
+                self.assertEqual(ids(2005, "Marek Jan WRONA"), ids(2011, "Marek Jan WRONA"))
+                self.assertNotEqual(ids(2011, "Marek WRONA"), ids(2011, "Marek Jan WRONA"))
+                self.assertNotEqual(ids(1991, "Jan NOWICKI"), ids(2005, "Jan Piotr NOWICKI"))
+                self.assertNotEqual(ids(1991, "Ewa LIS"), ids(1993, "Ewa Maria LIS"))
+                kot = ids(2011, "Andrzej KOT") + ids(2015, "Andrzej KOT") + ids(2019, "Andrzej KOT")
+                self.assertEqual(kot[0], kot[1])
+                self.assertNotEqual(kot[1], kot[2])
+                self.assertEqual(rule(kot[2]), "name+gender+voivodeship")
+                self.assertEqual(ids(2015, "Anna KOT"), ids(2019, "Anna KOT"))
+                mazur = ids(1991, "Jerzy MAZUR") + ids(1993, "Jerzy MAZUR") + ids(1997, "Jerzy MAZUR")
+                self.assertNotEqual(mazur[0], mazur[1])
+                self.assertEqual(mazur[1], mazur[2])
+                self.assertEqual(rule(mazur[0]), "name+gender+birth year")
+                self.assertEqual(ids(1991, "Jerzy GAJ"), ids(1993, "Jerzy GAJ"))
+                self.assertEqual(len(set(ids(1991, "Jan KAMIŃSKI"))), 2)
+                # Local namesakes whose birth year contradicts the national candidacy become local persons.
+                for year, name in ((2024, "Lech ROGALA"), (2018, "Zofia BUK")):
+                    national = self._person(conn, "sejm_candidates", 1991 if year == 2024 else 1997, name)
+                    local = self._person(conn, "rada_candidates", year, name)
+                    self.assertNotEqual(local, national)
+                    self.assertTrue(rule(local).startswith("local:"))
+            finally:
+                conn.rollback()
+
     def test_override_matching_nothing_fails(self) -> None:
         import psycopg
 

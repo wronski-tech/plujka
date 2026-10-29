@@ -6,7 +6,8 @@ import json
 import unittest
 
 from streamlit_app.map_units import (
-    GEO_DIR, boundaries, is_additive, is_osm, teryt_changes, unit_values, visible_features,
+    GEO_DIR, boundaries, feature_key, is_additive, is_osm, pre1999_codes, teryt_changes, unit_values,
+    visible_features, voivodeship_level,
 )
 
 DISTRICTS = [f"1465{n:02d}" for n in range(2, 20)]
@@ -15,7 +16,22 @@ DISTRICTS = [f"1465{n:02d}" for n in range(2, 20)]
 def drawn_codes(codes: set[str], level: str = "gminy", years: set[int] | None = None) -> list[tuple[str, bool]]:
     """(teryt, is former extent) of the features drawn for the result codes and years."""
     return [(f["properties"]["teryt"], "parts" in f["properties"])
-            for f in visible_features(boundaries(level)["features"], codes, years)]
+            for f in visible_features(boundaries(level)["features"], codes, years, level)]
+
+
+def contains(geometry: dict, lon: float, lat: float) -> bool:
+    """Point in (Multi)Polygon by ray casting (outer rings minus holes)."""
+    def in_ring(ring: list) -> bool:
+        inside = False
+        for (x1, y1), (x2, y2) in zip(ring, ring[1:] + ring[:1]):
+            if (y1 > lat) != (y2 > lat) and lon < x1 + (lat - y1) * (x2 - x1) / (y2 - y1):
+                inside = not inside
+        return inside
+    polygons = geometry["coordinates"] if geometry["type"] == "MultiPolygon" else [geometry["coordinates"]]
+    return any(in_ring(p[0]) and not any(in_ring(h) for h in p[1:]) for p in polygons)
+
+
+PRE1999 = json.loads((GEO_DIR / "gminy_pre1999.json").read_text(encoding="utf-8"))
 
 
 class TestTerytChanges(unittest.TestCase):
@@ -212,6 +228,119 @@ class TestYears2000To2003(unittest.TestCase):
         rows = [{"year": 1998, "teryt_gmina": "143101", "votes": 5}, {"year": 1998, "teryt_gmina": "143118", "votes": 7}]
         values, _, _ = unit_values(rows, "teryt_gmina", "votes", "gminy")
         self.assertEqual(values, {"146502": 5, "146517": 7})
+
+
+class TestVoivodeships1975(unittest.TestCase):
+    def test_level_needs_old_year_or_old_name(self) -> None:
+        self.assertEqual(voivodeship_level([{"year": 1995, "wojewodztwo": "łódzkie"}, {"year": 1995, "wojewodztwo": "opolskie"}]),
+                         "wojewodztwa_1975")
+        self.assertEqual(voivodeship_level([{"wojewodztwo": "katowickie"}, {"wojewodztwo": "łódzkie"}]), "wojewodztwa_1975")
+        # The 1998 sejmik and results without a year naming only shared names use the 16 voivodeships.
+        self.assertEqual(voivodeship_level([{"year": 1998, "wojewodztwo": "łódzkie"}, {"year": 1998, "wojewodztwo": "opolskie"}]),
+                         "wojewodztwa")
+        self.assertEqual(voivodeship_level([{"wojewodztwo": "łódzkie"}, {"wojewodztwo": "lubelskie"}]), "wojewodztwa")
+        self.assertEqual(voivodeship_level([{"year": 1995, "wojewodztwo": "mazowieckie"}]), "wojewodztwa")
+
+    def test_every_gmina_belongs_to_one_old_voivodeship(self) -> None:
+        voivodeships = PRE1999["voivodeships"]
+        self.assertEqual(len(voivodeships), 49)
+        assigned = [g for v in voivodeships.values() for g in v["gminy"]]
+        self.assertEqual(len(assigned), len(set(assigned)))
+        public = {f["properties"]["teryt"] for f in boundaries("gminy")["features"] if not is_osm(f)
+                  and ("parts" not in f["properties"] or f["properties"]["teryt"] in ("146501", "120705", "200209"))}
+        self.assertEqual(set(assigned), public)
+        self.assertEqual(PRE1999["unassigned"], [])
+        names = {f["properties"]["name"] for f in boundaries("wojewodztwa_1975")["features"]}
+        self.assertEqual(names, {v["name"] for v in voivodeships.values()})
+
+    def test_president_1995_colours_49_voivodeships(self) -> None:
+        rows = [{"year": 1995, "round": 2, "wojewodztwo": v["name"], "pct": 50.0 + n}
+                for n, v in enumerate(PRE1999["voivodeships"].values())]
+        self.assertEqual(voivodeship_level(rows), "wojewodztwa_1975")
+        values, merged, skipped = unit_values(rows, "wojewodztwo", "pct", "wojewodztwa_1975")
+        shown = visible_features(boundaries("wojewodztwa_1975")["features"], set(values), {1995}, "wojewodztwa_1975")
+        self.assertEqual(len({feature_key(f["properties"], "wojewodztwa_1975") for f in shown} & set(values)), 49)
+        self.assertEqual((merged, skipped), ({}, []))
+        # Brzeszcze (today małopolskie) was in katowickie, Szerzyny (today małopolskie) in tarnowskie.
+        katowickie = next(f for f in shown if f["properties"]["name"] == "katowickie")
+        self.assertTrue(contains(katowickie["geometry"], 19.15, 49.99))
+
+
+class TestGminasBefore1999(unittest.TestCase):
+    def test_codes_map_to_drawn_features(self) -> None:
+        keys = {f["properties"]["teryt"] for f in boundaries("gminy")["features"]}
+        for old, key in pre1999_codes().items():
+            self.assertIn(key, keys, old)
+        for old, entry in PRE1999["codes"].items():
+            self.assertEqual(old[:2], next(k for k, v in PRE1999["voivodeships"].items() if v["name"] == entry["wojewodztwo"]))
+            self.assertTrue(entry["current"] or entry.get("note"), old)
+            self.assertTrue(entry["match"], old)
+
+    def test_renamed_and_ambiguous_names(self) -> None:
+        codes = pre1999_codes()
+        self.assertEqual(codes["77641"], "221208")  # Słupsk gm., renamed Redzikowo in 2023
+        self.assertEqual(codes["01643"], "140805")  # Skrzeszew, renamed Wieliszew in 1996
+        self.assertEqual(codes["21177"], "080101")  # Kostrzyn (gorzowskie) = Kostrzyn nad Odrą
+        self.assertEqual(codes["63185"], "302108")  # Kostrzyn (poznańskie)
+        self.assertEqual(codes["01020"], "143104")  # Warszawa-Centrum 1994-2002
+        self.assertNotIn("33589", codes)  # Ostrowice, split in 2019
+
+    def test_referendum_1997_gminas_colour_current_outlines(self) -> None:
+        rows = [{"year": 1997, "teryt_gmina_pre1999": code, "yes_pct": 50.0 + n}
+                for n, code in enumerate(("27145", "27449", "27355"))]  # Bytom, Wodzisław Śląski, Pszów
+        values, merged, skipped = unit_values(rows, "teryt_gmina_pre1999", "yes_pct", "gminy")
+        self.assertEqual(set(values), {pre1999_codes()[r["teryt_gmina_pre1999"]] for r in rows})
+        drawn = drawn_codes(set(values), years={1997})
+        # Bytom covered Radzionków until 1997; Wodzisław Śląski no longer covered Radlin.
+        self.assertIn(("246201", True), drawn)
+        self.assertIn(("241504", False), drawn)
+        self.assertNotIn("241303", {teryt for teryt, former in drawn if not former})
+
+    def test_parent_extent_follows_the_year(self) -> None:
+        self.assertIn(("241504", True), drawn_codes({"241504", "241503"}, years={1993}))
+        parts = {tuple(f["properties"]["parts"]) for f in visible_features(boundaries("gminy")["features"], {"241504"}, {1993})
+                 if f["properties"]["teryt"] == "241504" and "parts" in f["properties"]}
+        self.assertEqual(parts, {("241504", "241501", "241502", "241508")})
+        parts = {tuple(f["properties"]["parts"]) for f in visible_features(boundaries("gminy")["features"], {"241504"}, {1995})
+                 if f["properties"]["teryt"] == "241504" and "parts" in f["properties"]}
+        self.assertEqual(parts, {("241504", "241502")})
+        # Without a year a 1990s extent is never used (a later result may lack Radzionków for other reasons).
+        self.assertIn(("246201", False), drawn_codes({"246201", "246101"}))
+
+    def test_warsaw_dzielnica_1990_uses_its_extent(self) -> None:
+        rows = [{"year": 1990, "teryt_gmina_pre1999": code, "votes": 10} for code in ("01001", "01009", "01010", "01103")]
+        values, _, _ = unit_values(rows, "teryt_gmina_pre1999", "votes", "gminy")
+        self.assertEqual(set(values), {"01001", "146510", "146512", "143201"})
+        drawn = drawn_codes(set(values), years={1990})
+        self.assertIn(("01001", True), drawn)
+        plain = {teryt for teryt, former in drawn if not former}
+        self.assertFalse({"146505", "146513", "146516"} & plain)
+        self.assertTrue({"146510", "146512"} <= plain)
+
+
+class TestVoivodeshipExtents(unittest.TestCase):
+    SLAWKOW, SZERZYNY = (19.39, 50.30), (21.25, 49.80)
+
+    def outline(self, name: str, year: int | None) -> dict:
+        shown = visible_features(boundaries("wojewodztwa")["features"], {"malopolskie", "slaskie", "podkarpackie"},
+                                 {year} if year else None, "wojewodztwa")
+        return next(f for f in shown if f["properties"]["name"] == name)
+
+    def test_slawkow_in_malopolskie_until_2001(self) -> None:
+        malopolskie, slaskie = self.outline("MAŁOPOLSKIE", 2001), self.outline("ŚLĄSKIE", 2001)
+        self.assertTrue(contains(malopolskie["geometry"], *self.SLAWKOW))
+        self.assertFalse(contains(slaskie["geometry"], *self.SLAWKOW))
+        self.assertTrue(contains(self.outline("ŚLĄSKIE", 2002)["geometry"], *self.SLAWKOW))
+        self.assertFalse(contains(self.outline("MAŁOPOLSKIE", 2002)["geometry"], *self.SLAWKOW))
+
+    def test_szerzyny_in_podkarpackie_until_2002(self) -> None:
+        for year in (2001, 2002):
+            self.assertTrue(contains(self.outline("PODKARPACKIE", year)["geometry"], *self.SZERZYNY))
+            self.assertFalse(contains(self.outline("MAŁOPOLSKIE", year)["geometry"], *self.SZERZYNY))
+        for year in (2003, None):
+            self.assertTrue(contains(self.outline("MAŁOPOLSKIE", year)["geometry"], *self.SZERZYNY))
+            self.assertNotIn("parts", self.outline("MAŁOPOLSKIE", year)["properties"])
+
 
 if __name__ == "__main__":
     unittest.main()

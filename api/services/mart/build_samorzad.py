@@ -8,8 +8,12 @@ Sources (KBW mirror):
   precedence and L = by lot in a tie, B = without voting, N = not elected; the list's district total
   ``Gł. na listę`` and the district's valid votes ``Gł. ważne``) and the per-precinct list results
   ``sejmik_listy_98`` (columns are list numbers, which name a committee per voivodeship and district),
-  summed to gminas and districts and checked against the gmina file ``sejmik-gminy-98``. Ballots issued
-  are not published per gmina; PKW computed the 1998 turnout from valid ballots ('oddało karty
+  summed to gminas and districts and checked against the gmina file ``sejmik-gminy-98``. The
+  per-district workbooks ``1998woj`` (see ``build_rady.load_district_workbooks_1998``) repeat every
+  precinct with its ballots issued ('Wydane karty', loaded as ballots_issued) and give the
+  candidates' votes per precinct (checked against the precinct and candidate files, not loaded);
+  ``1998mazowieckie`` summarises mazowieckie per district (seats, lists, candidates, protocol, list and
+  candidate votes; checked). PKW computed the 1998 turnout from valid ballots ('oddało karty
   ważne'). There is no district register; the 855 seats are checked against the PKW total. Codes are
   the 1999 TERYT register; Warsaw gminas (powiat 1431) are mapped to their post-2002 districts as in
   2000/2001, except Warszawa-Centrum (143104, seven districts), as for the 2000 presidential election.
@@ -104,6 +108,8 @@ SOURCES = {
         "sejmik_candidates": "**/samorzad/1998-kand-rady.parquet",
         "sejmik_precincts": "**/samorzad/sejmik/1998/sejmik_listy_98__*.parquet",
         "sejmik_gminas": "**/samorzad/sejmik/1998/sejmik-gminy-98__*.parquet",
+        "sejmik_workbooks": "**/samorzad/sejmik/1998woj/*__sheet*.parquet",
+        "sejmik_mazowieckie": "**/samorzad/sejmik/1998mazowieckie.parquet",
     },
     2002: {
         "sejmik_candidates": "**/samorzad/2002-kand-rady.parquet",
@@ -210,6 +216,13 @@ SEJMIK_NAME_VARIANTS = {
 # other protocol figures agree). The gmina rows are loaded, so national eligible voters are 30,241,176
 # against PKW's 30,241,185 (the district sum).
 SEJMIK_ELIGIBLE_GAPS = {2006: [("dolnośląskie", 1), ("lubelskie", 1)]}
+# 1998 sejmik totals in PKW's announcement (Dz. U. Nr 131, poz. 861) -> (official figure, KBW minus PKW).
+# Every KBW file gives the larger figures: the precinct file, the gmina file, the per-district workbooks
+# (1998woj, precinct by precinct) and the mazowieckie district summary (district by district); the
+# 23,756 precincts are PKW's count. The difference is not located in any published file.
+SEJMIK_PKW_GAP_1998 = {
+    "eligible_voters": (28544777, 1608), "valid_ballots": (12945043, 1402), "valid_votes": (11721825, 1382), "invalid_votes": (1223218, 20),
+}
 # Run-offs held two weeks later because a candidate who qualified withdrew: 2006 on 10 December
 # instead of 26 November (PKW announcements of 27 November and 11 December 2006: 16 gminas, listed in
 # '2006-trzecia-tura', see _wbp_2006), 2010 on 19 December instead of 5 December ('data gł.' in the
@@ -617,18 +630,22 @@ def _sejmik_gminas_1998(con: duckdb.DuckDBPyConnection, sources: YearSources) ->
 
     The result has the headers of a gmina file: protocol columns, then one column per committee. The
     precinct file has one column per list number; a number names a committee per voivodeship and
-    district (``sejmik_list_names_1998``, from the candidates). Ballots issued are not published
-    ("Wydane karty" stays NULL); "Frekwencja" is the votes cast (valid ballots). Warsaw gminas get the
-    code of their post-2002 district (WARSAW_GMINAS_2001), except Warszawa-Centrum (143104).
+    district (``sejmik_list_names_1998``, from the candidates). Ballots issued come from the precinct
+    sheets of the per-district workbooks (``sejmik_wb_1998_precincts``, same precincts, see the
+    checks); "Frekwencja" is the votes cast (valid ballots). Warsaw gminas get the code of their
+    post-2002 district (WARSAW_GMINAS_2001), except Warszawa-Centrum (143104).
     """
     prec = sources.load("sejmik_prec", SOURCES[1998]["sejmik_precincts"])
     sources.load("sejmik_gminas_file", SOURCES[1998]["sejmik_gminas"])  # for the checks
+    sources.load("sejmik_mazowieckie", SOURCES[1998]["sejmik_mazowieckie"])  # for the checks
+    build_rady.load_district_workbooks_1998(con, sources, SOURCES[1998]["sejmik_workbooks"], "sejmik_wb_1998")
     create_warsaw_gminas_2001(con)
     con.execute(
         f"""CREATE OR REPLACE TABLE sejmik_prec_1998 AS
             SELECT p.*, coalesce(w.teryt, clean_teryt(p."Kod gminy")) AS teryt, coalesce(w.gmina, p."Gmina") AS gmina,
-                   CAST(int_(p."Nr okr.") AS INT) AS district_no
-            FROM {prec} p LEFT JOIN warsaw_gminas_2001 w ON w.letter IS NULL AND w.old_teryt = clean_teryt(p."Kod gminy")"""
+                   CAST(int_(p."Nr okr.") AS INT) AS district_no, int_(b."Wydane karty") AS ballots_issued
+            FROM {prec} p LEFT JOIN warsaw_gminas_2001 w ON w.letter IS NULL AND w.old_teryt = clean_teryt(p."Kod gminy")
+            LEFT JOIN sejmik_wb_1998_precincts b ON b."Kod gminy" = p."Kod gminy" AND int_(b."Nr obw.") = int_(p."Nr obw.")"""
     )
     cols = ", ".join(quote_ident(c) for c in columns_of(con, prec) if c.isdigit())
     con.execute(
@@ -652,15 +669,16 @@ def _sejmik_gminas_1998(con: duckdb.DuckDBPyConnection, sources: YearSources) ->
         CREATE OR REPLACE TABLE sejmik_gminas_1998 AS
         WITH prot AS (
             SELECT teryt, district_no, any_value(gmina) AS gmina, any_value("Powiat") AS powiat, sum(int_("Upr.")) AS eligible,
-                   sum(int_("Frekwencja")) AS ballots, sum(int_("Nieważne")) AS invalid, sum(int_("Ważne")) AS valid
+                   sum(ballots_issued) AS issued, sum(int_("Frekwencja")) AS ballots, sum(int_("Nieważne")) AS invalid,
+                   sum(int_("Ważne")) AS valid
             FROM sejmik_prec_1998 GROUP BY ALL)
         SELECT p.teryt AS "TERYT gminy", CAST(p.district_no AS VARCHAR) AS "Nr okr.", p.gmina AS "Gmina", p.powiat AS "Powiat",
-               CAST(p.eligible AS VARCHAR) AS "Upr.", CAST(NULL AS VARCHAR) AS "Wydane karty", CAST(p.ballots AS VARCHAR) AS "Odd.",
+               CAST(p.eligible AS VARCHAR) AS "Upr.", CAST(p.issued AS VARCHAR) AS "Wydane karty", CAST(p.ballots AS VARCHAR) AS "Odd.",
                CAST(p.invalid AS VARCHAR) AS "Niew.", CAST(p.valid AS VARCHAR) AS "Ważne", {sums}
         FROM prot p
         LEFT JOIN sejmik_votes_1998 v USING (teryt, district_no)
         LEFT JOIN sejmik_list_names_1998 n ON n.wojewodztwo = voivodeship(v.teryt) AND n.district_no = v.district_no AND n.list_no = v.list_no
-        GROUP BY p.teryt, p.district_no, p.gmina, p.powiat, p.eligible, p.ballots, p.invalid, p.valid
+        GROUP BY p.teryt, p.district_no, p.gmina, p.powiat, p.eligible, p.issued, p.ballots, p.invalid, p.valid
         """
     )
     return "sejmik_gminas_1998"
@@ -1282,6 +1300,7 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
                               min(int_("Gł. ważne")) AS lo, max(int_("Gł. ważne")) AS hi FROM sejmik_cand GROUP BY ALL) k
               USING (wojewodztwo, district_no)
             WHERE l.votes IS DISTINCT FROM k.lo OR k.lo <> k.hi"""
+        checks.update(_checks_workbooks_1998(lists))
     if year == 2002:
         # Precinct sums against the official gmina statistics (Warsaw districts added up to 146501).
         checks["sejmik: 2002 gmina sums of the precinct file != official gmina statistics"] = f"""
@@ -1318,3 +1337,86 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
     run_checks(con, year, checks)
     if _has_mayors(year) and con.execute("SELECT count(*) FROM wbp_gmina_protocols WHERE office IS NULL").fetchone()[0]:
         raise BuildError(f"year {year}: mayor protocols without an office")
+
+
+def _checks_workbooks_1998(lists: list[str]) -> dict[str, str]:
+    """1998 sejmik checks against the per-district workbooks (``sejmik_wb_1998_*``, 1998woj), the
+    mazowieckie district summary (``src_sejmik_mazowieckie``) and PKW's national totals; ``lists`` are
+    the list-number columns of the precinct file."""
+    cols = ", ".join(quote_ident(c) for c in lists)
+    # Lists whose candidates' votes in a precinct differ from the list's precinct total.
+    short = """(SELECT voivodeship(l.council) AS wojewodztwo, l.district_no, l.list_no
+                FROM sejmik_wb_1998_lists l
+                LEFT JOIN (SELECT council, district_no, list_no, gmina, precinct_no, sum(votes) AS votes FROM sejmik_wb_1998_candidates
+                           GROUP BY ALL) c USING (council, district_no, list_no, gmina, precinct_no)
+                WHERE coalesce(c.votes, 0) <> l.votes GROUP BY ALL)"""
+    short_named = f"""(SELECT s.wojewodztwo, s.district_no, coalesce(n.committee_name, '') AS committee_name FROM {short} s
+                       LEFT JOIN sejmik_list_names_1998 n USING (wojewodztwo, district_no, list_no))"""
+    # Mazowieckie summary: district rows (and the voivodeship row, "Nr" = '-'), list rows, candidate rows.
+    maz = """FROM src_sejmik_mazowieckie WHERE "Nazwa jednostki administracyjnej" = 'województwo mazowieckie'"""
+    gap = " + ".join(f"abs(sum({c}) - {official} - {diff})" for c, (official, diff) in SEJMIK_PKW_GAP_1998.items())
+    gap_label = ", ".join(f"{c} {diff:+}" for c, (_, diff) in SEJMIK_PKW_GAP_1998.items())
+    return {
+        "sejmik: 1998 workbook precincts (1998woj) != precinct file (duplicates, district, eligible, votes cast, valid; ballots issued)": """
+            SELECT (SELECT count(*) - count(DISTINCT ("Kod gminy", int_("Nr obw."))) FROM sejmik_wb_1998_precincts) + count(*)
+            FROM sejmik_wb_1998_precincts w FULL JOIN src_sejmik_prec p ON p."Kod gminy" = w."Kod gminy" AND int_(p."Nr obw.") = int_(w."Nr obw.")
+            WHERE w."Kod gminy" IS NULL OR p."Kod gminy" IS NULL OR w."Kod rady" <> p."Kod rady" OR int_(w."Nr okr.") <> int_(p."Nr okr.")
+               OR int_(w."Upr.") <> int_(p."Upr.") OR int_(w."Gł. odd. (frekw.)") <> int_(p."Frekwencja")
+               OR int_(w."Gł. ważne") <> int_(p."Ważne") OR int_(w."Wydane karty") IS NULL""",
+        "sejmik: 1998 workbook list totals per precinct != precinct file": f"""
+            SELECT count(*) FROM sejmik_wb_1998_lists w
+            FULL JOIN (SELECT gmina, precinct_no, CAST(list_no AS INT) AS list_no, int_(votes) AS votes
+                       FROM (UNPIVOT (SELECT "Kod gminy" AS gmina, int_("Nr obw.") AS precinct_no, {cols} FROM src_sejmik_prec)
+                             ON {cols} INTO NAME list_no VALUE votes)) p USING (gmina, precinct_no, list_no)
+            WHERE w.votes IS DISTINCT FROM p.votes""",
+        "sejmik: 1998 workbook candidates != register (votes, mark, surname)": """
+            SELECT count(*) FROM (SELECT voivodeship(council) AS wojewodztwo, district_no, list_no, position AS list_position,
+                                         min(name) AS name_lo, max(name) AS name_hi, min(mark) AS mark_lo, max(mark) AS mark_hi,
+                                         sum(votes) AS votes
+                                  FROM sejmik_wb_1998_candidates GROUP BY ALL) w
+            FULL JOIN sejmik_candidates k USING (wojewodztwo, district_no, list_no, list_position)
+            WHERE w.votes IS DISTINCT FROM k.votes OR w.name_lo <> w.name_hi OR w.mark_lo <> w.mark_hi
+               OR (w.mark_lo = 'W') IS DISTINCT FROM k.elected OR surname(w.name_lo) IS DISTINCT FROM k.last_name""",
+        "sejmik: 1998 lists whose candidates' precinct votes != the list's precinct total (except named struck-off lists)": f"""
+            SELECT count(*) FROM {short_named} WHERE (wojewodztwo, district_no, committee_name) NOT IN ({_known_struck_off(1998)})""",
+        "sejmik: 1998 named struck-off lists whose candidates match the list in every precinct of the workbooks": f"""
+            SELECT count(*) FROM (VALUES {_known_struck_off(1998)}) n(wojewodztwo, district_no, committee_name)
+            ANTI JOIN {short_named} s USING (wojewodztwo, district_no, committee_name)""",
+        "sejmik: 1998 workbook district valid votes (sum of precincts) != 'Gł. ważne' of the candidate file": """
+            SELECT count(*) FROM (SELECT voivodeship("Kod rady") AS wojewodztwo, CAST(int_("Nr okr.") AS INT) AS district_no,
+                                         sum(int_("Gł. ważne")) AS valid FROM sejmik_wb_1998_precincts GROUP BY ALL) w
+            FULL JOIN (SELECT lower("Jednostka") AS wojewodztwo, CAST(int_("Nr okr.") AS INT) AS district_no,
+                              min(int_("Gł. ważne")) AS lo, max(int_("Gł. ważne")) AS hi FROM sejmik_cand GROUP BY ALL) k
+              USING (wojewodztwo, district_no)
+            WHERE w.valid IS DISTINCT FROM k.lo OR k.lo <> k.hi""",
+        f"sejmik: 1998 KBW totals minus PKW announcement != named gap ({gap_label})": f"""
+            SELECT {gap} FROM sejmik_gmina_protocols""",
+        "sejmik: 1998 mazowieckie summary (1998mazowieckie) districts and voivodeship != build (seats, lists, candidates, protocol)": f"""
+            WITH m AS (SELECT CAST(int_("Nr") AS INT) AS district_no, int_("Liczba") AS seats, int_(column3) AS lists,
+                              int_(column4) AS candidates, int_("Liczba_1") AS eligible, int_("Oddane karty ważne") AS cast_,
+                              int_("Oddane głosy - nieważne") AS invalid, int_(column10) AS no_x, int_("ważne") AS valid
+                       {maz} AND "Liczba" IS NOT NULL AND ("Nr" = '-' OR int_("Nr") IS NOT NULL)),
+            k AS (SELECT district_no, count(*) FILTER (WHERE elected) AS seats, count(DISTINCT list_no) AS lists, count(*) AS candidates
+                  FROM sejmik_candidates WHERE wojewodztwo = 'mazowieckie' GROUP BY ALL),
+            b AS (SELECT p.district_no, k.seats, k.lists, k.candidates, p.eligible, p.cast_, p.invalid, p.no_x, p.valid
+                  FROM (SELECT district_no, sum(int_("Upr.")) AS eligible, sum(int_("Frekwencja")) AS cast_, sum(int_("Nieważne")) AS invalid,
+                               sum(int_("0 'x'")) AS no_x, sum(int_("Ważne")) AS valid
+                        FROM sejmik_prec_1998 WHERE voivodeship(teryt) = 'mazowieckie' GROUP BY ALL) p FULL JOIN k USING (district_no)),
+            x AS (SELECT * FROM b UNION ALL
+                  SELECT NULL, sum(seats), sum(lists), sum(candidates), sum(eligible), sum(cast_), sum(invalid), sum(no_x), sum(valid) FROM b)
+            SELECT count(*) FROM m FULL JOIN x ON m.district_no IS NOT DISTINCT FROM x.district_no
+            WHERE (m.seats, m.lists, m.candidates, m.eligible, m.cast_, m.invalid, m.no_x, m.valid)
+                  IS DISTINCT FROM (x.seats, x.lists, x.candidates, x.eligible, x.cast_, x.invalid, x.no_x, x.valid)""",
+        "sejmik: 1998 mazowieckie summary list votes != district lists": f"""
+            SELECT count(*) FROM (SELECT CAST(int_("Nr") AS INT) AS district_no, CAST(int_("Nr_1") AS INT) AS list_no,
+                                         int_("Głosy ważne") AS votes {maz} AND "Nr_1" IS NOT NULL AND "Nr_2" IS NULL) m
+            FULL JOIN (SELECT district_no, list_no, votes FROM sejmik_district_lists WHERE wojewodztwo = 'mazowieckie') l
+              USING (district_no, list_no)
+            WHERE m.votes IS DISTINCT FROM l.votes""",
+        "sejmik: 1998 mazowieckie summary candidates != register (votes, elected, surname)": f"""
+            SELECT count(*) FROM (SELECT CAST(int_("Nr") AS INT) AS district_no, CAST(int_("Nr_1") AS INT) AS list_no,
+                                         CAST(int_("Nr_2") AS INT) AS list_position, upper(trim("Nazwisko")) AS last_name,
+                                         int_("Głosy ważne") AS votes, yes_("Wybrany") AS elected {maz} AND "Nr_2" IS NOT NULL) m
+            FULL JOIN (SELECT * FROM sejmik_candidates WHERE wojewodztwo = 'mazowieckie') k USING (district_no, list_no, list_position)
+            WHERE m.votes IS DISTINCT FROM k.votes OR m.elected IS DISTINCT FROM k.elected OR m.last_name IS DISTINCT FROM k.last_name""",
+    }

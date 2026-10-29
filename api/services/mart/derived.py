@@ -26,65 +26,229 @@ log = logging.getLogger("mart")
 # Person matching. National candidacies (Sejm, Senate, President, European Parliament) with the
 # same normalized full name and gender are one person, unless the name is shared by several
 # candidates within one election event (Sejm+Senate of one year, one presidential round, one EP
-# election); then residence must match too. A missing gender (2015 presidential files) is taken
-# from other candidacies of the same name when they agree. This is a deliberate, explainable
-# heuristic: PKW files carry no personal identifier, so namesakes in different years can be merged
-# and changed surnames are not linked. Manual corrections come from PERSON_OVERRIDES (see below).
+# election); then residence must match too (namesakes of one event with the same residence text are
+# a person each). A missing gender (2015 presidential files) is taken from other candidacies of the
+# same name when they agree. Three more rules, measured against the ages in the 1991-1997 Sejm and
+# Senate registers (see docs/MART.md, "Persons"):
+# - A name with a single given name is split by voivodeship of residence when its candidacies live in
+#   different voivodeships (Warsaw and unmapped residences count for any) and no occupations of the
+#   two sides are alike (trigram similarity >= 0.3, or a student), no residences have the same place
+#   text and no birth years are at most 1 apart. Candidacies linked to neither side join the part of
+#   the nearest candidacy in time. Names with a presidential candidacy are not split (no residence
+#   before 2020; such cases need overrides). Two given names make namesakes rare: there different
+#   voivodeships nearly always mean a move, so they are never split.
+# - Files before 2011 often give only the first given name ("Donald TUSK" in 1991, later "Donald
+#   Franciszek TUSK"). The candidacies before 2011 of a person with one given name join the one person
+#   with more given names, the same surname, gender and first given name, when no candidacies of the
+#   two share an election event or live in different voivodeships (as above), and one pair lives in
+#   the same powiat or place, or has birth years at most 1 apart (Sejm and Senate registers 1991-1997
+#   publish the age); birth years more than 3 apart contradict. Registers from 2011 give all given
+#   names, so a later candidacy with one given name is a namesake: it must share an election event
+#   with the fuller person (then it stays apart), otherwise nothing is joined.
+# - Birth years more than 3 apart split a person unless the candidacies share a powiat or place (see
+#   below).
+# This is a deliberate, explainable heuristic: PKW files carry no personal identifier, so namesakes
+# can still be merged and changed surnames are not linked. Manual corrections come from
+# PERSON_OVERRIDES (see below).
 PERSONS_SQL = r"""
 CREATE TEMP TABLE candidacy_raw ON COMMIT DROP AS
-SELECT 'sejm' AS chamber, year, 1 AS round, candidate_id, full_name, last_name, first_names, gender, residence
+SELECT 'sejm' AS chamber, year, 1 AS round, candidate_id, full_name, last_name, first_names, gender, residence,
+       residence_teryt, occupation, age
 FROM mart.sejm_candidates
 UNION ALL
-SELECT 'senat', year, 1, candidate_id, full_name, last_name, first_names, gender, residence FROM mart.senat_candidates
+SELECT 'senat', year, 1, candidate_id, full_name, last_name, first_names, gender, residence, residence_teryt, occupation,
+       age
+FROM mart.senat_candidates
 UNION ALL
-SELECT 'prezydent', year, round, candidate_id, full_name, last_name, first_names, gender, residence FROM mart.prezydent_candidates
+SELECT 'prezydent', year, round, candidate_id, full_name, last_name, first_names, gender, residence, residence_teryt,
+       occupation, NULL::int
+FROM mart.prezydent_candidates
 UNION ALL
-SELECT 'pe', year, 1, candidate_id, full_name, last_name, first_names, gender, residence FROM mart.pe_candidates;
+SELECT 'pe', year, 1, candidate_id, full_name, last_name, first_names, gender, residence, residence_teryt, occupation,
+       NULL::int
+FROM mart.pe_candidates;
 
+-- Place name (folded) -> powiat, learned from the residence text and residence_teryt pairs published
+-- since 2019: the powiat of at least 90% of the pairs of that place name. (Learned from 2019-2020, 98%
+-- of the 2023-2025 places that map get the right powiat; requiring a single powiat gives 97% and maps
+-- fewer places. Gmina names as a fallback reach only 86%, so they are not used.)
+CREATE TEMP TABLE residence_place ON COMMIT DROP AS
+SELECT place, powiat FROM (
+  SELECT place, powiat, n, sum(n) OVER (PARTITION BY place) AS total,
+         row_number() OVER (PARTITION BY place ORDER BY n DESC, powiat) AS rn
+  FROM (SELECT mart.fold_name(residence) AS place, left(residence_teryt, 4) AS powiat, count(*) AS n
+        FROM candidacy_raw WHERE residence_teryt ~ '^[0-9]{6}$' AND residence IS NOT NULL
+        GROUP BY 1, 2) p
+) p
+WHERE rn = 1 AND n >= 0.9 * total;
+
+-- place: the residence text without the gmina, house number or "k/" part ("Kleszewo, gm. Pułtusk",
+-- "Rogoźnik gm.Bobrowniki", "Grodzisko Dolne 640/7"), folded, compared only with other residences;
+-- powiat: residence_teryt where published, else the mapped residence text. (Mapping the place instead
+-- would put villages into same-name towns: only 59% of such places agree with their gmina's powiat.)
 CREATE TEMP TABLE candidacy ON COMMIT DROP AS
 WITH keyed AS (
   SELECT c.*, upper(regexp_replace(full_name, '\s+', ' ', 'g')) AS name_key,
-         CASE WHEN chamber IN ('sejm', 'senat') THEN 'parliament' ELSE chamber END || ' ' || year || '/' || round AS event
+         CASE WHEN chamber IN ('sejm', 'senat') THEN 'parliament' ELSE chamber END || ' ' || year || '/' || round AS event,
+         nullif(trim(mart.fold_name(regexp_replace(split_part(residence, ',', 1),
+                                                   '\s+(gm\.|gmina\s|gm\s|k\.|k/|\d).*$', '', 'i'))), '') AS place
   FROM candidacy_raw c
 ), name_gender AS (
   SELECT name_key, min(gender) AS gender FROM keyed WHERE gender IS NOT NULL
   GROUP BY name_key HAVING count(DISTINCT gender) = 1
 )
 SELECT k.chamber, k.year, k.round, k.candidate_id, k.full_name, k.last_name, k.first_names,
-       coalesce(k.gender, g.gender) AS gender, k.residence, k.name_key, k.event
-FROM keyed k LEFT JOIN name_gender g USING (name_key);
+       coalesce(k.gender, g.gender) AS gender, k.residence, k.occupation, k.name_key, k.event, k.place,
+       coalesce(left(k.residence_teryt, 4), p.powiat) AS powiat, k.year - k.age AS birth_year
+FROM keyed k
+LEFT JOIN name_gender g USING (name_key)
+LEFT JOIN residence_place p ON k.residence_teryt IS NULL AND p.place = mart.fold_name(k.residence);
 
 CREATE TEMP TABLE shared_name ON COMMIT DROP AS
 SELECT DISTINCT name_key, gender FROM candidacy
 GROUP BY name_key, gender, event HAVING count(DISTINCT (chamber, candidate_id)) > 1;
+CREATE TEMP TABLE shared_residence ON COMMIT DROP AS
+SELECT DISTINCT name_key, gender, upper(coalesce(residence, '')) AS residence FROM candidacy
+GROUP BY name_key, gender, upper(coalesce(residence, '')), event HAVING count(DISTINCT (chamber, candidate_id)) > 1;
 
+-- region: voivodeship of the residence; none for Warsaw, where members of parliament often move.
 CREATE TEMP TABLE candidacy_person ON COMMIT DROP AS
 SELECT c.*,
        CASE WHEN h.grp IS NOT NULL THEN 'manual'
             WHEN s.name_key IS NULL THEN 'name+gender' ELSE 'name+gender+residence' END AS match_rule,
        CASE WHEN h.grp IS NOT NULL THEN 'override|' || h.grp
             ELSE c.name_key || '|' || coalesce(c.gender, '') ||
-                 CASE WHEN s.name_key IS NULL THEN '' ELSE '|' || upper(coalesce(c.residence, '')) END END AS person_key
+                 CASE WHEN s.name_key IS NULL THEN '' ELSE '|' || upper(coalesce(c.residence, '')) END ||
+                 CASE WHEN r.name_key IS NULL THEN ''
+                      ELSE '|' || c.chamber || ' ' || c.year || '/' || c.round || '/' || c.candidate_id END END AS person_key,
+       CASE WHEN c.powiat <> '1465' THEN left(c.powiat, 2) END AS region
 FROM candidacy c
 LEFT JOIN shared_name s ON s.name_key = c.name_key AND s.gender IS NOT DISTINCT FROM c.gender
+LEFT JOIN shared_residence r ON r.name_key = c.name_key AND r.gender IS NOT DISTINCT FROM c.gender
+ AND r.residence = upper(coalesce(c.residence, ''))
 LEFT JOIN override_hit h ON (h.chamber, h.year, h.round, h.candidate_id) = (c.chamber, c.year, c.round, c.candidate_id);
+
+-- Single given name, residences in several voivodeships: candidacies in the same voivodeship or place,
+-- with alike occupations or birth years at most 1 apart are one part (connected components). A part
+-- without any voivodeship joins the part of the nearest candidacy in time; several parts with a
+-- voivodeship are several persons.
+CREATE TEMP TABLE region_candidacy ON COMMIT DROP AS
+SELECT *, chamber || ' ' || year || '/' || round || '/' || candidate_id AS node FROM candidacy_person
+WHERE person_key IN (SELECT person_key FROM candidacy_person WHERE match_rule = 'name+gender' AND first_names !~ ' '
+                     GROUP BY person_key HAVING count(DISTINCT region) > 1 AND NOT bool_or(chamber = 'prezydent'));
+CREATE TEMP TABLE region_link ON COMMIT DROP AS
+SELECT a.person_key, a.node AS node_a, b.node AS node_b
+FROM region_candidacy a JOIN region_candidacy b USING (person_key)
+WHERE a.node = b.node OR a.region = b.region OR a.place = b.place
+   OR similarity(lower(a.occupation), lower(b.occupation)) >= 0.3
+   OR a.occupation ~* '^student' OR b.occupation ~* '^student' OR abs(a.birth_year - b.birth_year) <= 1;
+CREATE TEMP TABLE region_part ON COMMIT DROP AS
+WITH RECURSIVE reach AS (
+  SELECT person_key, node_a, node_b FROM region_link
+  UNION
+  SELECT r.person_key, r.node_a, l.node_b FROM reach r JOIN region_link l ON l.person_key = r.person_key AND l.node_a = r.node_b
+)
+SELECT person_key, node_a AS node, min(node_b) AS part FROM reach GROUP BY 1, 2;
+CREATE TEMP TABLE region_part_known ON COMMIT DROP AS
+SELECT DISTINCT p.person_key, p.part FROM region_part p JOIN region_candidacy c USING (person_key, node)
+WHERE c.region IS NOT NULL;
+
+UPDATE candidacy_person c SET person_key = c.person_key || '|' || x.part, match_rule = 'name+gender+voivodeship'
+FROM (
+  SELECT r.chamber, r.year, r.round, r.candidate_id,
+         CASE WHEN k.part IS NOT NULL THEN p.part
+              ELSE (SELECT q.part FROM region_candidacy n JOIN region_part q USING (person_key, node)
+                    JOIN region_part_known m ON m.person_key = q.person_key AND m.part = q.part
+                    WHERE n.person_key = r.person_key ORDER BY abs(n.year - r.year), n.year LIMIT 1) END AS part
+  FROM region_candidacy r JOIN region_part p USING (person_key, node)
+  LEFT JOIN region_part_known k ON k.person_key = p.person_key AND k.part = p.part
+  WHERE r.person_key IN (SELECT person_key FROM region_part_known GROUP BY 1 HAVING count(*) > 1)
+) x
+WHERE (c.chamber, c.year, c.round, c.candidate_id) = (x.chamber, x.year, x.round, x.candidate_id);
+
+-- Birth years more than 3 apart (registers that publish the age): candidacies are one part when
+-- their birth years are at most 3 apart or they live in the same powiat or place (the 1990s registers
+-- are off by up to 3 years, sometimes more, for the same person); several parts are several persons.
+-- A candidacy without an age joins the one part with candidacies in its powiat or place, else the
+-- part of the nearest candidacy in time.
+CREATE TEMP TABLE aged_candidacy ON COMMIT DROP AS
+SELECT *, chamber || ' ' || year || '/' || round || '/' || candidate_id AS node FROM candidacy_person
+WHERE person_key IN (SELECT person_key FROM candidacy_person WHERE match_rule <> 'manual' AND birth_year IS NOT NULL
+                     GROUP BY person_key HAVING max(birth_year) - min(birth_year) > 3);
+CREATE TEMP TABLE birth_link ON COMMIT DROP AS
+SELECT a.person_key, a.node AS node_a, b.node AS node_b
+FROM aged_candidacy a JOIN aged_candidacy b USING (person_key)
+WHERE a.birth_year IS NOT NULL AND b.birth_year IS NOT NULL
+  AND (abs(a.birth_year - b.birth_year) <= 3 OR a.powiat = b.powiat OR a.place = b.place);
+CREATE TEMP TABLE birth_part ON COMMIT DROP AS
+WITH RECURSIVE reach AS (
+  SELECT person_key, node_a, node_b FROM birth_link
+  UNION
+  SELECT r.person_key, r.node_a, l.node_b FROM reach r JOIN birth_link l ON l.person_key = r.person_key AND l.node_a = r.node_b
+)
+SELECT person_key, node_a AS node, min(node_b) AS part FROM reach GROUP BY 1, 2;
+
+UPDATE candidacy_person c SET person_key = c.person_key || '|' || x.part, match_rule = 'name+gender+birth year'
+FROM (
+  SELECT a.chamber, a.year, a.round, a.candidate_id,
+         coalesce(p.part,
+                  (SELECT min(q.part) FROM aged_candidacy n JOIN birth_part q USING (person_key, node)
+                   WHERE n.person_key = a.person_key AND (n.powiat = a.powiat OR n.place = a.place)
+                   HAVING count(DISTINCT q.part) = 1),
+                  (SELECT q.part FROM aged_candidacy n JOIN birth_part q USING (person_key, node)
+                   WHERE n.person_key = a.person_key ORDER BY abs(n.year - a.year), n.year DESC LIMIT 1)) AS part
+  FROM aged_candidacy a LEFT JOIN birth_part p USING (person_key, node)
+  WHERE a.person_key IN (SELECT person_key FROM birth_part GROUP BY 1 HAVING count(DISTINCT part) > 1)
+) x
+WHERE (c.chamber, c.year, c.round, c.candidate_id) = (x.chamber, x.year, x.round, x.candidate_id);
+
+-- Abbreviated given names (files before 2011): see the rule above.
+CREATE TEMP TABLE key_name ON COMMIT DROP AS
+SELECT person_key, upper(min(last_name)) AS last_name, min(gender) AS gender,
+       upper(split_part(min(first_names), ' ', 1)) AS first_name, bool_and(first_names !~ ' ') AS single_name
+FROM candidacy_person WHERE match_rule <> 'manual' GROUP BY person_key;
+CREATE TEMP TABLE short_name_link ON COMMIT DROP AS
+SELECT m.short_key, m.target_key
+FROM (
+  SELECT s.person_key AS short_key, min(t.person_key) AS target_key
+  FROM key_name s
+  JOIN key_name t ON t.last_name = s.last_name AND t.gender IS NOT DISTINCT FROM s.gender
+   AND t.first_name = s.first_name AND NOT t.single_name
+  WHERE s.single_name
+  GROUP BY s.person_key HAVING count(*) = 1
+) m
+JOIN candidacy_person a ON a.person_key = m.short_key AND a.year < 2011
+JOIN candidacy_person b ON b.person_key = m.target_key
+GROUP BY m.short_key, m.target_key
+HAVING NOT bool_or(a.event = b.event)
+   AND NOT EXISTS (SELECT 1 FROM candidacy_person l WHERE l.person_key = m.short_key AND l.year >= 2011
+                   AND NOT EXISTS (SELECT 1 FROM candidacy_person t WHERE t.person_key = m.target_key AND t.event = l.event))
+   AND NOT coalesce(bool_or(a.region <> b.region AND coalesce(similarity(lower(a.occupation), lower(b.occupation)), 0) < 0.3
+                            AND coalesce(a.occupation !~* '^student' AND b.occupation !~* '^student', true)), false)
+   AND NOT coalesce(bool_or(abs(a.birth_year - b.birth_year) > 3), false)
+   AND coalesce(bool_or(a.powiat = b.powiat OR a.place = b.place OR abs(a.birth_year - b.birth_year) <= 1), false);
+
+UPDATE candidacy_person c SET person_key = l.target_key, match_rule = 'surname+first given name+gender'
+FROM short_name_link l WHERE c.person_key = l.short_key AND c.year < 2011;
 
 CREATE TEMP TABLE person_ids ON COMMIT DROP AS
 SELECT person_key, CAST(dense_rank() OVER (ORDER BY person_key) AS INT) AS person_id
 FROM (SELECT DISTINCT person_key FROM candidacy_person) k;
 
 CREATE TEMP TABLE candidacy_ids ON COMMIT DROP AS
-SELECT c.chamber, c.year, c.round, c.candidate_id, c.name_key, c.gender, i.person_id
+SELECT c.chamber, c.year, c.round, c.candidate_id, c.name_key, c.gender, c.powiat, c.birth_year, i.person_id
 FROM candidacy_person c JOIN person_ids i USING (person_key);
 
 TRUNCATE mart.persons;
 INSERT INTO mart.persons (person_id, full_name, last_name, first_names, gender, match_rule, candidacies)
 SELECT i.person_id,
-       (array_agg(c.full_name ORDER BY c.year DESC))[1],
-       (array_agg(c.last_name ORDER BY c.year DESC))[1],
-       (array_agg(c.first_names ORDER BY c.year DESC))[1],
+       (array_agg(c.full_name ORDER BY c.year DESC, c.first_names ~ ' ' DESC))[1],
+       (array_agg(c.last_name ORDER BY c.year DESC, c.first_names ~ ' ' DESC))[1],
+       (array_agg(c.first_names ORDER BY c.year DESC, c.first_names ~ ' ' DESC))[1],
        (array_agg(c.gender ORDER BY c.year DESC))[1],
-       CASE WHEN bool_or(c.match_rule = 'manual') THEN 'manual' ELSE min(c.match_rule) END,
+       CASE WHEN bool_or(c.match_rule = 'manual') THEN 'manual'
+            WHEN bool_or(c.match_rule = 'surname+first given name+gender') THEN 'surname+first given name+gender'
+            ELSE min(c.match_rule) END,
        count(*)
 FROM candidacy_person c JOIN person_ids i USING (person_key)
 GROUP BY i.person_id;
@@ -107,10 +271,12 @@ WHERE c.chamber = 'pe' AND c.year = k.year AND c.candidate_id = k.candidate_id;
 # When several national persons share the name, the one whose residence lies in the local candidacy's
 # powiat (sejmik: voivodeship) is taken, if there is exactly one: residence_teryt where published
 # (national registers from 2019), else the residence text mapped through place names seen with a TERYT.
-# Local registers publish the candidate's age, national registers do not. All local candidacies
+# Local registers publish the candidate's age; national registers mostly do not. All local candidacies
 # linked to one person must agree on the birth year (election year minus age; two candidacies of
-# one person differ by at most 1, because age is counted on election day). When they do not, the
-# name belongs to several people and none of that person's local candidacies stays linked.
+# one person differ by at most 1, because age is counted on election day), the birth year must allow
+# the person's national candidacies (minimum ages) and agree with national ages where published
+# (Sejm and Senate 1991-1997). When it does not, the name belongs to several people and none of that
+# person's local candidacies stays linked.
 # Overrides (PERSON_OVERRIDES) win over every rule.
 # Finally, local candidacies still unlinked become local persons (match_rule 'local:...'): same
 # name, gender and powiat (sejmik: voivodeship) with birth years at most 1 apart. This links a mayor
@@ -142,34 +308,12 @@ WHERE u.year = k.year AND u.full_name = k.full_name
 -- Names shared by several national persons: a local candidacy joins the one whose residence is in
 -- the same powiat (sejmik: voivodeship), when exactly one such person exists and the name occurs once
 -- there in that local election. Residence is residence_teryt where published (registers from 2019);
--- before 2019 the residence text is mapped to a powiat through residence_place.
-CREATE TEMP TABLE national_residence_raw ON COMMIT DROP AS
-SELECT i.name_key, i.gender, i.person_id, x.residence, x.residence_teryt
-FROM candidacy_ids i
-JOIN (SELECT 'sejm' AS chamber, year, 1 AS round, candidate_id, residence, residence_teryt FROM mart.sejm_candidates
-      UNION ALL SELECT 'senat', year, 1, candidate_id, residence, residence_teryt FROM mart.senat_candidates
-      UNION ALL SELECT 'prezydent', year, round, candidate_id, residence, residence_teryt FROM mart.prezydent_candidates
-      UNION ALL SELECT 'pe', year, 1, candidate_id, residence, residence_teryt FROM mart.pe_candidates) x
-  USING (chamber, year, round, candidate_id)
-WHERE NOT EXISTS (SELECT 1 FROM national_name n WHERE n.name_key = i.name_key AND n.gender IS NOT DISTINCT FROM i.gender);
-
--- Place name (folded) -> powiat, learned from the residence text and residence_teryt pairs published
--- since 2019; only place names that occur with one powiat. (97% of 2023-2025 places map to the right
--- powiat when learned from 2019-2020; gmina names as a fallback reach only 86%, so they are not used.)
-CREATE TEMP TABLE residence_place ON COMMIT DROP AS
-SELECT mart.fold_name(residence) AS place, min(left(residence_teryt, 4)) AS powiat
-FROM (SELECT residence, residence_teryt FROM mart.sejm_candidates
-      UNION ALL SELECT residence, residence_teryt FROM mart.senat_candidates
-      UNION ALL SELECT residence, residence_teryt FROM mart.prezydent_candidates
-      UNION ALL SELECT residence, residence_teryt FROM mart.pe_candidates) c
-WHERE residence_teryt ~ '^[0-9]{6}$' AND residence IS NOT NULL
-GROUP BY 1 HAVING count(DISTINCT left(residence_teryt, 4)) = 1;
-
+-- before 2019 the residence text mapped to a powiat through residence_place (see PERSONS_SQL).
 CREATE TEMP TABLE national_residence ON COMMIT DROP AS
-SELECT DISTINCT r.name_key, r.gender, coalesce(left(r.residence_teryt, 4), p.powiat) AS powiat, r.person_id
-FROM national_residence_raw r
-LEFT JOIN residence_place p ON r.residence_teryt IS NULL AND p.place = mart.fold_name(r.residence)
-WHERE coalesce(left(r.residence_teryt, 4), p.powiat) IS NOT NULL;
+SELECT DISTINCT i.name_key, i.gender, i.powiat, i.person_id
+FROM candidacy_ids i
+WHERE i.powiat IS NOT NULL
+  AND NOT EXISTS (SELECT 1 FROM national_name n WHERE n.name_key = i.name_key AND n.gender IS NOT DISTINCT FROM i.gender);
 
 CREATE TEMP TABLE residence_powiat ON COMMIT DROP AS
 SELECT name_key, gender, powiat, min(person_id) AS person_id FROM national_residence
@@ -205,15 +349,28 @@ WHERE k.person_id IS NULL AND w.wojewodztwo = k.wojewodztwo AND r.code = w.code
   AND NOT EXISTS (SELECT 1 FROM mart.sejmik_candidates o WHERE o.year = k.year AND o.full_name = k.full_name
                   AND o.wojewodztwo = k.wojewodztwo AND o.candidate_id <> k.candidate_id);
 
+CREATE TEMP TABLE local_birth ON COMMIT DROP AS
+SELECT person_id, year - age AS birth_year FROM mart.sejmik_candidates WHERE person_id IS NOT NULL AND age IS NOT NULL
+UNION ALL
+SELECT person_id, year - age FROM mart.wbp_candidates WHERE person_id IS NOT NULL AND age IS NOT NULL
+UNION ALL
+SELECT person_id, year - age FROM mart.rada_candidates WHERE person_id IS NOT NULL AND age IS NOT NULL;
+
+-- The local birth years must also allow every national candidacy of the person: candidates must be
+-- at least 21 (Sejm, European Parliament, Senate before 2001), 30 (Senate from 2001) or 35 (President)
+-- years old. The true birth year is year - age or one less, so the earliest is min(year - age) - 1.
+-- Where national registers publish the age (Sejm and Senate 1991-1997), birth years more than 3 apart
+-- contradict (those registers are off by up to 3 years for the same person).
 CREATE TEMP TABLE birth_conflict ON COMMIT DROP AS
-SELECT person_id FROM (
-  SELECT person_id, year - age AS birth_year FROM mart.sejmik_candidates WHERE person_id IS NOT NULL AND age IS NOT NULL
-  UNION ALL
-  SELECT person_id, year - age FROM mart.wbp_candidates WHERE person_id IS NOT NULL AND age IS NOT NULL
-  UNION ALL
-  SELECT person_id, year - age FROM mart.rada_candidates WHERE person_id IS NOT NULL AND age IS NOT NULL
-) b
-GROUP BY person_id HAVING max(birth_year) - min(birth_year) > 1;
+SELECT person_id FROM local_birth GROUP BY person_id HAVING max(birth_year) - min(birth_year) > 1
+UNION
+SELECT b.person_id
+FROM (SELECT person_id, min(birth_year) AS birth_year FROM local_birth GROUP BY person_id) b
+JOIN candidacy_ids c USING (person_id)
+WHERE c.year - (b.birth_year - 1) < CASE WHEN c.chamber = 'prezydent' THEN 35
+                                         WHEN c.chamber = 'senat' AND c.year >= 2001 THEN 30 ELSE 21 END
+UNION
+SELECT b.person_id FROM local_birth b JOIN candidacy_ids c USING (person_id) WHERE abs(b.birth_year - c.birth_year) > 3;
 
 UPDATE mart.sejmik_candidates SET person_id = NULL WHERE person_id IN (SELECT person_id FROM birth_conflict);
 UPDATE mart.wbp_candidates SET person_id = NULL WHERE person_id IN (SELECT person_id FROM birth_conflict);
@@ -888,12 +1045,12 @@ FROM mart.persons p
 JOIN (
   SELECT k.person_id, k.year, 'sejm' AS chamber, 1 AS round, k.district_no, NULL::text AS area, c.committee_name,
          c.aliases AS committee_aliases, k.list_no, k.list_position, k.votes::bigint AS votes, k.elected,
-         NULL::int AS age
+         k.age AS age
   FROM mart.sejm_candidates k JOIN mart.sejm_committees c USING (year, committee_id)
   UNION ALL
   SELECT s.person_id, s.year, 'senat', 1, s.district_no, NULL, s.committee_name,
          (SELECT c.aliases FROM mart.sejm_committees c WHERE c.year = s.year AND c.committee_name = s.committee_name),
-         NULL, NULL, s.votes, s.elected, NULL
+         NULL, NULL, s.votes, s.elected, s.age
   FROM mart.senat_candidates s
   UNION ALL
   SELECT k.person_id, k.year, 'prezydent', k.round, NULL, NULL, k.committee_name, NULL, NULL, NULL, k.votes, k.elected,
@@ -928,7 +1085,7 @@ JOIN (
 CREATE INDEX ON mart.v_person_history (person_id);
 CREATE INDEX ON mart.v_person_history USING gin (full_name gin_trgm_ops);
 COMMENT ON MATERIALIZED VIEW mart.v_person_history IS 'Every candidacy of a person (one row per candidacy and round): Sejm, Senate, President, European Parliament, sejmik, mayor and council candidacies of the same person (national persons, or local persons matched by name, gender, birth year and powiat). Use for "w których wyborach startował X", "kto zmienił komitet", "kto przeszedł z Sejmu do Senatu".';
-COMMENT ON COLUMN mart.v_person_history.age IS 'Age on election day; only local registers (sejmik, wbp, councils) publish it, NULL for national candidacies.';
+COMMENT ON COLUMN mart.v_person_history.age IS 'Age on election day as published: local registers (sejmik, wbp, councils) and the Sejm/Senate registers of 1991, 1993 and 1997; NULL for other national candidacies.';
 COMMENT ON COLUMN mart.v_person_history.chamber IS 'Election: sejm, senat, prezydent, pe, sejmik, wbp (mayor), rada_gminy, rada_powiatu or rada_dzielnicy (councils).';
 COMMENT ON COLUMN mart.v_person_history.area IS 'sejmik: voivodeship; wbp: gmina; councils: council name (2014: unit name). NULL otherwise.';
 COMMENT ON COLUMN mart.v_person_history.committee_aliases IS 'Aliases of the committee (Senate and mayor rows: only when a Sejm / sejmik committee of that year has the same name). Compare aliases, not committee_name, to find party switches across years.';

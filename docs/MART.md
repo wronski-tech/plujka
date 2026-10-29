@@ -12,7 +12,7 @@ small, documented schema, and guards keep that SQL read-only and inside `mart` (
 
 | Election (`mart.elections.election`) | Years | Detail |
 | ------------------------------------ | ----- | ------ |
-| `sejm` | 1991, 1993, 1997, 2001, 2005, 2007, 2011, 2015, 2019, 2023 | precinct: lists, candidates, protocols (1991–2005: no per-precinct candidate votes; 1991–1997: 69 national-list seats as district 0, pre-1999 geography) |
+| `sejm` | 1991, 1993, 1997, 2001, 2005, 2007, 2011, 2015, 2019, 2023 | precinct: lists, candidates, protocols (1991–2005: no per-precinct candidate votes; 1991–1997: 69 national-list seats as district 0, pre-1999 geography, candidate age `age`; 1997 national-list positions checked against the registered national lists) |
 | `senat` | 1991, 1993, 1997, 2001, 2005, 2007, 2011, 2015, 2019, 2023 | precinct: candidates, protocols (1991: candidates only; 1991–1997: 49 voivodeship districts; 2005: candidates with totals only, results published per powiat) |
 | `prezydent` (both rounds; 2000 one round) | 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025 | precinct: candidates, protocols |
 | `pe` (European Parliament) | 2004, 2009, 2014, 2019, 2024 | precinct: lists, candidates, protocols (2004, 2009: gmina rows, no candidate votes below district) |
@@ -143,8 +143,29 @@ new column in `schema.py` (tables) or `derived.py` (views).
 PKW files carry no personal identifier. National candidacies (Sejm, Senate, President, European
 Parliament) with the same normalized full name and gender are one person. When a name is shared by
 several candidates within one election event (Sejm+Senate of a year, a presidential round, an EP
-election), residence must match too. A missing gender (2015 presidential files) is taken from other
-candidacies with the same name when they agree. `persons.match_rule` records the rule.
+election), residence must match too; namesakes of one event with the same residence text are a person
+each. A missing gender (2015 presidential files) is taken from other candidacies with the same name
+when they agree. Three more rules, measured against the ages in the 1991–1997 Sejm and Senate
+registers (`age`; the true birth year is year − age or one less):
+
+- **One given name, residences in different voivodeships** (`name+gender+voivodeship`): split when
+  no candidacies of the two sides have alike occupations (trigram similarity ≥ 0.3, or a student),
+  the same place text or birth years at most 1 apart. Warsaw and unmapped residences fit any side;
+  such candidacies join the part nearest in time. Names with a presidential candidacy (no residence
+  before 2020) and names with two given names (there a new voivodeship nearly always means a move)
+  are not split. 82–92% of split pairs with ages differ by more than 3 years.
+- **Birth years more than 3 apart** (`name+gender+birth year`): split, unless the candidacies share a
+  powiat or place (the 1990s registers are off by up to 3 years for the same person; 2% of same-place
+  pairs differ by more).
+- **Abbreviated given names** (`surname+first given name+gender`): files before 2011 often give only
+  the first given name ("Donald TUSK" in 1991, "Donald Franciszek TUSK" later; 65–75% of unique
+  matches live in the same powiat before 2011, 5–10% from 2011). Candidacies before 2011 of a person
+  with one given name join the one person with more given names, the same surname, gender and first
+  given name, when they never share an election event, live in no conflicting voivodeships (as above),
+  have no birth years more than 3 apart, and one pair lives in the same powiat or place or has birth
+  years at most 1 apart (98% right on 1990s ages). A candidacy from 2011 with one given name is a
+  namesake: it must share an election event with the fuller person, otherwise nothing joins.
+  `persons.match_rule` records the rule.
 
 Local candidates (sejmik, mayors, councils) join a national person only when exactly one national
 person has that name and gender and the name occurs once in that local election (once among all
@@ -152,12 +173,17 @@ council candidates of the year). When several national persons share the name, a
 joins the one whose residence lies in the same powiat (sejmik: voivodeship), if exactly one does and
 the name occurs once in that powiat (voivodeship) in that local election. Residence is
 `residence_teryt` where published (national registers from 2019); before 2019 the residence text is
-mapped to a powiat through place names published with a TERYT since 2019, only where a place name
-occurs with one powiat (97% right on 2023–2025 places when learned from 2019–2020; gmina names as a
-fallback were 86% right and are not used). Local registers also publish the age on
-election day (`age`), national registers do not. All local candidacies linked to one person must
+mapped to a powiat through place names published with a TERYT since 2019: a place maps to a powiat
+when at least 90% of its residence text + `residence_teryt` pairs have that powiat (98% right on
+2023–2025 places learned from 2019–2020, also maps Warsaw and other cities); the village part of
+"X, gm. Y" is compared as text only (mapping it put 41% of villages into same-name towns). Local registers also publish the age on
+election day (`age`), national registers only in 1991–1997. All local candidacies linked to one person must
 agree on the birth year (year − age, at most 1 apart); otherwise the name belongs to several people
-and none of that person's local candidacies is linked. `v_person_history.age` shows the age.
+and none of that person's local candidacies is linked. Local candidacies linked to a national
+person must also have a birth year that allows the person's national candidacies (at least 21 for
+Sejm and EP, and for the Senate until 1997; 30 for the Senate from 2001; 35 for President) and that
+is within 3 years of national ages where published; otherwise none of that person's local
+candidacies is linked. `v_person_history.age` shows the age.
 
 **Local persons.** Local candidacies still unlinked are grouped by name, gender and powiat (TERYT of
 the gmina, powiat or Warsaw district, first four digits) into runs of birth years at most 1 apart.
@@ -187,12 +213,13 @@ candidacy of that name in that election and year. A local candidacy joins the pe
 candidacies in its group (no national candidacy: unlinked). A row that matches no candidacy fails
 the build. Overrides win over every automatic rule.
 
-Limits: national namesakes can still be merged (no age in national registers), and a person who
-changed surname is linked only by an override.
+Limits: namesakes with one given name who never ran in different voivodeships, or whose occupations
+happen to be alike, can still be merged; movers whose occupation changed are split (overrides:
+Hofman, Kośla, Hatka); people who changed surname are linked only by an override.
 
-Current build: 44,804 national and 951,259 local persons; the residence rule links 373 local
-candidacies to one of several national namesakes; every local candidacy with an age belongs to a person
-except 287 sejmik candidacies.
+Current build: 60,681 national persons (56,422 by name and gender, 2,349 with abbreviated given
+names joined, 1,014 by residence, 728 split by voivodeship, 163 by birth year, 5 manual) and
+1,121,830 local persons.
 
 ## Building it
 
@@ -205,10 +232,12 @@ for d in data/pkw_all/sejmsenat*/zip; do
   python3 scripts/kbw_stage_duckdb.py --root "$d" --out data/pkw_stage_parquet
 done
 
-# 2. Build the mart (about 7 minutes for everything, of which about 3 for persons, views and the seat check).
+# 2. Build the mart (about 9 minutes for everything serially, under 8 with --jobs 3 on 4 CPUs; about 4 of them are persons, views and the seat check).
 DATABASE_URL=postgresql://plujka:plujka@localhost:5432/plujka python3 scripts/build_mart.py
 python3 scripts/build_mart.py --years 2023                  # every family of one year
 python3 scripts/build_mart.py --elections prezydent,pe      # some families, all years
+MART_DUCKDB_MEMORY_LIMIT=3GB python3 scripts/build_mart.py --jobs 3   # families in parallel processes (CI)
+python3 scripts/build_mart.py --elections pe --skip-derived  # load only; persons and views on the next full run
 
 # 3. Check the curated SQL examples against the new build.
 MART_DATABASE_URL=postgresql://plujka_mart_reader:...@localhost:5432/plujka python3 scripts/add_sql_example.py --check
@@ -236,7 +265,7 @@ with `TABLES`, `FAMILY`, `available(sources)` and `build_<family>(con, sources) 
 - **PKW "dane w arkuszach" bundles** (`data/pkw_all/sejmsenat<year>/zip`): read first, per dataset.
   KBW's 2023 Senate per-precinct candidate file has empty vote columns; the PKW copy has the votes.
 
-The staged Parquet is committed (`data/kbw_stage_parquet` about 230 MB, `data/pkw_stage_parquet` about 40 MB, `data/gus` 2 MB; CI builds the mart from it); the raw
+The staged Parquet is committed (`data/kbw_stage_parquet` about 285 MB, `data/pkw_stage_parquet` about 40 MB, `data/gus` 2 MB; CI builds the mart from it); the raw
 mirror is not.
 
 ### Consistency checks
@@ -269,6 +298,19 @@ A family-year is not loaded if any check fails. Among them:
   split between its district lists by largest remainders (`hare_niemeyer`). A difference is allowed only for an
   exact tie in list votes for the last seat, which the Electoral Code decides by data not loaded
   (precincts won); these districts are logged (seven so far).
+- local elections 1998: the per-precinct files (sejmik and powiat per-district workbooks, gminas up to
+  20,000 inhabitants) match the precinct file and the candidate register precinct by precinct: precinct
+  protocols, list totals, every candidate's votes, mark and surname; candidates add up to their list in
+  every precinct except the named struck-off lists; district sums equal the published valid votes;
+  PKW's totals for gminas up to 20,000 inhabitants (votes cast, invalid, without an "x") and powiat
+  councils (votes cast); the mazowieckie district summary (seats, lists, candidates, protocol, votes);
+- 1991–1997 registers: every candidate has an age of at least 21 (the Sejm laws, and the Senate law
+  of 10 May 1991 through art. 1; 30 only from the 1997 Constitution, in force on 17 October 1997).
+  National-list seats went to the first candidates in list order without a district seat. 1997:
+  every row of the registered national lists (OGPOL-01..10) matches a register candidate on list,
+  position, district, surname and first given name, apart from
+  `build_sejm.NATIONAL_LIST_EXCEPTIONS_1997` (1,042 candidates and 69 seats, as in M.P. 1997 nr 64
+  poz. 620).
 
 ### Known gaps in the source data
 
@@ -284,10 +326,19 @@ These are properties of the official files, not build errors. Each check names i
   33, 34, 36 and 37 by bloc total only. Senate 1991: candidates with totals only, no precinct
   results. Senate 1993: skierniewickie (38) has candidate votes per precinct but no protocol
   columns, so its precinct protocols are NULL (its ballots exist per gmina only); zielonogórskie (49)
-  is published twice and the register-only copy is checked against the results file. The 1991 Sejm
-  file mostly gives only the first given name, so some 1991 candidates (e.g. "Donald TUSK") are not
-  linked to their later candidacies under the full name. `v_seat_methods` covers the Sejm from 2001
+  is published twice and the register-only copy is checked against the results file. The 1991–2009
+  files often give only the first given name; such candidacies join the person with the full name
+  only when residence or birth year confirms it (see Persons). `v_seat_methods` covers the Sejm from 2001
   (single-tier allocation). PKW computed turnout of all six elections from votes cast.
+  1997 national lists: OGPOL lists 1,045 candidates, the register 1,042. Żochowski (SLD 15) and
+  Morawski (KPEiR 24) were struck off. Pokrzepa (SLD 115) is missing from the register, while
+  `informacje_dodatkowe.txt` names Urbańczyk (SLD 66), who is in the register and won a district
+  seat. OGPOL-01 prints position 35 twice (the register has Mikosz at 36). Three surnames are
+  spelled differently. Both sources give PSL position 28 to Siwoń and Gwiżdż (no 29). Ages are as
+  published (`Wiek`): some are the age on election day, others year minus birth year, so the birth
+  year is year − age or one less. Senators under 30 were legal until 1997 (1993: Okrzesik and
+  Borkowski, both 29). National registers from 2001 publish no age. Sejm and Senate 1989 are not
+  loaded: KBW's archive starts in 1990.
 - **GUS statistics.** No unemployment rate below powiat level; no unemployment figures for Warsaw's
   districts (only the city; BDL's zeros are dropped, `build_gus.NOT_PUBLISHED_FOR_DISTRICTS`); no
   district area or density in 2006–2007; Jastrzębie-Zdrój salary withheld in 2022–2023. Before 2002
@@ -295,18 +346,30 @@ These are properties of the official files, not build errors. Each check names i
   The town and rural parts of urban-rural gminas are not loaded.
 - **Local elections 1998.** No mayors (elected by councils then). The KBW sejmik files exceed PKW's
   announcement (Dz.U. 1998 nr 131 poz. 861) by 1,608 eligible voters, 1,402 valid ballots, 1,382
-  valid votes and 20 invalid ballots; seats are unaffected and the cause is not in the published
-  files. Ballots issued are not published (NULL); turnout is valid ballots / eligible, PKW's basis.
-  Seats per committee are not in PKW's announcement; the sejmik seats match the voivodeship results
-  (AWS 342, SLD 329, …). KBW marks 1,651 small-gmina districts uncontested (PKW: 1,647) and has 4
-  more candidates and 40 fewer lists there than PKW; the difference cannot be located. Śniadowo
-  district 12 had no list (1 seat added), nobody voted in Margonin district 14 (seat empty),
-  Sochaczew district 5 lacks 77 votes of a list missing from the file. A committee's lists in
-  proportional councils share one number (art. 109, 141 of the 1998 act), so spelling variants with
-  a shared number are one committee (`build_rady._uniform_committees_1998`, named exceptions
-  `SEPARATE_LIST_NUMBERS` / `UNIFORM_LIST_NUMBERS`); variants above the highest shared number may
-  remain separate. Warsaw: Rada m.st. Warszawy (KBW code 149900) is loaded as 146501, the seven
-  Warszawa-Centrum district councils as their later districts (`build_rady.WARSAW_COUNCILS_1998`),
+  valid votes and 20 invalid ballots (14 of them without an "x"). Every KBW file gives the larger
+  figures: the precinct file, the gmina file, the per-district workbooks (`1998woj`, precinct by
+  precinct) and the mazowieckie summary (`1998mazowieckie`, district by district); the council files
+  reproduce PKW's council figures exactly, so the cause is not in the published files. The check
+  requires exactly this difference (`build_samorzad.SEJMIK_PKW_GAP_1998`); seats are unaffected.
+  Ballots issued come from the workbooks (in 64 precincts they are fewer than the votes cast); turnout
+  is valid ballots / eligible, PKW's basis. Seats per committee are not in PKW's announcement; the
+  sejmik seats match the voivodeship results (AWS 342, SLD 329, …). In gminas up to 20,000
+  inhabitants KBW marks 1,651 districts uncontested (PKW: 1,647) and has 4 more candidates and 27
+  fewer lists (93,864 by its list ids; `rada_district_lists` has 93,851 rows because same-named
+  committees are merged) than PKW. The per-precinct file has exactly KBW's 24,507 contested districts
+  and their 121,075 candidates with the same votes, so the difference cannot be located
+  (`build_rady.UNCONTESTED_GAP_1998`). Śniadowo district 12 had no list (1 seat added), nobody voted
+  in Margonin district 14 (seat empty; 0 votes in the precinct file), Sochaczew district 5 lacks 77
+  votes of a list missing from the file (a town over 20,000 inhabitants: no per-precinct file). The
+  candidate file numbers Komitet Wyborczy "Samorządność" in Powiat Kartuski district 4 as list 4; the
+  workbook and its other districts number it 7, which is loaded (`build_rady.LIST_NUMBER_ERRORS`). Four
+  of the seven surnames "1" are PRAWDA in the per-precinct files, which is loaded
+  (`build_rady.SURNAME_FIXES`); the other three stay "1" (`SURNAME_ERRORS`). A committee's
+  lists in proportional councils share one number (art. 109, 141 of the 1998 act), so spelling
+  variants with a shared number are one committee (`build_rady._uniform_committees_1998`, named
+  exceptions `SEPARATE_LIST_NUMBERS` / `UNIFORM_LIST_NUMBERS`); variants above the highest shared
+  number may remain separate. Warsaw: Rada m.st. Warszawy (KBW code 149900) is loaded as 146501, the
+  seven Warszawa-Centrum district councils as their later districts (`build_rady.WARSAW_COUNCILS_1998`),
   the other Warsaw gmina councils keep their 1431xx codes; in the sejmik data Warszawa-Centrum is
   gmina 143104 (powiat 1431) and the other Warsaw gminas carry their later district codes.
 - **Local elections 2002/2006.** No district register: seats are the elected candidates, checked
@@ -339,6 +402,16 @@ These are properties of the official files, not build errors. Each check names i
   published as 13101, corrected to 11 (`build_referendum.CORRECTIONS_PRE1999`), which reproduces PKW's
   national total. 1990: two empty ship precincts are dropped and two hospital precincts did not vote
   in round 2 (named in `build_prezydent`).
+- **Pre-1999 gmina codes.** `teryt_gmina_pre1999` is the code of the old GUS register: two digits for
+  the 1975–1998 voivodeship (odd numbers, 01 warszawskie … 97 zielonogórskie) and three for the gmina
+  (100–499 towns and urban-rural gminas, 500–999 rural gminas, 000–099 big cities and Warsaw
+  dzielnice). No official key to TERYT exists. `streamlit_app/geo/gminy_pre1999.json` matches every
+  code in the mart to its 1999 TERYT gmina by name and type, checked against GUS BDL units for
+  1995–1998 and the GUS change notices; the UI maps use it. The 1991 Sejm file has no row for 24
+  rural gminas (their precincts are under the town of the same name) and for 22 gminas created in
+  1991–1993. Before a gmina was split off (1994–1998, and Jaśliska in 2010), the parent's code covers
+  both. The Warsaw dzielnice of 1990–1994 cover several current districts. Ostrowice (split in 2019)
+  cannot be mapped to a current gmina.
 - **Sejm 2001** publishes no per-precinct candidate votes (no 2001 rows in
   `sejm_precinct_candidate_votes`); candidate totals are checked against list totals. Seats were
   allocated by modified Sainte-Laguë (`derived.SEAT_METHODS`).
@@ -502,9 +575,13 @@ would answer it from Sejm data.
    without a given name in the question, a capitalized word closer to the surname than to any
    committee alias ("w gminach" is not GMIŃSKI, "turę" not TUR, "PiS" not PIŚ, "Lewicy" not
    LEWICKI; "Kukiz" is both). A lower-case surname alone ("tusk") is left to SQL on `full_name`.
-   Persons whose given name appears in the question are kept first; then those elected more often. `narrow_matches` drops matches the
-   question rules out (other given names, surnames that are matched places, places named like the
-   given name of a matched person).
+   Persons whose given name appears in the question are kept first; then those elected more often.
+   `narrow_matches` drops matches the question rules out: other given names; surnames that are
+   matched places, except that a given name or a capitalized word inside the sentence beats a
+   voivodeship or powiat, whose names are lower-case adjectives ("Mazowieckiego" is the person,
+   "w województwie mazowieckim" the place); places named like the given name of a matched person;
+   places matched only by a party alias ("PiS" is not Pisz); and 1975–1998 voivodeships when a
+   current place matched and the question names neither an earlier year nor "województwo".
 2. **Clarification.** If several persons or same-name gminas remain, the API returns
    `intent = "clarification"` with options instead of guessing. The UI shows them as buttons; a
    choice is sent back as `entity_refs: [{"kind": "person", "ref": "<person_id>"}]`, which pins that

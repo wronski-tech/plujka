@@ -51,6 +51,7 @@ from api.services.mart.build_common import (
     sql_literal,
 )
 from api.services.mart.build_precincts import COMBINED_PRECINCTS, rows_without_number
+from api.services.mart.build_sejm import MIN_CANDIDATE_AGE_1990S
 
 log = logging.getLogger("mart")
 
@@ -165,7 +166,7 @@ def _build_excel_registers(con: duckdb.DuckDBPyConnection, year: int, candidates
                k."Przynależność do partii politycznej" AS party_membership, NULL AS party_support,
                int_(k."Głosy") AS votes,
                {pct_expr(con, candidates_src, '"% w okr."')} AS pct_of_district,
-               yes_(k."Mandat") AS elected
+               yes_(k."Mandat") AS elected, CAST(NULL AS INT) AS age
         FROM {candidates_src} k
         """
     )
@@ -215,7 +216,7 @@ def _build_csv_registers(con: duckdb.DuckDBPyConnection, year: int, sources: Yea
                {f"NULLIF(trim(k.{support}), '')" if support else "CAST(NULL AS VARCHAR)"} AS party_support,
                int_(k."Liczba głosów") AS votes,
                {pct_expr(con, candidates_src, pct)} AS pct_of_district,
-               yes_(k.{elected}) AS elected
+               yes_(k.{elected}) AS elected, CAST(NULL AS INT) AS age
         FROM {candidates_src} k
         """
     )
@@ -282,7 +283,8 @@ def _build_2005_registers(con: duckdb.DuckDBPyConnection, year: int, sources: Ye
                CAST(NULL AS VARCHAR) AS residence_teryt,
                {f"NULLIF(trim(k.{affiliation}), '')" if affiliation else "CAST(NULL AS VARCHAR)"} AS party_membership,
                CAST(NULL AS VARCHAR) AS party_support,
-               int_(k."Głosy") AS votes, {pct} AS pct_of_district, yes_(k."Mandat") AS elected
+               int_(k."Głosy") AS votes, {pct} AS pct_of_district, yes_(k."Mandat") AS elected,
+               CAST(NULL AS INT) AS age
         FROM {candidates_src} k
         """
     )
@@ -531,7 +533,8 @@ def _build_1990s(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
                gender_(k."Płeć") AS gender, NULLIF(trim(k."Zawód"), '') AS occupation,
                NULLIF(trim(k.{residence}), '') AS residence, CAST(NULL AS VARCHAR) AS residence_teryt,
                CAST(NULL AS VARCHAR) AS party_membership, NULLIF(trim(k."Poparcie"), '') AS party_support,
-               int_(k.{votes}) AS votes, {pct} AS pct_of_district, yes_(k."Mandat") AS elected
+               int_(k.{votes}) AS votes, {pct} AS pct_of_district, yes_(k."Mandat") AS elected,
+               CAST(int_(k."Wiek") AS INT) AS age
         FROM {src} k
         """
     )
@@ -790,6 +793,10 @@ def _register_checks(con: duckdb.DuckDBPyConnection, year: int) -> dict[str, str
         f"Senate districts != {districts}": f"SELECT abs(count(*) - {districts}) FROM senat_districts",
         "elected senators != 100": "SELECT abs(count(*) FILTER (WHERE elected) - 100) FROM senat_candidates",
     }
+    if year in SOURCES_1990S:  # the only registers that publish the age
+        checks["Senate candidates without a published age"] = "SELECT count(*) FROM senat_candidates WHERE age IS NULL"
+        checks[f"Senate candidates younger than {MIN_CANDIDATE_AGE_1990S} or older than 100"] = f"""
+            SELECT count(*) FROM senat_candidates WHERE age < {MIN_CANDIDATE_AGE_1990S} OR age > 100"""
     if con.execute("SELECT count(*) FROM information_schema.tables WHERE table_name = 'senat_district_seats'").fetchone()[0]:
         checks["Senate seats in districts != 100"] = "SELECT abs(sum(seats) - 100) FROM senat_district_seats"
         checks["Senate districts whose elected candidates differ from their seats"] = """

@@ -138,7 +138,7 @@ changed parquet and manifest. Files that disappeared are kept; check the KBW pag
 
 ## Staged data in Git
 
-The staged parquet (`data/kbw_stage_parquet`, `data/pkw_stage_parquet`, about 270 MB) is committed
+The staged parquet (`data/kbw_stage_parquet`, `data/pkw_stage_parquet`, about 320 MB in some 15,000 files) is committed
 as plain Git files, not Git LFS. CI checks out the repository and builds the whole mart from these
 files on every push, and GitHub's free LFS bandwidth (1 GB per month) would be used up by those
 checkouts within days. No parquet file is near GitHub's 100 MB file limit. If the data grows past a

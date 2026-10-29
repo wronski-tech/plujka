@@ -69,8 +69,11 @@ jobs:
         run: PYTHONPATH=. python -m unittest discover -s tests -p 'test*.py' -v
 
       # Every consistency check in the builders must pass on PostgreSQL 16 with the committed data.
+      # Families build in three processes (4 vCPU, 16 GB runner); persons and views follow serially.
       - name: Build the mart from committed parquet
-        run: PYTHONPATH=. python -u scripts/build_mart.py
+        env:
+          MART_DUCKDB_MEMORY_LIMIT: 3GB
+        run: PYTHONPATH=. python -u scripts/build_mart.py --jobs 3
 
       - name: Check curated SQL examples against the built mart
         run: PYTHONPATH=. python scripts/add_sql_example.py --check

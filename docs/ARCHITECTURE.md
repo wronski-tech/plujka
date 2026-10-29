@@ -24,6 +24,8 @@ flowchart LR
 
 A clarification answer is sent back as `POST /ask` with `entity_refs: [{"kind": "person", "ref": "<person_id>"}]`; the Streamlit UI shows the options as buttons and does this for the user. The UI also keeps the last answered turn and sends it as `previous` when the "Dopytaj o poprzedni wynik" toggle is on (on by default for questions such as "a w 2019?"). It draws a bar chart when each row is one labelled unit with a number, a choropleth when rows carry `teryt_gmina`, `teryt_powiat` or `wojewodztwo` (boundaries in `streamlit_app/geo/`), and shows the SQL with the PKW/KBW source. Maps match `teryt_gmina`/`teryt_powiat` against `streamlit_app/geo/*.json` through `streamlit_app/map_units.py`: old codes are translated by `geo/teryt_changes.json` (votes of merged units are summed, percentages skipped with a caption), and features with `parts` are pre-division outlines (Warsaw, Kamienica, Supraśl, powiat wałbrzyski) drawn only when the result uses the old unit. See `streamlit_app/geo/README.md`.
 
+The Streamlit UI also offers a person search ("Szukaj osoby") that calls `GET /persons?name=…` and, for the chosen match, `GET /persons/{id}`; it shows the same timeline as persons found in an answer. It is a Streamlit fragment, so its reruns do not touch the answer. Which result columns are charted is decided in `streamlit_app/chart_columns.py`: `numeric_columns` separates measures from codes (years, rounds, list numbers, ids, TERYT), and `scatter_columns` picks a scatter plot (label, x, y) when every row is a distinct territorial unit with exactly two measures; otherwise the bar chart and map use `_value_column`.
+
 ## Startup and data loading
 
 On API startup (`lifespan` in `api/main.py`):
@@ -81,6 +83,6 @@ Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `
 | Embeddings           | `api/services/embeddings.py`      |
 | KBW import           | `api/services/kbw_import.py`, `scripts/import_kbw_facts.py`, `loader` service |
 | Legacy PKW helpers   | `api/services/seed.py`            |
-| UI (charts, map, follow-ups) | `streamlit_app/app.py`, `streamlit_app/map_units.py`, `streamlit_app/geo/` |
+| UI (charts, map, follow-ups, person search) | `streamlit_app/app.py`, `streamlit_app/chart_columns.py`, `streamlit_app/map_units.py`, `streamlit_app/geo/` |
 | Feedback JSONL       | `api/services/feedback_store.py`  |
 | Person timeline / CSV | `/persons*` in `api/main.py`, `streamlit_app/app.py` |

@@ -219,29 +219,75 @@ def _given_names(match: EntityMatch) -> list[str]:
     return [fold(w) for w in match.name.split() if not (w.isupper() and len(w) > 1)]
 
 
+# Voivodeship and powiat names are adjectives written in lower case ("województwo mazowieckie",
+# "powiat bocheński"), unlike gmina names and surnames.
+ADJECTIVE_PLACE_KINDS = ("wojewodztwo", "powiat")
+
+
+def _capitalized_inside(question: str, surname: str) -> bool:
+    """Whether a capitalized word after the first one names ``surname`` ("Wynik Mazowieckiego")."""
+    words = re.findall(r"[^\W_]+", question)[1:]
+    return any(raw[:1].isupper() and _word_matches(surname, _word_stems(fold(raw))) for raw in words)
+
+
 def narrow_matches(question: str, matches: list[EntityMatch]) -> list[EntityMatch]:
     """Drop matches the question rules out.
 
     - Persons whose given name is not in the question, when another person with the same surname has
       one there ("Jarosław Kaczyński" keeps only Jarosław).
-    - Persons whose surname is really a matched place name ("w Krakowie" also matches surname KRAK).
+    - Persons whose surname is really a matched place name ("w Krakowie" also matches surname KRAK),
+      unless the place is a voivodeship or powiat (lower-case adjectives) and the person is named
+      with a given name or a capitalized word inside the sentence ("Tadeusz Mazowiecki", "wynik
+      Mazowieckiego"): then the place is dropped instead.
     - Places named like the given name of a person in the question ("Jarosław Kaczyński" also
       matches the gminas Jarosław).
+    - Places matched only by a word that is a matched committee alias ("PiS" is not the gmina Pisz).
+    - Voivodeships of 1975-1998 when the same question also matched a current gmina or powiat and
+      names neither a year before 1999 nor "województwo" ("w Krakowie" is the city, not the
+      voivodeship krakowskie).
     """
     stems, _ = question_terms(question)
+    aliases = {fold(m.name) for m in matches if m.kind == "committee"}
+    other_stems = {s for raw in re.findall(r"[^\W_]+", question) if fold(raw) not in aliases
+                   for s in _word_stems(fold(raw))}
+    old_years = any(int(y) < 1999 for y in re.findall(r"\b(?:19|20)\d{2}\b", question))
+    current_place = any(m.kind in ("gmina", "powiat") and max(m.years, default=0) >= 1999 for m in matches)
     persons = [m for m in matches if m.kind == "person"]
     named = [m for m in persons if any(_word_matches(g, stems) for g in _given_names(m))]
     given = {g for m in named for g in _given_names(m)}
-    places = [fold(m.name) for m in matches if m.kind in PLACE_KINDS]
+
+    def clashing_places(person: EntityMatch) -> list[EntityMatch]:
+        surname = fold(person.name.split()[-1])
+        if len(surname) < 4:
+            return []
+        return [p for p in matches if p.kind in PLACE_KINDS
+                and _PLACE_PREFIX.sub("", fold(p.name)).split()[-1].startswith(surname[:4])]
+
+    person_wins, beaten = set(), set()
+    for m in persons:
+        clash = clashing_places(m)
+        if clash and all(p.kind in ADJECTIVE_PLACE_KINDS for p in clash) and (
+            m in named or _capitalized_inside(question, fold(m.name.split()[-1]))
+        ):
+            person_wins.add(id(m))
+            beaten.update(id(p) for p in clash)
     out = []
     for m in matches:
+        if id(m) in beaten:
+            continue
         if m.kind in PLACE_KINDS and _PLACE_PREFIX.sub("", fold(m.name)) in given:
+            continue
+        if m.kind in PLACE_KINDS and aliases and not all(
+            _word_matches(w, other_stems) for w in re.split(r"[\s\-]+", _PLACE_PREFIX.sub("", fold(m.name))) if w
+        ):
+            continue
+        if m.kind == "wojewodztwo" and max(m.years, default=0) < 1999 and current_place and not old_years \
+                and "wojewodztw" not in fold(question):
             continue
         if m.kind == "person":
             if named and m not in named:
                 continue
-            surname = fold(m.name.split()[-1])
-            if any(p.split()[-1].startswith(surname[:4]) for p in places if len(surname) >= 4):
+            if id(m) not in person_wins and clashing_places(m):
                 continue
         out.append(m)
     return out

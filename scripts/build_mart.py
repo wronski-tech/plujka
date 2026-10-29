@@ -27,6 +27,7 @@ from __future__ import annotations
 
 import argparse
 import logging
+from concurrent.futures import ProcessPoolExecutor
 import sys
 import time
 from dataclasses import dataclass
@@ -134,8 +135,12 @@ def wait_for_database(seconds: int) -> None:
             time.sleep(5)
 
 
-def build_one(roots: list[Path], name: str, family: Family, year: int) -> bool:
-    """Build, check and load one family-year; return False when its files are not staged."""
+def build_one(roots: list[Path], name: str, family: Family, year: int, ensure: bool = True) -> bool:
+    """Build, check and load one family-year; return False when its files are not staged.
+
+    ``ensure=False`` skips ``schema.ensure_schema`` (the caller ran it): its ALTER TABLE statements
+    would lock every table for the whole load and serialize parallel builds.
+    """
     started = time.monotonic()
     con = open_duckdb()
     try:
@@ -145,13 +150,31 @@ def build_one(roots: list[Path], name: str, family: Family, year: int) -> bool:
             return False
         elections = family.build(con, sources)
         with psycopg.connect(DATABASE_URL) as pg:
-            schema.ensure_schema(pg)
+            if ensure:
+                schema.ensure_schema(pg)
             load_tables(pg, con, year, family.tables)
             record_elections(pg, family.kinds, year, elections)
         log.info("%s %s built in %.1fs", name, year, time.monotonic() - started)
         return True
     finally:
         con.close()
+
+
+def build_family(roots: list[Path], name: str, years: list[int], ensure: bool = True) -> tuple[list[str], list[str]]:
+    """Build the given years of one family in order; return (built, failed) labels."""
+    built, failed = [], []
+    for year in years:
+        try:
+            if build_one(roots, name, FAMILIES[name], year, ensure):
+                built.append(f"{name} {year}")
+        except BuildError as exc:
+            log.error("%s %s: %s", name, year, exc)
+            failed.append(f"{name} {year}")
+    return built, failed
+
+
+def _init_worker() -> None:
+    logging.basicConfig(level=logging.INFO, format="[mart] %(levelname)s %(message)s", force=True)
 
 
 def main() -> None:
@@ -169,6 +192,15 @@ def main() -> None:
         "--elections", type=str, default=None, help=f"Comma-separated families of {sorted(FAMILIES)} (default: all)"
     )
     parser.add_argument("--wait-db-seconds", type=int, default=0, help="Wait for PostgreSQL before building")
+    parser.add_argument(
+        "--jobs", type=int, default=1,
+        help="Families built in parallel processes (years of a family stay in order; gus runs last). "
+             "Set MART_DUCKDB_MEMORY_LIMIT so that jobs x limit fits in memory.",
+    )
+    parser.add_argument(
+        "--skip-derived", action="store_true",
+        help="Load family-years only; leave persons, views and the seat check to a later full run",
+    )
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="[mart] %(levelname)s %(message)s")
 
@@ -185,21 +217,31 @@ def main() -> None:
     if args.wait_db_seconds:
         wait_for_database(args.wait_db_seconds)
 
+    by_family = {n: [y for m, y in jobs if m == n] for n in dict.fromkeys(n for n, _ in jobs)}
     built, failed = [], []
-    for name, year in jobs:
-        try:
-            if build_one(roots, name, FAMILIES[name], year):
-                built.append(f"{name} {year}")
-        except BuildError as exc:
-            log.error("%s %s: %s", name, year, exc)
-            failed.append(f"{name} {year}")
+    if args.jobs > 1:
+        with psycopg.connect(DATABASE_URL) as pg:
+            schema.ensure_schema(pg)
+        # gus checks its TERYT codes against the election tables, so it runs after them.
+        parallel = [n for n in by_family if n != "gus"]
+        with ProcessPoolExecutor(max_workers=args.jobs, initializer=_init_worker) as pool:
+            results = list(pool.map(build_family, [roots] * len(parallel), parallel, [by_family[n] for n in parallel],
+                                    [False] * len(parallel)))
+        if "gus" in by_family:
+            results.append(build_family(roots, "gus", by_family["gus"], ensure=False))
+    else:
+        results = [build_family(roots, name, years) for name, years in by_family.items()]
+    for family_built, family_failed in results:
+        built += family_built
+        failed += family_failed
     if not built and not failed:
         raise SystemExit(f"[mart] nothing to build: no staged results under {roots}")
 
-    with psycopg.connect(DATABASE_URL) as pg:
-        schema.ensure_schema(pg)
-        derived.rebuild(pg)
-        schema.ensure_reader_role(pg, statement_timeout_ms=MART_STATEMENT_TIMEOUT_MS)
+    if not args.skip_derived:
+        with psycopg.connect(DATABASE_URL) as pg:
+            schema.ensure_schema(pg)
+            derived.rebuild(pg)
+            schema.ensure_reader_role(pg, statement_timeout_ms=MART_STATEMENT_TIMEOUT_MS)
     if failed:
         raise SystemExit(f"[mart] failed consistency checks and were not loaded: {failed}")
     log.info("done: %s", built)

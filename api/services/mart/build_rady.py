@@ -13,7 +13,9 @@ Sources (KBW mirror):
   gminas of powiat warszawski (1431xx, kept: a gmina council is not a district council), Rada m.st.
   Warszawy (KBW code 149900, loaded as 146501) and the councils of the seven districts of gmina
   Warszawa-Centrum (143105-143111, loaded as their post-2002 districts, WARSAW_COUNCILS_1998). Codes
-  are those of the 1999 TERYT register.
+  are those of the 1999 TERYT register. The per-precinct files of gminas up to 20,000 inhabitants
+  (``1998_rady_gmin``) and of powiat councils (``1998pow``, per-district workbooks) are used for the
+  checks only (candidates, list totals, district valid votes, PKW totals; see _checks_precincts_1998).
 - 2002: ``2002-kand-rady`` (candidates of every council with votes, ``% gł. odd. na listę``, ``% gł. w
   okręgu`` and ``Mandat`` = G (elected by votes), L (by lot), B (without voting)),
   ``2002-frekwencja-i-nieważne-gminy`` (official valid votes per gmina / Warsaw district for every
@@ -63,12 +65,16 @@ list totals; 2018 the 13,249 council lists differ from the protocols only in the
 
 from __future__ import annotations
 
+import hashlib
 import logging
+import re
 from pathlib import Path
 
 import duckdb
+import pyarrow as pa
+import pyarrow.parquet as pq
 
-from api.services.mart.build_common import BuildError, YearSources, columns_of, run_checks, sql_literal
+from api.services.mart.build_common import BuildError, YearSources, columns_of, run_checks, sql_list, sql_literal
 from api.services.mart.build_precincts import WARSAW_DISTRICTS_2005
 from api.services.mart.schema import RADA_TABLES
 
@@ -77,7 +83,11 @@ log = logging.getLogger("mart")
 TABLES = RADA_TABLES
 
 SOURCES = {
-    1998: {"candidates": "**/samorzad/1998-kand-rady.parquet"},
+    1998: {
+        "candidates": "**/samorzad/1998-kand-rady.parquet",
+        "gmina_precincts": "**/samorzad/rada_gminy/1998_rady_gmin/*.parquet",
+        "powiat_workbooks": "**/samorzad/rada_powiatu/1998pow/*__sheet*.parquet",
+    },
     2002: {
         "candidates": "**/samorzad/2002-kand-rady.parquet",
         "gminas": "**/samorzad/2002-frekwencja-i-niewa*ne-gminy.parquet",
@@ -217,6 +227,8 @@ UNLISTED_VOTES_DISTRICTS = {1998: [("gmina", "142801", 5)]}
 # Format: council_level -> "teryt/district" items.
 STRUCK_OFF_DISTRICTS = {
     # 1998: one list per district above its candidates; the published list totals keep the list votes.
+    # The powiat districts are confirmed by the per-district workbooks (1998pow): in each, exactly one
+    # list's candidates fall short of its precinct totals, in no other powiat district.
     1998: {
         "gmina": "026401/3 046101/7 046201/7 046301/8 066201/2 080302/1 086201/8 100101/2 100704/3 106201/4 141804/3 "
         "143103/3 143104/3 143104/12 180301/4 180301/5 180805/2 240101/4 240801/4 241101/3 241304/2 241602/1 "
@@ -249,9 +261,9 @@ STRUCK_OFF_DISTRICTS = {
 # Years whose registers keep candidates struck off after the ballots were printed (with NULL votes).
 STRUCK_OFF_IN_REGISTER = {2024}
 # Candidates whose surname in the source is not a name (1998, 2002, 2014: '1'), as (council_level, teryt, district).
+# 1998: three more are corrected from the per-precinct files, see SURNAME_FIXES; these three are not in them.
 SURNAME_ERRORS = {
-    1998: [("gmina", "120604", 6), ("gmina", "140705", 3), ("powiat", "1425", 10), ("powiat", "1434", 4), ("gmina", "146301", 8),
-           ("gmina", "221209", 3), ("gmina", "260202", 1)],
+    1998: [("gmina", "140705", 3), ("gmina", "146301", 8), ("gmina", "260202", 1)],
     2002: [("gmina", "120604", 5), ("gmina", "140705", 2), ("powiat", "1425", 6), ("gmina", "142512", 7), ("gmina", "142512", 10)],
     2014: [("gmina", "100408", 11), ("gmina", "140705", 19), ("gmina", "142512", 14), ("gmina", "182103", 7)]}
 # 1998 majoritarian districts where committees of the same name ('KOMITET WYBORCZY', a village
@@ -277,6 +289,102 @@ SEPARATE_LIST_NUMBERS = {1998: [("gmina", "100201", 11), ("gmina", "100607", 8)]
 # FORUM' in district 1, 'ZARZĄD STOWARZYSZENIE PONADPARTYJNE FORUM' in 2), whose official seats (1 and 2)
 # need its powiat-wide 6.7%; either spelling alone is below the 5% threshold.
 UNIFORM_LIST_NUMBERS = {1998: [("powiat", "0202", 8)]}
+# 1998 list numbers that the candidate file gets wrong, as (council_level, teryt, district, list_no in the
+# file): number on the ballot. Powiat Kartuski (2206) district 4: 'Komitet Wyborczy "Samorządność"' is
+# list 4 in the candidate file, list 7 in the per-district workbook (1998pow 220600-04) and in its six
+# other districts, as the shared numbering (art. 141 of the 1998 act) requires.
+LIST_NUMBER_ERRORS = {1998: {("powiat", "2206", 4, 4): 7}}
+# 1998 candidates whose surname is '1' in the candidate file but PRAWDA ('true', apparently turned into 1 by
+# the export) in the per-precinct files (1998_rady_gmin, 1998pow), as (council_level, teryt, district):
+# surname. The per-precinct surname checks compare the corrected names.
+SURNAME_FIXES = {1998: {("gmina", "120604", 6): "PRAWDA", ("gmina", "221209", 3): "PRAWDA",
+                        ("powiat", "1425", 10): "PRAWDA", ("powiat", "1434", 4): "PRAWDA"}}
+
+# 1998 per-precinct council files (KBW): gminas up to 20,000 inhabitants (``1998_rady_gmin``, one sheet
+# per voivodeship, one row per precinct and candidate of the contested districts, with the precinct's
+# eligible voters, votes cast, invalid votes, those without an "x" and valid ballots) and powiat councils
+# (``1998pow``, the per-district workbooks read by load_district_workbooks_1998). PKW announcement of 23
+# October 1998 (Dz. U. Nr 131, poz. 861): gminas up to 20,000 inhabitants 5,870,314 votes cast, 170,582
+# invalid votes, 108,741 of them without an "x"; powiat councils 9,485,117 votes cast. Both files
+# reproduce these figures (and the valid votes in OFFICIAL_VALID_1998).
+OFFICIAL_PRECINCTS_1998 = {"gmina_cast": 5870314, "gmina_invalid": 170582, "gmina_no_x": 108741, "powiat_cast": 9485117}
+# The same announcement counts in gminas up to 20,000 inhabitants 1,647 districts without voting,
+# 122,722 candidates and 93,891 lists. The KBW candidate file has 1,651 uncontested districts (one
+# candidate each), 122,726 candidates and 93,864 lists ('Id listy'), and the per-precinct file has
+# exactly its 24,507 contested districts and their 121,075 candidates with the same votes; the elected
+# total (41,472) agrees. So the difference (+4 / +4 / -27) is not in the KBW files and cannot be located.
+UNCONTESTED_GAP_1998 = {"uncontested": (1647, 4), "candidates": (122722, 4), "lists": (93891, -27)}
+
+# 1998 per-district workbooks (sejmik ``1998woj``, powiat councils ``1998pow``): one workbook per
+# district, ``<council code>-<district>.xls``. Sheet 1 lists the district's precincts (eligible
+# voters, ballots issued, votes cast, valid votes); every further sheet is one list, titled with its
+# two-digit number, with the list's precinct total ('Gł. na listę') and one column per candidate
+# ('<position>. SURNAME Given names (W|N)', W = elected). Staging writes one Parquet file per sheet,
+# named ``__sheetNN_<first 8 hex digits of sha1(sheet title)>`` (scripts/kbw_stage_duckdb.py), which
+# gives the list number back.
+_WORKBOOK_SHEET = re.compile(r"/(\d{6})-(\d{2})__[0-9a-f]+__sheet(\d+)_([0-9a-f]{8})\.parquet$")
+_WORKBOOK_LIST_NUMBERS = {hashlib.sha1(f"{n:02d}".encode()).hexdigest()[:8]: n for n in range(1, 100)}
+_WORKBOOK_CANDIDATE = re.compile(r"^(\d+)\. (.+) \(([WN])\)$")
+_WORKBOOK_PRECINCT_HEADERS = [
+    "Kod rady", "Nr okr.", "Kod gminy", "Gmina", "Powiat", "Nr obw.", "Adres", "Upr.", "Wydane karty", "Gł. odd. (frekw.)", "Gł. ważne",
+]
+
+
+def load_district_workbooks_1998(con: duckdb.DuckDBPyConnection, sources: YearSources, pattern: str, prefix: str) -> None:
+    """Load the 1998 per-district workbooks matching ``pattern`` into ``<prefix>_precincts`` (sheet 1,
+    as staged), ``<prefix>_lists`` (council, district_no, gmina, precinct_no, list_no, votes) and
+    ``<prefix>_candidates`` (the same plus position, name and mark W / N, one row per precinct)."""
+    precinct_files: list[str] = []
+    lists: dict[str, list] = {k: [] for k in ("council", "district_no", "gmina", "precinct_no", "list_no", "votes")}
+    cands: dict[str, list] = {k: [] for k in ("council", "district_no", "gmina", "precinct_no", "list_no", "position", "name", "mark", "votes")}
+    for path in sources.files(pattern):
+        match = _WORKBOOK_SHEET.search(path)
+        if not match:
+            raise BuildError(f"year 1998: unexpected workbook sheet file {path}")
+        council, district = match[1], int(match[2])
+        if match[3] == "01":
+            precinct_files.append(path)
+            continue
+        list_no = _WORKBOOK_LIST_NUMBERS.get(match[4])
+        table = pq.read_table(path, partitioning=None)
+        headers = table.column_names
+        if list_no is None or headers[:3] != ["Kod gminy", "Nr obw.", "Gł. na listę"]:
+            raise BuildError(f"year 1998: workbook list sheet {path} has no list number or headers {headers[:3]}")
+        data = table.to_pydict()
+        n = table.num_rows
+        for key, values in (("council", [council] * n), ("district_no", [district] * n), ("gmina", data["Kod gminy"]),
+                            ("precinct_no", data["Nr obw."]), ("list_no", [list_no] * n), ("votes", data["Gł. na listę"])):
+            lists[key].extend(values)
+        for header in headers[3:]:
+            candidate = _WORKBOOK_CANDIDATE.match(header)
+            if not candidate:
+                raise BuildError(f"year 1998: workbook list sheet {path} has a column {header!r} that names no candidate")
+            for key, values in (("council", [council] * n), ("district_no", [district] * n), ("gmina", data["Kod gminy"]),
+                                ("precinct_no", data["Nr obw."]), ("list_no", [list_no] * n), ("position", [int(candidate[1])] * n),
+                                ("name", [candidate[2]] * n), ("mark", [candidate[3]] * n), ("votes", data[header])):
+                cands[key].extend(values)
+    if not precinct_files or not lists["votes"]:
+        raise BuildError(f"year 1998: no staged workbooks match {pattern}")
+    con.execute(
+        f"""CREATE OR REPLACE TABLE {prefix}_precincts AS
+            SELECT * FROM read_parquet({sql_list(precinct_files)}, hive_partitioning = false, filename = true)"""
+    )
+    if columns_of(con, f"{prefix}_precincts") != [*_WORKBOOK_PRECINCT_HEADERS, "filename"]:
+        raise BuildError(f"year 1998: unexpected precinct sheet headers {columns_of(con, f'{prefix}_precincts')}")
+    foreign = con.execute(
+        f"""SELECT count(*) FROM {prefix}_precincts
+            WHERE regexp_extract(filename, '/(\\d{{6}})-(\\d{{2}})__', 1) <> "Kod rady"
+               OR int_(regexp_extract(filename, '/(\\d{{6}})-(\\d{{2}})__', 2)) <> int_("Nr okr.")"""
+    ).fetchone()[0]
+    if foreign:
+        raise BuildError(f"year 1998: {foreign} precinct rows of {pattern} name another council or district than their workbook")
+    for name, rows in (("lists", lists), ("candidates", cands)):
+        con.register(f"{prefix}_{name}_arrow", pa.table(rows))
+        con.execute(
+            f"""CREATE OR REPLACE TABLE {prefix}_{name} AS
+                SELECT * REPLACE (int_(precinct_no) AS precinct_no, int_(votes) AS votes) FROM {prefix}_{name}_arrow"""
+        )
+        con.unregister(f"{prefix}_{name}_arrow")
 
 
 # 2006 list blocs (grupy list): committees could join their lists in a council or voivodeship assembly
@@ -477,6 +585,23 @@ def _sources_1998(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
         WHERE k."Szczebel" <> 'województwo'
         """
     )
+    for (level, unit, district, wrong), right in LIST_NUMBER_ERRORS[1998].items():
+        updated = con.execute(
+            "UPDATE rada_cand SET list_no = ? WHERE council_level = ? AND teryt = ? AND district_no = ? AND list_no = ?",
+            [right, level, unit, district, wrong],
+        ).fetchone()[0]
+        if not updated:
+            raise BuildError(f"year 1998: named list number error {level}/{unit}/{district} list {wrong} matches no candidate")
+    for (level, unit, district), surname in SURNAME_FIXES[1998].items():
+        updated = con.execute(
+            "UPDATE rada_cand SET last_name = ? WHERE council_level = ? AND teryt = ? AND district_no = ? AND last_name = '1'",
+            [surname, level, unit, district],
+        ).fetchone()[0]
+        if updated != 1:
+            raise BuildError(f"year 1998: named surname fix {level}/{unit}/{district} matches {updated} candidates, expected 1")
+    # Per-precinct files, for the checks only (per-precinct council results are not loaded).
+    sources.load("rada_gmina_prec", SOURCES[1998]["gmina_precincts"])
+    load_district_workbooks_1998(con, sources, SOURCES[1998]["powiat_workbooks"], "rada_powiat_wb")
     _uniform_committees_1998(con)
     con.execute(
         """
@@ -1040,6 +1165,7 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
         checks["rada: named uniform list numbers that are not spelled differently in several districts"] = f"""
             SELECT count(*) FROM (VALUES {_named(year, UNIFORM_LIST_NUMBERS)}) n(council_level, teryt, list_no)
             LEFT JOIN rada_uniform u USING (council_level, teryt, list_no) WHERE coalesce(u.names, 0) < 2"""
+        checks.update(_checks_precincts_1998())
     if year == 2014:
         for (level, city), (councillors, districts) in OFFICIAL_2014.items():
             unit = f"council_level = '{level}' AND city_with_powiat_rights = {city}"
@@ -1123,3 +1249,100 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
     log.info("year %s councils: %s lists with unknown list votes (struck-off candidates)", year, unknown)
     if not con.execute("SELECT count(*) FROM rada_districts").fetchone()[0]:
         raise BuildError(f"year {year}: no council districts")
+
+
+def _checks_precincts_1998() -> dict[str, str]:
+    """1998 checks against the per-precinct files of gminas up to 20,000 inhabitants (``src_rada_gmina_prec``)
+    and of powiat councils (``rada_powiat_wb_*``, see load_district_workbooks_1998)."""
+    official, gap = OFFICIAL_PRECINCTS_1998, UNCONTESTED_GAP_1998
+    surname_errors = _named(1998, SURNAME_ERRORS)
+    struck_off = _named(1998, {1998: [item for item in _struck_off(1998)[1998] if item[0] == "powiat"]})
+    gmina_prec = """(SELECT clean_teryt("Kod gminy") AS teryt, CAST(int_("Okręg") AS INT) AS district_no,
+                             CAST(int_("Obwód") AS INT) AS precinct_no, int_("Upr.") AS eligible, int_("Odd.") AS cast_,
+                             int_("Nieważne") AS invalid, int_("Zero ""x""\") AS no_x, int_("Ważne") AS valid
+                      FROM src_rada_gmina_prec GROUP BY ALL)"""
+    gmina_cand = f"""(SELECT clean_teryt("Kod gminy") AS teryt, CAST(int_("Okręg") AS INT) AS district_no,
+                             CAST(int_("Nr listy") AS INT) AS list_no, CAST(int_("Pozycja") AS INT) AS list_position,
+                             min({_tidy('upper("Nazwisko")')}) AS name_lo, max({_tidy('upper("Nazwisko")')}) AS name_hi,
+                             min("Mandat") AS mark_lo, max("Mandat") AS mark_hi, sum(int_("Głosy")) AS votes
+                      FROM src_rada_gmina_prec GROUP BY ALL)"""
+    contested = """(SELECT k.* FROM rada_candidates k JOIN rada_districts r USING (council_level, teryt, district_no)
+                    WHERE r.contested AND r.council_level = '{level}' AND r.voting_system = '{system}')"""
+    powiat_prec = """(SELECT left("Kod rady", 4) AS teryt, "Kod rady" AS council, CAST(int_("Nr okr.") AS INT) AS district_no,
+                             "Kod gminy" AS gmina, CAST(int_("Nr obw.") AS INT) AS precinct_no, int_("Gł. odd. (frekw.)") AS cast_,
+                             int_("Gł. ważne") AS valid
+                      FROM rada_powiat_wb_precincts)"""
+    # Lists whose candidates' votes in a precinct fall short of the list's precinct total.
+    powiat_short = """(SELECT left(l.council, 4) AS teryt, l.district_no, l.list_no
+                       FROM rada_powiat_wb_lists l
+                       LEFT JOIN (SELECT council, district_no, list_no, gmina, precinct_no, sum(votes) AS votes FROM rada_powiat_wb_candidates
+                                  GROUP BY ALL) c USING (council, district_no, list_no, gmina, precinct_no)
+                       WHERE coalesce(c.votes, 0) <> l.votes GROUP BY ALL)"""
+    return {
+        "rada: 1998 gmina <=20k precincts with several protocols or votes cast != invalid + valid (1998_rady_gmin)": f"""
+            SELECT count(*) FROM (SELECT teryt, district_no, precinct_no, count(*) AS n, any_value(cast_ - invalid - valid) AS diff
+                                  FROM {gmina_prec} GROUP BY ALL) WHERE n > 1 OR diff <> 0""",
+        "rada: 1998 contested majoritarian districts != districts of the per-precinct file (1998_rady_gmin)": """
+            SELECT count(*) FROM (SELECT DISTINCT clean_teryt("Kod gminy") AS teryt, CAST(int_("Okręg") AS INT) AS district_no
+                                  FROM src_rada_gmina_prec) p
+            FULL JOIN (SELECT teryt, district_no FROM rada_districts WHERE voting_system = 'majoritarian' AND contested) r
+              USING (teryt, district_no)
+            WHERE p.teryt IS NULL OR r.teryt IS NULL""",
+        "rada: 1998 majoritarian districts whose precinct valid ballots (1998_rady_gmin) != published 'Gł. ważne'": f"""
+            SELECT count(*) FROM (SELECT teryt, district_no, sum(valid) AS valid FROM {gmina_prec} GROUP BY ALL) p
+            FULL JOIN rada_ballots b USING (teryt, district_no) WHERE p.valid IS DISTINCT FROM b.lo""",
+        "rada: 1998 candidates of the per-precinct file (1998_rady_gmin) != register (votes, mark, surname except named)": f"""
+            SELECT count(*) FROM {gmina_cand} p FULL JOIN {contested.format(level='gmina', system='majoritarian')} k
+              USING (teryt, district_no, list_no, list_position)
+            WHERE p.votes IS DISTINCT FROM k.votes OR p.name_lo <> p.name_hi OR p.mark_lo <> p.mark_hi
+               OR (p.mark_lo IN ('W', 'P', 'L')) IS DISTINCT FROM k.elected
+               OR (p.name_lo IS DISTINCT FROM k.last_name AND ('gmina', teryt, district_no) NOT IN ({surname_errors}))""",
+        f"rada: 1998 gmina <=20k precinct totals != PKW (votes cast {official['gmina_cast']}, invalid {official['gmina_invalid']}, "
+        f"without an x {official['gmina_no_x']})": f"""
+            SELECT abs(sum(cast_) - {official['gmina_cast']}) + abs(sum(invalid) - {official['gmina_invalid']})
+                   + abs(sum(no_x) - {official['gmina_no_x']}) FROM {gmina_prec}""",
+        "rada: 1998 named unfilled districts with votes cast or missing in the per-precinct file": f"""
+            SELECT count(*) FROM (VALUES {_named(1998, UNFILLED_DISTRICTS)}) n(council_level, teryt, district_no)
+            WHERE n.teryt <> ''
+              AND coalesce((SELECT sum(cast_) FROM {gmina_prec} p WHERE p.teryt = n.teryt AND p.district_no = n.district_no), -1) <> 0""",
+        "rada: 1998 gmina <=20k uncontested districts / candidates / lists minus PKW != named gap (+4 / +4 / -27)": f"""
+            SELECT abs((SELECT count(*) FROM rada_districts WHERE voting_system = 'majoritarian' AND NOT contested AND candidates > 0)
+                       - {sum(gap['uncontested'])})
+                   + abs((SELECT count(*) FROM rada_cand WHERE voting_system = 'majoritarian') - {sum(gap['candidates'])})
+                   + abs((SELECT count(DISTINCT (teryt, district_no, list_no)) FROM rada_cand WHERE voting_system = 'majoritarian')
+                         - {sum(gap['lists'])})""",
+        "rada: 1998 contested powiat districts != per-district workbooks (1998pow)": f"""
+            SELECT count(*) FROM (SELECT DISTINCT teryt, district_no FROM {powiat_prec}) w
+            FULL JOIN (SELECT teryt, district_no FROM rada_districts WHERE council_level = 'powiat' AND contested) r USING (teryt, district_no)
+            WHERE w.teryt IS NULL OR r.teryt IS NULL""",
+        "rada: 1998 powiat districts whose workbook valid votes (sum of precincts) != district valid votes": f"""
+            SELECT count(*) FROM (SELECT teryt, district_no, sum(valid) AS valid FROM {powiat_prec} GROUP BY ALL) w
+            JOIN rada_districts r ON r.council_level = 'powiat' AND r.teryt = w.teryt AND r.district_no = w.district_no
+            WHERE w.valid IS DISTINCT FROM r.valid_votes""",
+        "rada: 1998 powiat workbook precincts (duplicate, or list totals != valid votes)": f"""
+            SELECT (SELECT count(*) - count(DISTINCT (council, district_no, gmina, precinct_no)) FROM {powiat_prec}) + count(*)
+            FROM (SELECT council, district_no, gmina, precinct_no, sum(votes) AS votes FROM rada_powiat_wb_lists GROUP BY ALL) l
+            FULL JOIN {powiat_prec} p USING (council, district_no, gmina, precinct_no)
+            WHERE l.votes IS DISTINCT FROM p.valid""",
+        "rada: 1998 powiat workbook list totals != list votes": """
+            SELECT count(*) FROM (SELECT left(council, 4) AS teryt, district_no, list_no, sum(votes) AS votes FROM rada_powiat_wb_lists
+                                  GROUP BY ALL) w
+            FULL JOIN (SELECT teryt, district_no, list_no, votes FROM rada_district_lists WHERE council_level = 'powiat' AND votes IS NOT NULL) l
+              USING (teryt, district_no, list_no)
+            WHERE w.votes IS DISTINCT FROM l.votes""",
+        "rada: 1998 powiat workbook candidates != register (votes, mark, surname except named)": f"""
+            SELECT count(*) FROM (SELECT left(council, 4) AS teryt, district_no, list_no, position AS list_position, min(name) AS name_lo,
+                                         max(name) AS name_hi, min(mark) AS mark_lo, max(mark) AS mark_hi, sum(votes) AS votes
+                                  FROM rada_powiat_wb_candidates GROUP BY ALL) w
+            FULL JOIN {contested.format(level='powiat', system='proportional')} k USING (teryt, district_no, list_no, list_position)
+            WHERE w.votes IS DISTINCT FROM k.votes OR w.name_lo <> w.name_hi OR w.mark_lo <> w.mark_hi
+               OR (w.mark_lo = 'W') IS DISTINCT FROM k.elected
+               OR (NOT starts_with(w.name_lo || ' ', k.last_name || ' ') AND ('powiat', teryt, district_no) NOT IN ({surname_errors}))""",
+        "rada: 1998 powiat lists whose candidates' precinct votes != the list's precinct total (except named struck-off districts)": f"""
+            SELECT count(*) FROM {powiat_short} WHERE ('powiat', teryt, district_no) NOT IN ({struck_off})""",
+        "rada: 1998 named struck-off powiat districts without exactly one list short of its precinct totals": f"""
+            SELECT count(*) FROM (VALUES {struck_off}) n(council_level, teryt, district_no)
+            WHERE (SELECT count(*) FROM {powiat_short} s WHERE s.teryt = n.teryt AND s.district_no = n.district_no) <> 1""",
+        f"rada: 1998 powiat workbook votes cast != PKW {official['powiat_cast']}": f"""
+            SELECT abs(sum(cast_) - {official['powiat_cast']}) FROM {powiat_prec}""",
+    }

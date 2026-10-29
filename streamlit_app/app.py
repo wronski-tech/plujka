@@ -16,18 +16,25 @@ import pydeck as pdk
 import requests
 import streamlit as st
 
-from map_units import boundaries, feature_key, is_osm, unit_values, visible_features
+from chart_columns import numeric_columns, scatter_columns
+from map_units import boundaries, feature_key, is_osm, unit_values, visible_features, voivodeship_level
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 # Sent as X-API-Key when the API requires keys (API_KEYS on the API side).
 API_KEY = os.getenv("PLUJKA_API_KEY", "")
 API_HEADERS = {"X-API-Key": API_KEY} if API_KEY else {}
-# Result column that identifies a unit -> boundary file (gminy/powiaty by TERYT, voivodeships by name).
-MAP_LEVELS = (("teryt_gmina", "gminy"), ("teryt_powiat", "powiaty"), ("wojewodztwo", "wojewodztwa"))
+# Result column that identifies a unit -> boundary file (gminy/powiaty by TERYT, voivodeships by name;
+# 1990s gmina codes map to current gminas, 1990s voivodeship names to wojewodztwa_1975).
+MAP_LEVELS = (
+    ("teryt_gmina", "gminy"), ("teryt_gmina_pre1999", "gminy"), ("teryt_powiat", "powiaty"),
+    ("wojewodztwo", "wojewodztwa"),
+)
 # Charts and maps are drawn only for results that fit on screen.
 MAX_CHART_ROWS = 40
 # Persons offered for the timeline view (rows of a long result may name many people).
 MAX_PERSON_OPTIONS = 50
+# Matches listed by the person search box (GET /persons limit).
+PERSON_SEARCH_LIMIT = 20
 # Polish names of v_person_history.chamber values.
 CHAMBER_LABELS = {
     "sejm": "Sejm",
@@ -133,20 +140,9 @@ def _remember(question: str, data: dict, entity_refs: list[dict] | None, previou
     st.session_state.pop("person_view", None)
 
 
-def _numeric_columns(rows: list[dict]) -> list[str]:
-    """Columns with numbers that are values, not codes (years, rounds, numbers, ids)."""
-    first = rows[0]
-    return [
-        name for name, value in first.items()
-        if isinstance(value, (int, float)) and not isinstance(value, bool)
-        and name not in ("year", "round", "prev_year") and not name.endswith(("_no", "_id"))
-        and not name.startswith("teryt")
-    ]
-
-
 def _value_column(rows: list[dict]) -> str | None:
     """Column to chart: a percentage first, then votes, then any other number."""
-    numeric = _numeric_columns(rows)
+    numeric = numeric_columns(rows)
     for pattern in ("pct", "votes", "seats", "mandat"):
         for name in numeric:
             if pattern in name:
@@ -154,8 +150,32 @@ def _value_column(rows: list[dict]) -> str | None:
     return numeric[0] if numeric else None
 
 
+def _render_scatter(rows: list[dict], label: str, x: str, y: str) -> None:
+    """One point per territorial unit: first measure on x, second on y, unit name on hover."""
+    frame = pd.DataFrame(rows)[[label, x, y]].dropna()
+    if frame.empty:
+        return
+    chart = (
+        alt.Chart(frame)
+        .mark_circle(color="#6366f1", size=60, opacity=0.7)
+        .encode(
+            x=alt.X(f"{x}:Q", title=x, scale=alt.Scale(zero=False)),
+            y=alt.Y(f"{y}:Q", title=y, scale=alt.Scale(zero=False)),
+            tooltip=[label, x, y],
+        )
+        .properties(height=420)
+    )
+    st.altair_chart(chart, use_container_width=True)
+    st.caption(f"Każdy punkt to jedna jednostka ({len(frame)}): {x} (oś pozioma) i {y} (oś pionowa).")
+
+
 def _render_chart(rows: list[dict]) -> None:
-    """Horizontal bar chart when each row is one labelled unit with a number (e.g. results by party)."""
+    """Scatter plot for two measures per territorial unit, otherwise a horizontal bar chart when each row is
+    one labelled unit with a number (e.g. results by party)."""
+    scatter = scatter_columns(rows)
+    if scatter:
+        _render_scatter(rows, *scatter)
+        return
     if not 2 <= len(rows) <= MAX_CHART_ROWS:
         return
     value = _value_column(rows)
@@ -210,11 +230,13 @@ def _render_map(rows: list[dict]) -> None:
             break
     else:
         return
-    # Old TERYT codes are mapped to current units; Warsaw, split gminas and changed powiats use their former
-    # extent when the result describes the old layout.
+    if level == "wojewodztwa":
+        level = voivodeship_level(rows)
+    # Old TERYT codes are mapped to current units; Warsaw, split gminas, changed powiats and voivodeships use
+    # their former extent when the result describes the old layout.
     values, merged, skipped = unit_values(rows, column, value, level)
     years = {r["year"] for r in rows if isinstance(r.get("year"), int)}
-    shown = visible_features(boundaries(level)["features"], set(values) | set(skipped), years)
+    shown = visible_features(boundaries(level)["features"], set(values) | set(skipped), years, level)
     drawn = [values[k] for k in (feature_key(f["properties"], level) for f in shown) if k in values]
     if not drawn:
         return
@@ -251,6 +273,13 @@ def _render_map(rows: list[dict]) -> None:
         use_container_width=True,
     )
     st.caption(f"Kolor: {value} (jaśniej {low:g} → ciemniej {high:g}). Szare jednostki nie występują w wyniku.")
+    if level == "wojewodztwa_1975":
+        st.caption("Granice 49 województw z lat 1975–1998 złożone z obecnych gmin (przybliżone).")
+    elif column == "teryt_gmina_pre1999":
+        st.caption(
+            "Gminy sprzed 1999 r. w obecnych granicach; gminy wydzielone później są w granicach gminy, "
+            "z której powstały, albo szare."
+        )
     if any(is_osm(f) for f in shown):
         st.caption("© OpenStreetMap contributors (ODbL)")
     names = {feature_key(f["properties"], level): f["properties"]["name"] for f in shown}
@@ -403,6 +432,15 @@ def _match_note(rule: str) -> str:
             "Kandydatury w wyborach ogólnokrajowych połączone po imieniu, nazwisku, płci i miejscu zamieszkania — "
             "w jednych wyborach startowało kilka osób o tym imieniu i nazwisku."
         )
+    if rule == "name+gender+voivodeship":
+        return "Kandydatury rozdzielone według województwa zamieszkania — jedno imię i różne regiony."
+    if rule == "name+gender+birth year":
+        return "Kandydatury rozdzielone według roku urodzenia z rejestrów 1991–1997."
+    if rule == "surname+first given name+gender":
+        return (
+            "Kandydatury sprzed 2011 r. z jednym imieniem połączone z osobą o pełnych imionach (to samo nazwisko "
+            "i pierwsze imię, potwierdzone miejscem zamieszkania lub rokiem urodzenia)."
+        )
     if rule.startswith("local:"):
         area = "województwie" if rule.endswith("voivodeship") else "powiecie"
         return (
@@ -436,8 +474,36 @@ def _fetch_person(person_id: int) -> dict | None:
     return response.json()
 
 
-def _render_person_timeline(person_id: int) -> None:
-    """Every candidacy of one person, ordered by date, with how the candidacies were linked."""
+def _search_persons(name: str) -> list[dict] | None:
+    """``GET /persons?name=...``; shows a message and returns None on failure."""
+    try:
+        response = requests.get(
+            f"{API_URL}/persons", params={"name": name, "limit": PERSON_SEARCH_LIMIT}, headers=API_HEADERS, timeout=30
+        )
+    except requests.RequestException as error:
+        st.error(f"Coś poszło nie tak z API: {error}")
+        return None
+    if response.status_code == 401:
+        st.error("API wymaga klucza (ustaw PLUJKA_API_KEY dla interfejsu).")
+        return None
+    if response.status_code == 503:
+        st.warning("Baza wyników jest chwilowo niedostępna. Spróbuj ponownie za chwilę.")
+        return None
+    if response.status_code == 422:
+        st.info("Wpisz imię lub nazwisko (co najmniej 2 litery, bez cyfr).")
+        return None
+    if not response.ok:
+        st.error(f"Coś poszło nie tak z API: HTTP {response.status_code}")
+        return None
+    return response.json().get("persons") or []
+
+
+def _render_person_timeline(person_id: int, view_key: str = "person_view") -> None:
+    """Every candidacy of one person, ordered by date, with how the candidacies were linked.
+
+    ``view_key`` is the session key holding the shown person ("Zamknij" clears it); it also prefixes the
+    widget keys, so the answer's timeline and the person search may show the same person at once.
+    """
     payload = _fetch_person(person_id)
     if payload is None:
         return
@@ -445,8 +511,8 @@ def _render_person_timeline(person_id: int) -> None:
     with st.container(border=True):
         head, close = st.columns([5, 1])
         head.markdown(f"#### 🗂️ {person['full_name']}")
-        if close.button("Zamknij", key=f"person_close_{person_id}", use_container_width=True):
-            st.session_state.pop("person_view", None)
+        if close.button("Zamknij", key=f"{view_key}_close_{person_id}", use_container_width=True):
+            st.session_state.pop(view_key, None)
             st.rerun()
         first, last = person.get("first_year"), person.get("last_year")
         c1, c2, c3 = st.columns(3)
@@ -491,7 +557,7 @@ def _render_person_timeline(person_id: int) -> None:
             )
             st.altair_chart(chart, use_container_width=True)
         st.dataframe(rows, use_container_width=True, hide_index=True)
-        _csv_download(rows, f"kandydatury {person['full_name']}", key=f"csv_person_{person_id}")
+        _csv_download(rows, f"kandydatury {person['full_name']}", key=f"csv_{view_key}_{person_id}")
 
 
 def _render_person_links(data: dict, entity_refs: list[dict] | None, key: str) -> None:
@@ -512,6 +578,48 @@ def _render_person_links(data: dict, entity_refs: list[dict] | None, key: str) -
                 st.session_state["person_view"] = chosen
     if st.session_state.get("person_view"):
         _render_person_timeline(st.session_state["person_view"])
+
+
+@st.fragment
+def _person_search() -> None:
+    """"Szukaj osoby": persons by name without asking a question, then the chosen person's timeline.
+
+    A fragment, so typing and picking here rerun only this box, not the answer below. Its session keys
+    (``person_search_*``) are separate from the answer's ``person_view``.
+    """
+    with st.expander("🔎 Szukaj osoby", expanded=False):
+        name = st.text_input(
+            "Imię i nazwisko", placeholder="np. Kwaśniewski · Szymon Hołow", key="person_search_name"
+        ).strip()
+        if st.session_state.get("person_search_for") != name:
+            # A new search closes the timeline of the previous one.
+            st.session_state["person_search_for"] = name
+            st.session_state.pop("person_search_view", None)
+        if not name:
+            st.caption("Wpisz imię i nazwisko albo sam początek nazwiska, a potem Enter.")
+            return
+        if sum(c.isalpha() for c in name) < 2:
+            st.info("Wpisz co najmniej 2 litery imienia lub nazwiska.")
+            return
+        persons = _search_persons(name)
+        if persons is None:
+            return
+        if not persons:
+            st.info(f"Nie znaleziono osoby „{name}”. Sprawdź pisownię albo wpisz sam początek nazwiska.")
+            return
+        more = " (pierwsze wyniki — doprecyzuj, by zawęzić)" if len(persons) >= PERSON_SEARCH_LIMIT else ""
+        st.caption(f"Znalezione osoby: {len(persons)}{more}")
+        # A long list scrolls inside the box, so the timeline below stays close to the search field.
+        with st.container(height=340 if len(persons) > 3 else None):
+            for person in persons:
+                text, button = st.columns([5, 1], vertical_alignment="center")
+                text.markdown(f"**{person['full_name']}** · kandydatury: {person['candidacies']}")
+                if person.get("detail"):
+                    text.caption(person["detail"])
+                if button.button("Pokaż", key=f"person_search_open_{person['person_id']}", use_container_width=True):
+                    st.session_state["person_search_view"] = person["person_id"]
+        if st.session_state.get("person_search_view"):
+            _render_person_timeline(st.session_state["person_search_view"], view_key="person_search_view")
 
 
 st.set_page_config(
@@ -661,6 +769,8 @@ with st.container(border=True):
         help=f"Poprzednie pytanie: {earlier['question']}" if can_follow else None,
     )
     submitted = st.button("Wyślij zapytanie", type="primary", use_container_width=True)
+
+_person_search()
 
 if submitted:
     if not q_val:

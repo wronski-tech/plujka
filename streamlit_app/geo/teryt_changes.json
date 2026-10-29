@@ -362,10 +362,13 @@
     "329997": "Ships (Szczecin) in 2000-2001; no territory."
   },
   "former_extents": {
-    "note": "Documentation of the features with 'parts' in gminy.json/powiaty.json (not read by the code). Powiat extents are unions of current gmina polygons in the powiat's composition of the time, taken from the mart data (gmina codes under the powiat code of that year) and the gmina entries above.",
+    "note": "Documentation of the features with 'parts' in gminy.json/powiaty.json/wojewodztwa.json (not read by the code; the pre-1999 gmina extents are documented in gminy_pre1999.json, 'extents'). Powiat extents are unions of current gmina polygons in the powiat's composition of the time, taken from the mart data (gmina codes under the powiat code of that year) and the gmina entries above.",
     "gminy 146501": "Warszawa as one unit (rows with 146501 and no district codes, e.g. EP 2004).",
     "gminy 143104": "Gmina Warszawa-Centrum (sejmik 1998; gmina council 1998) = districts Mokotów, Ochota, Praga-Południe, Praga-Północ, Śródmieście, Wola, Żoliborz; Ustawa z dnia 15 marca 2002 r. o ustroju m.st. Warszawy (Dz.U. 2002 nr 41 poz. 361), art. 14.",
-    "gminy 120705 / 200209": "Kamienica and Supraśl before Szczawa and Grabówka were split off on 2025-01-01 (Dz.U. 2024 poz. 1453, 1454); years 1998-2024.",
+    "gminy 120705 / 200209": "Kamienica and Supraśl before Szczawa and Grabówka were split off on 2025-01-01 (Dz.U. 2024 poz. 1453, 1454); years 1990-2024 (from 1990 for the pre-1999 gmina codes).",
+    "gminy 180702": "Dukla with Jaśliska, split off on 2010-01-01 (Rozporządzenie Rady Ministrów z dnia 28 lipca 2009 r., Dz.U. 2009 nr 120 poz. 1000); years 1990-2009.",
+    "wojewodztwa 12 / 24": "Małopolskie with Sławków and śląskie without it until 2001 (Sławków moved from powiat olkuski to będziński on 2002-01-01, Dz.U. 2001 nr 62 poz. 630); małopolskie without Szerzyny until 2002 (two extents: 1998-2001 and 2002). Current voivodeship polygon plus or minus the gminy.json polygon of Sławków (240108).",
+    "wojewodztwa 18": "Podkarpackie with Szerzyny until 2002 (Szerzyny moved from powiat jasielski to tarnowski on 2003-01-01, Dz.U. 2002 nr 93 poz. 821). Current polygon plus the gminy.json polygon of Szerzyny (121616).",
     "powiaty 0804 1006 1801 2209 2806 2813 3204 3205 3214": "Powiats that lost gminas to the powiats created on 2002-01-01 (Dz.U. 2001 nr 62 poz. 631); years 1998-2001 (the 1998 files already use the 1999 powiats).",
     "powiaty 1212 / 2401": "Olkuski with Sławków and będziński without it, until 2001 (Dz.U. 2001 nr 62 poz. 630).",
     "powiaty 1406 / 1418, 1805 / 1216": "Grójecki with Tarczyn and piaseczyński without it; jasielski with Szerzyny and tarnowski without it; until 2002 (Dz.U. 2002 nr 93 poz. 821).",

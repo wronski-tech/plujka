@@ -8,7 +8,7 @@ As its last step the loader runs `scripts/build_mart.py`, which builds the relat
 
 Staging (`scripts/kbw_stage_duckdb.py`) is strict: the delimiter is detected from the header, CP1250 files are transcoded, and a file fails instead of silently dropping malformed rows. XLS/XLSX tables are staged too; a workbook with several sheets becomes one Parquet file per sheet (`<stem>__sheetNN_<hash>.parquet`). ZIP member names in CP437/CP852 are decoded, and `__MACOSX/` entries are skipped.
 
-The KBW files used by the mart (per election under `data/kbw_mirror/dane/<year>/`) come from danewyborcze.kbw.gov.pl. The raw mirror is not committed; the staged Parquet in `data/kbw_stage_parquet` is (about 230 MB), so the mart can be built without downloading.
+The KBW files used by the mart (per election under `data/kbw_mirror/dane/<year>/`) come from danewyborcze.kbw.gov.pl. The raw mirror is not committed; the staged Parquet in `data/kbw_stage_parquet` is (about 285 MB), so the mart can be built without downloading.
 
 For local iteration, `SEED_SAMPLE_CSV` in `api/services/config.py` still defaults to `data/sample/sejm_results_sample_1000.csv` for legacy helpers in `api/services/seed.py` (not used by the API on startup).
 

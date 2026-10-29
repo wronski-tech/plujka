@@ -241,6 +241,8 @@ CREATE TABLE IF NOT EXISTS mart.sejm_candidates (
 ALTER TABLE mart.sejm_candidates ADD COLUMN IF NOT EXISTS residence_teryt TEXT;
 ALTER TABLE mart.sejm_candidates ADD COLUMN IF NOT EXISTS national_list_position INT;
 ALTER TABLE mart.sejm_candidates ADD COLUMN IF NOT EXISTS national_list_seat BOOLEAN NOT NULL DEFAULT false;
+ALTER TABLE mart.sejm_candidates ADD COLUMN IF NOT EXISTS age INT;
+COMMENT ON COLUMN mart.sejm_candidates.age IS 'Age in years as published in the candidate register (Wiek), 1991, 1993 and 1997 only (birth year is year - age or one less); NULL from 2001, when national registers no longer publish it.';
 COMMENT ON COLUMN mart.sejm_candidates.national_list_position IS '1991-1997 only: position on the committee''s national list (lista ogólnopolska), for candidates who were also on it; every national-list candidate also ran on a district list (district_no). NULL otherwise.';
 COMMENT ON COLUMN mart.sejm_candidates.national_list_seat IS '1991-1997 only: true when the seat (elected) came from the national list (district_no 0 in mart.sejm_districts), not from the candidate''s district list. False otherwise.';
 COMMENT ON TABLE mart.sejm_candidates IS 'Sejm candidates with their official vote totals and whether they won a seat (elected = poseł). One row per candidacy; the same person in other years shares person_id.';
@@ -327,6 +329,8 @@ CREATE TABLE IF NOT EXISTS mart.senat_candidates (
 );
 -- Added after the first release; existing databases get the column here.
 ALTER TABLE mart.senat_candidates ADD COLUMN IF NOT EXISTS residence_teryt TEXT;
+ALTER TABLE mart.senat_candidates ADD COLUMN IF NOT EXISTS age INT;
+COMMENT ON COLUMN mart.senat_candidates.age IS 'Age in years as published in the candidate register (Wiek), 1991, 1993 and 1997 only (birth year is year - age or one less); NULL from 2001, when national registers no longer publish it. Senators had to be 21 until 1997 and 30 from 2001.';
 COMMENT ON TABLE mart.senat_candidates IS 'Senate candidates with official vote totals; elected = senator. Senate committees are not linked to Sejm committees (match on committee_name text if needed).';
 COMMENT ON COLUMN mart.senat_candidates.full_name IS 'Given names and SURNAME.';
 COMMENT ON COLUMN mart.senat_candidates.last_name IS 'Surname in upper case.';
@@ -869,7 +873,7 @@ CREATE TABLE IF NOT EXISTS mart.persons (
     candidacies INT NOT NULL
 );
 COMMENT ON TABLE mart.persons IS 'People who ran in any loaded national election (Sejm, Senate, President, European Parliament); local candidates (sejmik, wbp, councils) are linked only when their name is unambiguous. Candidacies carry person_id; mart.v_person_history lists them. person_id is rebuilt on every load (not stable across loads).';
-COMMENT ON COLUMN mart.persons.match_rule IS '''name+gender'': same full name and gender in every year; ''name+gender+residence'': the name was shared by several candidates in one election, so residence was also required; ''manual'': set by api/services/mart/person_overrides.csv; ''local:...'': only local candidacies (sejmik, mayors, councils) with the same name, gender, birth year (+-1) and powiat or voivodeship. Different people with identical names can still be merged; people who changed surname are not linked.';
+COMMENT ON COLUMN mart.persons.match_rule IS '''name+gender'': same full name and gender in every year; ''name+gender+residence'': the name was shared by several candidates in one election, so residence was also required; ''name+gender+voivodeship'': one given name, candidacies split by voivodeship of residence; ''name+gender+birth year'': split by register birth years more than 3 apart; ''surname+first given name+gender'': abbreviated given names before 2011 joined to the person with the full name; ''manual'': set by api/services/mart/person_overrides.csv; ''local:...'': only local candidacies (sejmik, mayors, councils) with the same name, gender, birth year (+-1) and powiat or voivodeship. Different people with identical names can still be merged; people who changed surname are not linked.';
 COMMENT ON COLUMN mart.persons.candidacies IS 'Number of candidacies in all loaded elections.';
 
 CREATE TABLE IF NOT EXISTS mart.entity_lexicon (

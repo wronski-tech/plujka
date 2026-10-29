@@ -23,9 +23,9 @@ def fold(text: str) -> str:
     return unicodedata.normalize("NFKD", text.lower().replace("ł", "l")).encode("ascii", "ignore").decode()
 
 
-@lru_cache(maxsize=3)
+@lru_cache(maxsize=4)
 def boundaries(level: str) -> dict:
-    """GeoJSON FeatureCollection for ``gminy``, ``powiaty`` or ``wojewodztwa``.
+    """GeoJSON FeatureCollection for ``gminy``, ``powiaty``, ``wojewodztwa`` or ``wojewodztwa_1975``.
 
     Public-domain features come from ``<level>.json``; features derived from OpenStreetMap (ODbL,
     ``properties.source == "osm"``) from ``<level>_osm.json`` when it exists. Current units come
@@ -50,6 +50,37 @@ def teryt_changes() -> dict:
     return {level: {old: entry["current"] for old, entry in data[level].items()} for level in ("gminy", "powiaty")}
 
 
+@lru_cache(maxsize=1)
+def pre1999_codes() -> dict:
+    """Pre-1999 gmina code (``teryt_gmina_pre1999``) -> key of the gmina feature that covers it.
+
+    A code covered by one current gmina maps to that gmina; a code covered by several (Warsaw dzielnice of
+    1990-1994) maps to itself, the key of its former extent. Codes without a cover (Ostrowice) are left out.
+    """
+    data = json.loads((GEO_DIR / "gminy_pre1999.json").read_text(encoding="utf-8"))
+    return {
+        old: entry["current"][0] if len(entry["current"]) == 1 else old
+        for old, entry in data["codes"].items() if entry["current"]
+    }
+
+
+def voivodeship_level(rows: list[dict]) -> str:
+    """``wojewodztwa_1975`` when the rows name the 49 voivodeships of 1975-1998, else ``wojewodztwa``.
+
+    Three names (łódzkie, lubelskie, opolskie) exist in both divisions, so the old map needs a year
+    before 1998 (the 1998 local elections already used the 16 voivodeships) or a name that exists only
+    in the old division.
+    """
+    def names(level: str) -> set[str]:
+        return {fold(f["properties"]["name"]) for f in boundaries(level)["features"]}
+
+    found = {fold(r["wojewodztwo"]) for r in rows if r.get("wojewodztwo")}
+    years = [r["year"] for r in rows if isinstance(r.get("year"), int)]
+    if found and found <= names("wojewodztwa_1975") and (found - names("wojewodztwa") or (years and max(years) < 1998)):
+        return "wojewodztwa_1975"
+    return "wojewodztwa"
+
+
 def is_additive(column: str) -> bool:
     """True for counts (votes, seats, voters), which may be summed; False for percentages and rates."""
     name = column.lower()
@@ -58,19 +89,20 @@ def is_additive(column: str) -> bool:
 
 def feature_key(props: dict, level: str) -> str:
     """Key of a boundary feature in ``unit_values``: TERYT, or folded name for voivodeships."""
-    return fold(props["name"]) if level == "wojewodztwa" else props["teryt"]
+    return fold(props["name"]) if level.startswith("wojewodztwa") else props["teryt"]
 
 
 def unit_values(rows: list[dict], column: str, value: str, level: str) -> tuple[dict, dict, list[str]]:
     """Value per current boundary code.
 
-    Old codes are mapped to the current unit that covers them. When several rows land on one unit,
+    Old codes are mapped to the current unit that covers them (``teryt_gmina_pre1999`` through
+    ``gminy_pre1999.json``, other codes through ``teryt_changes.json``). When several rows land on one unit,
     their values are summed if the column is additive and the rows come from the same election
     (year, round); otherwise the unit is left out. Returns (values, merged, skipped): ``merged`` maps
     a summed unit to the number of rows in it, ``skipped`` lists the units left out.
     """
-    key = fold if level == "wojewodztwa" else str
-    changes = teryt_changes().get(level, {})
+    key = fold if level.startswith("wojewodztwa") else str
+    changes = pre1999_codes() if column == "teryt_gmina_pre1999" else teryt_changes().get(level, {})
     groups: dict[str, list[dict]] = defaultdict(list)
     for row in rows:
         if row.get(value) is not None:
@@ -95,14 +127,17 @@ def _former_applies(props: dict, codes: set[str], years: set[int], current: set[
         return False
     if "years" not in props:
         return True
+    first, last = props["years"]
     if years:
-        first, last = props["years"]
         return all(first <= year <= last for year in years)
-    # Without a year column only codes tell the periods apart.
-    return bool(others) or props["teryt"] not in current
+    # Without a year column only codes tell the periods apart; extents of the 1990s (a gmina before
+    # another was split off it) need the year, as later results often lack the split-off gmina too.
+    return last >= 1998 and (bool(others) or props["teryt"] not in current)
 
 
-def visible_features(features: list[dict], codes: set[str], years: set[int] | None = None) -> list[dict]:
+def visible_features(
+    features: list[dict], codes: set[str], years: set[int] | None = None, level: str = "gminy",
+) -> list[dict]:
     """Features to draw for the result codes and the result years (``year`` column, if any).
 
     A feature with ``parts`` is a former extent (Warsaw before its districts are shown, a gmina
@@ -115,7 +150,13 @@ def visible_features(features: list[dict], codes: set[str], years: set[int] | No
     OpenStreetMap units that the result does not use (all grey) are drawn as the public-domain former
     extent that covers them instead (Warsaw as one unit, Kamienica and Supraśl before 2025), so a
     map needs the OpenStreetMap attribution only when it colours such a unit.
+
+    Voivodeship codes are folded names (``feature_key``); they are turned into TERYT here, so the
+    voivodeship extents (małopolskie with Sławków until 2001, ...) follow the same rules.
     """
+    if level.startswith("wojewodztwa"):
+        teryt = {feature_key(f["properties"], level): f["properties"]["teryt"] for f in features}
+        codes = {teryt.get(code, code) for code in codes}
     current = {f["properties"]["teryt"] for f in features if "parts" not in f["properties"]}
     former = [
         f for f in features

@@ -640,6 +640,24 @@ class TestClarification(unittest.TestCase):
         city = entities.EntityMatch("gmina", "m. Kraków", "126101", "powiat Kraków", [2023])
         self.assertEqual(entities.narrow_matches("Frekwencja w Krakowie", [krak, city]), [city])
 
+    def test_capitalized_or_named_surname_beats_an_adjective_place(self) -> None:
+        tadeusz = _person("Tadeusz MAZOWIECKI", "5")
+        voivodeship = entities.EntityMatch("wojewodztwo", "mazowieckie", "mazowieckie", "TERYT 14", [2023])
+        for question in ("Wynik Mazowieckiego w 1990", "Ile głosów dostał Tadeusz Mazowiecki?"):
+            self.assertEqual(entities.narrow_matches(question, [tadeusz, voivodeship]), [tadeusz])
+        self.assertEqual(entities.narrow_matches("Frekwencja w województwie mazowieckim", [voivodeship]), [voivodeship])
+        self.assertEqual(entities.narrow_matches("Mazowieckie: frekwencja", [tadeusz, voivodeship]), [voivodeship])
+
+    def test_party_alias_and_old_voivodeship_are_not_places(self) -> None:
+        pis = entities.EntityMatch("committee", "PiS", "PiS", "sejm", [2023])
+        pisz = entities.EntityMatch("gmina", "gm. Pisz", "281403", "powiat piski", [2023])
+        self.assertEqual(entities.narrow_matches("Wynik PiS w powiatach", [pis, pisz]), [pis])
+        self.assertEqual(entities.narrow_matches("Wynik PiS w Piszu", [pis, pisz]), [pis, pisz])
+        city = entities.EntityMatch("gmina", "m. Kraków", "126101", "powiat Kraków", [2023])
+        old = entities.EntityMatch("wojewodztwo", "krakowskie", "krakowskie", "1975-1998", [1991, 1997])
+        self.assertEqual(entities.narrow_matches("Frekwencja w Krakowie", [city, old]), [city])
+        self.assertEqual(entities.narrow_matches("Frekwencja w Krakowie w 1995", [city, old]), [city, old])
+
 
 class TestCuratedExamples(unittest.TestCase):
     def test_every_curated_example_passes_the_guard(self) -> None:

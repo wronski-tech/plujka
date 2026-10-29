@@ -122,8 +122,34 @@ SOURCES_1990S = {
     1993: {"results": "**/sejm/1993-listy-obw/*.parquet", "candidates": "**/sejm/kandsejm1993kom.parquet",
            "districts": "**/sejm/okregi1993.parquet"},
     1997: {"results": "**/sejm/sejm1997obw.parquet", "candidates": "**/sejm/kandsejm1997pop.parquet",
-           "districts": "**/sejm/sejm1997okregi.parquet"},
+           "districts": "**/sejm/sejm1997okregi.parquet", "national_lists": "**/sejm/listy-kandydaci/OGPOL-*.parquet"},
 }
+# 1997 registered national lists (listy-kandydaci.zip, OGPOL-NN = list NN: position, surname, given names, district of
+# the candidate's district list), checked against the candidate register's national-list positions. Rows that differ,
+# by (list number, position in OGPOL), as described in the archive's informacje_dodatkowe.txt and found by the check:
+NATIONAL_LIST_EXCEPTIONS_1997 = {
+    # Struck off after registration, not in the candidate register (positions of later candidates kept).
+    (6, 15): "ŻOCHOWSKI Ryszard Jacek, struck off (informacje_dodatkowe.txt)",
+    (10, 24): "MORAWSKI Zbigniew Marian, struck off (informacje_dodatkowe.txt)",
+    # Not in the candidate register either. informacje_dodatkowe.txt names URBAŃCZYK Andrzej Tadeusz (position 66) as
+    # the second struck-off SLD candidate, but he is in the register at position 66 and won a district seat (21).
+    (6, 115): "POKRZEPA Władysław Kazimierz, not in the candidate register",
+    # OGPOL-01 prints position 35 twice (SAWICKI, MIKOSZ) and no 36; the register has MIKOSZ at 36.
+    (1, 35): "MIKOSZ Jerzy Maria, register position 36",
+    # Surname spelled differently in the register.
+    (5, 32): "SMERCZYŃSKA Maria Władysława, register SMERECZYŃSKA",
+    (5, 98): "ZWIERZYNIECKI Krzysztof, register ZWIERZYŃSKI",
+    (7, 87): "OPALSKI Jacek, register OPALSKI-WIECZOREK",
+}
+# Register-side rows of NATIONAL_LIST_EXCEPTIONS_1997 (list number, register position) with no OGPOL row.
+NATIONAL_LIST_REGISTER_ONLY_1997 = {(1, 36)}
+# National-list positions held by two candidates, in the register and in OGPOL alike (PSL list 7: SIWOŃ and GWIŻDŻ at
+# 28, no 29), as (year, list number, position).
+SHARED_NATIONAL_LIST_POSITIONS = {(1997, 7, 28)}
+# Minimum candidate age (passive electoral right) in 1991-1997: 21 for the Sejm (art. 8 of the 1991 law, art. 14 of the
+# 1993 law) and, through art. 1 of the Senate law of 10 May 1991, for the Senate (30 only from the 1997 Constitution,
+# in force since 17 October 1997, after that year's election).
+MIN_CANDIDATE_AGE_1990S = 21
 # Sejm districts per year where not 41: 1991 37, 1993/1997 52, each plus district 0 (national list).
 SEJM_DISTRICTS = {1991: 38, 1993: 53, 1997: 53}
 # Seats elected from national lists (lista ogólnopolska) 1991-1997; stored as district 0.
@@ -207,11 +233,12 @@ def build_sejm(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
         _build_1990s_layout(con, sources)
     else:
         _build_2005_layout(con, sources)
-    # Columns that only the 1991-1997 layout fills (pre-1999 gmina code, list blocs, national lists).
+    # Columns that only the 1991-1997 layout fills (pre-1999 gmina code, list blocs, national lists, age).
     con.execute("ALTER TABLE precincts ADD COLUMN IF NOT EXISTS teryt_gmina_pre1999 VARCHAR")
     con.execute("ALTER TABLE sejm_district_lists ADD COLUMN IF NOT EXISTS list_group INT")
     con.execute("ALTER TABLE sejm_candidates ADD COLUMN IF NOT EXISTS national_list_position INT")
     con.execute("ALTER TABLE sejm_candidates ADD COLUMN IF NOT EXISTS national_list_seat BOOLEAN DEFAULT false")
+    con.execute("ALTER TABLE sejm_candidates ADD COLUMN IF NOT EXISTS age INT")  # published 1991-1997 only
     con.execute(
         """
         CREATE OR REPLACE TABLE sejm_combined_candidate_votes AS
@@ -975,9 +1002,11 @@ def _build_1990s_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) ->
 
     Candidates carry the seat type ('Mandat': O district list, K national list) and their position on
     their committee's national list ('Nr na liście oglnp.'); every national-list candidate also ran on a
-    district list. The 69 national-list seats are district 0: one sejm_district_lists row per committee
-    with a national list, votes 0 (the national list had no votes of its own; seats went by the
-    committee's district votes nationwide), seats from the K mandates. Thresholds follow the electoral
+    district list. 1997 positions are checked against the registered national lists (OGPOL files,
+    NATIONAL_LIST_EXCEPTIONS_1997). The registers publish each candidate's age ('Wiek'). The 69
+    national-list seats are district 0: one sejm_district_lists row per committee with a national list,
+    votes 0 (the national list had no votes of its own; seats went by the committee's district votes
+    nationwide), seats from the K mandates. Thresholds follow the electoral
     laws: none in 1991 districts; 1993/1997 districts 5% nationally (coalitions 8%, exempt minority lists,
     COALITION_LISTS_1990S, MINORITY_LISTS_1990S); national lists 7% (1993/1997) or, in 1991, 5% or seats in
     at least 5 districts or a minority list, with blocs (NATIONAL_BLOCS_1991) counted together. 1991
@@ -1098,7 +1127,8 @@ def _build_1990s_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) ->
                CAST(round(100.0 * int_(k.{k_votes}) / NULLIF(int_(k.{k_district_total}), 0), 2) AS DECIMAL(6, 2)) AS pct_of_district,
                coalesce(trim(k.{k_mandate}), '') IN ('O', 'K') AS elected,
                CAST(int_(k."Nr na liście oglnp.") AS INT) AS national_list_position,
-               coalesce(trim(k.{k_mandate}), '') = 'K' AS national_list_seat
+               coalesce(trim(k.{k_mandate}), '') = 'K' AS national_list_seat,
+               CAST(int_(k."Wiek") AS INT) AS age
         FROM {candidates_src} k JOIN sejm_committees c ON c.committee_name = strip_signature(k.{k_committee})
         """
     )
@@ -1326,7 +1356,26 @@ def _build_1990s_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) ->
             SELECT count(*) FROM (SELECT list_no, seats FROM sejm_district_lists WHERE district_no = 0 AND seats > 0) l
             FULL JOIN (VALUES {", ".join(f"({n}, {s})" for n, s in official["national_list_seats"].items())}) o(list_no, seats) USING (list_no)
             WHERE l.seats IS DISTINCT FROM o.seats""",
+        # National-list seats went down the list, skipping candidates who won a district seat.
+        "national-list seats not held by the first candidates in list order without a district seat": """
+            SELECT count(*) FROM (
+              SELECT k.national_list_seat, l.seats,
+                     row_number() OVER (PARTITION BY k.committee_id ORDER BY k.national_list_position, k.candidate_id) AS rank
+              FROM sejm_candidates k JOIN national_lists l USING (committee_id)
+              WHERE k.national_list_position IS NOT NULL AND NOT (k.elected AND NOT k.national_list_seat))
+            WHERE national_list_seat <> (rank <= seats)""",
+        "national-list positions held by two candidates other than SHARED_NATIONAL_LIST_POSITIONS, or vice versa": f"""
+            SELECT count(*) FROM (SELECT list_no || '/' || national_list_position AS k FROM sejm_candidates
+                                  WHERE national_list_position IS NOT NULL GROUP BY ALL HAVING count(*) > 1) d
+            FULL JOIN (SELECT unnest([{", ".join(f"'{n}/{p}'" for y, n, p in SHARED_NATIONAL_LIST_POSITIONS if y == year)}]::VARCHAR[]) AS k) s
+              ON s.k = d.k
+            WHERE d.k IS NULL OR s.k IS NULL""",
+        "candidates without a published age": "SELECT count(*) FROM sejm_candidates WHERE age IS NULL",
+        f"candidates younger than {MIN_CANDIDATE_AGE_1990S} or older than 100": f"""
+            SELECT count(*) FROM sejm_candidates WHERE age < {MIN_CANDIDATE_AGE_1990S} OR age > 100""",
     }
+    if "national_lists" in spec:
+        checks |= _national_list_register_checks(con, sources.files(spec["national_lists"]))
     if year == 1991:
         checks |= {
             "district lists whose votes, seats or candidates differ from the list table": f"""
@@ -1338,6 +1387,59 @@ def _build_1990s_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) ->
                   AND (d.votes, d.seats, d.candidates_count) IS DISTINCT FROM (l.votes, l.seats, l.candidates_count)""",
         }
     run_checks(con, year, checks)
+
+
+def _national_list_register_checks(con: duckdb.DuckDBPyConnection, files: list[str]) -> dict[str, str]:
+    """Checks of the candidates' national-list positions against the registered national lists (1997 OGPOL files).
+
+    Every OGPOL row must be a register candidate with the same list, position, district, surname (letters only) and
+    first given name, and every register position must have an OGPOL row of the same list and district, except the
+    rows in NATIONAL_LIST_EXCEPTIONS_1997 / NATIONAL_LIST_REGISTER_ONLY_1997. Column names and their order differ
+    between the files, so they are read by name.
+    """
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE national_list_register AS
+        SELECT CAST(regexp_extract(filename, 'OGPOL-(\\d+)__', 1) AS INT) AS list_no,
+               CAST(int_(coalesce("Lp", "Lp.")) AS INT) AS position,
+               CAST(int_("Okręg") AS INT) AS district_no,
+               regexp_replace(upper(trim("Nazwisko")), '[^\\p{{L}}]', '', 'g') AS surname_key,
+               split_part(trim(coalesce("Imiona", "Imię")), ' ', 1) AS first_name
+        FROM read_parquet({sql_list(files)}, union_by_name = true, filename = true, hive_partitioning = false)
+        """
+    )
+    con.execute("CREATE OR REPLACE TABLE national_list_exceptions (list_no INT, position INT)")
+    con.executemany("INSERT INTO national_list_exceptions VALUES (?, ?)", sorted(NATIONAL_LIST_EXCEPTIONS_1997))
+    register_only = " OR ".join(
+        f"(k.list_no = {n} AND k.national_list_position = {p})" for n, p in sorted(NATIONAL_LIST_REGISTER_ONLY_1997)
+    ) or "false"
+    exact = """EXISTS (SELECT 1 FROM sejm_candidates k
+                       WHERE k.list_no = r.list_no AND k.national_list_position = r.position AND k.district_no = r.district_no
+                         AND regexp_replace(k.last_name, '[^\\p{L}]', '', 'g') = r.surname_key
+                         AND split_part(k.first_names, ' ', 1) = r.first_name)"""
+    return {
+        "national-list register rows without list, position, district, surname or given name": """
+            SELECT count(*) FROM national_list_register
+            WHERE list_no IS NULL OR position IS NULL OR district_no IS NULL OR surname_key = '' OR coalesce(first_name, '') = ''""",
+        "national-list register rows unlike the register candidate, other than NATIONAL_LIST_EXCEPTIONS_1997": f"""
+            SELECT count(*) FROM national_list_register r
+            WHERE NOT {exact} AND NOT EXISTS (SELECT 1 FROM national_list_exceptions e
+                                              WHERE e.list_no = r.list_no AND e.position = r.position)""",
+        "NATIONAL_LIST_EXCEPTIONS_1997 entries missing from the national-list register or equal to the register": f"""
+            SELECT count(*) FROM national_list_exceptions e
+            WHERE NOT EXISTS (SELECT 1 FROM national_list_register r
+                              WHERE r.list_no = e.list_no AND r.position = e.position AND NOT {exact})""",
+        "candidates' national-list positions missing from the national-list register, other than NATIONAL_LIST_REGISTER_ONLY_1997": f"""
+            SELECT count(*) FROM sejm_candidates k
+            WHERE k.national_list_position IS NOT NULL AND NOT ({register_only}) AND NOT EXISTS (
+                SELECT 1 FROM national_list_register r
+                WHERE r.list_no = k.list_no AND r.position = k.national_list_position AND r.district_no = k.district_no)""",
+        "NATIONAL_LIST_REGISTER_ONLY_1997 entries that are not register candidates missing from the national-list register": f"""
+            SELECT {len(NATIONAL_LIST_REGISTER_ONLY_1997)} - count(*) FROM sejm_candidates k
+            WHERE ({register_only}) AND NOT EXISTS (
+                SELECT 1 FROM national_list_register r
+                WHERE r.list_no = k.list_no AND r.position = k.national_list_position AND r.district_no = k.district_no)""",
+    }
 
 
 def _district_lists_from_candidates(con: duckdb.DuckDBPyConnection, year: int) -> None:
