@@ -747,6 +747,30 @@ class TestCuratedExamples(unittest.TestCase):
                 self.assertEqual(review.review_candidates(feedback, ask=lambda _: self.fail("asked again")), 0)
             examples.load_seed.cache_clear()
 
+    def test_thumbs_down_groups_propose_reviewable_corrections(self) -> None:
+        spec = importlib.util.spec_from_file_location("triage_feedback", Path(__file__).resolve().parents[1] / "scripts" / "triage_feedback.py")
+        triage = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(triage)
+        bad = "SELECT turnout_pct FROM mart.v_turnout WHERE year = 2019 AND level = 'country'"
+        fixed = "SELECT turnout_pct FROM mart.v_turnout WHERE election = 'pe' AND year = 2019 AND level = 'country'"
+        with tempfile.TemporaryDirectory() as tmp:
+            feedback = Path(tmp) / "feedback.jsonl"
+            lines = [{"rating": "thumbs_down", "question": q, "needs_fix": True, "ask_response": {"intent": "dynamic_sql", "sql": sql}}
+                     for q, sql in (("Frekwencja w eurowyborach 2019", bad), ("Frekwencja PE 2014", fixed), ("Sondaż na 2027", None))]
+            feedback.write_text("".join(json.dumps(r) + "\n" for r in [*lines, {"rating": "thumbs_up", "question": "x"}]), encoding="utf-8")
+            groups = [{"problem": "Election filter missing", "items": [0, 1]}, {"problem": "Not in the database", "items": [2, 7]}]
+            # The model returns the fix for the first question and the same rejected query for the second.
+            with patch.object(dynamic_sql, "resolve_question_entities", return_value=([], None)), \
+                    patch.object(dynamic_sql, "build_context", return_value=("ctx", "v", {})), \
+                    patch.object(dynamic_sql, "_llm_sql", return_value=(fixed, {})), \
+                    patch("api.services.mart.safe_sql.run_readonly", return_value=[{"turnout_pct": 45.68}]):
+                self.assertEqual(triage.triage(feedback, group=lambda items: groups), 1)
+                self.assertEqual(triage.triage(feedback, group=lambda items: groups), 0, "a question is proposed once")
+            proposals = [json.loads(line) for line in (Path(tmp) / "example_proposals.jsonl").read_text(encoding="utf-8").splitlines()]
+            self.assertEqual(proposals, [{"question": "Frekwencja w eurowyborach 2019", "sql": validate_mart_sql(fixed), "note": "Election filter missing"}])
+            report = (Path(tmp) / "feedback_groups.md").read_text(encoding="utf-8")
+            self.assertIn("## Not in the database (1)", report)
+
     def test_local_search_ranks_by_shared_words(self) -> None:
         hits = examples._local_similar("frekwencja w drugiej turze wyborów prezydenckich 2025", k=2)
         self.assertIn("frekwencja", hits[0]["question"].lower())

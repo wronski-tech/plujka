@@ -4,7 +4,8 @@
 The examples are few-shot prompts for LLM-written SQL, so every one must pass the SQL guard and
 return rows from the built mart. ``--check`` runs all curated examples (use after rebuilding the
 mart or changing views); ``--review`` goes through the thumbs-up answers queued in the feedback log
-(``FEEDBACK_JSONL_PATH``): each is run, shown and added only when you accept it; decisions are kept
+(``FEEDBACK_JSONL_PATH``) and the corrected queries ``scripts/triage_feedback.py`` proposed for
+thumbs-down answers: each is run, shown and added only when you accept it; decisions are kept
 in ``example_reviews.jsonl`` next to the log so a candidate is asked once. Otherwise the given pair is
 validated, executed and appended.
 
@@ -62,17 +63,21 @@ def review_candidates(feedback_path: Path, ask=input) -> int:
         decided = {json.loads(line)["id"] for line in reviews_path.read_text(encoding="utf-8").splitlines() if line.strip()}
     curated = {examples.example_id(e["question"]) for e in examples.load_seed()}
     candidates: dict[str, dict] = {}
-    if feedback_path.exists():
-        for line in feedback_path.read_text(encoding="utf-8").splitlines():
+    # Thumbs-up answers, then corrected queries proposed for thumbs-down groups (triage_feedback.py).
+    for path, wanted in ((feedback_path, "thumbs_up"), (feedback_path.with_name("example_proposals.jsonl"), None)):
+        if not path.exists():
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
             record = json.loads(line) if line.strip() else {}
-            if record.get("rating") == "thumbs_up" and record.get("sql"):
+            if record.get("sql") and (wanted is None or record.get("rating") == wanted):
                 key = examples.example_id(record["question"])
                 if key not in decided and key not in curated:
                     candidates[key] = record  # the latest SQL for a repeated question
     added = 0
     for key, record in candidates.items():
         ok, message = check_example(record["question"], record["sql"])
-        print(f"\nQ: {record['question']}\n{record['sql']}\n-> {message[:300]}")
+        note = f"\n({record['note']})" if record.get("note") else ""
+        print(f"\nQ: {record['question']}{note}\n{record['sql']}\n-> {message[:300]}")
         if not ok:
             answer = "n"
             print("rejected automatically")

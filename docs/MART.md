@@ -670,6 +670,10 @@ schemas.
 A thumbs-up on a `dynamic_sql` answer only queues the pair in the feedback log (`sql` on the
 thumbs-up line); `scripts/add_sql_example.py --review` runs each queued pair, shows the rows and
 appends it to the curated file when accepted (decisions in `example_reviews.jsonl` next to the log).
+`scripts/triage_feedback.py` groups the thumbs-down answers by likely problem with the LLM
+(`feedback_groups.md`) and asks the usual SQL prompt for a corrected query, with the rejected one and
+the problem as the error to fix; proposals that pass the guard and return rows go to
+`example_proposals.jsonl`, which `--review` offers next.
 Curated pairs are indexed in the OpenSearch index `SQL_EXAMPLES_INDEX` (anything else is removed at
 startup) and retrieved by kNN on the question embedding plus text match; without OpenSearch the
 curated file is searched by word overlap.
