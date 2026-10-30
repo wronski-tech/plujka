@@ -62,6 +62,7 @@ DERIVED_RELATIONS = (
     "party_families",
     "v_seat_methods",
     "v_gus_units",
+    "gmina_codes_pre1999",
     "entity_lexicon",
     "v_sejm_national_results",
     "v_sejm_list_results",

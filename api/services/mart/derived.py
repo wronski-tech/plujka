@@ -16,6 +16,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import logging
 from pathlib import Path
 
@@ -546,6 +547,75 @@ def load_person_overrides(pg: psycopg.Connection, path: Path = PERSON_OVERRIDES)
     ).fetchall()
     if missing:
         raise ValueError(f"{path.name}: lines {[m[0] for m in missing]} match no candidacy")
+    return len(rows)
+
+
+# Key from the 1975-1998 gmina codes to 1999 and current TERYT, matched by name and type and
+# documented code by code (sources and method inside the file); the UI maps use the same file.
+GMINA_CODES_PRE1999 = Path(__file__).resolve().parents[3] / "streamlit_app" / "geo" / "gminy_pre1999.json"
+VOIVODESHIPS_1999 = {
+    "02": "dolnośląskie", "04": "kujawsko-pomorskie", "06": "lubelskie", "08": "lubuskie", "10": "łódzkie",
+    "12": "małopolskie", "14": "mazowieckie", "16": "opolskie", "18": "podkarpackie", "20": "podlaskie",
+    "22": "pomorskie", "24": "śląskie", "26": "świętokrzyskie", "28": "warmińsko-mazurskie", "30": "wielkopolskie",
+    "32": "zachodniopomorskie",
+}
+GMINA_CODES_PRE1999_SQL = r"""
+DROP TABLE IF EXISTS mart.gmina_codes_pre1999;
+CREATE TABLE mart.gmina_codes_pre1999 (
+    teryt_gmina_pre1999 TEXT PRIMARY KEY,
+    wojewodztwo_1975 TEXT NOT NULL,
+    gmina TEXT NOT NULL,
+    years INT[] NOT NULL,
+    teryt_1999 TEXT,
+    wojewodztwo TEXT,
+    teryt_powiat TEXT,
+    teryt_gmina_current TEXT[] NOT NULL,
+    match TEXT NOT NULL
+);
+COMMENT ON TABLE mart.gmina_codes_pre1999 IS 'Key from the gmina codes of the 1975-1998 division (teryt_gmina_pre1999 in precincts, prezydent_precinct_protocols and referendum_precinct_protocols, elections 1990-1997) to the 1999 TERYT gmina and today''s units. No official key exists; every code was matched by name and gmina type (GUS BDL units 1995-1998, GUS change notices). Join on teryt_gmina_pre1999 to sum 1990s results by today''s voivodeship or powiat. Before 1995 a parent gmina''s code also covers gminas split off later (e.g. Mysłowice with Imielin and Chełm Śląski until 1994), and the 1991 Sejm file has no row for 24 rural gminas (counted under the town of the same name), so powiat sums for those years are approximate.';
+COMMENT ON COLUMN mart.gmina_codes_pre1999.teryt_gmina_pre1999 IS '5-digit code of the old division: 2 digits for the 1975-1998 voivodeship (odd numbers 01-97), 3 for the gmina.';
+COMMENT ON COLUMN mart.gmina_codes_pre1999.wojewodztwo_1975 IS 'Voivodeship of the 1975-1998 division (one of 49, e.g. katowickie, bialskopodlaskie), as in the 1990s result tables.';
+COMMENT ON COLUMN mart.gmina_codes_pre1999.gmina IS 'Gmina name as published by PKW.';
+COMMENT ON COLUMN mart.gmina_codes_pre1999.years IS 'Election years in which PKW used this code.';
+COMMENT ON COLUMN mart.gmina_codes_pre1999.teryt_1999 IS '6-digit TERYT of the same gmina on 1999-01-01; NULL for the 7 Warsaw dzielnice of 1990-1994, which cover several later districts (see teryt_gmina_current).';
+COMMENT ON COLUMN mart.gmina_codes_pre1999.wojewodztwo IS 'Today''s voivodeship (one of 16) containing the gmina; every old gmina lies inside one.';
+COMMENT ON COLUMN mart.gmina_codes_pre1999.teryt_powiat IS '4-digit powiat of teryt_1999 (the 1999 powiat; a few powiats were renumbered in 2002).';
+COMMENT ON COLUMN mart.gmina_codes_pre1999.teryt_gmina_current IS 'Current TERYT gmina code(s) covering the gmina: one code, several for the Warsaw dzielnice of 1990-1994, none for Ostrowice (split in 2019).';
+COMMENT ON COLUMN mart.gmina_codes_pre1999.match IS 'How the code was matched (name and type, name only, renamed with the act, Warsaw dzielnica).';
+"""
+GMINA_CODES_PRE1999_CHECK_SQL = r"""
+SELECT d.teryt_gmina_pre1999, d.year, d.wojewodztwo, k.wojewodztwo_1975, k.years
+FROM (
+  SELECT DISTINCT teryt_gmina_pre1999, year, wojewodztwo FROM mart.precincts WHERE teryt_gmina_pre1999 IS NOT NULL
+  UNION SELECT DISTINCT teryt_gmina_pre1999, year, wojewodztwo FROM mart.prezydent_precinct_protocols WHERE teryt_gmina_pre1999 IS NOT NULL
+  UNION SELECT DISTINCT teryt_gmina_pre1999, year, wojewodztwo FROM mart.referendum_precinct_protocols WHERE teryt_gmina_pre1999 IS NOT NULL
+) d
+LEFT JOIN mart.gmina_codes_pre1999 k USING (teryt_gmina_pre1999)
+WHERE k.teryt_gmina_pre1999 IS NULL OR k.wojewodztwo_1975 <> d.wojewodztwo OR NOT d.year = ANY (k.years)
+ORDER BY 1, 2
+"""
+
+
+def load_gmina_codes_pre1999(pg: psycopg.Connection, path: Path = GMINA_CODES_PRE1999) -> int:
+    """Create ``mart.gmina_codes_pre1999`` from ``path``; return its row count.
+
+    Raises ValueError when a pre-1999 code in the result tables is missing from the key, or the key
+    gives it another old voivodeship or does not list that election year.
+    """
+    codes = json.loads(path.read_text(encoding="utf-8"))["codes"]
+    rows = []
+    for code, c in codes.items():
+        teryt = c.get("teryt_1999")
+        current = c["current"]
+        voivodeship = VOIVODESHIPS_1999[(teryt or current[0])[:2]]
+        rows.append((code, c["wojewodztwo"], c["name"], c["years"], teryt, voivodeship, teryt[:4] if teryt else None,
+                     current, c["match"]))
+    pg.execute(GMINA_CODES_PRE1999_SQL)
+    with pg.cursor() as cur:
+        cur.executemany("INSERT INTO mart.gmina_codes_pre1999 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", rows)
+    errors = pg.execute(GMINA_CODES_PRE1999_CHECK_SQL).fetchall()
+    if errors:
+        raise ValueError(f"{path.name}: {len(errors)} pre-1999 codes missing or inconsistent: {errors[:5]}")
     return len(rows)
 
 
@@ -1425,6 +1495,7 @@ def rebuild(pg: psycopg.Connection) -> None:
     pg.execute(PERSON_HISTORY_SQL)
     pg.execute(SEAT_METHODS_VIEW_SQL)
     pg.execute(GUS_VIEW_SQL)
+    log.info("pre-1999 gmina codes: %s", load_gmina_codes_pre1999(pg))
     linked = pg.execute(
         "SELECT (SELECT count(*) FROM mart.sejmik_candidates WHERE person_id IS NOT NULL),"
         " (SELECT count(*) FROM mart.wbp_candidates WHERE person_id IS NOT NULL)"

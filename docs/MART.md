@@ -116,6 +116,7 @@ count only in `country`.
 | `v_gus_units` | GUS statistics per unit and year in wide form: population, urban share, area, density, unemployment, salary |
 | `v_seat_methods` | Sejm and sejmik seats per committee under D'Hondt, Sainte-Laguë and modified Sainte-Laguë, with the official thresholds |
 | `party_families` (table) | lead alias → party family, with a Polish note on the lineage |
+| `gmina_codes_pre1999` (table) | 1975–1998 gmina code → 1999 TERYT, today's voivodeship and powiat, current gmina codes (from `streamlit_app/geo/gminy_pre1999.json`) |
 
 Cross-election rules:
 
@@ -407,7 +408,9 @@ These are properties of the official files, not build errors. Each check names i
   (100–499 towns and urban-rural gminas, 500–999 rural gminas, 000–099 big cities and Warsaw
   dzielnice). No official key to TERYT exists. `streamlit_app/geo/gminy_pre1999.json` matches every
   code in the mart to its 1999 TERYT gmina by name and type, checked against GUS BDL units for
-  1995–1998 and the GUS change notices; the UI maps use it. The 1991 Sejm file has no row for 24
+  1995–1998 and the GUS change notices; the UI maps use it, and `derived.load_gmina_codes_pre1999`
+  loads it as `mart.gmina_codes_pre1999` (the build fails when a code in the result tables is missing
+  from it, or the file gives it another old voivodeship or does not list that year). The 1991 Sejm file has no row for 24
   rural gminas (their precincts are under the town of the same name) and for 22 gminas created in
   1991–1993. Before a gmina was split off (1994–1998, and Jaśliska in 2010), the parent's code covers
   both. The Warsaw dzielnice of 1990–1994 cover several current districts. Ostrowice (split in 2019)

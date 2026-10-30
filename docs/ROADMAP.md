@@ -37,7 +37,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 21. „Zgłoś błędne połączenie osoby” → `feedback.jsonl`.
 
 **Dane**
-- [ ] 22. Mapowanie kodów gmin sprzed 1999 jako tabela w marcie (odtwarzalny skrypt, kontrole).
+- [x] 22. Mapowanie kodów gmin sprzed 1999 jako tabela w marcie (odtwarzalny skrypt, kontrole).
 - [ ] 23. Widoki lat 90. według dawnych województw i dzisiejszych gmin, z `CAVEATS`.
 - [ ] 24. Wybory samorządowe 1994 i 1990 (jeśli KBW publikuje pliki).
 - [ ] 25. Głosy kandydatów na poziomie gminy z plików obwodowych.

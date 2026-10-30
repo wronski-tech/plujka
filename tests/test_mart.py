@@ -803,6 +803,7 @@ class TestPromptRelations(unittest.TestCase):
     AVAILABLE = [
         "elections", "persons", "v_turnout", "precincts", "sejm_lists", "senat_candidates",
         "prezydent_results", "wbp_candidates", "sejmik_lists", "rada_candidates", "pe_lists", "v_seat_methods",
+        "gmina_codes_pre1999",
     ]
 
     def test_named_election_kind_limits_the_schema(self) -> None:
@@ -817,6 +818,12 @@ class TestPromptRelations(unittest.TestCase):
             dynamic_sql.relevant_relations("Frekwencja w wyborach do Parlamentu Europejskiego", self.AVAILABLE),
             ["elections", "persons", "v_turnout", "pe_lists"],
         )
+
+    def test_1990s_questions_get_the_pre1999_gmina_key(self) -> None:
+        relations = dynamic_sql.relevant_relations("Wyniki wyborów prezydenckich 1995 według dzisiejszych województw", self.AVAILABLE)
+        self.assertIn("gmina_codes_pre1999", relations)
+        self.assertNotIn("sejm_lists", relations)
+        self.assertNotIn("gmina_codes_pre1999", dynamic_sql.relevant_relations("Kto wygrał wybory prezydenckie w 2020?", self.AVAILABLE))
 
     def test_seat_method_questions_get_the_seat_view(self) -> None:
         relations = dynamic_sql.relevant_relations("Ile mandatów miałby PiS metodą Sainte-Laguë?", self.AVAILABLE)
