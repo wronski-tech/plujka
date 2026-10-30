@@ -103,6 +103,15 @@ WHERE year = %(year)s AND round = %(round)s {_UNIT_FILTER}
 ORDER BY wojewodztwo, teryt_powiat, teryt_gmina, votes DESC
 LIMIT 50000
 """
+# Change of each party against the previous election of the same kind (v_party_change), per unit.
+CHANGE_SQL = f"""
+SELECT election, year, 1 AS round, prev_year, level, wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina,
+       party AS name, votes, prev_votes, pct, prev_pct, change_pp, comparable
+FROM mart.v_party_change
+WHERE election = %(election)s AND year = %(year)s {_UNIT_FILTER}
+ORDER BY wojewodztwo, teryt_powiat, teryt_gmina, votes DESC
+LIMIT 50000
+"""
 UNIT_SEARCH_SQL = """
 SELECT DISTINCT ON (kind, ref) kind AS level, ref AS unit, regexp_replace(name, '^(gm\.|m\.|pow\.) ', '') AS name, detail
 FROM mart.entity_lexicon
@@ -601,6 +610,21 @@ def get_results(
     params = {**_unit_params(level, None), "election": election, "year": year, "round": round,
               "wojewodztwo": wojewodztwo, "teryt_powiat": teryt_powiat}
     return BrowseRowsResponse.model_validate({"rows": _mart_rows(RESULTS_SQL, params)})
+
+
+@app.get("/change", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])
+def get_change(
+    election: Literal["sejm", "sejmik", "pe"] = Query(description="Election kind"),
+    year: int = Query(ge=1989, le=2100),
+    level: UnitLevel = Query("country"),
+    wojewodztwo: str | None = Query(None, max_length=40, description="Only units in this voivodeship"),
+    teryt_powiat: str | None = Query(None, pattern=r"^\d{4}$", description="Only units in this powiat"),
+) -> BrowseRowsResponse:
+    """Each party's result against the previous election of the same kind (``v_party_change``):
+    ``change_pp`` in percentage points; ``comparable`` is false when the party's lead alias changed."""
+    params = {**_unit_params(level, None), "election": election, "year": year,
+              "wojewodztwo": wojewodztwo, "teryt_powiat": teryt_powiat}
+    return BrowseRowsResponse.model_validate({"rows": _mart_rows(CHANGE_SQL, params)})
 
 
 @app.get("/units", response_model=list[UnitHit], tags=["browse"], dependencies=[Depends(require_api_key)])

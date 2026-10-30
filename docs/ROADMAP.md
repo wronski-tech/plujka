@@ -12,9 +12,9 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 **Eksploratory wyników**
 - [x] 1. Tryb „Przeglądaj”: wybór wyborów, roku, poziomu i jednostki → tabela, mapa, wykres bez pytania.
 - [x] 2. Karta gminy / powiatu / województwa: wszystkie wybory, frekwencja w czasie, zwycięzcy, GUS.
-- [ ] 3. Porównanie dwóch jednostek obok siebie.
-- [ ] 4. Porównanie dwóch wyborów dla jednej jednostki (`v_party_change`).
-- [ ] 5. Ranking jednostek według miary, z filtrem województwa.
+- [x] 3. Porównanie dwóch jednostek obok siebie.
+- [x] 4. Porównanie dwóch wyborów dla jednej jednostki (`v_party_change`).
+- [x] 5. Ranking jednostek według miary, z filtrem województwa.
 - [ ] 6. Wyniki obwodowe z wyszukiwaniem obwodu po numerze i gminie.
 - [ ] 7. Wykres liniowy jednostki w czasie (`chart_columns.py`).
 - [ ] 8. Karta wyborów: frekwencja, mandaty, progi, metoda, liczba obwodów.
@@ -25,8 +25,8 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [x] 11. Symulator mandatów: metoda i próg suwakami (`mart.allocate_seats`).
 - [ ] 12. Symulacja koalicji (komitety jako jedna lista).
 - [x] 13. Inny podział na okręgi (np. jeden okręg krajowy).
-- [ ] 14. Koszt mandatu: głosy na mandat według komitetu.
-- [ ] 15. Głosy zmarnowane według województwa.
+- [x] 14. Koszt mandatu: głosy na mandat według komitetu.
+- [ ] 15. Głosy zmarnowane według województwa. (Krajowo już w symulatorze mandatów.)
 
 **Osoby**
 - [ ] 16. Rankingi osób: kandydowania, długość kariery, suma głosów.

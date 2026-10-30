@@ -241,3 +241,4 @@ class TestBrowseEndpoints(unittest.TestCase):
     def test_unknown_unit_and_unsupported_election(self) -> None:
         self.assertEqual(self.client.get("/units/999999").status_code, 404)
         self.assertEqual(self.client.get("/results", params={"election": "senat", "year": 2023}).status_code, 422)
+        self.assertEqual(self.client.get("/change", params={"election": "prezydent", "year": 2025}).status_code, 422)

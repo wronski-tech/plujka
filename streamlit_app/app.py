@@ -693,6 +693,7 @@ ELECTION_LABELS = {
     "referendum": "Referendum", "sejmik": "Sejmiki", "wbp": "Wójtowie / burmistrzowie", "rada": "Rady",
 }
 RESULT_ELECTIONS = ("sejm", "sejmik", "pe", "prezydent")
+CHANGE_ELECTIONS = ("sejm", "sejmik", "pe")
 LEVEL_LABELS = {"country": "Kraj", "wojewodztwo": "Województwa", "powiat": "Powiaty", "gmina": "Gminy"}
 UNIT_NAME = {"wojewodztwo": "wojewodztwo", "powiat": "powiat", "gmina": "gmina"}
 UNIT_SINGULAR = {"wojewodztwo": "województwo", "powiat": "powiat", "gmina": "gmina"}
@@ -722,6 +723,8 @@ def _browse() -> None:
         rnd = c3.selectbox("Tura", rounds, key="browse_round") if len(rounds) > 1 else rounds[0]
         c4, c5, c6 = st.columns(3)
         views = ["Wyniki", "Frekwencja"] if kind in RESULT_ELECTIONS else ["Frekwencja"]
+        if kind in CHANGE_ELECTIONS and year > min(years):
+            views.insert(1, "Zmiana")
         view = c4.radio("Pokaż", views, horizontal=True, key="browse_view")
         level = c5.selectbox("Poziom", list(LEVEL_LABELS), index=1, format_func=LEVEL_LABELS.get, key="browse_level")
         if year < 1999 and level != "country":
@@ -732,7 +735,23 @@ def _browse() -> None:
             voivodeship = c6.text_input("Województwo (opcjonalnie)", placeholder="np. mazowieckie", key="browse_woj")
         params = {"election": kind, "year": year, "round": rnd, "level": level,
                   "wojewodztwo": (voivodeship or "").strip().lower() or None}
-        if view == "Frekwencja":
+        if view == "Zmiana":
+            data = _api_get("/change", {k: v for k, v in params.items() if k != "round"})
+            rows = (data or {}).get("rows") or []
+            if not rows:
+                st.caption("Brak danych dla tego wyboru.")
+                return
+            value = "change_pp"
+            st.caption(f"Zmiana w punktach procentowych względem wyborów z {rows[0]['prev_year']} r.; "
+                       "„porównywalny” = ten sam komitet wiodący w obu wyborach.")
+            if level == "country":
+                shown = [{"name": r["name"], "pct": r["pct"], "prev_pct": r["prev_pct"], "change_pp": r["change_pp"],
+                          "porównywalny": r["comparable"]} for r in rows]
+            else:
+                names = list(dict.fromkeys(r["name"] for r in rows))
+                name = st.selectbox("Komitet na mapie", names, key="browse_change_name")
+                shown = _unit_rows([r for r in rows if r["name"] == name], level, value)
+        elif view == "Frekwencja":
             data = _api_get("/turnout", params)
             rows = (data or {}).get("rows") or []
             if not rows:
@@ -753,6 +772,12 @@ def _browse() -> None:
             else:
                 name = st.selectbox("Komitet / kandydat na mapie", names, key="browse_name")
                 shown = _unit_rows([r for r in rows if r["name"] == name], level, value)
+        if level != "country":
+            order = st.radio("Jednostki", ["Wszystkie", "20 najwyższych", "20 najniższych"], horizontal=True, key="browse_rank")
+            if order != "Wszystkie":
+                ranked = sorted((r for r in shown if r.get(value) is not None), key=lambda r: r[value],
+                                reverse=order == "20 najwyższych")
+                shown = ranked[:20]
         # The year column stays in the rows for the map (former extents by year), not in the table.
         st.dataframe(pd.DataFrame(shown).drop(columns=["year"], errors="ignore"), hide_index=True, use_container_width=True)
         _csv_download(rows, f"{kind}_{year}_{view}_{level}", key="csv_browse")
@@ -800,6 +825,7 @@ def _unit_card() -> None:
                 .properties(height=280, padding={"left": 5, "right": 5, "top": 5, "bottom": 25})
             )
             st.altair_chart(chart, use_container_width=True)
+        _compare_units(card)
         winners = pd.DataFrame(card["winners"])
         if not winners.empty:
             winners = winners.sort_values(["year", "election", "round"], ascending=[False, True, True])
@@ -814,6 +840,41 @@ SEAT_METHODS = {
     "dhondt": "D'Hondt", "sainte_lague": "Sainte-Laguë", "sainte_lague_modified": "Sainte-Laguë zmodyfikowana (1,4)",
     "hare_niemeyer": "Hare-Niemeyer",
 }
+
+
+def _compare_units(card: dict) -> None:
+    """Turnout of the unit next to a second unit, for one kind of election."""
+    other = st.text_input("Porównaj z jednostką", placeholder="np. Niepołomice", key="unit_compare").strip()
+    if len(other) < 2:
+        return
+    hits = _api_get("/units", {"name": other}) or []
+    if not hits:
+        st.caption(f"Nie znaleziono jednostki „{other}”.")
+        return
+    hit = st.selectbox("Druga jednostka", hits, key="unit_compare_pick",
+                       format_func=lambda h: f"{h['name']} ({UNIT_SINGULAR[h['level']]}{', ' + h['detail'] if h.get('detail') else ''})")
+    second = _api_get(f"/units/{hit['unit']}")
+    if not second:
+        st.caption("Brak wyników dla drugiej jednostki.")
+        return
+    frames = []
+    for c in (card, second):
+        frame = pd.DataFrame(c["turnout"])
+        frame["jednostka"] = c["name"] or c["unit"]
+        frames.append(frame)
+    both = pd.concat(frames)
+    kinds = [k for k in ELECTION_LABELS if k in set(both["election"])]
+    kind = st.selectbox("Wybory do porównania", kinds, format_func=ELECTION_LABELS.get, key="unit_compare_kind")
+    both = both[(both["election"] == kind) & (both["round"] == 1)]
+    chart = (
+        alt.Chart(both)
+        .mark_line(point=True)
+        .encode(x=alt.X("year:Q", title=None, axis=alt.Axis(format="d"), scale=alt.Scale(zero=False)),
+                y=alt.Y("turnout_pct:Q", title="frekwencja %", scale=alt.Scale(zero=False)),
+                color=alt.Color("jednostka:N", title=None), tooltip=["jednostka", "year", "turnout_pct"])
+        .properties(height=240, padding={"left": 5, "right": 5, "top": 5, "bottom": 25})
+    )
+    st.altair_chart(chart, use_container_width=True)
 
 
 @st.fragment
@@ -841,6 +902,9 @@ def _seat_simulator() -> None:
             return
         table = pd.DataFrame(rows)[["party", "votes", "pct", "seats_official", "seats_simulated"]]
         table["zmiana"] = table["seats_simulated"] - table["seats_official"]
+        table["głosy na mandat"] = (table["votes"] / table["seats_simulated"].where(table["seats_simulated"] > 0)).round(0)
+        wasted = int(table.loc[table["seats_simulated"] == 0, "votes"].sum())
+        total = int(table["votes"].sum())
         shown = table[(table["seats_official"] > 0) | (table["seats_simulated"] > 0)]
         st.dataframe(shown.rename(columns={"party": "komitet", "votes": "głosy", "pct": "%", "seats_official": "mandaty (oficjalnie)",
                                            "seats_simulated": "mandaty (symulacja)"}), hide_index=True, use_container_width=True)
@@ -854,7 +918,8 @@ def _seat_simulator() -> None:
             .properties(height=max(160, 52 * len(shown)), padding={"left": 5, "right": 5, "top": 5, "bottom": 25})
         )
         st.altair_chart(chart, use_container_width=True)
-        st.caption("Przeliczone z oficjalnych głosów na listy (mart.allocate_seats); próg liczony od głosów ważnych na listy w kraju.")
+        st.caption(f"Głosy na komitety bez mandatu: {wasted:,} z {total:,} ({100 * wasted / total:.1f}%). ".replace(",", " ")
+                   + "Przeliczone z oficjalnych głosów na listy (mart.allocate_seats); próg liczony od głosów ważnych na listy w kraju.")
 
 
 @st.fragment
