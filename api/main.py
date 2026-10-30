@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import csv
 import functools
 import hashlib
+import io
 import json
 import logging
 import pathlib
 import re
 import secrets
 import time
+import zipfile
 from contextlib import asynccontextmanager
 from datetime import date, datetime, timezone
 from decimal import Decimal
@@ -15,7 +18,7 @@ from email.utils import parsedate_to_datetime
 from typing import Any, Literal
 
 import psycopg
-from fastapi import Depends, FastAPI, Header, HTTPException, Path, Query, Request
+from fastapi import Depends, FastAPI, Header, HTTPException, Path, Query, Request, Response
 from psycopg.conninfo import conninfo_to_dict
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -1060,6 +1063,61 @@ def get_turnout(
     params = {**_unit_params(level, None), "election": election, "year": year, "round": round,
               "wojewodztwo": wojewodztwo, "teryt_powiat": teryt_powiat}
     return BrowseRowsResponse.model_validate({"rows": _mart_rows(TURNOUT_SQL, params)})
+
+
+PACKAGE_LEVELS = ("country", "wojewodztwo", "powiat", "gmina")
+PACKAGE_README = """Plujka data package: {election} {year}
+
+Source: official PKW/KBW files (see data/source_manifest.json in the repository), loaded into the
+Plujka mart; GUS statistics are not included. Files (UTF-8, comma-separated, dot decimal):
+  turnout.csv  official turnout per unit and round (mart.v_turnout)
+  results.csv  votes and percent per unit and round: party families (mart.v_party_results) or
+               presidential candidates (mart.v_prezydent_results)
+level is country, wojewodztwo, powiat or gmina (today's units; 1990-1997 results through
+mart.gmina_codes_pre1999, see the known gaps). Abroad and ships count only in country.
+
+Columns
+"""
+
+
+def _package_csv(rows: list[dict[str, Any]]) -> str:
+    """Rows as a plain CSV (comma, dot decimal) for the data package."""
+    buffer = io.StringIO()
+    columns = list(dict.fromkeys(name for row in rows for name in row))
+    writer = csv.DictWriter(buffer, fieldnames=columns, lineterminator="\n")
+    writer.writeheader()
+    writer.writerows({k: _json_value(v) for k, v in row.items()} for row in rows)
+    return buffer.getvalue()
+
+
+@app.get("/packages/{election}/{year}", tags=["browse"], dependencies=[Depends(require_api_key)],
+         response_class=Response, responses={200: {"content": {"application/zip": {}}}, 404: {"description": "Not loaded"}})
+def data_package(
+    election: Literal[RESULT_ELECTIONS] = Path(),  # type: ignore[valid-type]
+    year: int = Path(ge=1989, le=2100),
+) -> Response:
+    """A zip with turnout and results of one election at every level (all rounds) and a column dictionary."""
+    rounds = [r["round"] for r in _mart_rows(ELECTIONS_SQL, {}) if (r["election"], r["year"]) == (election, year)]
+    if not rounds:
+        raise HTTPException(status_code=404, detail="Election not loaded.")
+    turnout, results = [], []
+    for rnd in rounds:
+        for level in PACKAGE_LEVELS + (("wojewodztwo_1975",) if year < 1999 else ()):
+            params = {**_unit_params(level, None), "election": election, "year": year, "round": rnd,
+                      "wojewodztwo": None, "teryt_powiat": None}
+            turnout += _mart_rows(TURNOUT_SQL, params)
+            results += _mart_rows(RESULTS_SQL, params)
+    relations = {"v_turnout", "v_prezydent_results" if election == "prezydent" else "v_party_results"}
+    columns = [r for r in _mart_rows(DATA_DICTIONARY_SQL, {"relations": sorted(relations)}) if r["column_comment"]]
+    readme = PACKAGE_README.format(election=election, year=year) + "".join(
+        f"  {r['relation']}.{r['column_name']}: {r['column_comment']}\n" for r in columns)
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("README.txt", readme)
+        archive.writestr("turnout.csv", _package_csv(turnout))
+        archive.writestr("results.csv", _package_csv(results))
+    return Response(buffer.getvalue(), media_type="application/zip",
+                    headers={"Content-Disposition": f'attachment; filename="plujka-{election}-{year}.zip"'})
 
 
 @app.get("/results", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])

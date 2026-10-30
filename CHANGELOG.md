@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Exports: every table also downloads as XLSX and Parquet; `GET /packages/{election}/{year}` and an election-card button give a zip with turnout and results at every level and round (plain CSV) and a README with the column dictionary.
 - Mart: Sejm and Senate 1991, 1993 and 1997 (precinct level; Senate 1991 candidates only), reconciled with PKW, with the national lists as district 0, list blocs, pre-1999 geography and seat checks (Hare-Niemeyer and modified Sainte-Laguë 1991, D'Hondt 1993/1997); party families for UD/KLD (UW/PD), POC/PC, NSZZ Solidarność (AWS), WAK/Ojczyzna.
 - Mart: candidate ages (`age`) in `sejm_candidates`/`senat_candidates` for 1991–1997 (checked: every candidate 21+), shown in `v_person_history`; Sejm 1997 national-list positions checked against the registered national lists (OGPOL), with named exceptions.
 - Mart: president 1990 and 1995 (both rounds) and referendums 1996 and 1997 at precinct level, reconciled with PKW; pre-1999 gminas keep their old code (`teryt_gmina_pre1999`) and voivodeship, views show them at country level. President 2000: Warszawa-Centrum precincts split into today's districts through the 2001 precinct addresses.

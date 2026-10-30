@@ -49,8 +49,8 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 
 **API i otwarte dane**
 - [x] 31. Endpointy bez LLM: `/elections`, `/units/{teryt}`, `/results`, `/turnout`.
-- [ ] 32. Eksport Parquet i XLSX.
-- [ ] 33. Paczki danych na wybory (zip ze słownikiem kolumn).
+- [x] 32. Eksport Parquet i XLSX.
+- [x] 33. Paczki danych na wybory (zip ze słownikiem kolumn).
 - [x] 34. `GET /data-version`: wersja martu i daty źródeł.
 - [ ] 35. Widget do osadzania (mapa / wykres dla jednostki).
 - [x] 36. Stałe linki odtwarzające widok „Przeglądaj”.

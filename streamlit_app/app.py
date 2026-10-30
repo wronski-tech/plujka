@@ -452,13 +452,32 @@ def _csv_file_name(text: str) -> str:
     return f"plujka-{slug}-{date.today().isoformat()}.csv"
 
 
+def _table_bytes(rows: list[dict], kind: str) -> bytes:
+    """Rows as an XLSX workbook or a Parquet file (lists and dicts as text in XLSX)."""
+    frame = pd.DataFrame(rows)
+    buffer = io.BytesIO()
+    if kind == "xlsx":
+        frame.map(lambda v: ", ".join(map(str, v)) if isinstance(v, list) else str(v) if isinstance(v, dict) else v).to_excel(
+            buffer, index=False, sheet_name="plujka")
+    else:
+        frame.to_parquet(buffer, index=False)
+    return buffer.getvalue()
+
+
 def _csv_download(rows: list[dict], name: str, key: str) -> None:
-    """"Pobierz CSV" button exporting exactly these rows."""
-    if rows:
-        st.download_button(
-            "Pobierz CSV", data=_csv_bytes(rows), file_name=_csv_file_name(name), mime="text/csv", key=key,
-            help="Separator „;” i przecinek dziesiętny — plik otwiera się poprawnie w polskim Excelu.",
-        )
+    """"Pobierz CSV / XLSX / Parquet" buttons exporting exactly these rows."""
+    if not rows:
+        return
+    c1, c2, c3, _ = st.columns([1, 1, 1, 3])
+    file_name = _csv_file_name(name)
+    c1.download_button(
+        "Pobierz CSV", data=_csv_bytes(rows), file_name=file_name, mime="text/csv", key=key,
+        help="Separator „;” i przecinek dziesiętny — plik otwiera się poprawnie w polskim Excelu.",
+    )
+    c2.download_button("XLSX", data=_table_bytes(rows, "xlsx"), file_name=file_name.removesuffix(".csv") + ".xlsx",
+                       mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", key=f"{key}_xlsx")
+    c3.download_button("Parquet", data=_table_bytes(rows, "parquet"), file_name=file_name.removesuffix(".csv") + ".parquet",
+                       mime="application/octet-stream", key=f"{key}_parquet", help="Dla analiz w Pythonie, R lub DuckDB.")
 
 
 def _persons_in_answer(data: dict, entity_refs: list[dict] | None) -> list[tuple[int, str]]:
@@ -784,6 +803,29 @@ def _election_card(kind: str, year: int, rnd: int) -> None:
              f"metoda: {card['seat_method']}" if card.get("seat_method") else None,
              "progi: " + " / ".join(f"{t:g}%" for t in card["thresholds_pct"]) if card.get("thresholds_pct") else None]
     st.caption(" · ".join(n for n in notes if n))
+    if kind in RESULT_ELECTIONS:
+        _package_download(kind, year)
+
+
+def _package_download(kind: str, year: int) -> None:
+    """Zip with turnout and results at every level plus a column dictionary, fetched on request."""
+    name = f"plujka-{kind}-{year}.zip"
+    slot = st.empty()
+    if st.session_state.get("package_name") != name:
+        if not slot.button("Przygotuj paczkę danych (zip)", key="package_prepare",
+                         help="Frekwencja i wyniki we wszystkich jednostkach i turach (CSV) oraz słownik kolumn."):
+            return
+        try:
+            response = requests.get(f"{API_URL}/packages/{kind}/{year}", headers=API_HEADERS, timeout=120)
+        except requests.RequestException as error:
+            st.error(f"Coś poszło nie tak z API: {error}")
+            return
+        if not response.ok:
+            st.error(f"Nie udało się przygotować paczki: HTTP {response.status_code}")
+            return
+        st.session_state["package_name"], st.session_state["package_bytes"] = name, response.content
+    slot.download_button(f"Pobierz {name}", data=st.session_state["package_bytes"], file_name=name,
+                       mime="application/zip", key="package_download")
 
 
 def _unit_rows(rows: list[dict], level: str, value: str) -> list[dict]:

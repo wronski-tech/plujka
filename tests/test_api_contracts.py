@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import io
 import unittest
+import zipfile
 from datetime import date
 from decimal import Decimal
 from unittest.mock import patch
@@ -242,6 +244,16 @@ class TestBrowseEndpoints(unittest.TestCase):
         self.assertEqual(card["name"], "Gdów")
         self.assertEqual(card["turnout"], [{"election": "sejm", "year": 2023, "round": 1, "turnout_pct": 71.5}])
         self.assertEqual(card["winners"][0]["votes"], 100)
+
+    def test_data_package_zips_every_level_as_plain_csv(self) -> None:
+        response = self.client.get("/packages/sejm/2023")
+        self.assertEqual(response.headers["content-type"], "application/zip")
+        archive = zipfile.ZipFile(io.BytesIO(response.content))
+        self.assertEqual(sorted(archive.namelist()), ["README.txt", "results.csv", "turnout.csv"])
+        results = archive.read("results.csv").decode().splitlines()
+        self.assertEqual(results[0], "election,year,round,name,votes,pct")
+        self.assertEqual(results[1:], ["sejm,2023,1,KO,100,40.5"] * 4)  # country, voivodeship, powiat, gmina
+        self.assertEqual(self.client.get("/packages/sejm/2019").status_code, 404)
 
     def test_data_version_reads_the_source_manifest(self) -> None:
         version = self.client.get("/data-version").json()
