@@ -28,7 +28,7 @@ jobs:
       - name: Run unit tests
         run: PYTHONPATH=. python -m unittest discover -s tests -p 'test*.py' -v
 
-  # Ruff (errors only, ruff.toml), mypy (mypy.ini, with a baseline of modules not yet clean) and
+  # Ruff (errors only, ruff.toml), mypy (mypy.ini, with a baseline of modules not yet clean), pip-audit and
   # links between the repository's Markdown files (offline: external sites are not fetched).
   lint:
     runs-on: ubuntu-latest
@@ -44,13 +44,16 @@ jobs:
             loader/requirements.txt
 
       - name: Install dependencies
-        run: pip install -r api/requirements.txt -r loader/requirements.txt ruff==0.17.3 mypy==2.4.1
+        run: pip install -r api/requirements.txt -r loader/requirements.txt ruff==0.17.3 mypy==2.4.1 pip-audit
 
       - name: Ruff
         run: ruff check api scripts streamlit_app tests
 
       - name: Mypy
         run: mypy
+
+      - name: Known vulnerabilities in pinned dependencies
+        run: pip-audit -r api/requirements.txt -r loader/requirements.txt --progress-spinner off
 
       - name: Markdown links
         uses: lycheeverse/lychee-action@v2

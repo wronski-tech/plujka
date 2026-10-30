@@ -1,0 +1,18 @@
+# Weekly update pull requests; CI (unit, lint with pip-audit, full mart build) checks each one.
+version: 2
+updates:
+  - package-ecosystem: pip
+    directories: ["/api", "/loader"]
+    schedule: { interval: weekly }
+    groups:
+      python:
+        patterns: ["*"]
+  - package-ecosystem: docker
+    directories: ["/docker"]
+    schedule: { interval: weekly }
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule: { interval: weekly }
+  - package-ecosystem: terraform
+    directory: "/infra/hetzner"
+    schedule: { interval: weekly }
