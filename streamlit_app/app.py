@@ -701,6 +701,24 @@ UNIT_SINGULAR = {"wojewodztwo": "województwo", "powiat": "powiat", "gmina": "gm
 UNIT_CODE = {"powiat": "teryt_powiat", "gmina": "teryt_gmina"}
 
 
+def _election_card(kind: str, year: int, rnd: int) -> None:
+    """Key facts of the selected election: turnout, precincts, districts, seats, method, thresholds."""
+    card = _api_get(f"/elections/{kind}/{year}", {"round": rnd})
+    if not card:
+        return
+    turnout = (card.get("turnout") or {}).get("turnout_pct")
+    facts = [("Frekwencja", f"{turnout:.2f}%".replace(".", ",") if turnout is not None else None),
+             ("Obwody", card.get("precincts")), ("Gminy", card.get("gminas")), ("Okręgi", card.get("districts")),
+             ("Mandaty", card.get("seats"))]
+    facts = [(label, value) for label, value in facts if value is not None]
+    for column, (label, value) in zip(st.columns(len(facts)), facts):
+        column.metric(label, f"{value:,}".replace(",", " ") if isinstance(value, int) else value)
+    notes = [f"{card['election_date']}" if card.get("election_date") else None,
+             f"metoda: {card['seat_method']}" if card.get("seat_method") else None,
+             "progi: " + " / ".join(f"{t:g}%" for t in card["thresholds_pct"]) if card.get("thresholds_pct") else None]
+    st.caption(" · ".join(n for n in notes if n))
+
+
 def _unit_rows(rows: list[dict], level: str, value: str) -> list[dict]:
     """Rows for the chart and map: unit name, its code and one value (the map reads the code column)."""
     keep = [UNIT_NAME[level]] + ([UNIT_CODE[level]] if level in UNIT_CODE else []) + ["year", value]
@@ -722,10 +740,13 @@ def _browse() -> None:
         year = c2.selectbox("Rok", years, key="browse_year")
         rounds = sorted({e["round"] for e in elections if e["election"] == kind and e["year"] == year})
         rnd = c3.selectbox("Tura", rounds, key="browse_round") if len(rounds) > 1 else rounds[0]
+        _election_card(kind, year, rnd)
         c4, c5, c6 = st.columns(3)
         views = ["Wyniki", "Frekwencja"] if kind in RESULT_ELECTIONS else ["Frekwencja"]
         if kind in CHANGE_ELECTIONS and year > min(years):
             views.insert(1, "Zmiana")
+        if kind == "prezydent" and 2 in rounds:
+            views.insert(1, "II tura")
         view = c4.radio("Pokaż", views, horizontal=True, key="browse_view")
         levels = [k for k in LEVEL_LABELS if year < 1999 or k != "wojewodztwo_1975"]
         level = c5.selectbox("Poziom", levels, index=1, format_func=LEVEL_LABELS.get, key="browse_level")
@@ -737,7 +758,23 @@ def _browse() -> None:
             voivodeship = c6.text_input("Województwo (opcjonalnie)", placeholder="np. mazowieckie", key="browse_woj")
         params = {"election": kind, "year": year, "round": rnd, "level": level,
                   "wojewodztwo": (voivodeship or "").strip().lower() or None}
-        if view == "Zmiana":
+        if view == "II tura":
+            data = _api_get("/runoff", {k: v for k, v in params.items() if k != "round"})
+            rows = (data or {}).get("rows") or []
+            if not rows:
+                st.caption("Brak danych dla tego wyboru.")
+                return
+            value = "gain_pp"
+            st.caption("Przyrost poparcia finalistów między turami (punkty procentowe i głosy). Wyniki nie pokazują, "
+                       "kto na kogo przeszedł, tylko zmianę netto.")
+            if level == "country":
+                shown = [{k: r[k] for k in ("name", "votes_round1", "pct_round1", "votes", "pct", "gain_votes", "gain_pp")}
+                         for r in rows]
+            else:
+                names = list(dict.fromkeys(r["name"] for r in rows))
+                name = st.selectbox("Kandydat na mapie", names, key="browse_runoff_name")
+                shown = _unit_rows([r for r in rows if r["name"] == name], level, value)
+        elif view == "Zmiana":
             data = _api_get("/change", {k: v for k, v in params.items() if k != "round"})
             rows = (data or {}).get("rows") or []
             if not rows:

@@ -252,3 +252,4 @@ class TestBrowseEndpoints(unittest.TestCase):
         self.assertEqual(self.client.get("/change", params={"election": "prezydent", "year": 2025}).status_code, 422)
         self.assertEqual(self.client.get("/candidates/stats", params={"chamber": "rada"}).status_code, 422)
         self.assertEqual(self.client.get("/rankings/persons", params={"by": "age"}).status_code, 422)
+        self.assertEqual(self.client.get("/elections/rada/2024").status_code, 422)

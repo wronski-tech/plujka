@@ -20,6 +20,7 @@ from psycopg.conninfo import conninfo_to_dict
 from pydantic import BaseModel, ConfigDict, Field
 
 from api.services import answer, config, db, feedback_store, opensearch_store, router
+from api.services.mart import derived as mart_derived
 from api.services.mart import examples as sql_examples
 from api.services.mart import safe_sql
 from api.services.mart import schema as mart_schema
@@ -174,6 +175,36 @@ WHERE chamber = %(chamber)s AND year = %(year)s AND elected
   AND (%(party)s::text IS NULL OR committee_aliases[1] = %(party)s)
 ORDER BY area NULLS FIRST, district_no, votes DESC NULLS LAST
 """
+# Election card: fixed SQL per election for the number of precincts (sejmik, wbp: gminas) and of
+# districts and seats. Keys are the allowed election kinds, never user text.
+ELECTION_TURNOUT_SQL = """
+SELECT eligible_voters, ballots_issued, valid_ballots, turnout_pct, turnout_basis
+FROM mart.v_turnout WHERE election = %(election)s AND year = %(year)s AND round = %(round)s AND level = 'country'
+"""
+ELECTION_UNITS_SQL = {
+    "sejm": "SELECT (SELECT count(*) FROM mart.sejm_precinct_protocols WHERE year = %(year)s) AS precincts,"
+            " count(*) FILTER (WHERE district_no > 0) AS districts, sum(seats) AS seats FROM mart.sejm_districts WHERE year = %(year)s",
+    "senat": "SELECT (SELECT count(*) FROM mart.senat_precinct_protocols WHERE year = %(year)s) AS precincts,"
+             " count(DISTINCT district_no) AS districts, count(*) FILTER (WHERE elected) AS seats"
+             " FROM mart.senat_candidates WHERE year = %(year)s",
+    "pe": "SELECT (SELECT count(*) FROM mart.pe_precinct_protocols WHERE year = %(year)s) AS precincts,"
+          " count(DISTINCT district_no) AS districts, sum(seats) AS seats FROM mart.pe_district_lists WHERE year = %(year)s",
+    "prezydent": "SELECT count(*) AS precincts, NULL::bigint AS districts, NULL::bigint AS seats"
+                 " FROM mart.prezydent_precinct_protocols WHERE year = %(year)s AND round = %(round)s",
+    "referendum": "SELECT count(DISTINCT precinct_id) AS precincts, NULL::bigint AS districts, NULL::bigint AS seats"
+                  " FROM mart.referendum_precinct_protocols WHERE year = %(year)s",
+    "sejmik": "SELECT (SELECT count(*) FROM mart.sejmik_gmina_protocols WHERE year = %(year)s) AS gminas,"
+              " count(DISTINCT (wojewodztwo, district_no)) AS districts, sum(seats) AS seats"
+              " FROM mart.sejmik_district_lists WHERE year = %(year)s",
+    "wbp": "SELECT count(*) AS gminas, NULL::bigint AS districts, count(*) AS seats"
+           " FROM mart.wbp_gmina_protocols WHERE year = %(year)s AND round = %(round)s",
+}
+SEJM_THRESHOLDS_SQL = """
+SELECT array_agg(DISTINCT threshold_pct ORDER BY threshold_pct) AS thresholds
+FROM mart.v_sejm_national_results WHERE year = %(year)s AND threshold_pct IS NOT NULL
+"""
+SEAT_METHOD_LABELS = {"dhondt": "D'Hondt", "sainte_lague": "Sainte-Laguë", "sainte_lague_modified": "zmodyfikowana Sainte-Laguë",
+                      "hare_niemeyer": "Hare-Niemeyer"}
 DATA_VERSION_SQL = """
 SELECT max(loaded_at) AS mart_loaded_at, count(*) AS elections, max(election_date) AS latest_election_date
 FROM mart.elections
@@ -207,6 +238,23 @@ SELECT * FROM (
   WHERE %(election)s = 'prezydent'
 ) r
 WHERE year = %(year)s AND round = %(round)s {_UNIT_FILTER}
+ORDER BY wojewodztwo, teryt_powiat, teryt_gmina, votes DESC
+LIMIT 50000
+"""
+# Presidential run-off finalists per unit: their round 1 and round 2 votes and the gain between rounds
+# (candidate ids differ between rounds, so rounds are matched by name).
+RUNOFF_SQL = f"""
+SELECT * FROM (
+  SELECT 'prezydent' AS election, r2.year, r2.round, r2.level, r2.wojewodztwo, r2.teryt_powiat, r2.powiat,
+         r2.teryt_gmina, r2.gmina, r2.full_name AS name, r1.votes AS votes_round1, r1.pct AS pct_round1,
+         r2.votes, r2.pct, r2.votes - r1.votes AS gain_votes, r2.pct - r1.pct AS gain_pp
+  FROM mart.v_prezydent_results r2
+  JOIN mart.v_prezydent_results r1 ON r1.year = r2.year AND r1.round = 1 AND r1.full_name = r2.full_name
+   AND r1.level = r2.level AND r1.wojewodztwo IS NOT DISTINCT FROM r2.wojewodztwo
+   AND r1.teryt_powiat IS NOT DISTINCT FROM r2.teryt_powiat AND r1.teryt_gmina IS NOT DISTINCT FROM r2.teryt_gmina
+  WHERE r2.year = %(year)s AND r2.round = 2
+) r
+WHERE true {_UNIT_FILTER}
 ORDER BY wojewodztwo, teryt_powiat, teryt_gmina, votes DESC
 LIMIT 50000
 """
@@ -838,6 +886,50 @@ def elected(
     return [ElectedRow.model_validate(r) for r in _mart_rows(ELECTED_SQL, params)]
 
 
+class ElectionCard(BaseModel):
+    election: str
+    year: int
+    round: int
+    election_date: date | None
+    description: str | None
+    turnout: dict[str, Any] | None = Field(description="Country turnout (v_turnout)")
+    precincts: int | None = Field(description="Precincts with a protocol in the mart")
+    gminas: int | None = Field(description="Gminas with a protocol (sejmik and mayors, which are published per gmina)")
+    districts: int | None
+    seats: int | None
+    seat_method: str | None = Field(description="Seat allocation method (Sejm, sejmik, EP; mart.allocate_seats check)")
+    thresholds_pct: list[float] | None = Field(description="Sejm thresholds in force (committees, coalitions)")
+
+
+@app.get("/elections/{election}/{year}", response_model=ElectionCard, tags=["browse"], dependencies=[Depends(require_api_key)],
+         responses={404: {"description": "Election not loaded"}})
+def election_card(
+    election: Literal["sejm", "senat", "pe", "prezydent", "referendum", "sejmik", "wbp"] = Path(),
+    year: int = Path(ge=1989, le=2100),
+    round: int = Query(1, ge=1, le=2),
+) -> ElectionCard:
+    """One election at a glance: date, turnout, precincts, districts, seats, method and thresholds. Fixed SQL."""
+    info = [r for r in _mart_rows(ELECTIONS_SQL, {}) if (r["election"], r["year"], r["round"]) == (election, year, round)]
+    if not info:
+        raise HTTPException(status_code=404, detail="Election not loaded.")
+    params = {"election": election, "year": year, "round": round}
+    turnout = _mart_rows(ELECTION_TURNOUT_SQL, params)
+    units = _mart_rows(ELECTION_UNITS_SQL[election], params)[0]
+    method = None
+    if election in ("sejm", "sejmik", "pe"):
+        method = SEAT_METHOD_LABELS[mart_derived.SEAT_METHODS.get((election, year), "dhondt")]
+        if election == "pe":
+            method += " w kraju, Hare-Niemeyer między okręgami komitetu"
+        if election == "sejm" and year <= 1997:
+            method += "; lista krajowa: " + SEAT_METHOD_LABELS[mart_derived.SEAT_METHODS.get(("sejm national list", year), "dhondt")]
+    thresholds = _mart_rows(SEJM_THRESHOLDS_SQL, params)[0]["thresholds"] if election == "sejm" else None
+    return ElectionCard.model_validate({
+        **info[0], "turnout": turnout[0] if turnout else None, "precincts": units.get("precincts"),
+        "gminas": units.get("gminas"), "districts": units.get("districts"), "seats": units.get("seats"),
+        "seat_method": method, "thresholds_pct": thresholds,
+    })
+
+
 class DataVersion(BaseModel):
     mart_loaded_at: datetime | None = Field(description="When the newest election was loaded into the mart")
     elections: int = Field(description="Elections and rounds in the mart")
@@ -896,6 +988,19 @@ def get_results(
     params = {**_unit_params(level, None), "election": election, "year": year, "round": round,
               "wojewodztwo": wojewodztwo, "teryt_powiat": teryt_powiat}
     return BrowseRowsResponse.model_validate({"rows": _mart_rows(RESULTS_SQL, params)})
+
+
+@app.get("/runoff", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])
+def get_runoff(
+    year: int = Query(ge=1989, le=2100, description="Presidential election year with a run-off"),
+    level: UnitLevel = Query("country"),
+    wojewodztwo: str | None = Query(None, max_length=40, description="Only units in this voivodeship"),
+    teryt_powiat: str | None = Query(None, pattern=r"^\d{4}$", description="Only units in this powiat"),
+) -> BrowseRowsResponse:
+    """The two presidential finalists per unit: round 1 and round 2 votes and percent, and the gain between
+    rounds (``gain_votes``, ``gain_pp``). Votes cannot show who moved where, only the net change."""
+    params = {**_unit_params(level, None), "year": year, "wojewodztwo": wojewodztwo, "teryt_powiat": teryt_powiat}
+    return BrowseRowsResponse.model_validate({"rows": _mart_rows(RUNOFF_SQL, params)})
 
 
 @app.get("/change", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])

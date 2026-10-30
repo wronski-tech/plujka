@@ -17,9 +17,9 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [x] 5. Ranking jednostek według miary, z filtrem województwa.
 - [ ] 6. Wyniki obwodowe z wyszukiwaniem obwodu po numerze i gminie.
 - [ ] 7. Wykres liniowy jednostki w czasie (`chart_columns.py`).
-- [ ] 8. Karta wyborów: frekwencja, mandaty, progi, metoda, liczba obwodów.
+- [x] 8. Karta wyborów: frekwencja, mandaty, progi, metoda, liczba obwodów.
 - [x] 9. Lista wybranych według okręgu z filtrem komitetu.
-- [ ] 10. Druga tura (prezydent, wójtowie): przepływ wyników między turami w jednostce.
+- [ ] 10. Druga tura (prezydent, wójtowie): przepływ wyników między turami w jednostce. (Prezydent już jest: widok „II tura”.)
 
 **Symulacje**
 - [x] 11. Symulator mandatów: metoda i próg suwakami (`mart.allocate_seats`).
