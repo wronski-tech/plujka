@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Embeddable widget: `?widget=mapa|wykres` with the browse link parameters (plus `nazwa` for a committee or candidate) renders only the map or chart; „Osadź na stronie” in the browse panel gives the `<iframe>` code for the current view.
 - Precinct results: plain view `mart.v_precinct_results` (Sejm, president, EP; prompt-visible for questions about an *obwód*), `GET /precincts` (precincts of a gmina with turnout and winner, or one precinct in full) and the „Wyniki obwodowe” panel with a precinct picker; one curated example.
 - Ready-made reports without the LLM: `GET /reports` and `GET /reports/{id}` run the curated SQL examples (grouped by election family) through the SQL guard and the read-only role; panel „Gotowe zestawienia” with table, chart, map and exports.
 - PKW compliance report: the build stores every consistency check a family-year passed in `mart.build_checks`; `GET /checks/{election}/{year}` and the „Zgodność z PKW” button on the election card list them.

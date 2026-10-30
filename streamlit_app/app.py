@@ -10,6 +10,7 @@ import re
 import unicodedata
 from typing import Any
 from datetime import date, timedelta
+from urllib.parse import urlencode
 
 import altair as alt
 import pandas as pd
@@ -809,14 +810,15 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.markdown(
-    """
-    <div class="plujka-hero">
-        <h2>Pluj faktami</h2>
-    </div>
-    """,
-    unsafe_allow_html=True,
-)
+if "widget" not in st.query_params:
+    st.markdown(
+        """
+        <div class="plujka-hero">
+            <h2>Pluj faktami</h2>
+        </div>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 ELECTION_LABELS = {
@@ -973,6 +975,9 @@ def _browse() -> None:
         link = {"wybory": kind, "rok": year, "tura": rnd, "pokaz": view, "poziom": level, "woj": params["wojewodztwo"]}
         st.query_params.from_dict({k: str(v) for k, v in link.items() if v is not None})
         st.caption("Adres strony w przeglądarce otwiera ten widok — skopiuj go, aby go udostępnić.")
+        if view in ("Wyniki", "Frekwencja") and level != "country":
+            link["nazwa"] = st.session_state.get("browse_name") if view == "Wyniki" else None
+            _embed_code(link)
         if view == "Głosy zmarnowane":
             data = _api_get("/wasted", {k: v for k, v in params.items() if k not in ("round", "election")})
             rows = (data or {}).get("rows") or []
@@ -1059,6 +1064,57 @@ def _browse() -> None:
         _csv_download(rows, f"{kind}_{year}_{view}_{level}", key="csv_browse")
         _render_chart(shown)
         _render_map(shown, key="browse")
+
+
+def _page_url() -> str:
+    """Public address of this page, from the request headers (no configuration needed)."""
+    headers = st.context.headers
+    host = headers.get("X-Forwarded-Host") or headers.get("Host") or "localhost:8501"
+    scheme = headers.get("X-Forwarded-Proto") or ("http" if host.startswith(("localhost", "127.")) else "https")
+    return f"{scheme}://{host}/"
+
+
+def _embed_code(link: dict) -> None:
+    """<iframe> code embedding the current map or chart (``?widget=``) on another page."""
+    with st.popover("Osadź na stronie"):
+        what = st.radio("Co osadzić", ["mapa", "wykres"], horizontal=True, key="embed_what")
+        query = urlencode({"embed": "true", "widget": what, **{k: v for k, v in link.items() if v is not None}})
+        st.code(f'<iframe src="{_page_url()}?{query}" width="100%" height="560" style="border:0" '
+                f'title="Plujka: {ELECTION_LABELS[link["wybory"]]} {link["rok"]}"></iframe>', language="html", wrap_lines=True)
+        st.caption("Wklej kod na swojej stronie. Wykres pokazuje do "
+                   f"{MAX_CHART_ROWS} jednostek; dla gmin wybierz mapę albo zawęź województwo.")
+
+
+def _widget() -> None:
+    """Embeddable map or chart for ``?widget=mapa|wykres`` with the browse link parameters; nothing else."""
+    q = st.query_params
+    kind, view, level = q.get("wybory", "sejm"), q.get("pokaz", "Frekwencja"), q.get("poziom", "wojewodztwo")
+    try:
+        year, rnd = int(q.get("rok", "0")), int(q.get("tura", "1"))
+    except ValueError:
+        year = rnd = 0
+    if kind not in ELECTION_LABELS or level not in UNIT_NAME or view not in ("Wyniki", "Frekwencja") or not year:
+        st.info("Nieprawidłowe parametry widżetu.")
+        return
+    params = {"election": kind, "year": year, "round": rnd, "level": level, "wojewodztwo": q.get("woj")}
+    rows = ((_api_get("/results" if view == "Wyniki" else "/turnout", params) or {}).get("rows")) or []
+    if view == "Wyniki" and rows:
+        name = q.get("nazwa") if q.get("nazwa") in {r["name"] for r in rows} else rows[0]["name"]
+        rows, value, label = [r for r in rows if r["name"] == name], "pct", f"poparcie: {name}"
+    else:
+        value, label = "turnout_pct", "frekwencja"
+    if not rows:
+        st.caption("Brak danych dla tego wyboru.")
+        return
+    st.markdown(f"**{ELECTION_LABELS[kind]} {year}{' (II tura)' if rnd == 2 else ''} — {label}, "
+                f"{LEVEL_LABELS[level].lower()}**")
+    shown = _unit_rows(rows, level, value)
+    if q.get("widget") == "wykres":
+        _render_chart(shown)
+    else:
+        _render_map(shown, key="widget")
+    browse = urlencode({k: v for k, v in q.items() if k not in ("widget", "embed")})
+    st.caption(f"Dane: PKW/KBW · [Plujka]({_page_url()}?{browse})")
 
 
 @st.fragment
@@ -1513,6 +1569,10 @@ def _api_data_readiness_banner() -> None:
             "Status odświeża się automatycznie po załadowaniu `kbw_facts`."
         )
 
+
+if "widget" in st.query_params:
+    _widget()
+    st.stop()
 
 _api_data_readiness_banner()
 
