@@ -165,6 +165,15 @@ SELECT prev_family AS from_family, family AS to_family, count(DISTINCT person_id
 FROM s WHERE prev_family IS NOT NULL AND prev_family <> family
 GROUP BY prev_family, family ORDER BY persons DESC, from_family, to_family LIMIT 50
 """
+ELECTED_SQL = """
+SELECT district_no, area, coalesce(committee_aliases[1], committee_name) AS party, committee_name, person_id, full_name,
+       list_position, votes
+FROM mart.v_person_history
+WHERE chamber = %(chamber)s AND year = %(year)s AND elected
+  AND (%(district_no)s::int IS NULL OR district_no = %(district_no)s)
+  AND (%(party)s::text IS NULL OR committee_aliases[1] = %(party)s)
+ORDER BY area NULLS FIRST, district_no, votes DESC NULLS LAST
+"""
 DATA_VERSION_SQL = """
 SELECT max(loaded_at) AS mart_loaded_at, count(*) AS elections, max(election_date) AS latest_election_date
 FROM mart.elections
@@ -804,6 +813,29 @@ def person_rankings(
 def party_switches(since: int = Query(1991, ge=1989, le=2100, description="Only candidacies from this year")) -> list[PartySwitch]:
     """Moves between party families from one Sejm, Senate or EP candidacy to the next, with examples."""
     return [PartySwitch.model_validate(r) for r in _mart_rows(PARTY_SWITCH_SQL, {"since": since})]
+
+
+class ElectedRow(BaseModel):
+    district_no: int | None
+    area: str | None = Field(description="Voivodeship for sejmik districts")
+    party: str
+    committee_name: str | None
+    person_id: int | None
+    full_name: str
+    list_position: int | None
+    votes: int | None
+
+
+@app.get("/elected", response_model=list[ElectedRow], tags=["browse"], dependencies=[Depends(require_api_key)])
+def elected(
+    chamber: Literal["sejm", "senat", "pe", "sejmik"] = Query(description="Election"),
+    year: int = Query(ge=1989, le=2100),
+    district_no: int | None = Query(None, ge=0, description="Only this district"),
+    party: str | None = Query(None, max_length=40, description="Only this committee lead alias, e.g. KO or PiS"),
+) -> list[ElectedRow]:
+    """Elected candidates of one election by district, optionally of one committee (lead alias)."""
+    params = {"chamber": chamber, "year": year, "district_no": district_no, "party": party}
+    return [ElectedRow.model_validate(r) for r in _mart_rows(ELECTED_SQL, params)]
 
 
 class DataVersion(BaseModel):

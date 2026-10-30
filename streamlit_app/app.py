@@ -1003,6 +1003,39 @@ def _mayor_terms() -> None:
     st.caption("Wybory zwykłe (bez przedterminowych); osoby łączone po imionach, nazwisku, płci, roku urodzenia i powiecie.")
 
 
+@st.fragment
+def _elected() -> None:
+    """"Wybrani": elected candidates of one election by district, with a committee filter."""
+    with st.expander("🗳️ Wybrani według okręgu", expanded=False):
+        elections = _api_get("/elections") or []
+        kinds = [k for k in ("sejm", "senat", "pe", "sejmik") if any(e["election"] == k for e in elections)]
+        if not kinds:
+            return
+        c1, c2 = st.columns(2)
+        chamber = c1.selectbox("Wybory", kinds, format_func=CHAMBER_LABELS.get, key="elected_chamber")
+        years = sorted({e["year"] for e in elections if e["election"] == chamber}, reverse=True)
+        year = c2.selectbox("Rok", years, key="elected_year")
+        rows = _api_get("/elected", {"chamber": chamber, "year": year}) or []
+        if not rows:
+            st.caption("Brak wybranych w danych.")
+            return
+        table = pd.DataFrame(rows)
+        c3, c4 = st.columns(2)
+        parties = ["wszystkie", *table["party"].value_counts().index]
+        party = c3.selectbox("Komitet", parties, key=f"elected_party_{chamber}_{year}")
+        districts = ["wszystkie", *sorted(table["district_no"].dropna().astype(int).unique())]
+        district = c4.selectbox("Okręg", districts, key=f"elected_district_{chamber}_{year}")
+        if party != "wszystkie":
+            table = table[table["party"] == party]
+        if district != "wszystkie":
+            table = table[table["district_no"] == district]
+        st.caption(f"{len(table)} wybranych.")
+        columns = {"area": "województwo", "district_no": "okręg", "party": "komitet", "full_name": "imię i nazwisko",
+                   "list_position": "miejsce na liście", "votes": "głosy"}
+        st.dataframe(table[[c for c in columns if table[c].notna().any()]].rename(columns=columns),
+                     hide_index=True, use_container_width=True)
+
+
 RANKING_LABELS = {"candidacies": "liczba kandydowań", "elected": "liczba wygranych", "career": "długość kariery",
                   "votes": "suma głosów"}
 
@@ -1152,6 +1185,7 @@ _browse()
 _unit_card()
 _seat_simulator()
 _candidates()
+_elected()
 _rankings()
 _data_coverage()
 

@@ -18,7 +18,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 6. Wyniki obwodowe z wyszukiwaniem obwodu po numerze i gminie.
 - [ ] 7. Wykres liniowy jednostki w czasie (`chart_columns.py`).
 - [ ] 8. Karta wyborów: frekwencja, mandaty, progi, metoda, liczba obwodów.
-- [ ] 9. Lista wybranych według okręgu z filtrem komitetu.
+- [x] 9. Lista wybranych według okręgu z filtrem komitetu.
 - [ ] 10. Druga tura (prezydent, wójtowie): przepływ wyników między turami w jednostce.
 
 **Symulacje**
