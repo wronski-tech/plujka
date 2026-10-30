@@ -544,6 +544,10 @@ class TestAnswerNumbers(unittest.TestCase):
         self.assertIn("1990–1997", answer.caveats([{"year": 1995, "level": "gmina", "turnout_pct": 64.7}], by_gmina)[0])
         self.assertEqual(answer.caveats([{"year": 1998, "level": "gmina", "turnout_pct": 45.3}], by_gmina), [])
         self.assertEqual(answer.caveats([{"year": 1997, "level": "wojewodztwo_1975", "turnout_pct": 47.9}], by_gmina), [])
+        # 1994 councils are in the old division; other council years are not.
+        councils = "SELECT year, committee_name, seats FROM mart.v_rada_results WHERE level = 'country'"
+        self.assertIn("1994", answer.caveats([{"year": 1994, "committee_name": "PSL", "seats": 10}], councils)[0])
+        self.assertEqual(answer.caveats([{"year": 1998, "committee_name": "PSL", "seats": 10}], councils), [])
         with patch.object(answer, "OPENAI_API_KEY", ""):
             self.assertEqual(len(answer.compose_answer("Frekwencja PE 2014?", pe2014, turnout)["caveats"]), 1)
 

@@ -4,6 +4,16 @@ called from ``build_samorzad.build_samorzad`` after the sejmik tables (committee
 from sejmik committees of the same name).
 
 Sources (KBW mirror):
+- 1994: ``samo1994kand`` (one workbook per 1975-1998 voivodeship: every gmina council candidate with
+  votes, the district's seats, eligible voters, ballots, valid ballots ``Gł. ważn.`` and valid ballots
+  without a choice ``Gł. bez wyb.``, and ``Mandat`` = T / N) and ``samo1994gm`` (official totals per
+  gmina, for the checks). Only gmina councils (no powiats or voivodeship assemblies before 1999); the
+  KBW publishes no council files of 1990. Gminas up to 40,000 inhabitants (``Typ`` W) elected their
+  councils in single-member districts, where a candidate ran with an optional supporting organisation
+  (``Poparcie``); cities above 40,000 (``Typ`` P) in districts of 5-10 seats with lists numbered per
+  district. A voter had one vote. Codes are those of the 1975-1998 division (the first 5 of the 7
+  published digits, as ``teryt_gmina_pre1999`` elsewhere) with the old voivodeship in ``wojewodztwo``;
+  Warsaw is its eleven gminas of 1994 (Warszawa-Centrum and ten others), not one city council.
 - 1998: ``1998-kand-rady`` (candidates of every council with votes, the list's district total ``Gł. na
   listę``, the district's valid votes or, in majoritarian districts, valid ballots ``Gł. ważne``, and
   ``Mand.`` = W (elected by votes), P / L (by precedence / lot in a tie), B (without voting)). No
@@ -83,6 +93,7 @@ log = logging.getLogger("mart")
 TABLES = RADA_TABLES
 
 SOURCES = {
+    1994: {"candidates": "**/samorzad/samo1994kand/*.parquet", "gminas": "**/samorzad/samo1994gm.parquet"},
     1998: {
         "candidates": "**/samorzad/1998-kand-rady.parquet",
         "gmina_precincts": "**/samorzad/rada_gminy/1998_rady_gmin/*.parquet",
@@ -209,7 +220,15 @@ RESOLVED_LIST_TOTALS = {2002: {("gmina", "146501", 7, 18): 19030}}
 # the candidate file (PKW: no list registered in 1 district); 1 seat, because PKW counts 2 empty seats
 # (the other is Margonin, UNFILLED_DISTRICTS) and both councils then have 18 seats, like 866 other 1998
 # councils of gminas up to 20,000 inhabitants (no such council has 17).
-EMPTY_DISTRICTS = {1998: [("gmina", "200707", 12)], 2018: [("gmina", "160913", 6), ("gmina", "321602", 5)]}
+# 1994: seven single-member districts missing from the candidate file, each one district short of the
+# districts and seats of its gmina in the official totals (samo1994gm): Mały Płock, Wizna, Kamiennik,
+# Szczerców, Bircza, Przerośl, Tuplice.
+EMPTY_DISTRICTS = {
+    1994: [("gmina", "45577", 5), ("gmina", "45665", 1), ("gmina", "53601", 13), ("gmina", "59681", 18), ("gmina", "65509", 17),
+           ("gmina", "79621", 12), ("gmina", "97721", 14)],
+    1998: [("gmina", "200707", 12)],
+    2018: [("gmina", "160913", 6), ("gmina", "321602", 5)],
+}
 # 1998 districts whose published valid votes exceed the sum of all published list totals, so votes of a
 # list that is not in the candidate file are missing: Sochaczew (142801) district 5, 1,609 valid votes,
 # 1,532 for its five lists. List votes are exact; the district's valid votes are kept as published.
@@ -485,7 +504,7 @@ def available(sources: YearSources) -> bool:
 def build_rady(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
     """Build and check the council tables of ``sources.year`` (needs ``sejmik_committees``)."""
     year = sources.year
-    {1998: _sources_1998, 2002: _sources_2002, 2006: _sources_2006, 2010: _sources_2010, 2014: _sources_2014,
+    {1994: _sources_1994, 1998: _sources_1998, 2002: _sources_2002, 2006: _sources_2006, 2010: _sources_2010, 2014: _sources_2014,
      2018: _sources_2018, 2024: _sources_2024}[year](con, sources)
     _build_tables(con, year)
     add_list_groups(con, year, "rada")
@@ -550,6 +569,90 @@ def _add_unfilled_seats(con: duckdb.DuckDBPyConnection, year: int) -> None:
     for level, teryt, district in UNFILLED_DISTRICTS.get(year, []):
         con.execute(
             "UPDATE rada_reg SET seats = seats + 1 WHERE council_level = ? AND teryt = ? AND district_no = ?", [level, teryt, district]
+        )
+
+
+_HEADERS_1994 = {
+    "candidates": ["TERYT", "Gmina", "Typ", "Nr okr.", "L. mand.", "L. kand.", "Upr.", "Odd.", "Gł. ważn.", "Gł. bez wyb.",
+                   "Nr listy", "Oznaczenie", "L. kand._1", "L. mand._1", "Poz.", "Nazwisko", "Imiona", "Wiek", "Płeć", "Zawód",
+                   "Miejsce zam.", "Poparcie", "Gł.", "Mandat", "year"],
+    "gminas": ["Województwo", "TERYT", "Gmina", "Ludność", "Typ", "L. mand.", "L. kand.", "L. okr.", "L. obw.", "L. upr.", "Odd.",
+               "Frekw.", "Niew.", "Ważne", "% odd.", "Ważne bez dokonania wyboru", "year"],
+}
+# Committee of a 1994 candidate whose source names none: a single-member candidate without a supporting
+# organisation, or a list without a designation (Oznaczenie; '(nie podano, lista N)' when a district has
+# several such lists).
+NO_COMMITTEE_1994 = "(nie podano)"
+
+
+def _sources_1994(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
+    """1994: candidates with the district register (seats) on every row, plus the official gmina totals
+    (``rada_gminas_1994``) for the checks. ``rada_reg`` carries the old voivodeship (``wojewodztwo``)."""
+    raw = sources.load("rada_cand_raw", SOURCES[1994]["candidates"])
+    gminas = sources.load("rada_gminas_raw", SOURCES[1994]["gminas"])
+    for key, relation in (("candidates", raw), ("gminas", gminas)):
+        if columns_of(con, relation) != _HEADERS_1994[key]:
+            raise BuildError(f"year 1994: unexpected {key} headers {columns_of(con, relation)}")
+    # Same name in one voivodeship: a town and the rural gmina around it (old numbers 500-999), named
+    # 'X gm.' as in the 1990s PKW files.
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE rada_gminas_1994 AS
+        SELECT left("TERYT", 5) AS teryt, "TERYT" AS teryt7, "Województwo" AS wojewodztwo, "Typ" AS typ,
+               CASE WHEN count(*) OVER (PARTITION BY "Województwo", "Gmina") > 1 AND substr("TERYT", 3, 3) >= '500'
+                    THEN "Gmina" || ' gm.' ELSE "Gmina" END AS unit_name,
+               CASE "Typ" WHEN 'W' THEN 'majoritarian' WHEN 'P' THEN 'proportional' END AS voting_system,
+               int_("L. mand.") AS seats, int_("L. kand.") AS candidates, int_("L. okr.") AS districts, int_("L. upr.") AS eligible,
+               int_("Odd.") AS ballots, int_("Ważne") AS valid_ballots, int_("Niew.") AS invalid_ballots,
+               int_("Ważne bez dokonania wyboru") AS no_choice
+        FROM {gminas}
+        """
+    )
+    proportional = "k.\"Typ\" = 'P'"
+    con.execute(
+        f"""
+        CREATE OR REPLACE TABLE rada_cand AS
+        SELECT 'gmina' AS council_level, g.teryt, CAST(int_(k."Nr okr.") AS INT) AS district_no, g.unit_name,
+               CAST(NULL AS VARCHAR) AS council_name, g.wojewodztwo,
+               CASE k."Typ" WHEN 'W' THEN 'majoritarian' WHEN 'P' THEN 'proportional' END AS voting_system,
+               CASE WHEN {proportional} THEN CAST(int_(k."Nr listy") AS INT) END AS list_no, CAST(int_(k."Poz.") AS INT) AS list_position,
+               {_tidy('upper(k."Nazwisko")')} AS last_name, {_tidy('capw_(k."Imiona")')} AS first_names,
+               coalesce(CASE WHEN {proportional} THEN k."Oznaczenie" ELSE k."Poparcie" END, {sql_literal(NO_COMMITTEE_1994)}) AS committee,
+               k."Płeć" AS gender, int_(k."Wiek") AS age, k."Miejsce zam." AS residence, int_(k."Gł.") AS votes, k."Mandat" = 'T' AS elected,
+               int_(k."Gł. ważn.") - int_(k."Gł. bez wyb.") AS district_valid,
+               int_(k."L. mand.") AS seats, int_(k."L. kand.") AS published_candidates, int_(k."Upr.") AS eligible,
+               int_(k."Odd.") AS ballots, int_(k."Gł. ważn.") AS valid_ballots, int_(k."Gł. bez wyb.") AS no_choice,
+               CASE WHEN {proportional} THEN int_(k."L. kand._1") END AS list_candidates,
+               CASE WHEN {proportional} THEN int_(k."L. mand._1") END AS list_seats, k."Typ" = g.typ AS same_type
+        FROM {raw} k LEFT JOIN rada_gminas_1994 g ON g.teryt7 = k."TERYT"
+        """
+    )
+    # Lists of one district with the same designation (or none) are separate lists: their committee
+    # name gets the list number.
+    con.execute(
+        f"""
+        UPDATE rada_cand k
+        SET committee = CASE WHEN k.committee = {sql_literal(NO_COMMITTEE_1994)} THEN '(nie podano, lista ' || k.list_no || ')'
+                             ELSE k.committee || ' (lista ' || k.list_no || ')' END
+        FROM (SELECT teryt, district_no, committee FROM rada_cand WHERE voting_system = 'proportional'
+              GROUP BY ALL HAVING count(DISTINCT list_no) > 1) d
+        WHERE k.voting_system = 'proportional' AND d.teryt = k.teryt AND d.district_no = k.district_no AND d.committee = k.committee
+        """
+    )
+    # The register: one row per district with candidates, plus the named empty districts.
+    con.execute(
+        """
+        CREATE OR REPLACE TABLE rada_reg AS
+        SELECT council_level, teryt, district_no, any_value(council_name) AS council_name, any_value(unit_name) AS unit_name,
+               any_value(voting_system) AS voting_system, CAST(max(seats) AS INT) AS seats, true AS contested,
+               any_value(wojewodztwo) AS wojewodztwo
+        FROM rada_cand GROUP BY ALL
+        """
+    )
+    for level, teryt, district in EMPTY_DISTRICTS[1994]:
+        con.execute(
+            "INSERT INTO rada_reg SELECT ?, teryt, ?, NULL, unit_name, voting_system, 1, false, wojewodztwo FROM rada_gminas_1994 WHERE teryt = ?",
+            [level, district, teryt],
         )
 
 
@@ -968,12 +1071,14 @@ def _sources_2024(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
 
 def _build_tables(con: duckdb.DuckDBPyConnection, year: int) -> None:
     """rada_committees, rada_candidates, rada_districts and rada_district_lists from rada_cand/rada_reg."""
+    # Voivodeship assemblies were first elected in 1998, so 1994 committees get no aliases from them.
+    aliases = "'{}'" if year == 1994 else "(SELECT s.aliases FROM sejmik_committees s WHERE s.committee_name = n.committee_name)"
     con.execute(
         f"""
         CREATE OR REPLACE TABLE rada_committees AS
         WITH names AS (SELECT DISTINCT strip_signature(committee) AS committee_name FROM rada_cand)
         SELECT {year} AS year, CAST(row_number() OVER (ORDER BY committee_name) AS INT) AS committee_id, committee_name,
-               coalesce((SELECT s.aliases FROM sejmik_committees s WHERE s.committee_name = n.committee_name), '{{}}') AS aliases
+               coalesce({aliases}, '{{}}') AS aliases
         FROM names n
         """
     )
@@ -1001,14 +1106,18 @@ def _build_tables(con: duckdb.DuckDBPyConnection, year: int) -> None:
         FROM rada_cand GROUP BY ALL
         """
     )
+    # 1994: codes of the 1975-1998 division, no powiats, the old voivodeship from the register.
+    geography = (
+        "CAST(NULL AS VARCHAR) AS teryt_powiat, r.wojewodztwo, false AS city_with_powiat_rights" if year == 1994 else
+        "CASE WHEN r.council_level = 'dzielnica' THEN '1465' ELSE left(r.teryt, 4) END AS teryt_powiat, voivodeship(r.teryt) AS wojewodztwo,"
+        " r.council_level = 'gmina' AND substr(r.teryt, 3, 2) >= '61' AS city_with_powiat_rights"
+    )
     con.execute(
         f"""
         CREATE OR REPLACE TABLE rada_districts AS
         SELECT {year} AS year, r.council_level, r.teryt, r.district_no, coalesce(r.council_name, d.council_name) AS council_name,
                coalesce(d.unit_name, r.unit_name, max(d.unit_name) OVER (PARTITION BY r.council_level, r.teryt)) AS unit_name,
-               CASE WHEN r.council_level = 'dzielnica' THEN '1465' ELSE left(r.teryt, 4) END AS teryt_powiat,
-               voivodeship(r.teryt) AS wojewodztwo,
-               r.council_level = 'gmina' AND substr(r.teryt, 3, 2) >= '61' AS city_with_powiat_rights,
+               {geography},
                r.voting_system, r.seats, coalesce(d.candidates, 0) AS candidates,
                coalesce(r.contested, coalesce(d.voted, false)) AS contested,
                CAST(CASE WHEN coalesce(r.contested, coalesce(d.voted, false)) THEN d.valid_max END AS INT) AS valid_votes
@@ -1166,6 +1275,8 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
             SELECT count(*) FROM (VALUES {_named(year, UNIFORM_LIST_NUMBERS)}) n(council_level, teryt, list_no)
             LEFT JOIN rada_uniform u USING (council_level, teryt, list_no) WHERE coalesce(u.names, 0) < 2"""
         checks.update(_checks_precincts_1998())
+    if year == 1994:
+        checks.update(_checks_1994())
     if year == 2014:
         for (level, city), (councillors, districts) in OFFICIAL_2014.items():
             unit = f"council_level = '{level}' AND city_with_powiat_rights = {city}"
@@ -1249,6 +1360,39 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
     log.info("year %s councils: %s lists with unknown list votes (struck-off candidates)", year, unknown)
     if not con.execute("SELECT count(*) FROM rada_districts").fetchone()[0]:
         raise BuildError(f"year {year}: no council districts")
+
+
+def _checks_1994() -> dict[str, str]:
+    """1994: candidates against the district facts on their rows and the official gmina totals."""
+    return {
+        "rada: 1994 candidates whose code is not in the official gmina totals or whose gmina type differs": """
+            SELECT count(*) FROM rada_cand WHERE teryt IS NULL OR NOT same_type""",
+        "rada: 1994 gminas without any district": """
+            SELECT count(*) FROM rada_gminas_1994 g WHERE NOT EXISTS (SELECT 1 FROM rada_districts r WHERE r.teryt = g.teryt)""",
+        "rada: 1994 codes not unique in five digits": """
+            SELECT count(*) - count(DISTINCT teryt) FROM rada_gminas_1994""",
+        "rada: 1994 district facts that differ between candidate rows": """
+            SELECT count(*) FROM (SELECT teryt, district_no FROM rada_cand GROUP BY ALL
+                                  HAVING count(DISTINCT (seats, published_candidates, eligible, ballots, valid_ballots, no_choice)) > 1)""",
+        "rada: 1994 districts whose published candidate count differs from their candidates": """
+            SELECT count(*) FROM rada_districts r JOIN (SELECT teryt, district_no, max(published_candidates) AS n FROM rada_cand GROUP BY ALL) c
+            USING (teryt, district_no) WHERE r.candidates <> c.n""",
+        "rada: 1994 lists whose published candidates or seats differ from their candidates": """
+            SELECT count(*) FROM (SELECT teryt, district_no, list_no FROM rada_cand WHERE voting_system = 'proportional' GROUP BY ALL
+                                  HAVING count(DISTINCT (list_candidates, list_seats)) > 1 OR max(list_candidates) <> count(*)
+                                      OR max(list_seats) <> count(*) FILTER (WHERE elected))""",
+        "rada: 1994 gminas whose districts, seats, candidates, voters, ballots or valid ballots differ from the official totals": """
+            SELECT count(*) FROM rada_gminas_1994 g
+            LEFT JOIN (SELECT teryt, count(*) AS districts, sum(seats) AS seats, sum(candidates) AS candidates FROM rada_districts GROUP BY ALL) r
+                   USING (teryt)
+            LEFT JOIN (SELECT teryt, sum(eligible) AS eligible, sum(ballots) AS ballots, sum(valid_ballots) AS valid_ballots,
+                              sum(no_choice) AS no_choice
+                       FROM (SELECT DISTINCT teryt, district_no, eligible, ballots, valid_ballots, no_choice FROM rada_cand) GROUP BY ALL) c
+                   USING (teryt)
+            WHERE (g.districts, g.seats, g.candidates, g.eligible, g.ballots, g.valid_ballots, g.no_choice)
+                  IS DISTINCT FROM (r.districts, r.seats, r.candidates, c.eligible, c.ballots, c.valid_ballots, c.no_choice)
+               OR g.valid_ballots + g.invalid_ballots <> g.ballots""",
+    }
 
 
 def _checks_precincts_1998() -> dict[str, str]:

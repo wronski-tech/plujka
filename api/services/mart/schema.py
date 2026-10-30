@@ -102,8 +102,8 @@ $$;
 CREATE OR REPLACE FUNCTION mart.allocate_seats(votes numeric[], seats bigint, method text DEFAULT 'dhondt')
 RETURNS int[] LANGUAGE plpgsql IMMUTABLE PARALLEL SAFE AS $$
 BEGIN
-  IF method NOT IN ('dhondt', 'sainte_lague', 'sainte_lague_modified', 'hare_niemeyer') THEN
-    RAISE EXCEPTION 'allocate_seats: unknown method %, use dhondt, sainte_lague, sainte_lague_modified or hare_niemeyer', method;
+  IF method NOT IN ('dhondt', 'sainte_lague', 'sainte_lague_modified', 'sainte_lague_modified_whole', 'hare_niemeyer') THEN
+    RAISE EXCEPTION 'allocate_seats: unknown method %, use dhondt, sainte_lague, sainte_lague_modified, sainte_lague_modified_whole or hare_niemeyer', method;
   END IF;
   IF method = 'hare_niemeyer' THEN
     -- Whole parts of the quotas first, then the remaining seats by the largest remainders.
@@ -122,18 +122,21 @@ BEGIN
   RETURN (
     WITH v AS (SELECT i, coalesce(votes[i], 0) AS n FROM generate_subscripts(votes, 1) AS i),
     q AS (
-      SELECT v.i, v.n, v.n / CASE WHEN method = 'dhondt' THEN k
-                                  WHEN method = 'sainte_lague_modified' AND k = 1 THEN 1.4
-                                  ELSE 2 * k - 1 END AS quotient
-      FROM v CROSS JOIN generate_series(1, greatest(seats, 0)) AS k
-      WHERE v.n > 0
+      SELECT i, n, CASE WHEN method = 'sainte_lague_modified_whole' THEN floor(quotient) ELSE quotient END AS quotient
+      FROM (
+        SELECT v.i, v.n, v.n / CASE WHEN method = 'dhondt' THEN k
+                                    WHEN method IN ('sainte_lague_modified', 'sainte_lague_modified_whole') AND k = 1 THEN 1.4
+                                    ELSE 2 * k - 1 END AS quotient
+        FROM v CROSS JOIN generate_series(1, greatest(seats, 0)) AS k
+        WHERE v.n > 0
+      ) e
     ),
     won AS (SELECT i FROM q ORDER BY quotient DESC, n DESC, i LIMIT greatest(seats, 0))
     SELECT array_agg((SELECT count(*) FROM won WHERE won.i = v.i)::int ORDER BY v.i) FROM v
   );
 END
 $$;
-COMMENT ON FUNCTION mart.allocate_seats(numeric[], bigint, text) IS 'Seats per list (same order as votes): dhondt (Sejm since 2005, sejmiki and councils since 2002, EP nationally), sainte_lague (inside 2006 list blocs), sainte_lague_modified (first divisor 1.4: Sejm 2001), or hare_niemeyer (largest remainders: a committee''s EP seats between its district lists). Ties go to more votes, then to the earlier element. Pass only lists that passed the threshold, e.g. mart.allocate_seats(array_agg(votes ORDER BY committee_id), 12) per district. NULL or 0 votes get no seat.';
+COMMENT ON FUNCTION mart.allocate_seats(numeric[], bigint, text) IS 'Seats per list (same order as votes): dhondt (Sejm since 2005, sejmiki and councils since 2002, EP nationally), sainte_lague (inside 2006 list blocs), sainte_lague_modified (first divisor 1.4: Sejm 2001), sainte_lague_modified_whole (the same with quotients cut to whole numbers, which reproduces the 1994 gmina council seats), or hare_niemeyer (largest remainders: a committee''s EP seats between its district lists). Ties go to more votes, then to the earlier element. Pass only lists that passed the threshold, e.g. mart.allocate_seats(array_agg(votes ORDER BY committee_id), 12) per district. NULL or 0 votes get no seat.';
 
 CREATE TABLE IF NOT EXISTS mart.precincts (
     year INT NOT NULL,
@@ -756,7 +759,7 @@ CREATE TABLE IF NOT EXISTS mart.rada_committees (
     aliases TEXT[] NOT NULL DEFAULT '{}',
     PRIMARY KEY (year, committee_id)
 );
-COMMENT ON TABLE mart.rada_committees IS 'Committees running for councils (rady gmin, rady powiatów, rady dzielnic) in local elections, identified by name within a year (local committees with identical names share one row).';
+COMMENT ON TABLE mart.rada_committees IS 'Committees running for councils (rady gmin, rady powiatów, rady dzielnic) in local elections, identified by name within a year (local committees with identical names share one row). 1994: in cities above 40,000 inhabitants the list designation; in single-member districts the organisation supporting the candidate (several candidates of one district can share it); ''(NIE PODANO)'' where the source names none (candidates without a supporting organisation, lists without a designation). Several 1994 lists of one district with the same designation (or none) are told apart by '' (LISTA N)'' / ''(NIE PODANO, LISTA N)''.';
 COMMENT ON COLUMN mart.rada_committees.aliases IS 'Colloquial short names, e.g. {PiS}, {KO,PO}; only for committees that also ran for a voivodeship assembly that year under the same name (otherwise empty, also for local committees).';
 
 CREATE TABLE IF NOT EXISTS mart.rada_districts (
@@ -776,18 +779,19 @@ CREATE TABLE IF NOT EXISTS mart.rada_districts (
     valid_votes INT,
     PRIMARY KEY (year, council_level, teryt, district_no)
 );
-COMMENT ON TABLE mart.rada_districts IS 'Electoral districts (okręgi wyborcze) of councils: rady gmin/miast, rady powiatów and rady dzielnic m.st. Warszawy, with seats. A council is (year, council_level, teryt); district numbers restart in every council. Per-precinct results are not loaded.';
+COMMENT ON TABLE mart.rada_districts IS 'Electoral districts (okręgi wyborcze) of councils: rady gmin/miast, rady powiatów and rady dzielnic m.st. Warszawy, with seats. A council is (year, council_level, teryt); district numbers restart in every council. Per-precinct results are not loaded. Years 1994 (gmina councils only, 1975-1998 division) and 1998-2024 (no KBW files for 1990).';
 COMMENT ON COLUMN mart.rada_districts.council_level IS '''gmina'' (rada gminy / rada miasta, including cities with powiat rights and Rada m.st. Warszawy), ''powiat'' (rada powiatu) or ''dzielnica'' (rada dzielnicy m.st. Warszawy).';
-COMMENT ON COLUMN mart.rada_districts.teryt IS 'Council unit: 6-digit gmina TERYT for gmina councils (Warsaw city council 146501), 6-digit Warsaw district TERYT (1465xx) for dzielnica councils, 4-digit powiat TERYT for powiat councils (same as teryt_powiat in other relations).';
+COMMENT ON COLUMN mart.rada_districts.teryt IS 'Council unit: 6-digit gmina TERYT for gmina councils (Warsaw city council 146501), 6-digit Warsaw district TERYT (1465xx) for dzielnica councils, 4-digit powiat TERYT for powiat councils (same as teryt_powiat in other relations). 1994: the 5-digit gmina code of the 1975-1998 division (= teryt_gmina_pre1999 in other relations; Warsaw as its eleven gminas of 1994); join mart.gmina_codes_pre1999 on teryt_gmina_pre1999 = teryt for teryt_1999 and today''s units, and select it AS teryt_gmina_pre1999 for a map.';
 COMMENT ON COLUMN mart.rada_districts.council_name IS 'Official council name, e.g. ''Rada Miasta Bolesławiec'', ''Rada Powiatu Bolesławieckiego''; NULL in 2002-2014 (not published in those files).';
-COMMENT ON COLUMN mart.rada_districts.unit_name IS 'Name of the gmina (''m. Kraków'', ''gm. Bolesławiec''), powiat (''bolesławiecki'') or Warsaw district (''Bemowo'').';
-COMMENT ON COLUMN mart.rada_districts.teryt_powiat IS '4-digit TERYT of the powiat the council unit lies in (for cities with powiat rights the city itself).';
-COMMENT ON COLUMN mart.rada_districts.city_with_powiat_rights IS 'Gmina council of a city with powiat rights (miasto na prawach powiatu); such a city has no separate rada powiatu.';
-COMMENT ON COLUMN mart.rada_districts.voting_system IS '''majoritarian'': the candidates with most votes win (2002-2010: districts of 1-5 seats in gminas up to 20,000 inhabitants, each voter had as many votes as seats; 2014: single-member districts in gminas that are not cities with powiat rights; since 2018: single-member districts in gminas up to 20,000 inhabitants). ''proportional'': multi-member districts with committee lists (D''Hondt among lists that passed 5% in the council).';
+COMMENT ON COLUMN mart.rada_districts.unit_name IS 'Name of the gmina (''m. Kraków'', ''gm. Bolesławiec''), powiat (''bolesławiecki'') or Warsaw district (''Bemowo''). 1994 and 1998: as published, without prefixes (''Kraków''; a rural gmina named like its town ''Bolesławiec gm.''). Filter with ILIKE.';
+COMMENT ON COLUMN mart.rada_districts.teryt_powiat IS '4-digit TERYT of the powiat the council unit lies in (for cities with powiat rights the city itself). NULL in 1994 (no powiats before 1999; see mart.gmina_codes_pre1999).';
+COMMENT ON COLUMN mart.rada_districts.wojewodztwo IS 'Voivodeship in lower case. 1994: one of the 49 voivodeships of 1975-1998 (e.g. ''katowickie''; old names such as ''łódzkie'' covered other territory than today).';
+COMMENT ON COLUMN mart.rada_districts.city_with_powiat_rights IS 'Gmina council of a city with powiat rights (miasto na prawach powiatu); such a city has no separate rada powiatu. Always false in 1994.';
+COMMENT ON COLUMN mart.rada_districts.voting_system IS '''majoritarian'': the candidates with most votes win (1994: single-member districts in gminas up to 40,000 inhabitants; 2002-2010: districts of 1-5 seats in gminas up to 20,000 inhabitants, each voter had as many votes as seats; 2014: single-member districts in gminas that are not cities with powiat rights; since 2018: single-member districts in gminas up to 20,000 inhabitants). ''proportional'': multi-member districts with committee lists (D''Hondt among lists that passed 5% in the council; 1994: cities above 40,000 inhabitants, districts of 5-10 seats, modified Sainte-Laguë without a threshold).';
 COMMENT ON COLUMN mart.rada_districts.seats IS 'Seats to fill in the district (2002-2014: number of elected councillors, those files have no district register; 2006 Markuszów district 4 has 1 seat that stayed empty because no valid vote was cast).';
 COMMENT ON COLUMN mart.rada_districts.candidates IS 'Registered candidates in the district.';
 COMMENT ON COLUMN mart.rada_districts.contested IS 'False when no vote took place: the number of candidates did not exceed the seats, so they were elected without voting (or nobody ran and the seat stayed empty).';
-COMMENT ON COLUMN mart.rada_districts.valid_votes IS 'Valid votes cast in the district for all lists / candidates; NULL when no vote took place. In 2002-2010 majoritarian districts with several seats this is the votes for all candidates, which exceeds the number of voters.';
+COMMENT ON COLUMN mart.rada_districts.valid_votes IS 'Valid votes cast in the district for all lists / candidates; NULL when no vote took place. In 2002-2010 majoritarian districts with several seats this is the votes for all candidates, which exceeds the number of voters. 1994: votes for candidates; valid ballots without a choice (not marking any candidate) are not included.';
 
 CREATE TABLE IF NOT EXISTS mart.rada_district_lists (
     year INT NOT NULL,

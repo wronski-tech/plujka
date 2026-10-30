@@ -160,7 +160,7 @@ def _mart_geography() -> frozenset[str]:
     """TERYT codes of gminas (6 digits) and powiats (4 digits) in any loaded election (read once per run).
 
     NULL codes (abroad, ships, and pre-1999 rows, which carry the old 49-voivodeship codes in
-    ``teryt_gmina_pre1999`` instead) are ignored.
+    ``teryt_gmina_pre1999`` instead) and the 1994 councils (old codes in ``teryt``) are ignored.
     """
     gmina_sources = [
         "SELECT teryt_gmina FROM mart.precincts",
@@ -169,7 +169,7 @@ def _mart_geography() -> frozenset[str]:
         "SELECT teryt_gmina FROM mart.referendum_precinct_protocols",
         "SELECT teryt_gmina FROM mart.sejmik_gmina_protocols",
         "SELECT teryt_gmina FROM mart.wbp_gmina_protocols",
-        "SELECT teryt FROM mart.rada_districts WHERE council_level IN ('gmina', 'dzielnica')",
+        "SELECT teryt FROM mart.rada_districts WHERE council_level IN ('gmina', 'dzielnica') AND year >= 1998",
     ]
     with psycopg.connect(DATABASE_URL) as pg:
         gminas = {row[0] for row in pg.execute(" UNION ".join(gmina_sources)).fetchall() if row[0]}

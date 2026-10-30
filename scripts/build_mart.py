@@ -114,7 +114,7 @@ FAMILIES = {
         build_referendum.available, build_referendum.build_referendum,
     ),
     "samorzad": Family(
-        (1998, 2002, 2006, 2010, 2014, 2018, 2024), build_samorzad.TABLES, build_samorzad.FAMILY,
+        (1994, 1998, 2002, 2006, 2010, 2014, 2018, 2024), build_samorzad.TABLES, build_samorzad.FAMILY,
         build_samorzad.available, build_samorzad.build_samorzad,
     ),
     # Not an election: GUS statistics per unit and year (data/gus); must come after the election families,

@@ -307,6 +307,14 @@ FROM (SELECT year, full_name FROM mart.wbp_candidates GROUP BY year, full_name H
 WHERE u.year = k.year AND u.full_name = k.full_name
   AND n.name_key = upper(regexp_replace(k.full_name, '\s+', ' ', 'g')) AND n.gender IS NOT DISTINCT FROM k.gender;
 
+-- Powiat of a council candidacy: the first 4 digits of its TERYT; 1994 (codes of the 1975-1998
+-- division) the powiat of the same gmina in 1999, from mart.gmina_codes_pre1999.
+CREATE TEMP TABLE rada_area ON COMMIT DROP AS
+SELECT k.year, k.candidate_id, CASE WHEN k.year < 1998 THEN g.teryt_powiat ELSE left(k.teryt, 4) END AS area
+FROM mart.rada_candidates k LEFT JOIN mart.gmina_codes_pre1999 g ON k.year < 1998 AND g.teryt_gmina_pre1999 = k.teryt;
+ALTER TABLE rada_area ADD PRIMARY KEY (year, candidate_id);
+ANALYZE rada_area;
+
 UPDATE mart.rada_candidates SET person_id = NULL;
 UPDATE mart.rada_candidates k SET person_id = n.person_id
 FROM (SELECT year, full_name FROM mart.rada_candidates GROUP BY year, full_name HAVING count(*) = 1) u, national_name n
@@ -345,11 +353,11 @@ WHERE k.person_id IS NULL AND r.powiat = left(k.teryt_gmina, 4)
   AND NOT EXISTS (SELECT 1 FROM mart.wbp_candidates o WHERE o.year = k.year AND o.full_name = k.full_name
                   AND left(o.teryt_gmina, 4) = left(k.teryt_gmina, 4) AND o.teryt_gmina <> k.teryt_gmina);
 UPDATE mart.rada_candidates k SET person_id = r.person_id
-FROM residence_powiat r
-WHERE k.person_id IS NULL AND r.powiat = left(k.teryt, 4)
+FROM residence_powiat r, rada_area a
+WHERE k.person_id IS NULL AND a.year = k.year AND a.candidate_id = k.candidate_id AND r.powiat = a.area
   AND r.name_key = upper(regexp_replace(k.full_name, '\s+', ' ', 'g')) AND r.gender IS NOT DISTINCT FROM k.gender
-  AND NOT EXISTS (SELECT 1 FROM mart.rada_candidates o WHERE o.year = k.year AND o.full_name = k.full_name
-                  AND left(o.teryt, 4) = left(k.teryt, 4) AND o.candidate_id <> k.candidate_id);
+  AND NOT EXISTS (SELECT 1 FROM mart.rada_candidates o JOIN rada_area b USING (year, candidate_id)
+                  WHERE o.year = k.year AND o.full_name = k.full_name AND b.area = a.area AND o.candidate_id <> k.candidate_id);
 UPDATE mart.sejmik_candidates k SET person_id = r.person_id
 FROM (SELECT DISTINCT wojewodztwo, left(teryt_gmina, 2) AS code FROM mart.sejmik_gmina_protocols) w, residence_woj r
 WHERE k.person_id IS NULL AND w.wojewodztwo = k.wojewodztwo AND r.code = w.code
@@ -411,8 +419,8 @@ WHERE k.age IS NOT NULL
   AND NOT EXISTS (SELECT 1 FROM override_hit h WHERE h.chamber = 'wbp' AND (h.year, h.round, h.candidate_id) = (k.year, k.round, k.candidate_id))
 UNION ALL
 SELECT 'rada', k.year, 1, k.candidate_id, k.full_name, k.last_name, k.first_names, k.gender,
-       k.year - k.age, upper(regexp_replace(k.full_name, '\s+', ' ', 'g')), left(k.teryt, 4), k.person_id
-FROM mart.rada_candidates k
+       k.year - k.age, upper(regexp_replace(k.full_name, '\s+', ' ', 'g')), a.area, k.person_id
+FROM mart.rada_candidates k JOIN rada_area a USING (year, candidate_id)
 WHERE k.age IS NOT NULL
   AND NOT EXISTS (SELECT 1 FROM override_hit h WHERE h.chamber = 'rada' AND (h.year, h.candidate_id) = (k.year, k.candidate_id));
 
@@ -597,7 +605,7 @@ CREATE TABLE mart.gmina_codes_pre1999 (
     teryt_gmina_current TEXT[] NOT NULL,
     match TEXT NOT NULL
 );
-COMMENT ON TABLE mart.gmina_codes_pre1999 IS 'Key from the gmina codes of the 1975-1998 division (teryt_gmina_pre1999 in precincts, prezydent_precinct_protocols and referendum_precinct_protocols, elections 1990-1997) to the 1999 TERYT gmina and today''s units. No official key exists; every code was matched by name and gmina type (GUS BDL units 1995-1998, GUS change notices). Join on teryt_gmina_pre1999 to sum 1990s results by today''s voivodeship or powiat. Before 1995 a parent gmina''s code also covers gminas split off later (e.g. Mysłowice with Imielin and Chełm Śląski until 1994), and the 1991 Sejm file has no row for 24 rural gminas (counted under the town of the same name), so powiat sums for those years are approximate.';
+COMMENT ON TABLE mart.gmina_codes_pre1999 IS 'Key from the gmina codes of the 1975-1998 division (teryt_gmina_pre1999 in precincts, prezydent_precinct_protocols and referendum_precinct_protocols, elections 1990-1997; teryt of the 1994 gmina councils in rada_districts, rada_candidates and v_rada_results) to the 1999 TERYT gmina and today''s units. No official key exists; every code was matched by name and gmina type (GUS BDL units 1995-1998, GUS change notices). Join on teryt_gmina_pre1999 to sum 1990s results by today''s voivodeship or powiat. Before 1995 a parent gmina''s code also covers gminas split off later (e.g. Mysłowice with Imielin and Chełm Śląski until 1994), and the 1991 Sejm file has no row for 24 rural gminas (counted under the town of the same name), so powiat sums for those years are approximate.';
 COMMENT ON COLUMN mart.gmina_codes_pre1999.teryt_gmina_pre1999 IS '5-digit code of the old division: 2 digits for the 1975-1998 voivodeship (odd numbers 01-97), 3 for the gmina.';
 COMMENT ON COLUMN mart.gmina_codes_pre1999.wojewodztwo_1975 IS 'Voivodeship of the 1975-1998 division (one of 49, e.g. katowickie, bialskopodlaskie), as in the 1990s result tables.';
 COMMENT ON COLUMN mart.gmina_codes_pre1999.gmina IS 'Gmina name as published by PKW.';
@@ -626,6 +634,7 @@ FROM (
   SELECT DISTINCT teryt_gmina_pre1999, year, wojewodztwo FROM mart.precincts WHERE teryt_gmina_pre1999 IS NOT NULL
   UNION SELECT DISTINCT teryt_gmina_pre1999, year, wojewodztwo FROM mart.prezydent_precinct_protocols WHERE teryt_gmina_pre1999 IS NOT NULL
   UNION SELECT DISTINCT teryt_gmina_pre1999, year, wojewodztwo FROM mart.referendum_precinct_protocols WHERE teryt_gmina_pre1999 IS NOT NULL
+  UNION SELECT DISTINCT teryt, year, wojewodztwo FROM mart.rada_districts WHERE year < 1998
 ) d
 LEFT JOIN mart.gmina_codes_pre1999 k USING (teryt_gmina_pre1999)
 WHERE k.teryt_gmina_pre1999 IS NULL OR k.wojewodztwo_1975 <> d.wojewodztwo OR NOT d.year = ANY (k.years)
@@ -663,7 +672,12 @@ def load_gmina_codes_pre1999(pg: psycopg.Connection, path: Path = GMINA_CODES_PR
 
 
 def link_persons(pg: psycopg.Connection, overrides: Path = PERSON_OVERRIDES) -> None:
-    """Rebuild ``mart.persons`` and every ``person_id`` from the candidate tables (caller's transaction)."""
+    """Rebuild ``mart.persons`` and every ``person_id`` from the candidate tables (caller's transaction).
+
+    Loads ``mart.gmina_codes_pre1999`` first: 1994 council candidacies take their powiat from it (views
+    over that table must be dropped before, see ``rebuild``).
+    """
+    log.info("pre-1999 gmina codes: %s", load_gmina_codes_pre1999(pg))
     log.info("person overrides: %s rows", load_person_overrides(pg, overrides))
     pg.execute(PERSONS_SQL)
     pg.execute(LOCAL_PERSONS_SQL)
@@ -1058,7 +1072,8 @@ JOIN mart.rada_committees c ON c.year = a.year AND c.committee_id = a.committee_
 COMMENT ON MATERIALIZED VIEW mart.v_rada_results IS 'Council results (rady gmin/miast, rady powiatów, rady dzielnic m.st. Warszawy) per committee: seats, votes and percent of valid votes, per council (level ''council'', teryt = council unit), voivodeship and country, separately for each council_level. Use for "ile mandatów PiS zdobył w radach powiatów", "kto wygrał wybory do rady miasta Krakowa". Committees are matched by name, so at wojewodztwo/country level local committees with identical names are added up; compare parties by aliases.';
 COMMENT ON COLUMN mart.v_rada_results.council_level IS 'gmina, powiat or dzielnica (as in mart.rada_districts).';
 COMMENT ON COLUMN mart.v_rada_results.level IS 'Aggregation level: council (one council, identified by teryt), wojewodztwo or country.';
-COMMENT ON COLUMN mart.v_rada_results.teryt IS 'Council unit (level council only): 6-digit gmina / Warsaw district TERYT or 4-digit powiat TERYT.';
+COMMENT ON COLUMN mart.v_rada_results.teryt IS 'Council unit (level council only): 6-digit gmina / Warsaw district TERYT or 4-digit powiat TERYT; 1994 the 5-digit gmina code of the 1975-1998 division (teryt_gmina_pre1999 in mart.gmina_codes_pre1999).';
+COMMENT ON COLUMN mart.v_rada_results.wojewodztwo IS 'Voivodeship (levels council and wojewodztwo); 1994 one of the 49 voivodeships of 1975-1998, not comparable with later years.';
 COMMENT ON COLUMN mart.v_rada_results.councils IS 'Number of councils in the unit.';
 COMMENT ON COLUMN mart.v_rada_results.seats IS 'Seats won by the committee.';
 COMMENT ON COLUMN mart.v_rada_results.unit_seats IS 'All seats in the unit (council, voivodeship or country) at this council level.';
@@ -1322,7 +1337,11 @@ ANALYZED = (
 # Divisor method of each election-year where it is not D'Hondt (mart.allocate_seats). 1991: Hare-Niemeyer
 # in districts, also inside district blocs (art. 93 and 96 of the 1991 Sejm electoral law), modified
 # Sainte-Laguë for the national list (art. 101); 1993/1997 D'Hondt in both (art. 110 and 118 of the 1993 law).
+# 1994 councils: modified Sainte-Laguë per district without a threshold (art. 97 of the 1990 gmina council
+# law); the published seats follow whole-number quotients (exact quotients differ in 17 of 843 districts,
+# whole-number ones in two: a tie and SEAT_MISMATCHES).
 SEAT_METHODS = {
+    ("rada", 1994): "sainte_lague_modified_whole",
     ("sejm", 2001): "sainte_lague_modified",
     ("sejm", 1991): "hare_niemeyer",
     ("sejm national list", 1991): "sainte_lague_modified",
@@ -1341,7 +1360,7 @@ SEAT_METHODS = {
 #   one contender: how it split its seats between its lists is not published (list 41 took all 8 seats
 #   of its bloc, which no divisor method reproduces), so only the bloc's total is checked;
 # - sejmik and proportional councils: 5% of the voivodeship's / council's valid votes for a list;
-#   2002 gmina councils outside cities with powiat rights and Warsaw district councils had none;
+#   1994 councils, 2002 gmina councils outside cities with powiat rights and Warsaw district councils had none;
 # - 2006 blocs: 15% (sejmik) or 10% (councils) for the bloc's lists together, counting members below
 #   5%; a bloc takes part in a district only if one of its lists there passed 5%; seats inside the
 #   bloc go to its members that passed 5%.
@@ -1379,7 +1398,8 @@ WITH lists AS (
   UNION ALL
   SELECT 'rada', l.year, l.council_level || ' ' || l.teryt, l.district_no, l.committee_id, l.list_group, l.votes, l.seats,
          d.seats,
-         (l.year = 2002 AND (l.council_level = 'dzielnica' OR (l.council_level = 'gmina' AND substr(l.teryt, 3, 2) < '61')))
+         l.year = 1994
+         OR (l.year = 2002 AND (l.council_level = 'dzielnica' OR (l.council_level = 'gmina' AND substr(l.teryt, 3, 2) < '61')))
          -- 1998: 5% only in powiat councils and cities with powiat rights; Rada m.st. Warszawy had none
          OR (l.year = 1998 AND (l.council_level = 'dzielnica'
                                 OR (l.council_level = 'gmina' AND (substr(l.teryt, 3, 2) < '61' OR l.teryt = '146501'))))
@@ -1633,8 +1653,16 @@ COMMENT ON COLUMN mart.v_seat_methods.seats_sainte_lague_modified IS 'Seats unde
 """
 
 
+# Districts whose published seats contradict the published votes under the official method, as
+# (election, year, unit, district_no): 1994 Nysa (53305) district 4: by the votes PSL (list 1, 685)
+# takes the 7th seat (685 / 5 = 137 against 170 / 1.4 = 121 for list 7), but the candidate file and its
+# list totals ('L. mand.') give it to list 7 (Forum Rozwoju Ziemi Nyskiej).
+SEAT_MISMATCHES = {("rada", 1994, "gmina 53305", 4)}
+
+
 def check_seat_allocation(pg: psycopg.Connection) -> None:
-    """Recompute official district seats with mart.allocate_seats; raise unless they match (ties aside)."""
+    """Recompute official district seats with mart.allocate_seats; raise unless they match (ties and
+    SEAT_MISMATCHES aside, which must still differ)."""
     methods = " ".join(f"WHEN ('{e}'::text, {y}) THEN '{m}'" for (e, y), m in SEAT_METHODS.items())
     rows = pg.execute(SEAT_CHECK_SQL.format(methods=methods)).fetchall()
     districts = pg.execute(
@@ -1646,7 +1674,12 @@ def check_seat_allocation(pg: psycopg.Connection) -> None:
     for election, year, unit, district_no, official, computed, _ in ties:
         log.info("seat check: tie for the last seat in %s %s %s district %s (official %s, recomputed %s)",
                  election, year, unit, district_no, official, computed)
-    errors = [r for r in rows if not r[6]]
+    council_years = {row[0] for row in pg.execute("SELECT DISTINCT year FROM mart.rada_districts").fetchall()}
+    expected = {m for m in SEAT_MISMATCHES if m[1] in council_years}
+    named = {tuple(r[:4]) for r in rows if tuple(r[:4]) in SEAT_MISMATCHES}
+    if named != expected:
+        raise ValueError(f"named seat mismatches that match the recomputed allocation: {sorted(expected - named)}")
+    errors = [r for r in rows if not r[6] and tuple(r[:4]) not in SEAT_MISMATCHES]
     log.info("seat check: sejm %s, sejmik %s, proportional council districts %s, EP elections %s; %s ties, %s mismatches",
              *districts, len(ties), len(errors))
     if errors:
@@ -1716,14 +1749,13 @@ def load_senat_byelections(pg: psycopg.Connection, path: Path = SENAT_BYELECTION
 def rebuild(pg: psycopg.Connection) -> None:
     """Rebuild persons, views and the entity lexicon from everything loaded (caller's transaction)."""
     log.info("Senate by-elections: %s", load_senat_byelections(pg))
+    pg.execute(DROP_SQL)
     link_persons(pg)
     persons = pg.execute(
         "SELECT count(*) FILTER (WHERE match_rule NOT LIKE 'local:%'), count(*) FILTER (WHERE match_rule LIKE 'local:%')"
         " FROM mart.persons"
     ).fetchone()
     log.info("persons: %s national, %s local", *persons)
-    pg.execute(DROP_SQL)
-    log.info("pre-1999 gmina codes: %s", load_gmina_codes_pre1999(pg))
     pg.execute(SEJM_VIEWS_SQL)
     pg.execute(_results_views_sql())
     pg.execute(_cross_election_views_sql())

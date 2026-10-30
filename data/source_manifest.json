@@ -55,12 +55,33 @@
   "sha256": "66076ecc9e6637d2d4cb9d83687882992f4a65bb30114eb7fa3c5863d02bf0bf",
   "url": "https://danewyborcze.kbw.gov.pl/dane/1991/sejm/kandsejm1991kom.xls"
  },
+ "1991/sejm/listyokr1991.xls": {
+  "bytes": 161280,
+  "etag": "\"60e84458-27600\"",
+  "last_modified": "Fri, 09 Jul 2021 12:43:04 GMT",
+  "sha256": "ffc084c06f3f8458a0ae611b9b12b2f0b0a6a8ebe1ef650619671a4642b93b32",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1991/sejm/listyokr1991.xls"
+ },
  "1991/sejm/okreg1991sejm.xls": {
   "bytes": 49152,
   "etag": "\"60e846ff-c000\"",
   "last_modified": "Fri, 09 Jul 2021 12:54:23 GMT",
   "sha256": "73a3fa42136bee508046b200ae5add9d599542df43036101bf99c619ecdebe69",
   "url": "https://danewyborcze.kbw.gov.pl/dane/1991/sejm/okreg1991sejm.xls"
+ },
+ "1991/sejm/sejm1991-lis-okr-proc.xls": {
+  "bytes": 59904,
+  "etag": "\"5c826eb1-ea00\"",
+  "last_modified": "Fri, 08 Mar 2019 13:31:29 GMT",
+  "sha256": "2b3d5f4a0c7d761b8f94183638f4950d0cd3799971dbf92f71e568af3df2437a",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1991/sejm/sejm1991-lis-okr-proc.xls"
+ },
+ "1991/sejm/sejm1991-lis-okr.xls": {
+  "bytes": 53760,
+  "etag": "\"61ea5493-d200\"",
+  "last_modified": "Fri, 21 Jan 2022 06:37:07 GMT",
+  "sha256": "f6ace6331fc59db09be22aa43d8c3a3133d2e310786c9f2470241cf2491add83",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1991/sejm/sejm1991-lis-okr.xls"
  },
  "1991/sejm/sejm1991.zip": {
   "bytes": 1150899,
@@ -76,6 +97,13 @@
   "sha256": "d1ec1b46dcac4b5889b328a4fdd036deb11dfcd345d3006afd76d9e62f3fe3b4",
   "url": "https://danewyborcze.kbw.gov.pl/dane/1991/senat/KANSEN1991.xls"
  },
+ "1993/sejm/1993-frekw-gm.xls": {
+  "bytes": 444928,
+  "etag": "\"4d9af998-6ca00\"",
+  "last_modified": "Tue, 05 Apr 2011 11:14:32 GMT",
+  "sha256": "95efd711af72cb2bc4ba5dec401fcf4e56dd2edc4e01b599e07eeace45145f67",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1993/sejm/1993-frekw-gm.xls"
+ },
  "1993/sejm/1993-listy-obw.zip": {
   "bytes": 2750222,
   "etag": "\"62066224-29f70e\"",
@@ -90,12 +118,40 @@
   "sha256": "c54cc2de6876a311e1a2149eb2b9a8eaa08d395a13e0eb94dcca41c280ee38c3",
   "url": "https://danewyborcze.kbw.gov.pl/dane/1993/sejm/kandsejm1993kom.xls"
  },
+ "1993/sejm/kom-glosy-1993.xls": {
+  "bytes": 31232,
+  "etag": "\"6107e758-7a00\"",
+  "last_modified": "Mon, 02 Aug 2021 12:38:48 GMT",
+  "sha256": "9dbe65d2f8439cb48aafe44f6b503b02ab78c9384e6509662054caf43e8614fb",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1993/sejm/kom-glosy-1993.xls"
+ },
  "1993/sejm/okregi1993.xls": {
   "bytes": 50176,
   "etag": "\"6107e64b-c400\"",
   "last_modified": "Mon, 02 Aug 2021 12:34:19 GMT",
   "sha256": "a040c3d86576380e3330924f4596edf7a1176345be296f2e21e6703efe7699ba",
   "url": "https://danewyborcze.kbw.gov.pl/dane/1993/sejm/okregi1993.xls"
+ },
+ "1993/sejm/sejm1993.zip": {
+  "bytes": 828427,
+  "etag": "\"61c35e6f-ca40b\"",
+  "last_modified": "Wed, 22 Dec 2021 17:20:47 GMT",
+  "sha256": "45df41de6dd5cf3752ad82186cbec7ce74991026144a369e329358836bf58877",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1993/sejm/sejm1993.zip"
+ },
+ "1993/sejm/sejm1993lis-okr-proc.xls": {
+  "bytes": 64000,
+  "etag": "\"6107e7ee-fa00\"",
+  "last_modified": "Mon, 02 Aug 2021 12:41:18 GMT",
+  "sha256": "a38fe4f0ac255a4109a50896e6eba6daffaeac41b8f71964d1b0d3c63c527984",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1993/sejm/sejm1993lis-okr-proc.xls"
+ },
+ "1993/sejm/sejm1993lis-okr.xls": {
+  "bytes": 55808,
+  "etag": "\"61ea8470-da00\"",
+  "last_modified": "Fri, 21 Jan 2022 10:01:20 GMT",
+  "sha256": "879abbe4b7a0f3b85b9149ac93048b648c5fb58472f1fbfe9965b56f02368c57",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1993/sejm/sejm1993lis-okr.xls"
  },
  "1993/senat/1993-frekw-gm.xls": {
   "bytes": 444928,
@@ -117,6 +173,20 @@
   "last_modified": "Wed, 22 Dec 2021 18:41:51 GMT",
   "sha256": "c8a83e7e4dc3ae8a7786bbd902c307296b60e63fdffe8e6314a6b6d58a5cfe6c",
   "url": "https://danewyborcze.kbw.gov.pl/dane/1993/senat/senat1993.zip"
+ },
+ "1994/samorzad/samo1994gm.xls": {
+  "bytes": 624128,
+  "etag": "\"5b7e92ef-98600\"",
+  "last_modified": "Thu, 23 Aug 2018 10:56:47 GMT",
+  "sha256": "070562b27744cfb1c834b45cd58ec0f8f7f1c5e9779fd34c198c60666c27555d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1994/samo1994/samo1994gm.xls"
+ },
+ "1994/samorzad/samo1994kand.zip": {
+  "bytes": 11965697,
+  "etag": "\"62065f6a-b69501\"",
+  "last_modified": "Fri, 11 Feb 2022 13:06:50 GMT",
+  "sha256": "7ef1d77e25f4deb61e725746a2a57c3253c901c54cf989e24355bcae83676db9",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1994/samo1994/samo1994kand.zip"
  },
  "1995/prezydent/Prez1995.zip": {
   "bytes": 3637772,
@@ -146,6 +216,20 @@
   "sha256": "fd01024a225b198c5544394c03769bd2f8f7961dcc978fc3b9385978df3dadea",
   "url": "https://danewyborcze.kbw.gov.pl/dane/1997/referendum/Ref1997.zip"
  },
+ "1997/sejm/1997-frekw-gm.xls": {
+  "bytes": 429056,
+  "etag": "\"4d9b0676-68c00\"",
+  "last_modified": "Tue, 05 Apr 2011 12:09:26 GMT",
+  "sha256": "986b1cbd4b76fc9d94611679ef21bba8334d44c69782528fff8bfd2812de87b3",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/sejm/1997-frekw-gm.xls"
+ },
+ "1997/sejm/kandsejm1997kom.xls": {
+  "bytes": 1517056,
+  "etag": "\"609d1d62-172600\"",
+  "last_modified": "Thu, 13 May 2021 12:36:50 GMT",
+  "sha256": "343c385437312656addea06ef068c04173b22bb864db2329a00b753282682c8c",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/sejm/kandsejm1997kom.xls"
+ },
  "1997/sejm/kandsejm1997pop.xls": {
   "bytes": 1781760,
   "etag": "\"61c378f8-1b3000\"",
@@ -159,6 +243,20 @@
   "last_modified": "Tue, 18 Jan 2022 11:30:17 GMT",
   "sha256": "6928beef8ce59f50c46aad27ff4c2c6b55801287cb9db57e664aff6e1f38143e",
   "url": "https://danewyborcze.kbw.gov.pl/dane/1997/sejm/listy-kandydaci.zip"
+ },
+ "1997/sejm/sejm1997.zip": {
+  "bytes": 590182,
+  "etag": "\"61c35e9f-90166\"",
+  "last_modified": "Wed, 22 Dec 2021 17:21:35 GMT",
+  "sha256": "2abb5fec462376d1e02ec8fd9b93d396dfdfa5a9d99cb93662b40cb35f3e01ce",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/sejm/sejm1997.zip"
+ },
+ "1997/sejm/sejm1997lisokr.zip": {
+  "bytes": 30813,
+  "etag": "\"61ea862e-785d\"",
+  "last_modified": "Fri, 21 Jan 2022 10:08:46 GMT",
+  "sha256": "df4fab5960729e09300b71c827c1605ff7368e351e31df7faec8aa14a59c6b7d",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/sejm/sejm1997lisokr.zip"
  },
  "1997/sejm/sejm1997obw.xls": {
   "bytes": 8088064,
@@ -174,6 +272,20 @@
   "sha256": "412e5b58454ecdf70b974a0464e4164b29147430fe7e4ab8ba5b79bc5c0da491",
   "url": "https://danewyborcze.kbw.gov.pl/dane/1997/sejm/sejm1997okregi.xls"
  },
+ "1997/senat/1997-frekw-gm.xls": {
+  "bytes": 429056,
+  "etag": "\"4d9b0676-68c00\"",
+  "last_modified": "Tue, 05 Apr 2011 12:09:26 GMT",
+  "sha256": "986b1cbd4b76fc9d94611679ef21bba8334d44c69782528fff8bfd2812de87b3",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/senat/1997-frekw-gm.xls"
+ },
+ "1997/senat/ksenat1997.xls": {
+  "bytes": 143360,
+  "etag": "\"5da9afbe-23000\"",
+  "last_modified": "Fri, 18 Oct 2019 12:27:42 GMT",
+  "sha256": "0e7a8a04780452f97196dafb1188a188b54776054e2e6ddf786aa6d69caa0f05",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/senat/ksenat1997.xls"
+ },
  "1997/senat/ksenat1997pop.xls": {
   "bytes": 232960,
   "etag": "\"61c37a3c-38e00\"",
@@ -187,6 +299,13 @@
   "last_modified": "Wed, 22 Dec 2021 18:36:22 GMT",
   "sha256": "6cc8cad738c6b8ee58e1019551f6211283261915761a2bb9e2683cc4532ccb7c",
   "url": "https://danewyborcze.kbw.gov.pl/dane/1997/senat/obwsenat97.zip"
+ },
+ "1997/senat/senat1997gminy.zip": {
+  "bytes": 317699,
+  "etag": "\"61c37022-4d903\"",
+  "last_modified": "Wed, 22 Dec 2021 18:36:18 GMT",
+  "sha256": "f01a50a6af395398eaecfb39477d94d393bc0390bfa0e587de793cff598a3674",
+  "url": "https://danewyborcze.kbw.gov.pl/dane/1997/senat/senat1997gminy.zip"
  },
  "1997/senat/senat1997okr.xls": {
   "bytes": 33792,

@@ -128,6 +128,12 @@ def _pre1999_units(rows: list[dict[str, Any]], sql: str) -> bool:
     return by_unit and any(isinstance(y, int) and 1990 <= y <= 1997 for y in years)
 
 
+def _about_rada_1994(rows: list[dict[str, Any]], sql: str) -> bool:
+    """Whether council results of 1994 (pre-1999 division) are shown."""
+    years = _values(rows, "year") or {int(y) for y in re.findall(r"\b(?:19|20)\d{2}\b", sql)}
+    return 1994 in years and "rada_" in sql.lower()
+
+
 # Caveats of the data that a reader must know to interpret the rows. Each rule looks only at the rows
 # and the SQL, never at outside facts, so the text contains no numbers of its own. Details of each
 # gap are in docs/MART.md ("Known gaps").
@@ -164,6 +170,11 @@ CAVEATS: tuple[tuple[str, Any], ...] = (
         "nieoficjalny, dopasowany po nazwie); przed 1995 r. gmina obejmuje też gminy wydzielone z niej później, "
         "a w 1991 r. część gmin wiejskich jest liczona razem z miastem o tej samej nazwie.",
         _pre1999_units,
+    ),
+    (
+        "Rady gmin z 1994 r. są w ówczesnym podziale kraju: dawne województwa (nieporównywalne z dzisiejszymi), "
+        "bez powiatów i z kodami gmin sprzed 1999 r.; KBW nie publikuje danych z wyborów samorządowych 1990 r.",
+        _about_rada_1994,
     ),
     (
         "PKW nie publikuje identyfikatorów osób: kandydatury łączone są po imieniu, nazwisku, płci "

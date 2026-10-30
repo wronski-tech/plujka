@@ -58,8 +58,10 @@ def family_year(rel_path: str) -> tuple[str, int]:
 
 # Mirror prefixes that differ from the server path: the server keeps the 1998, 2002, 2006 and 2010
 # local-election files directly under /dane/<year>/, the mirror under <year>/samorzad/ (apart from the
-# 2010 presidential files). The 1996 referendum files are directly under /dane/1996/ too.
+# 2010 presidential files). The 1996 referendum files are directly under /dane/1996/ too, the 1994
+# council files under /dane/1994/samo1994/.
 SERVER_PREFIX = {
+    "1994/samorzad/": "1994/samo1994/",
     "1998/samorzad/": "1998/", "2002/samorzad/": "2002/", "2006/samorzad/": "2006/", "2010/samorzad/": "2010/",
     "1996/referendum/": "1996/",
 }

@@ -19,7 +19,7 @@ small, documented schema, and guards keep that SQL read-only and inside `mart` (
 | `referendum` | 1996 (5 questions, two ballots), 1997, 2003, 2015, 2023 | precinct: answers per question |
 | `sejmik` (voivodeship assembly) | 1998, 2002, 2006, 2010, 2014, 2018, 2024 | gmina: list votes, protocols; candidates with totals |
 | `wbp` (wójt / burmistrz / prezydent miasta, both rounds) | 2002, 2006, 2010, 2014, 2018, 2024 | gmina: candidates, protocols |
-| `rada` (councils: rada gminy / miasta, rada powiatu, rady dzielnic Warszawy; 1998: Rada m.st. Warszawy and the Warszawa-Centrum districts) | 1998, 2002, 2006, 2010, 2014, 2018, 2024 | district: candidates with totals, lists (2006: list blocs), seats |
+| `rada` (councils: rada gminy / miasta, rada powiatu, rady dzielnic Warszawy; 1994: gmina councils only, pre-1999 codes; 1998: Rada m.st. Warszawy and the Warszawa-Centrum districts) | 1994, 1998, 2002, 2006, 2010, 2014, 2018, 2024 | district: candidates with totals, lists (2006: list blocs), seats |
 
 Councils are loaded at district level only (no per-precinct council results); list totals are the
 sum of their candidates' votes (see [Known gaps](#known-gaps-in-the-source-data)).
@@ -333,6 +333,20 @@ A family-year is not loaded if any check fails. The checks it passed are stored 
 
 These are properties of the official files, not build errors. Each check names its exception.
 
+- **Councils 1994 and 1990.** KBW publishes no files of the 1990 local elections. 1994 (gmina councils
+  only, 19 June 1994) keeps the codes of the 1975–1998 division: `rada_districts.teryt` is the 5-digit
+  code (the first 5 of KBW's 7 digits, as `teryt_gmina_pre1999`; 33225 Silnowo only here, added to
+  `gminy_pre1999.json`), `wojewodztwo` the old voivodeship, `teryt_powiat` NULL; person linking takes
+  the powiat of the 1999 gmina from `mart.gmina_codes_pre1999`. Seven single-member districts are
+  missing from the candidate file, each one district and seat short of its gmina's official totals
+  (`build_rady.EMPTY_DISTRICTS[1994]`). Single-member candidates name only an optional supporting
+  organisation (`Poparcie`, the committee; `(NIE PODANO)` without one; names are upper case as in other
+  years); lists of one district with the same designation get ` (LISTA N)`. `valid_votes` is the votes for candidates: valid ballots without a
+  choice are not included (they reconcile with KBW's valid ballots in every district). Seats in cities
+  above 40,000 follow modified Sainte-Laguë without a threshold (art. 97 of the 1990 law) only with
+  quotients cut to whole numbers (`allocate_seats` method `sainte_lague_modified_whole`; exact quotients
+  differ in 17 of 843 districts); Gniezno district 3 is a tie (473 votes each), and in Nysa district 4
+  the published seats contradict the published votes (`derived.SEAT_MISMATCHES`).
 - **GUS census education 2011.** NSP 2011 education comes from the census sample survey and GUS
   rounds each unit's estimate separately: residents with higher education in the powiats of 13
   voivodeships differ from the voivodeship total by up to 3 persons (`build_gus.SAMPLE_ROUNDING`).

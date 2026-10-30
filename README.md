@@ -12,7 +12,7 @@ Polish election (PKW/KBW) analytics: a question in Polish becomes one checked, r
 | President | 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025 |
 | European Parliament | 2004, 2009, 2014, 2019, 2024 |
 | Referendums | 1996, 1997, 2003, 2015, 2023 |
-| Sejmiki, councils | 1998, 2002, 2006, 2010, 2014, 2018, 2024 |
+| Sejmiki, councils | 1998, 2002, 2006, 2010, 2014, 2018, 2024 (gmina councils also 1994) |
 | Mayors (wójt / burmistrz / prezydent miasta) | 2002, 2006, 2010, 2014, 2018, 2024 |
 | GUS statistics per gmina (population, unemployment, salary) | 1995–2024 |
 

@@ -3,6 +3,7 @@
 councils of gminas, powiats and Warsaw districts.
 
 Sources (KBW mirror):
+- 1994: gmina councils only (no mayors, powiats or voivodeship assemblies), see ``build_rady``.
 - 1998 sejmik (no mayors: wójts were elected by the councils until 2002): ``1998-kand-rady``
   (candidates of every council; ``Szczebel = 'województwo'``, ``Mand.`` W = elected by votes, P = by
   precedence and L = by lot in a tie, B = without voting, N = not elected; the list's district total
@@ -93,8 +94,10 @@ log = logging.getLogger("mart")
 TABLES = SEJMIK_TABLES + WBP_TABLES + RADA_TABLES
 FAMILY = ("sejmik", "wbp", "rada")
 
-# 2006 and 2010: some run-offs took place two weeks later (see LATE_RUNOFFS). 1998 had no mayor elections.
+# 2006 and 2010: some run-offs took place two weeks later (see LATE_RUNOFFS). 1998 had no mayor elections;
+# 1994 only gmina councils (build_rady; no powiats or voivodeship assemblies before 1999).
 DATES = {
+    1994: ("1994-06-19", None),
     1998: ("1998-10-11", None),
     2002: ("2002-10-27", "2002-11-10"),
     2006: ("2006-11-12", "2006-11-26"),
@@ -238,6 +241,8 @@ REPLACED_RUNOFF_CANDIDATES = {
     2002: ["040606", "062004", "101605", "121502", "140502", "141608", "160802", "180307", "181408", "200802",
            "200903", "220205", "220305", "220705", "280804", "281408", "321406"],
 }
+# Years with council elections only (1994: gmina councils).
+COUNCILS_ONLY = {1994}
 OFFICES = {"W": "wójt", "B": "burmistrz", "P": "prezydent miasta"}
 _AGAINST = re.compile(r"^Głosy przeciw wyborowi kandydata - (.+?) zarejestrowanego przez ")
 
@@ -249,6 +254,8 @@ def _has_mayors(year: int) -> bool:
 
 def available(sources: YearSources) -> bool:
     """Whether the year has staged sejmik candidates and, in years with mayor elections, mayor candidates."""
+    if sources.year in COUNCILS_ONLY:
+        return build_rady.available(sources)
     spec = SOURCES.get(sources.year)
     if not spec:
         return False
@@ -268,6 +275,9 @@ def build_samorzad(con: duckdb.DuckDBPyConnection, sources: YearSources) -> list
         "CREATE OR REPLACE MACRO capw_(x) AS CASE WHEN upper(x) = x THEN array_to_string("
         "list_transform(str_split(x, ' '), w -> upper(left(w, 1)) || lower(substr(w, 2))), ' ') ELSE x END"
     )
+    if year in COUNCILS_ONLY:
+        build_rady.build_rady(con, sources)
+        return [Election("rada", year, 1, DATES[year][0], f"Gmina council elections {year}")]
     if year == 2002:
         _gmina_names_2002(con, sources)
         _stats_2002(con, sources)
