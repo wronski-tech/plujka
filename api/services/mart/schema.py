@@ -75,6 +75,7 @@ DERIVED_RELATIONS = (
     "v_rada_results",
     "v_turnout",
     "v_precinct_results",
+    "v_candidate_gmina_votes",
     "v_party_results",
     "v_party_change",
     "v_gmina_continuity",

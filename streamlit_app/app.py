@@ -705,7 +705,35 @@ def _render_person_timeline(person_id: int, view_key: str = "person_view") -> No
             st.altair_chart(chart, use_container_width=True)
         st.dataframe(rows, use_container_width=True, hide_index=True)
         _csv_download(rows, f"kandydatury {person['full_name']}", key=f"csv_{view_key}_{person_id}")
+        _person_gmina_votes(person_id, candidacies, view_key)
         _person_link_report(person_id, rows, view_key)
+
+
+# First year whose precinct files carry candidate votes with current gmina codes (v_candidate_gmina_votes).
+GMINA_VOTES_FROM = {"sejm": 2007, "senat": 2001, "pe": 2014}
+
+
+def _person_gmina_votes(person_id: int, candidacies: list[dict], view_key: str) -> None:
+    """Map and top gminas of one Sejm, Senate or EP candidacy (votes summed from precincts)."""
+    options = sorted({(c["chamber"], c["year"]) for c in candidacies
+                      if c["chamber"] in GMINA_VOTES_FROM and c["year"] >= GMINA_VOTES_FROM[c["chamber"]]},
+                     key=lambda o: o[1], reverse=True)
+    if not options:
+        return
+    chosen = st.selectbox("Głosy w gminach", [None, *options], key=f"{view_key}_gminas_{person_id}",
+                          format_func=lambda o: "— wybierz kandydowanie —" if o is None else f"{CHAMBER_LABELS[o[0]]} {o[1]}")
+    if chosen is None:
+        return
+    rows = (_api_get(f"/persons/{person_id}/gminas", {"election": chosen[0], "year": chosen[1]}) or {}).get("rows", [])
+    if not rows:
+        st.caption("Brak wyników obwodowych tego kandydowania.")
+        return
+    st.caption(f"Głosy w {len(rows)} gminach okręgu, zsumowane z protokołów obwodowych (bez głosów z zagranicy i statków); "
+               "% = udział wśród ważnych głosów w gminie.")
+    st.dataframe([{"gmina": r["gmina"], "powiat": r["powiat"], "głosy": r["votes"], "%": r["pct"]} for r in rows[:10]],
+                 hide_index=True, use_container_width=True)
+    _render_map([{"gmina": r["gmina"], "teryt_gmina": r["teryt_gmina"], "year": r["year"], "pct": r["pct"]} for r in rows],
+                key=f"{view_key}_gminas_{person_id}")
 
 
 def _person_link_report(person_id: int, rows: list[dict], view_key: str) -> None:

@@ -40,7 +40,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [x] 22. Mapowanie kodów gmin sprzed 1999 jako tabela w marcie (odtwarzalny skrypt, kontrole).
 - [x] 23. Widoki lat 90. według dawnych województw i dzisiejszych gmin, z `CAVEATS`.
 - [ ] 24. Wybory samorządowe 1994 i 1990 (jeśli KBW publikuje pliki).
-- [ ] 25. Głosy kandydatów na poziomie gminy z plików obwodowych.
+- [x] 25. Głosy kandydatów na poziomie gminy z plików obwodowych.
 - [ ] 26. Więcej GUS: struktura wieku, wykształcenie (NSP 2002/2011/2021), dochody gmin.
 - [ ] 27. Wybory uzupełniające do Senatu.
 - [ ] 28. Referenda lokalne i odwołania wójtów (jeśli dane są dostępne).

@@ -142,10 +142,10 @@ def schema_description(version: str = "", compact: bool = False) -> dict[str, st
 # A question naming at least one kind gets only those relations plus SHARED_RELATIONS in the
 # prompt; a question naming none gets the whole schema.
 FAMILY_KEYWORDS: dict[str, tuple[str, ...]] = {
-    r"\bsejm(?!ik)|posel|posl|poslank|parlament(?!\w*\s+europ)": ("sejm_", "v_sejm_", "precincts"),
-    r"senat|senac|parlament(?!\w*\s+europ)": ("senat_", "precincts"),
+    r"\bsejm(?!ik)|posel|posl|poslank|parlament(?!\w*\s+europ)": ("sejm_", "v_sejm_", "precincts", "v_candidate_"),
+    r"senat|senac|parlament(?!\w*\s+europ)": ("senat_", "precincts", "v_candidate_"),
     r"prezyden": ("prezydent_", "v_prezydent_", "wbp_"),
-    r"europ|\bpe\b": ("pe_", "v_pe_"),
+    r"europ|\bpe\b": ("pe_", "v_pe_", "v_candidate_"),
     r"referend": ("referendum_", "v_referendum_"),
     r"sejmik|wojewodzk": ("sejmik_", "v_sejmik_"),
     r"samorzad": ("sejmik_", "v_sejmik_", "wbp_", "rada_", "v_rada_"),

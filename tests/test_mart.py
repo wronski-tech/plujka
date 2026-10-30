@@ -808,7 +808,7 @@ class TestPromptRelations(unittest.TestCase):
     AVAILABLE = [
         "elections", "persons", "v_turnout", "precincts", "sejm_lists", "senat_candidates",
         "prezydent_results", "wbp_candidates", "sejmik_lists", "rada_candidates", "pe_lists", "v_seat_methods",
-        "gmina_codes_pre1999", "v_precinct_results",
+        "gmina_codes_pre1999", "v_precinct_results", "v_candidate_gmina_votes",
     ]
 
     def test_named_election_kind_limits_the_schema(self) -> None:
@@ -819,9 +819,10 @@ class TestPromptRelations(unittest.TestCase):
         self.assertIn("rada_candidates", dynamic_sql.relevant_relations("Ilu radnych ma gmina Zakopane?", self.AVAILABLE))
         self.assertNotIn("sejm_lists", dynamic_sql.relevant_relations("Ile mandatów w sejmikach zdobyło PiS?", self.AVAILABLE))
         self.assertIn("precincts", dynamic_sql.relevant_relations("Ile głosów dostał poseł Nowak?", self.AVAILABLE))
+        self.assertNotIn("v_candidate_gmina_votes", dynamic_sql.relevant_relations("Kto wygrał wybory prezydenckie w 2020?", self.AVAILABLE))
         self.assertEqual(
             dynamic_sql.relevant_relations("Frekwencja w wyborach do Parlamentu Europejskiego", self.AVAILABLE),
-            ["elections", "persons", "v_turnout", "pe_lists"],
+            ["elections", "persons", "v_turnout", "pe_lists", "v_candidate_gmina_votes"],
         )
 
     def test_1990s_questions_get_the_pre1999_gmina_key(self) -> None:

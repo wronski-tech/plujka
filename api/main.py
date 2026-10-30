@@ -1240,6 +1240,27 @@ def data_package(
                     headers={"Content-Disposition": f'attachment; filename="plujka-{election}-{year}.zip"'})
 
 
+CANDIDATE_GMINAS_SQL = """
+SELECT election, year, 1 AS round, 'gmina' AS level, wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina,
+       full_name AS name, district_no, votes, valid_votes, pct
+FROM mart.v_candidate_gmina_votes
+WHERE election = %(election)s AND year = %(year)s AND person_id = %(person_id)s
+ORDER BY votes DESC
+"""
+
+
+@app.get("/persons/{person_id}/gminas", response_model=BrowseRowsResponse, tags=["persons"],
+         dependencies=[Depends(require_api_key)])
+def person_gmina_votes(
+    person_id: int = Path(ge=1),
+    election: Literal["sejm", "senat", "pe"] = Query(),
+    year: int = Query(ge=2000, le=2100),
+) -> BrowseRowsResponse:
+    """One person's votes per gmina in one Sejm, Senate or EP election (summed precinct files; no abroad)."""
+    params = {"election": election, "year": year, "person_id": person_id}
+    return BrowseRowsResponse.model_validate({"rows": _mart_rows(CANDIDATE_GMINAS_SQL, params)})
+
+
 PRECINCT_FILTER = """election = %(election)s AND year = %(year)s AND round = %(round)s AND teryt_gmina = %(teryt_gmina)s"""
 # One row per precinct of a gmina with its winner (v_precinct_results), or every list/candidate of one precinct.
 PRECINCTS_SQL = f"""

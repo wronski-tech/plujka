@@ -820,6 +820,7 @@ PRE1999_UNITS_NOTE = (
 
 DROP_SQL = r"""
 DROP VIEW IF EXISTS mart.v_precinct_results;
+DROP VIEW IF EXISTS mart.v_candidate_gmina_votes;
 -- v_person_history was a plain view before it was materialized; drop either kind.
 DO $$
 BEGIN
@@ -1528,6 +1529,35 @@ COMMENT ON COLUMN mart.v_precinct_results.turnout_pct IS 'Official turnout of th
 """
 
 
+CANDIDATE_GMINA_VOTES_SQL = r"""
+CREATE VIEW mart.v_candidate_gmina_votes AS
+SELECT election, year, candidate_id, person_id, full_name, district_no, wojewodztwo, left(teryt_gmina, 4) AS teryt_powiat,
+       powiat, teryt_gmina, gmina, sum(votes) AS votes, sum(valid_votes) AS valid_votes,
+       round(100.0 * sum(votes) / NULLIF(sum(valid_votes), 0), 2) AS pct
+FROM (
+  SELECT 'sejm' AS election, v.year, v.candidate_id, c.person_id, c.full_name, c.district_no, p.wojewodztwo, p.powiat,
+         p.teryt_gmina, p.gmina, v.votes, r.valid_votes
+  FROM mart.sejm_precinct_candidate_votes v JOIN mart.sejm_candidates c USING (year, candidate_id)
+  JOIN mart.precincts p USING (year, precinct_id) JOIN mart.sejm_precinct_protocols r USING (year, precinct_id)
+  UNION ALL
+  SELECT 'senat', v.year, v.candidate_id, c.person_id, c.full_name, c.district_no, p.wojewodztwo, p.powiat,
+         p.teryt_gmina, p.gmina, v.votes, r.valid_votes
+  FROM mart.senat_precinct_candidate_votes v JOIN mart.senat_candidates c USING (year, candidate_id)
+  JOIN mart.precincts p USING (year, precinct_id) JOIN mart.senat_precinct_protocols r USING (year, precinct_id)
+  UNION ALL
+  SELECT 'pe', v.year, v.candidate_id, c.person_id, c.full_name, c.district_no, r.wojewodztwo, r.powiat,
+         r.teryt_gmina, r.gmina, v.votes, r.valid_votes
+  FROM mart.pe_precinct_candidate_votes v JOIN mart.pe_candidates c USING (year, candidate_id)
+  JOIN mart.pe_precinct_protocols r USING (year, precinct_id)
+) x
+WHERE teryt_gmina IS NOT NULL
+GROUP BY election, year, candidate_id, person_id, full_name, district_no, wojewodztwo, powiat, teryt_gmina, gmina;
+COMMENT ON VIEW mart.v_candidate_gmina_votes IS 'Votes of one Sejm, Senate or European Parliament candidate per gmina, summed from the precinct files: one row per election, year, candidate and gmina of the candidate''s district. Not materialized: always filter by election, year and person_id or candidate_id given as a value or a scalar subquery (candidate_id = (SELECT candidate_id FROM mart.sejm_candidates WHERE ...)); a join on names aggregates every candidate and times out. Years with precinct candidate results: Sejm 2007-2023, Senate 2001-2023 (1990s precincts carry no current gmina code), EP 2014-2024. Abroad and ships are left out, so the gmina rows of a candidate may sum to less than the candidate''s total.';
+COMMENT ON COLUMN mart.v_candidate_gmina_votes.valid_votes IS 'Valid votes cast in the gmina''s precincts of that district (for Sejm and EP: valid votes for all lists).';
+COMMENT ON COLUMN mart.v_candidate_gmina_votes.pct IS 'votes / valid_votes in percent (0-100): the candidate''s share of all valid votes in the gmina.';
+"""
+
+
 SEAT_METHODS_VIEW_SQL = r"""
 CREATE MATERIALIZED VIEW mart.v_seat_methods AS
 WITH sejmik_share AS (
@@ -1611,6 +1641,7 @@ def rebuild(pg: psycopg.Connection) -> None:
     pg.execute(PERSON_HISTORY_SQL)
     pg.execute(SEAT_METHODS_VIEW_SQL)
     pg.execute(_precinct_results_sql())
+    pg.execute(CANDIDATE_GMINA_VOTES_SQL)
     pg.execute(GUS_VIEW_SQL)
     linked = pg.execute(
         "SELECT (SELECT count(*) FROM mart.sejmik_candidates WHERE person_id IS NOT NULL),"
