@@ -650,6 +650,16 @@ class TestClarification(unittest.TestCase):
         # "drugą turę" is not the gmina Turek.
         self.assertNotIn("ture", entities.question_terms("Kto wygrał drugą turę?")[0])
 
+    def test_declined_town_names_match(self) -> None:
+        for question, name in (("Prezydent Białegostoku", "Białystok"), ("Frekwencja w Białymstoku", "m. Białystok"),
+                               ("Wyniki w Krasnymstawie", "Krasnystaw"), ("Wyniki w Jeleniej Górze", "m. Jelenia Góra"),
+                               ("Frekwencja w Białej Podlaskiej", "Biała Podlaska")):
+            with self.subTest(question=question):
+                stems, exact = entities.question_terms(question)
+                self.assertTrue(entities.score_entry("gmina", entities.fold(entities._PLACE_PREFIX.sub("", name)), stems, exact))
+        stems, exact = entities.question_terms("Frekwencja w Białymstoku")
+        self.assertFalse(entities.score_entry("gmina", "bialobrzegi", stems, exact))
+
     def test_question_years_and_town_narrow_namesakes(self) -> None:
         older = entities.EntityMatch("person", "Jarosław KACZYŃSKI", "8", "sejm 2011", [2011])
         narrowed = entities.narrow_matches("Ile głosów dostał Jarosław Kaczyński w 2023?", [self.JAROSLAW, older])

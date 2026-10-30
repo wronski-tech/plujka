@@ -609,8 +609,10 @@ would answer it from Sejm data.
 **Dynamic SQL** (`dynamic_sql.try_dynamic_query`):
 
 1. **Entity resolution** (`mart/entities.py`). Question words are folded (lower case, no diacritics),
-   common Polish endings are stripped, and the result is matched against `entity_lexicon`: "w
-   Krakowie" becomes `m. Kraków (teryt_gmina = '126101')`. A person needs a question word that
+   common Polish endings are stripped (an adjective inside a one-word name and the "-rze" locative are
+   put back in the nominative: "Białegostoku", "Jeleniej Górze"), and the result is matched against
+   `entity_lexicon`: "w Krakowie" becomes `m. Kraków (teryt_gmina = '126101')`; places with more
+   name words are kept first ("Jelenia Góra" before "Góra"). A person needs a question word that
    names the surname (`entities.surname_mentioned`): not the word that matched a given name, and,
    without a given name in the question, a capitalized word closer to the surname than to any
    committee alias ("w gminach" is not GMIŃSKI, "turę" not TUR, "PiS" not PIŚ, "Lewicy" not

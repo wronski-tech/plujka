@@ -27,9 +27,11 @@ _FOLD = str.maketrans("ąćęłńóśźż", "acelnoszz")
 
 # Longest first: the first ending that leaves a stem of at least 3 letters is stripped.
 _ENDINGS = (
-    "owie", "iego", "ach", "ami", "ego", "emu", "owi", "iem", "ich", "ym", "im", "em", "iu", "ie", "ow",
-    "om", "a", "u", "y", "i", "e",
+    "owie", "iego", "ach", "ami", "ego", "emu", "owi", "iem", "ich", "iej", "ym", "im", "em", "ej", "iu",
+    "ie", "ow", "om", "a", "u", "y", "i", "e",
 )
+# A declined adjective inside a one-word town name ("Białegostoku", "Białymstoku", "Krasnymstawie").
+_INNER_ADJECTIVE = re.compile(r"(?<=[a-z]{3})(?:ego|ym)(?=[a-z]{3})")
 
 # Frequent question words that would otherwise prefix-match place or person names.
 _STOPWORDS = frozenset(
@@ -63,14 +65,18 @@ def fold(text: str) -> str:
 
 
 def _word_stems(word: str) -> set[str]:
-    """Stems of one folded question word: the word and the word without one case ending."""
+    """Stems of one folded question word: the word (also with an inner adjective or a "-rze" locative
+    in the nominative) and the word without one case ending."""
     if len(word) < 3 or word in _STOPWORDS or word.isdigit():
         return set()
-    stems = {word}
-    for ending in _ENDINGS:
-        if word.endswith(ending) and len(word) - len(ending) >= 3:
-            stems.add(word[: -len(ending)])
-            break
+    stems = set()
+    # Locative "-rze" of "-ra" nouns ("Górze" -> "Góra").
+    for form in {word, _INNER_ADJECTIVE.sub("y", word, count=1), re.sub(r"rze$", "ra", word)}:
+        stems.add(form)
+        for ending in _ENDINGS:
+            if form.endswith(ending) and len(form) - len(ending) >= 3:
+                stems.add(form[: -len(ending)])
+                break
     return stems
 
 
@@ -146,7 +152,7 @@ def score_entry(kind: str, folded: str, stems: set[str], exact: set[str]) -> boo
 def resolve_entities(question: str, conn: psycopg.Connection | None = None) -> list[EntityMatch]:
     """Lexicon entries mentioned in ``question``, at most MAX_PER_KIND per kind.
 
-    Places are ordered by recency; persons as described in the sort key below.
+    Places are ordered by name length in words, then recency; persons as described in the sort key below.
     """
     stems, exact = question_terms(question)
     if not stems and not exact:
@@ -184,8 +190,9 @@ def resolve_entities(question: str, conn: psycopg.Connection | None = None) -> l
                 named = any(_word_matches(g, stems) for g in _given_names(m))
                 return (not named, -(m.detail or "").count("elected"), -max(m.years), m.name)
         else:
+            # Longer names first: every word of a match is in the question ("Jelenia Góra" before "Góra").
             def key(m: EntityMatch) -> tuple:
-                return (-max(m.years), m.name)
+                return (-len(re.split(r"[\s\-]+", _PLACE_PREFIX.sub("", fold(m.name)))), -max(m.years), m.name)
         matches.extend(sorted(by_kind[kind], key=key)[:MAX_PER_KIND])
     return matches
 
@@ -303,7 +310,7 @@ def narrow_matches(question: str, matches: list[EntityMatch]) -> list[EntityMatc
         if len(surname) < 4:
             return []
         return [p for p in matches if p.kind in PLACE_KINDS and id(p) not in shadowed
-                and re.split(r"[\s\-]+", _PLACE_PREFIX.sub("", fold(p.name)))[-1].startswith(surname[:4])]
+                and any(w.startswith(surname[:4]) for w in re.split(r"[\s\-]+", _PLACE_PREFIX.sub("", fold(p.name))))]
 
     person_wins, beaten = set(), set()
     for m in persons:
