@@ -745,8 +745,10 @@ def _browse() -> None:
         views = ["Wyniki", "Frekwencja"] if kind in RESULT_ELECTIONS else ["Frekwencja"]
         if kind in CHANGE_ELECTIONS and year > min(years):
             views.insert(1, "Zmiana")
-        if kind == "prezydent" and 2 in rounds:
+        if kind in ("prezydent", "wbp") and 2 in rounds:
             views.insert(1, "II tura")
+        if kind == "sejm":
+            views.insert(-1, "Głosy zmarnowane")
         view = c4.radio("Pokaż", views, horizontal=True, key="browse_view")
         levels = [k for k in LEVEL_LABELS if year < 1999 or k != "wojewodztwo_1975"]
         level = c5.selectbox("Poziom", levels, index=1, format_func=LEVEL_LABELS.get, key="browse_level")
@@ -758,7 +760,20 @@ def _browse() -> None:
             voivodeship = c6.text_input("Województwo (opcjonalnie)", placeholder="np. mazowieckie", key="browse_woj")
         params = {"election": kind, "year": year, "round": rnd, "level": level,
                   "wojewodztwo": (voivodeship or "").strip().lower() or None}
-        if view == "II tura":
+        if view == "Głosy zmarnowane":
+            data = _api_get("/wasted", {k: v for k, v in params.items() if k not in ("round", "election")})
+            rows = (data or {}).get("rows") or []
+            if not rows:
+                st.caption("Brak danych dla tego wyboru.")
+                return
+            value = "wasted_pct"
+            st.caption("Głosy na komitety poniżej progu krajowego (bez udziału w podziale mandatów), w % ważnych głosów na listy.")
+            shown = ([{k: r[k] for k in ("valid_votes", "wasted_votes", "wasted_pct")} for r in rows] if level == "country"
+                     else _unit_rows(rows, level, value))
+        elif view == "II tura":
+            if kind == "wbp" and level != "gmina":
+                st.caption("II tura wyborów wójtów i burmistrzów jest tylko na poziomie gmin.")
+                level = params["level"] = "gmina"
             data = _api_get("/runoff", {k: v for k, v in params.items() if k != "round"})
             rows = (data or {}).get("rows") or []
             if not rows:
@@ -770,6 +785,15 @@ def _browse() -> None:
             if level == "country":
                 shown = [{k: r[k] for k in ("name", "votes_round1", "pct_round1", "votes", "pct", "gain_votes", "gain_pp")}
                          for r in rows]
+            elif kind == "wbp":
+                # Each mayoral finalist runs in one gmina: show the winner of each run-off.
+                winners: dict[str, dict] = {}
+                for r in rows:
+                    if r["teryt_gmina"] not in winners or r["pct"] > winners[r["teryt_gmina"]]["pct"]:
+                        winners[r["teryt_gmina"]] = r
+                st.caption("Na mapie: przyrost zwycięzcy II tury w każdej gminie.")
+                shown = [{"gmina": r["gmina"], "teryt_gmina": r["teryt_gmina"], "zwycięzca": r["name"], "year": r["year"],
+                          value: r[value]} for r in winners.values()]
             else:
                 names = list(dict.fromkeys(r["name"] for r in rows))
                 name = st.selectbox("Kandydat na mapie", names, key="browse_runoff_name")

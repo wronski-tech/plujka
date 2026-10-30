@@ -19,14 +19,14 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 7. Wykres liniowy jednostki w czasie (`chart_columns.py`).
 - [x] 8. Karta wyborów: frekwencja, mandaty, progi, metoda, liczba obwodów.
 - [x] 9. Lista wybranych według okręgu z filtrem komitetu.
-- [ ] 10. Druga tura (prezydent, wójtowie): przepływ wyników między turami w jednostce. (Prezydent już jest: widok „II tura”.)
+- [x] 10. Druga tura (prezydent, wójtowie): przepływ wyników między turami w jednostce.
 
 **Symulacje**
 - [x] 11. Symulator mandatów: metoda i próg suwakami (`mart.allocate_seats`).
 - [x] 12. Symulacja koalicji (komitety jako jedna lista).
 - [x] 13. Inny podział na okręgi (np. jeden okręg krajowy).
 - [x] 14. Koszt mandatu: głosy na mandat według komitetu.
-- [ ] 15. Głosy zmarnowane według województwa. (Krajowo już w symulatorze mandatów.)
+- [x] 15. Głosy zmarnowane według województwa.
 
 **Osoby**
 - [x] 16. Rankingi osób: kandydowania, długość kariery, suma głosów.

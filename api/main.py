@@ -252,11 +252,32 @@ SELECT * FROM (
   JOIN mart.v_prezydent_results r1 ON r1.year = r2.year AND r1.round = 1 AND r1.full_name = r2.full_name
    AND r1.level = r2.level AND r1.wojewodztwo IS NOT DISTINCT FROM r2.wojewodztwo
    AND r1.teryt_powiat IS NOT DISTINCT FROM r2.teryt_powiat AND r1.teryt_gmina IS NOT DISTINCT FROM r2.teryt_gmina
-  WHERE r2.year = %(year)s AND r2.round = 2
+  WHERE r2.year = %(year)s AND r2.round = 2 AND %(election)s = 'prezydent'
+  UNION ALL
+  SELECT 'wbp', r2.year, 2, 'gmina', g.wojewodztwo, left(r2.teryt_gmina, 4), g.powiat, r2.teryt_gmina, g.gmina,
+         r2.full_name, r1.votes, r1.pct, r2.votes, r2.pct, r2.votes - r1.votes, r2.pct - r1.pct
+  FROM mart.wbp_candidates r2
+  JOIN mart.wbp_candidates r1 ON r1.year = r2.year AND r1.round = 1 AND r1.teryt_gmina = r2.teryt_gmina
+   AND r1.full_name = r2.full_name
+  JOIN mart.wbp_gmina_protocols g ON g.year = r2.year AND g.round = 2 AND g.teryt_gmina = r2.teryt_gmina
+  WHERE r2.year = %(year)s AND r2.round = 2 AND %(election)s = 'wbp'
 ) r
 WHERE true {_UNIT_FILTER}
 ORDER BY wojewodztwo, teryt_powiat, teryt_gmina, votes DESC
 LIMIT 50000
+"""
+# Sejm votes for committees below the national threshold (they took no part in seat allocation), per unit.
+WASTED_SQL = f"""
+SELECT * FROM (
+  SELECT 'sejm' AS election, r.year, 1 AS round, r.level, r.wojewodztwo, r.teryt_powiat, r.powiat, r.teryt_gmina, r.gmina,
+         sum(r.votes) AS valid_votes, sum(r.votes) FILTER (WHERE NOT n.passed_threshold) AS wasted_votes,
+         round(100.0 * coalesce(sum(r.votes) FILTER (WHERE NOT n.passed_threshold), 0) / NULLIF(sum(r.votes), 0), 2) AS wasted_pct
+  FROM mart.v_sejm_list_results r JOIN mart.v_sejm_national_results n USING (year, committee_id)
+  WHERE r.year = %(year)s
+  GROUP BY r.year, r.level, r.wojewodztwo, r.teryt_powiat, r.powiat, r.teryt_gmina, r.gmina
+) w
+WHERE true {_UNIT_FILTER}
+ORDER BY wojewodztwo, teryt_powiat, teryt_gmina
 """
 # Change of each party against the previous election of the same kind (v_party_change), per unit.
 CHANGE_SQL = f"""
@@ -992,15 +1013,29 @@ def get_results(
 
 @app.get("/runoff", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])
 def get_runoff(
-    year: int = Query(ge=1989, le=2100, description="Presidential election year with a run-off"),
+    year: int = Query(ge=1989, le=2100, description="Election year with a run-off"),
+    election: Literal["prezydent", "wbp"] = Query("prezydent", description="President, or mayors (gmina level only)"),
     level: UnitLevel = Query("country"),
     wojewodztwo: str | None = Query(None, max_length=40, description="Only units in this voivodeship"),
     teryt_powiat: str | None = Query(None, pattern=r"^\d{4}$", description="Only units in this powiat"),
 ) -> BrowseRowsResponse:
-    """The two presidential finalists per unit: round 1 and round 2 votes and percent, and the gain between
-    rounds (``gain_votes``, ``gain_pp``). Votes cannot show who moved where, only the net change."""
-    params = {**_unit_params(level, None), "year": year, "wojewodztwo": wojewodztwo, "teryt_powiat": teryt_powiat}
+    """The two run-off finalists per unit (president) or gmina (mayors): round 1 and round 2 votes and percent,
+    and the gain between rounds (``gain_votes``, ``gain_pp``). Votes cannot show who moved where, only the net change."""
+    params = {**_unit_params(level, None), "year": year, "election": election, "wojewodztwo": wojewodztwo,
+              "teryt_powiat": teryt_powiat}
     return BrowseRowsResponse.model_validate({"rows": _mart_rows(RUNOFF_SQL, params)})
+
+
+@app.get("/wasted", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])
+def get_wasted(
+    year: int = Query(ge=1989, le=2100, description="Sejm election year"),
+    level: UnitLevel = Query("wojewodztwo"),
+    wojewodztwo: str | None = Query(None, max_length=40, description="Only units in this voivodeship"),
+    teryt_powiat: str | None = Query(None, pattern=r"^\d{4}$", description="Only units in this powiat"),
+) -> BrowseRowsResponse:
+    """Sejm votes cast for committees below the national threshold, per unit (``wasted_pct`` of valid list votes)."""
+    params = {**_unit_params(level, None), "year": year, "wojewodztwo": wojewodztwo, "teryt_powiat": teryt_powiat}
+    return BrowseRowsResponse.model_validate({"rows": _mart_rows(WASTED_SQL, params)})
 
 
 @app.get("/change", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])
