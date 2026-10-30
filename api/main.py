@@ -104,6 +104,32 @@ UNION ALL
  WHERE chamber = %(chamber)s AND year = %(year)s AND round = 1 AND age IS NOT NULL AND (NOT %(elected)s OR elected)
  ORDER BY age DESC, full_name LIMIT 10)
 """
+# Mayors (wójt / burmistrz / prezydent miasta) elected in regular elections since 2002; one elected
+# candidacy per gmina and year (round 1 or the run-off). By-elections are not in the mart.
+_MAYORS = """
+  SELECT DISTINCT ON (c.year, c.teryt_gmina) c.year, c.round, c.teryt_gmina, g.gmina, g.wojewodztwo,
+         c.person_id, c.full_name, c.committee_name, c.pct
+  FROM mart.wbp_candidates c
+  JOIN mart.wbp_gmina_protocols g ON g.year = c.year AND g.round = c.round AND g.teryt_gmina = c.teryt_gmina
+  WHERE c.elected AND (%(wojewodztwo)s::text IS NULL OR g.wojewodztwo = %(wojewodztwo)s)
+  ORDER BY c.year, c.teryt_gmina, c.round DESC
+"""
+MAYOR_TERMS_SQL = f"""
+WITH m AS ({_MAYORS}), terms AS (
+  SELECT person_id, (array_agg(full_name ORDER BY year DESC))[1] AS full_name, count(*) AS terms,
+         array_agg(year ORDER BY year) AS years, array_agg(DISTINCT gmina) AS gminas,
+         array_agg(DISTINCT wojewodztwo) AS wojewodztwa
+  FROM m GROUP BY person_id
+)
+SELECT person_id, full_name, terms, years, gminas, wojewodztwa, count(*) OVER (PARTITION BY terms) AS persons_with_terms
+FROM terms ORDER BY terms DESC, full_name
+"""
+MAYOR_GMINA_SQL = f"""
+WITH m AS ({_MAYORS})
+SELECT year, round, gmina, wojewodztwo, person_id, full_name, committee_name, pct,
+       person_id IS NOT DISTINCT FROM lag(person_id) OVER (ORDER BY year) AS same_as_before
+FROM m WHERE teryt_gmina = %(teryt_gmina)s ORDER BY year
+"""
 DATA_VERSION_SQL = """
 SELECT max(loaded_at) AS mart_loaded_at, count(*) AS elections, max(election_date) AS latest_election_date
 FROM mart.elections
@@ -667,6 +693,48 @@ def candidate_ages(
     """The 10 youngest and 10 oldest candidates (or elected) of one election (``end_``: youngest/oldest)."""
     rows = _mart_rows(CANDIDATE_AGES_SQL, {"chamber": chamber, "year": year, "elected": elected})
     return [CandidateAge.model_validate(r) for r in rows]
+
+
+class MayorTerms(BaseModel):
+    person_id: int | None
+    full_name: str
+    terms: int = Field(description="Regular elections won since 2002")
+    years: list[int]
+    gminas: list[str | None]
+    wojewodztwa: list[str | None]
+
+
+class MayorTermsResponse(BaseModel):
+    histogram: dict[int, int] = Field(description="Number of terms -> persons")
+    top: list[MayorTerms] = Field(description="Persons with the most terms (up to 100)")
+
+
+class MayorTerm(BaseModel):
+    year: int
+    round: int
+    gmina: str | None
+    wojewodztwo: str | None
+    person_id: int | None
+    full_name: str
+    committee_name: str | None
+    pct: float | None
+    same_as_before: bool
+
+
+@app.get("/mayors/terms", response_model=MayorTermsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])
+def mayor_terms(wojewodztwo: str | None = Query(None, max_length=40, description="Only gminas in this voivodeship")) -> MayorTermsResponse:
+    """How many regular elections (2002 on) each mayor won: a histogram and the longest-serving persons.
+    Persons are linked by name and birth year (see v_person_history.match_rule); by-elections are not counted."""
+    rows = _mart_rows(MAYOR_TERMS_SQL, {"wojewodztwo": wojewodztwo})
+    return MayorTermsResponse(histogram={r["terms"]: r["persons_with_terms"] for r in rows},
+                              top=[MayorTerms.model_validate(r) for r in rows[:100]])
+
+
+@app.get("/mayors/gmina/{teryt_gmina}", response_model=list[MayorTerm], tags=["browse"],
+         dependencies=[Depends(require_api_key)])
+def mayor_gmina(teryt_gmina: str = Path(pattern=r"^\d{6}$")) -> list[MayorTerm]:
+    """Mayors of one gmina elected in each regular election since 2002, and whether the same person won again."""
+    return [MayorTerm.model_validate(r) for r in _mart_rows(MAYOR_GMINA_SQL, {"teryt_gmina": teryt_gmina, "wojewodztwo": None})]
 
 
 class DataVersion(BaseModel):

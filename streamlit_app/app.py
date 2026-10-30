@@ -828,6 +828,14 @@ def _unit_card() -> None:
             )
             st.altair_chart(chart, use_container_width=True)
         _compare_units(card)
+        if card["level"] == "gmina":
+            mayors = _api_get(f"/mayors/gmina/{card['unit']}") or []
+            if mayors:
+                st.markdown("**Wójtowie / burmistrzowie**")
+                st.dataframe(pd.DataFrame(mayors).assign(year=lambda d: d["year"].astype(str))[
+                    ["year", "round", "full_name", "committee_name", "pct", "same_as_before"]].rename(columns={
+                    "year": "rok", "round": "tura", "full_name": "imię i nazwisko", "committee_name": "komitet",
+                    "pct": "%", "same_as_before": "ta sama osoba co wcześniej"}), hide_index=True, use_container_width=True)
         winners = pd.DataFrame(card["winners"])
         if not winners.empty:
             winners = winners.sort_values(["year", "election", "round"], ascending=[False, True, True])
@@ -960,6 +968,8 @@ def _candidates() -> None:
             "elected_women_pct": "kobiety wśród wybranych %", "median_age": "mediana wieku",
             "elected_median_age": "mediana wieku wybranych"})
         st.dataframe(table.dropna(axis=1, how="all"), hide_index=True, use_container_width=True)
+        if chamber == "wbp":
+            _mayor_terms()
         aged = [r["year"] for r in rows if r.get("median_age") is not None]
         if not aged:
             st.caption("Pliki PKW dla tych wyborów nie podają wieku kandydatów.")
@@ -975,6 +985,22 @@ def _candidates() -> None:
             if not part.empty:
                 st.dataframe(part[list(columns)].rename(columns=columns), hide_index=True, use_container_width=True)
         st.caption("Wiek z dnia wyborów, jak w plikach PKW (wybory samorządowe od 1998 r., Sejm i Senat 1991–1997).")
+
+
+def _mayor_terms() -> None:
+    """How many regular elections mayors won since 2002, and the longest-serving ones."""
+    terms = _api_get("/mayors/terms") or {}
+    if not terms.get("top"):
+        return
+    st.markdown("**Liczba wygranych wyborów na wójta / burmistrza (od 2002 r.)**")
+    histogram = pd.DataFrame([{"kadencje": int(k), "osoby": v} for k, v in terms["histogram"].items()]).sort_values("kadencje")
+    st.dataframe(histogram, hide_index=True, use_container_width=True)
+    top = pd.DataFrame(terms["top"])
+    top["lata"] = top["years"].map(lambda ys: ", ".join(map(str, ys)))
+    top["gminy"] = top["gminas"].map(lambda gs: ", ".join(g for g in gs if g))
+    st.dataframe(top[["full_name", "terms", "lata", "gminy"]].rename(columns={"full_name": "imię i nazwisko", "terms": "kadencje"}),
+                 hide_index=True, use_container_width=True)
+    st.caption("Wybory zwykłe (bez przedterminowych); osoby łączone po imionach, nazwisku, płci, roku urodzenia i powiecie.")
 
 
 @st.fragment

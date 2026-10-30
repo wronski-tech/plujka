@@ -409,6 +409,23 @@ FROM mart.rada_candidates k
 WHERE k.age IS NOT NULL
   AND NOT EXISTS (SELECT 1 FROM override_hit h WHERE h.chamber = 'rada' AND (h.year, h.candidate_id) = (k.year, k.candidate_id));
 
+-- Some local files before 2010 give only the first given name ("Artur KOZIOŁ" as mayor in 2002 and
+-- 2006, "Artur Stanisław KOZIOŁ" from 2010). Such a candidacy takes the full name of the one name with
+-- more given names, the same surname, first given name, gender and powiat, and a birth year at most 1
+-- apart, used in another election.
+UPDATE local_candidacy c SET name_key = m.name_key
+FROM (
+  SELECT s.chamber, s.year, s.round, s.candidate_id, min(f.name_key) AS name_key
+  FROM local_candidacy s
+  JOIN local_candidacy f ON f.last_name = s.last_name AND f.area = s.area AND f.gender IS NOT DISTINCT FROM s.gender
+   AND f.first_names LIKE '% %' AND split_part(f.first_names, ' ', 1) = s.first_names
+   AND f.year <> s.year AND abs(f.birth_year - s.birth_year) <= 1
+  WHERE s.year < 2010 AND s.first_names NOT LIKE '% %'
+  GROUP BY s.chamber, s.year, s.round, s.candidate_id
+  HAVING count(DISTINCT f.name_key) = 1
+) m
+WHERE (m.chamber, m.year, m.round, m.candidate_id) = (c.chamber, c.year, c.round, c.candidate_id);
+
 CREATE TEMP TABLE local_island ON COMMIT DROP AS
 SELECT c.*, name_key || '|' || coalesce(gender, '') || '|' || area || '|' ||
        sum(new_island) OVER (PARTITION BY name_key, gender, area ORDER BY birth_year, year, chamber, round, candidate_id) AS island

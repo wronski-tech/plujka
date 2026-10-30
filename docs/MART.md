@@ -194,6 +194,10 @@ several national persons stays unlinked. Sejmik candidacies (voivodeship-wide) j
 matching run in their voivodeship, or form runs of their own (`'local:...+voivodeship'`). So a wójt
 who was a councillor in 2014 and mayor in 2018 and 2024 is one person in `v_person_history` without
 any national candidacy. Two namesakes in one powiat born within a year of each other are merged.
+Some local files before 2010 give only the first given name ("Artur KOZIOŁ", mayor of Wieliczka in
+2006, is "Artur Stanisław KOZIOŁ" from 2010): such a candidacy takes the full name of the single name
+with the same surname, first given name, gender and powiat and a birth year at most 1 apart from
+another election, before the runs are formed.
 Only elected mayors and sejmik councillors among local persons are in `entity_lexicon` (hundreds of
 thousands of council candidates would make every surname ambiguous); others are found by SQL on
 `full_name`.
@@ -220,7 +224,7 @@ Hofman, Kośla, Hatka); people who changed surname are linked only by an overrid
 
 Current build: 60,681 national persons (56,422 by name and gender, 2,349 with abbreviated given
 names joined, 1,014 by residence, 728 split by voivodeship, 163 by birth year, 5 manual) and
-1,121,831 local persons.
+1,058,801 local persons.
 
 ## Building it
 
