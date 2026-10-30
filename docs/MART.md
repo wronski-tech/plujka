@@ -72,7 +72,9 @@ templates.
 
 Every table has `year` in its key; two-round elections also have `round`. Elections that publish
 per-precinct files carry the precinct geography (TERYT, gmina, powiat, województwo) in their
-protocol table. Sejm and Senate share `precincts`.
+protocol table. Sejm and Senate share `precincts`; from 2011 it also keeps each precinct's published
+area (`boundary_description`: streets with house-number ranges or villages), which `GET /precincts/find`
+searches for the „mój obwód” field of the „Wyniki obwodowe” panel.
 
 | Family | Tables |
 | ------ | ------ |

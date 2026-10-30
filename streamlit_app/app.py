@@ -1522,7 +1522,22 @@ def _precinct_results() -> None:
         st.caption(f"{len(rows)} obwodów. Wybierz numer, aby zobaczyć wszystkie wyniki obwodu.")
         st.dataframe(table, hide_index=True, use_container_width=True)
         _csv_download(table, f"obwody {gmina['name']} {kind} {year}", key="csv_precincts")
-        number = st.selectbox(_t("Obwód nr"), [r["precinct_no"] for r in rows], key="precinct_no",
+        numbers = [r["precinct_no"] for r in rows]
+        street = st.text_input(_t("Mój obwód: ulica lub miejscowość"), placeholder="np. Bema", key="precinct_street").strip()
+        found = []
+        if len(street) >= 2:
+            found = (_api_get("/precincts/find", {"teryt_gmina": gmina["unit"], "street": street}) or {}).get("rows", [])
+        if found:
+            st.caption(f"Obwody, których granice obejmują „{street}” (opis granic z wyborów do Sejmu {found[0]['year']}; "
+                       "sprawdź numer domu, w innych latach numeracja obwodów mogła być inna):")
+            # Plain text, not a table: the house-number ranges in long area descriptions must stay readable.
+            st.markdown("\n".join(f"- **{_t('Obwód nr')} {r['precinct_no']}** — {r['address']}  \n  {r['boundary_description']}"
+                                  for r in found))
+        elif len(street) >= 2:
+            st.caption(f"Żaden opis granic obwodów tej gminy nie zawiera „{street}” (opisy publikowane od 2011 r.).")
+        # Jump to the found precinct when its numbering is the one shown (same Sejm year).
+        mine = next((r["precinct_no"] for r in found if (kind, year) == ("sejm", r["year"]) and r["precinct_no"] in numbers), None)
+        number = st.selectbox(_t("Obwód nr"), numbers, index=numbers.index(mine) if mine else 0, key=f"precinct_no_{mine}",
                               format_func=lambda n: f"{n} — {next(r['address'] or '' for r in rows if r['precinct_no'] == n)}")
         detail = (_api_get("/precincts", {**params, "precinct_no": number}) or {}).get("rows", [])
         if detail:

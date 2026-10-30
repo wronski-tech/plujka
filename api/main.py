@@ -1315,6 +1315,29 @@ def precincts(
     return BrowseRowsResponse.model_validate({"rows": _mart_rows(sql, params)})
 
 
+# "Mój obwód": precincts of the latest parliamentary year whose published area names the street or village.
+PRECINCT_FIND_SQL = """
+SELECT 'sejm' AS election, year, 1 AS round, 'precinct' AS level, wojewodztwo, powiat, teryt_gmina, gmina,
+       precinct_no, address, precinct_type, boundary_description
+FROM mart.precincts
+WHERE teryt_gmina = %(teryt_gmina)s AND boundary_description ILIKE %(pattern)s
+  AND year = (SELECT max(year) FROM mart.precincts WHERE teryt_gmina = %(teryt_gmina)s AND boundary_description IS NOT NULL)
+ORDER BY precinct_no
+"""
+
+
+@app.get("/precincts/find", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])
+def find_precinct(
+    teryt_gmina: str = Query(pattern=r"^\d{6}$"),
+    street: str = Query(min_length=2, max_length=80, description="Street or village name, e.g. 'Bema'"),
+) -> BrowseRowsResponse:
+    """Precincts whose published area (``mart.precincts.boundary_description``, latest Sejm year from 2011)
+    names the street or village. House-number ranges stay in the text for the reader to check."""
+    escaped = street.strip().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    params = {"teryt_gmina": teryt_gmina, "pattern": f"%{escaped}%"}
+    return BrowseRowsResponse.model_validate({"rows": _mart_rows(PRECINCT_FIND_SQL, params)})
+
+
 @app.get("/results", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])
 def get_results(
     election: Literal[RESULT_ELECTIONS] = Query(description="Election kind"),  # type: ignore[valid-type]

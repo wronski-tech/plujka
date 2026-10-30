@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Precinct areas and „mój obwód”: `mart.precincts.boundary_description` keeps PKW's „Opis granic” (Sejm 2011, 2015, 2019, 2023); `GET /precincts/find?teryt_gmina=&street=` lists the precincts of the latest such year whose area names a street or village, and the „Wyniki obwodowe” panel shows them with the commission address and jumps to the precinct.
 - Sejm and Senate district borders on browse maps (2001 onwards): `GET /districts` gives each district's gminas from the precinct register, `map_units.district_borders` draws the edges between districts from the shared gmina boundaries (no geometry library); Wrocław, Łódź and Kraków, split between two Senate districts, get no inner line.
 - English UI labels: `?lang=en` (switch link in the header) translates panel titles, controls, buttons and election/level names (`streamlit_app/i18n.py`); answers, captions and data stay Polish; browse links keep the language.
 - Candidate votes per gmina: plain view `mart.v_candidate_gmina_votes` (Sejm, Senate, EP; in the prompt with those elections), `GET /persons/{id}/gminas` and a „Głosy w gminach” map with top gminas on the person card.

@@ -45,7 +45,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 27. Wybory uzupełniające do Senatu.
 - [ ] 28. Referenda lokalne i odwołania wójtów (jeśli dane są dostępne).
 - [x] 29. Granice okręgów sejmowych i senackich na mapie.
-- [ ] 30. Adresy obwodów i wyszukiwarka „mój obwód”.
+- [x] 30. Adresy obwodów i wyszukiwarka „mój obwód”.
 
 **API i otwarte dane**
 - [x] 31. Endpointy bez LLM: `/elections`, `/units/{teryt}`, `/results`, `/turnout`.

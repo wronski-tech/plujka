@@ -44,6 +44,7 @@ EN = {
     "Gmina": "Gmina",
     "Wybierz gminę": "Choose a gmina",
     "Obwód nr": "Precinct no.",
+    "Mój obwód: ulica lub miejscowość": "My precinct: street or village",
     "Nazwa jednostki": "Unit name",
     "Porównaj z jednostką": "Compare with a unit",
     "Druga jednostka": "Second unit",

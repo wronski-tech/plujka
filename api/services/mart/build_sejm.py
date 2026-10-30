@@ -235,6 +235,8 @@ def build_sejm(con: duckdb.DuckDBPyConnection, sources: YearSources) -> None:
         _build_2005_layout(con, sources)
     # Columns that only the 1991-1997 layout fills (pre-1999 gmina code, list blocs, national lists, age).
     con.execute("ALTER TABLE precincts ADD COLUMN IF NOT EXISTS teryt_gmina_pre1999 VARCHAR")
+    # Precinct areas are published from 2011 (CSV, 2015 and 2011 layouts).
+    con.execute("ALTER TABLE precincts ADD COLUMN IF NOT EXISTS boundary_description VARCHAR")
     con.execute("ALTER TABLE sejm_district_lists ADD COLUMN IF NOT EXISTS list_group INT")
     con.execute("ALTER TABLE sejm_candidates ADD COLUMN IF NOT EXISTS national_list_position INT")
     con.execute("ALTER TABLE sejm_candidates ADD COLUMN IF NOT EXISTS national_list_seat BOOLEAN DEFAULT false")
@@ -324,6 +326,7 @@ def _build_csv_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> N
                coalesce({r_type}, o."Typ obwodu") AS precinct_type,
                coalesce({r_area}, o."Typ obszaru") AS area_type,
                CAST(int_(o."Mieszkańcy") AS INT) AS residents,
+               o."Opis granic" AS boundary_description,
                o.{o_number} IS NOT NULL AS in_register
         FROM {results} r
         LEFT JOIN {register} o ON pkey(o.{o_teryt}, o.{o_number}) = pkey(r.{r_teryt}, r.{r_number})
@@ -472,6 +475,7 @@ def _build_excel_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) ->
                o."Typ" AS precinct_type,
                o."Teren" AS area_type,
                CAST(int_(o."Mieszk.") AS INT) AS residents,
+               o."Granice" AS boundary_description,
                o."Nr obw." IS NOT NULL AS in_register
         FROM src_sejm_results r
         LEFT JOIN {register} o ON pkey(o."TERYT", o."Nr obw.") = pkey(r.teryt, r.nr)
@@ -611,6 +615,7 @@ def _build_2011_layout(con: duckdb.DuckDBPyConnection, sources: YearSources) -> 
                o."Typ obwodu" AS precinct_type,
                CASE r."Teren obw." {area_cases} END AS area_type,
                CAST(NULL AS INT) AS residents,
+               o."Granice obwodu" AS boundary_description,
                o."Nr obwodu" IS NOT NULL AS in_register
         FROM {results} r
         LEFT JOIN {register} o ON pkey(o."Kod gm.", o."Nr obwodu") = pkey(r."TERYT", r."Nr obw.")

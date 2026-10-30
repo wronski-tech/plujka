@@ -163,6 +163,8 @@ COMMENT ON COLUMN mart.precincts.precinct_type IS 'Precinct type as published, e
 COMMENT ON COLUMN mart.precincts.area_type IS 'Urban/rural flag as published: ''miasto'' / ''wieś'' (2019+), ''gmina miejska'' / ''gmina wiejska'' / ''miasto w gminie miejsko-wiejskiej'' / ''obszar wiejski w gminie miejsko-wiejskiej'' (2001-2015; Warsaw districts ''dzielnica w m.st. Warszawa'' in 2005, 2007 and 2023); 1993: ''miasto'' / ''wieś''; NULL in 1991 and 1997.';
 COMMENT ON COLUMN mart.precincts.residents IS 'Number of residents of the precinct area (Mieszkańcy).';
 ALTER TABLE mart.precincts ADD COLUMN IF NOT EXISTS teryt_gmina_pre1999 TEXT;
+ALTER TABLE mart.precincts ADD COLUMN IF NOT EXISTS boundary_description TEXT;
+COMMENT ON COLUMN mart.precincts.boundary_description IS 'Area of the precinct as published by PKW (Opis granic): streets, often with house-number ranges and odd/even sides, or villages, e.g. ''Bolesławiec ulice: Agatowa, Bazaltowa, Ceramiczna 1 - 13, ...''. To find the precinct of an address, filter by teryt_gmina and boundary_description ILIKE ''%street%'' and check the house number in the text. Special precincts name their institution (hospital, care home, prison) and abroad precincts their country. 2011, 2015, 2019 and 2023 only; NULL in other years.';
 COMMENT ON COLUMN mart.precincts.teryt_gmina_pre1999 IS '1991, 1993 and 1997 only: 5-digit gmina code of the 1975-1998 division (first 2 digits = old voivodeship, odd numbers 01-97) as published by PKW; no official key maps it to post-1999 TERYT, so teryt_gmina and powiat are NULL then. NULL abroad, on ships and from 2001.';
 
 CREATE TABLE IF NOT EXISTS mart.sejm_districts (
