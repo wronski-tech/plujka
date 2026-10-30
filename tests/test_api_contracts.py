@@ -254,6 +254,15 @@ class TestBrowseEndpoints(unittest.TestCase):
         self.assertEqual([(r["relation"], [c["name"] for c in r["columns"]]) for r in relations], [("v_turnout", ["election", "level"])])
         self.assertIn("v_turnout", self.calls[-1]["relations"])
 
+    def test_known_gaps_and_sources_read_the_shipped_files(self) -> None:
+        gaps = self.client.get("/known-gaps").json()
+        self.assertIn("1991", gaps["markdown"])
+        self.assertNotIn("### Adding an election year", gaps["markdown"])
+        self.assertTrue(gaps["caveats"])
+        files = self.client.get("/sources", params={"limit": 3}).json()
+        self.assertEqual(len(files), 3)
+        self.assertGreaterEqual(files[0]["last_modified"], files[-1]["last_modified"])
+
     def test_unknown_unit_and_unsupported_election(self) -> None:
         self.assertEqual(self.client.get("/units/999999").status_code, 404)
         self.assertEqual(self.client.get("/results", params={"election": "senat", "year": 2023}).status_code, 422)

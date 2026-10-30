@@ -68,10 +68,10 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 46. Angielska wersja interfejsu (etykiety).
 
 **Jakość danych dla użytkownika**
-- [ ] 47. Strona „Znane luki w danych” z `docs/MART.md` i `CAVEATS`.
+- [x] 47. Strona „Znane luki w danych” z `docs/MART.md` i `CAVEATS`.
 - [ ] 48. Link do pliku źródłowego KBW/PKW przy każdym wyniku.
 - [ ] 49. Raport zgodności z PKW dla każdych wyborów.
-- [ ] 50. Strona „Zmiany w danych” z `source_manifest.json`.
+- [x] 50. Strona „Zmiany w danych” z `source_manifest.json`.
 
 ## Etap 2 — funkcje z kluczem API (LLM)
 

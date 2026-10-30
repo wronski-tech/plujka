@@ -1206,6 +1206,31 @@ def _data_dictionary() -> None:
         st.caption("Opisy po angielsku, te same, które czyta model piszący SQL.")
 
 
+@st.fragment
+def _gaps_and_sources() -> None:
+    """"Znane luki i źródła": documented data gaps, answer caveats and the source files by republication date."""
+    with st.expander("⚠️ Znane luki w danych i pliki źródłowe", expanded=False):
+        gaps_tab, sources_tab = st.tabs(["Znane luki", "Pliki źródłowe"])
+        with gaps_tab:
+            gaps = _api_get("/known-gaps") or {}
+            if gaps.get("caveats"):
+                st.markdown("**Uwagi dodawane do odpowiedzi, gdy luka ich dotyczy**")
+                st.markdown("\n".join(f"- {c}" for c in gaps["caveats"]))
+            if gaps.get("markdown"):
+                st.markdown("**Szczegóły (docs/MART.md, po angielsku)**")
+                st.markdown(gaps["markdown"])
+        with sources_tab:
+            files = _api_get("/sources", {"limit": 200}) or []
+            if files:
+                table = pd.DataFrame(files)
+                table["last_modified"] = table["last_modified"].str[:10]
+                st.dataframe(table[["last_modified", "path", "bytes", "url"]].rename(columns={
+                    "last_modified": "opublikowano", "path": "plik", "bytes": "bajty", "url": "adres"}),
+                    hide_index=True, use_container_width=True, column_config={"adres": st.column_config.LinkColumn("adres")})
+                st.caption("Pliki KBW/PKW, z których zbudowano bazę, od ostatnio (ponownie) opublikowanych. "
+                           "Ponowną publikację wykrywa scripts/check_sources.py.")
+
+
 @st.fragment(run_every=_READINESS_POLL_INTERVAL)
 def _api_data_readiness_banner() -> None:
     """Api data readiness banner."""
@@ -1305,6 +1330,7 @@ _elected()
 _rankings()
 _data_coverage()
 _data_dictionary()
+_gaps_and_sources()
 
 if submitted:
     if not q_val:

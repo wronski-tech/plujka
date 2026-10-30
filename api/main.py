@@ -9,7 +9,7 @@ import re
 import secrets
 import time
 from contextlib import asynccontextmanager
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from decimal import Decimal
 from email.utils import parsedate_to_datetime
 from typing import Any, Literal
@@ -222,6 +222,7 @@ SELECT max(loaded_at) AS mart_loaded_at, count(*) AS elections, max(election_dat
 FROM mart.elections
 """
 SOURCE_MANIFEST = pathlib.Path(__file__).resolve().parents[1] / "data" / "source_manifest.json"
+MART_DOC = pathlib.Path(__file__).resolve().parents[1] / "docs" / "MART.md"
 _UNIT_FILTER = """
   AND level = %(level)s
   AND (%(wojewodztwo)s::text IS NULL OR wojewodztwo = %(wojewodztwo)s)
@@ -984,6 +985,37 @@ def data_dictionary() -> list[DictionaryRelation]:
         rel = relations.setdefault(r["relation"], {"relation": r["relation"], "kind": r["kind"], "comment": r["comment"], "columns": []})
         rel["columns"].append({"name": r["column_name"], "type": r["column_type"], "comment": r["column_comment"]})
     return [DictionaryRelation.model_validate(r) for r in relations.values()]
+
+
+class KnownGaps(BaseModel):
+    markdown: str = Field(description="The 'Known gaps in the source data' section of docs/MART.md (English)")
+    caveats: list[str] = Field(description="Polish notes added to answers when a gap applies (answer.CAVEATS)")
+
+
+class SourceFile(BaseModel):
+    path: str
+    url: str
+    bytes: int | None
+    last_modified: datetime | None
+
+
+@app.get("/known-gaps", response_model=KnownGaps, tags=["browse"], dependencies=[Depends(require_api_key)])
+def known_gaps() -> KnownGaps:
+    """Documented gaps of the source data and the caveats answers carry when one applies."""
+    text = MART_DOC.read_text(encoding="utf-8") if MART_DOC.exists() else ""
+    section = re.search(r"^### Known gaps in the source data\n(.*?)(?=^#{2,3} )", text, re.S | re.M)
+    return KnownGaps(markdown=section.group(1).strip() if section else "", caveats=[c for c, _ in answer.CAVEATS])
+
+
+@app.get("/sources", response_model=list[SourceFile], tags=["browse"], dependencies=[Depends(require_api_key)])
+def sources(limit: int = Query(50, ge=1, le=1000)) -> list[SourceFile]:
+    """KBW/PKW source files of this release (data/source_manifest.json), most recently republished first."""
+    files = json.loads(SOURCE_MANIFEST.read_text(encoding="utf-8")) if SOURCE_MANIFEST.exists() else {}
+    rows = [{"path": path, "url": f["url"], "bytes": f.get("bytes"),
+             "last_modified": parsedate_to_datetime(f["last_modified"]) if f.get("last_modified") else None}
+            for path, f in files.items()]
+    rows.sort(key=lambda r: r["last_modified"] or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
+    return [SourceFile.model_validate(r) for r in rows[:limit]]
 
 
 class DataVersion(BaseModel):
