@@ -10,8 +10,8 @@ Cel: aplikacja jest użyteczna bez LLM (także przy limicie tokenów lub awarii 
 funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 
 **Eksploratory wyników**
-- [ ] 1. Tryb „Przeglądaj”: wybór wyborów, roku, poziomu i jednostki → tabela, mapa, wykres bez pytania.
-- [ ] 2. Karta gminy / powiatu / województwa: wszystkie wybory, frekwencja w czasie, zwycięzcy, GUS.
+- [x] 1. Tryb „Przeglądaj”: wybór wyborów, roku, poziomu i jednostki → tabela, mapa, wykres bez pytania.
+- [x] 2. Karta gminy / powiatu / województwa: wszystkie wybory, frekwencja w czasie, zwycięzcy, GUS.
 - [ ] 3. Porównanie dwóch jednostek obok siebie.
 - [ ] 4. Porównanie dwóch wyborów dla jednej jednostki (`v_party_change`).
 - [ ] 5. Ranking jednostek według miary, z filtrem województwa.
@@ -57,7 +57,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 37. Słownik danych generowany z `COMMENT ON`.
 
 **UI i dostępność**
-- [ ] 38. Panel „Co jest w bazie”.
+- [x] 38. Panel „Co jest w bazie”.
 - [ ] 39. Gotowe zestawienia dla każdej rodziny wyborów, działające bez LLM.
 - [ ] 40. Tryb ciemny i palety map przyjazne daltonistom.
 - [ ] 41. Dostępność: klawiatura, kontrast, opisy wykresów.

@@ -8,6 +8,7 @@ import math
 import os
 import re
 import unicodedata
+from typing import Any
 from datetime import date, timedelta
 
 import altair as alt
@@ -474,12 +475,10 @@ def _fetch_person(person_id: int) -> dict | None:
     return response.json()
 
 
-def _search_persons(name: str) -> list[dict] | None:
-    """``GET /persons?name=...``; shows a message and returns None on failure."""
+def _api_get(path: str, params: dict | None = None, invalid: str = "Nieprawidłowe parametry.") -> Any:
+    """GET an API endpoint; shows a message and returns None on failure (``invalid`` for HTTP 422)."""
     try:
-        response = requests.get(
-            f"{API_URL}/persons", params={"name": name, "limit": PERSON_SEARCH_LIMIT}, headers=API_HEADERS, timeout=30
-        )
+        response = requests.get(f"{API_URL}{path}", params=params, headers=API_HEADERS, timeout=60)
     except requests.RequestException as error:
         st.error(f"Coś poszło nie tak z API: {error}")
         return None
@@ -490,12 +489,21 @@ def _search_persons(name: str) -> list[dict] | None:
         st.warning("Baza wyników jest chwilowo niedostępna. Spróbuj ponownie za chwilę.")
         return None
     if response.status_code == 422:
-        st.info("Wpisz imię lub nazwisko (co najmniej 2 litery, bez cyfr).")
+        st.info(invalid)
+        return None
+    if response.status_code == 404:
         return None
     if not response.ok:
         st.error(f"Coś poszło nie tak z API: HTTP {response.status_code}")
         return None
-    return response.json().get("persons") or []
+    return response.json()
+
+
+def _search_persons(name: str) -> list[dict] | None:
+    """``GET /persons?name=...``; shows a message and returns None on failure."""
+    data = _api_get("/persons", {"name": name, "limit": PERSON_SEARCH_LIMIT},
+                    invalid="Wpisz imię lub nazwisko (co najmniej 2 litery, bez cyfr).")
+    return None if data is None else data.get("persons") or []
 
 
 def _render_person_timeline(person_id: int, view_key: str = "person_view") -> None:
@@ -680,6 +688,145 @@ st.markdown(
 )
 
 
+ELECTION_LABELS = {
+    "sejm": "Sejm", "senat": "Senat", "prezydent": "Prezydent", "pe": "Parlament Europejski",
+    "referendum": "Referendum", "sejmik": "Sejmiki", "wbp": "Wójtowie / burmistrzowie", "rada": "Rady",
+}
+RESULT_ELECTIONS = ("sejm", "sejmik", "pe", "prezydent")
+LEVEL_LABELS = {"country": "Kraj", "wojewodztwo": "Województwa", "powiat": "Powiaty", "gmina": "Gminy"}
+UNIT_NAME = {"wojewodztwo": "wojewodztwo", "powiat": "powiat", "gmina": "gmina"}
+UNIT_SINGULAR = {"wojewodztwo": "województwo", "powiat": "powiat", "gmina": "gmina"}
+UNIT_CODE = {"powiat": "teryt_powiat", "gmina": "teryt_gmina"}
+
+
+def _unit_rows(rows: list[dict], level: str, value: str) -> list[dict]:
+    """Rows for the chart and map: unit name, its code and one value (the map reads the code column)."""
+    keep = [UNIT_NAME[level]] + ([UNIT_CODE[level]] if level in UNIT_CODE else []) + ["year", value]
+    return [{k: r.get(k) for k in keep} for r in rows]
+
+
+@st.fragment
+def _browse() -> None:
+    """"Przeglądaj wyniki": turnout or results of one election per unit, with fixed SQL (no LLM)."""
+    with st.expander("📊 Przeglądaj wyniki (bez pytania)", expanded=False):
+        elections = _api_get("/elections")
+        if not elections:
+            st.caption("Brak załadowanych wyborów.")
+            return
+        kinds = [k for k in ELECTION_LABELS if any(e["election"] == k for e in elections) and k != "rada"]
+        c1, c2, c3 = st.columns(3)
+        kind = c1.selectbox("Wybory", kinds, format_func=ELECTION_LABELS.get, key="browse_kind")
+        years = sorted({e["year"] for e in elections if e["election"] == kind}, reverse=True)
+        year = c2.selectbox("Rok", years, key="browse_year")
+        rounds = sorted({e["round"] for e in elections if e["election"] == kind and e["year"] == year})
+        rnd = c3.selectbox("Tura", rounds, key="browse_round") if len(rounds) > 1 else rounds[0]
+        c4, c5, c6 = st.columns(3)
+        views = ["Wyniki", "Frekwencja"] if kind in RESULT_ELECTIONS else ["Frekwencja"]
+        view = c4.radio("Pokaż", views, horizontal=True, key="browse_view")
+        level = c5.selectbox("Poziom", list(LEVEL_LABELS), index=1, format_func=LEVEL_LABELS.get, key="browse_level")
+        if year < 1999 and level != "country":
+            st.info("Wyniki sprzed 1999 r. są w bazie tylko dla całego kraju (dawny podział terytorialny).")
+            level = "country"
+        voivodeship = None
+        if level in ("powiat", "gmina"):
+            voivodeship = c6.text_input("Województwo (opcjonalnie)", placeholder="np. mazowieckie", key="browse_woj")
+        params = {"election": kind, "year": year, "round": rnd, "level": level,
+                  "wojewodztwo": (voivodeship or "").strip().lower() or None}
+        if view == "Frekwencja":
+            data = _api_get("/turnout", params)
+            rows = (data or {}).get("rows") or []
+            if not rows:
+                st.caption("Brak danych dla tego wyboru.")
+                return
+            value = "turnout_pct"
+            shown = rows if level == "country" else _unit_rows(rows, level, value)
+        else:
+            data = _api_get("/results", params)
+            rows = (data or {}).get("rows") or []
+            if not rows:
+                st.caption("Brak danych dla tego wyboru.")
+                return
+            names = list(dict.fromkeys(r["name"] for r in rows))
+            value = "pct"
+            if level == "country":
+                shown = [{"name": r["name"], "votes": r["votes"], "pct": r["pct"]} for r in rows]
+            else:
+                name = st.selectbox("Komitet / kandydat na mapie", names, key="browse_name")
+                shown = _unit_rows([r for r in rows if r["name"] == name], level, value)
+        # The year column stays in the rows for the map (former extents by year), not in the table.
+        st.dataframe(pd.DataFrame(shown).drop(columns=["year"], errors="ignore"), hide_index=True, use_container_width=True)
+        _csv_download(rows, f"{kind}_{year}_{view}_{level}", key="csv_browse")
+        _render_chart(shown)
+        _render_map(shown)
+
+
+@st.fragment
+def _unit_card() -> None:
+    """"Karta jednostki": one gmina, powiat or voivodeship across every election, with GUS statistics."""
+    with st.expander("🏛️ Karta gminy / powiatu / województwa", expanded=False):
+        name = st.text_input("Nazwa jednostki", placeholder="np. Wieliczka · krakowski · śląskie", key="unit_search").strip()
+        if len(name) < 2:
+            st.caption("Wpisz początek nazwy gminy, powiatu lub województwa.")
+            return
+        hits = _api_get("/units", {"name": name}) or []
+        if not hits:
+            st.caption(f"Nie znaleziono jednostki „{name}”.")
+            return
+        hit = st.selectbox(
+            "Jednostka", hits, key="unit_pick",
+            format_func=lambda h: f"{h['name']} ({UNIT_SINGULAR[h['level']]}{', ' + h['detail'] if h.get('detail') else ''})",
+        )
+        card = _api_get(f"/units/{hit['unit']}")
+        if not card:
+            st.caption("Brak wyników dla tej jednostki (np. jednostka spoza okresu w bazie).")
+            return
+        st.subheader(card["name"] or hit["name"])
+        gus = card.get("gus")
+        if gus:
+            m1, m2, m3 = st.columns(3)
+            m1.metric(f"Ludność ({gus['year']})", f"{gus['population']:,}".replace(",", " ") if gus.get("population") else "—")
+            m2.metric("Powierzchnia", f"{gus['area_km2']} km²" if gus.get("area_km2") else "—")
+            share = gus.get("unemployed_share_working_age")
+            m3.metric("Bezrobotni (% w wieku prod.)", f"{share}%" if share is not None else "—")
+            st.caption("Źródło: GUS, Bank Danych Lokalnych (CC BY 4.0).")
+        turnout = pd.DataFrame(card["turnout"])
+        if not turnout.empty:
+            turnout["wybory"] = turnout["election"].map(ELECTION_LABELS) + turnout["round"].map(lambda r: "" if r == 1 else " (II tura)")
+            chart = (
+                alt.Chart(turnout)
+                .mark_line(point=True)
+                .encode(x=alt.X("year:Q", title=None, axis=alt.Axis(format="d"), scale=alt.Scale(zero=False)), y=alt.Y("turnout_pct:Q", title="frekwencja %", scale=alt.Scale(zero=False)),
+                        color=alt.Color("wybory:N", title=None, legend=alt.Legend(labelLimit=300)), tooltip=["wybory", "year", "turnout_pct"])
+                .properties(height=280, padding={"left": 5, "right": 5, "top": 5, "bottom": 25})
+            )
+            st.altair_chart(chart, use_container_width=True)
+        winners = pd.DataFrame(card["winners"])
+        if not winners.empty:
+            winners = winners.sort_values(["year", "election", "round"], ascending=[False, True, True])
+            winners["election"] = winners["election"].map(ELECTION_LABELS)
+            winners["year"] = winners["year"].astype(str)
+            st.markdown("**Zwycięzcy**")
+            st.dataframe(winners.rename(columns={"election": "wybory", "year": "rok", "round": "tura", "name": "komitet / kandydat",
+                                                 "votes": "głosy", "pct": "%"}), hide_index=True, use_container_width=True)
+
+
+@st.fragment
+def _data_coverage() -> None:
+    """"Co jest w bazie": loaded elections and years (``GET /elections``)."""
+    with st.expander("ℹ️ Co jest w bazie", expanded=False):
+        elections = _api_get("/elections") or []
+        years: dict[str, list[int]] = {}
+        for e in elections:
+            years.setdefault(e["election"], [])
+            if e["year"] not in years[e["election"]]:
+                years[e["election"]].append(e["year"])
+        st.dataframe(
+            pd.DataFrame([{"wybory": ELECTION_LABELS.get(k, k), "lata": ", ".join(map(str, v))} for k, v in years.items()]),
+            hide_index=True, use_container_width=True,
+        )
+        st.caption("Dane PKW/KBW; statystyki GUS dla gmin z lat 1995–2024. Znane luki: docs/MART.md.")
+
+
 @st.fragment(run_every=_READINESS_POLL_INTERVAL)
 def _api_data_readiness_banner() -> None:
     """Api data readiness banner."""
@@ -771,6 +918,9 @@ with st.container(border=True):
     submitted = st.button("Wyślij zapytanie", type="primary", use_container_width=True)
 
 _person_search()
+_browse()
+_unit_card()
+_data_coverage()
 
 if submitted:
     if not q_val:
