@@ -851,9 +851,20 @@ def _election_card(kind: str, year: int, rnd: int) -> None:
     if kind in RESULT_ELECTIONS:
         _package_download(kind, year)
     sources = _source_files_markdown([(kind, year)])
+    checks = _api_get(f"/checks/{kind}/{year}") or []
+    left, right, _ = st.columns([1, 1, 2])
     if sources:
-        with st.popover("Pliki źródłowe KBW/PKW"):
+        with left.popover("Pliki źródłowe KBW/PKW", use_container_width=True):
             st.markdown(sources)
+    if checks:
+        with right.popover(f"Zgodność z PKW: {len(checks)} kontroli ✓", use_container_width=True):
+            st.caption(
+                f"Przed wczytaniem {checks[0]['checked_at'][:10]} każda kontrola porównała dane z oficjalnymi "
+                "sumami PKW/KBW i nie znalazła ani jednego niezgodnego wiersza (inaczej wybory nie trafiłyby "
+                "do bazy). Nazwy kontroli pochodzą z kodu budowania, po angielsku. Wyjątki opisuje panel "
+                "„Znane luki w danych”."
+            )
+            st.markdown("\n".join(f"- {c['label']}" for c in checks))
 
 
 SOURCE_LINKS_SHOWN = 8

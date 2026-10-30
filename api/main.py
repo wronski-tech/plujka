@@ -1064,6 +1064,31 @@ def sources(
     return [SourceFile.model_validate(r) for r in rows[:limit]]
 
 
+CHECKS_SQL = """
+SELECT family, year, check_no, label, failing_rows, checked_at FROM mart.build_checks
+WHERE %(election)s = ANY(elections) AND year = %(year)s ORDER BY check_no
+"""
+
+
+class BuildCheck(BaseModel):
+    family: str
+    year: int
+    check_no: int
+    label: str = Field(description="What the check verifies against the official totals (English)")
+    failing_rows: int
+    checked_at: datetime
+
+
+@app.get("/checks/{election}/{year}", response_model=list[BuildCheck], tags=["browse"], dependencies=[Depends(require_api_key)])
+def build_checks(
+    election: Literal[tuple(SOURCE_DIRS)] = Path(),  # type: ignore[valid-type]
+    year: int = Path(ge=1989, le=2100),
+) -> list[BuildCheck]:
+    """Consistency checks with the official PKW/KBW totals the build ran before loading this election
+    (empty when it is not loaded or was loaded before checks were recorded)."""
+    return [BuildCheck.model_validate(r) for r in _mart_rows(CHECKS_SQL, {"election": election, "year": year})]
+
+
 class DataVersion(BaseModel):
     mart_loaded_at: datetime | None = Field(description="When the newest election was loaded into the mart")
     elections: int = Field(description="Elections and rounds in the mart")

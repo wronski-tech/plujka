@@ -373,6 +373,22 @@ CREATE TABLE IF NOT EXISTS mart.elections (
 COMMENT ON TABLE mart.elections IS 'Elections loaded into the mart. election: sejm, senat, prezydent, pe (European Parliament), referendum, sejmik (voivodeship assembly), wbp (wójt/burmistrz/prezydent miasta = mayor), rada (councils of gminas, powiats and Warsaw districts). round is 1, or 2 for run-offs (prezydent, wbp).';
 COMMENT ON COLUMN mart.elections.loaded_at IS 'When the election was last loaded by scripts/build_mart.py.';
 
+-- Consistency checks a family-year passed when it was built (not queryable by generated SQL).
+CREATE TABLE IF NOT EXISTS mart.build_checks (
+    family TEXT NOT NULL,
+    year INT NOT NULL,
+    elections TEXT[] NOT NULL,
+    check_no INT NOT NULL,
+    label TEXT NOT NULL,
+    failing_rows BIGINT NOT NULL,
+    checked_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (family, year, check_no)
+);
+COMMENT ON TABLE mart.build_checks IS 'Consistency checks against the official PKW/KBW totals that scripts/build_mart.py ran for one family-year (parliament, prezydent, pe, referendum, samorzad, gus) before loading it; a family-year is loaded only when every check returns 0 failing rows.';
+COMMENT ON COLUMN mart.build_checks.elections IS 'Values of mart.elections.election the family-year loads (e.g. sejm and senat for parliament).';
+COMMENT ON COLUMN mart.build_checks.label IS 'What the check verifies, in English (e.g. district lists whose precinct votes differ from the official total).';
+COMMENT ON COLUMN mart.build_checks.failing_rows IS 'Rows that broke the check; always 0 for a loaded family-year.';
+
 -- President ------------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS mart.prezydent_candidates (
     year INT NOT NULL,

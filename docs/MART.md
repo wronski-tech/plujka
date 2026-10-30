@@ -275,7 +275,9 @@ mirror is not.
 
 ### Consistency checks
 
-A family-year is not loaded if any check fails. Among them:
+A family-year is not loaded if any check fails. The checks it passed are stored in
+`mart.build_checks` (label and failing rows per family-year; `GET /checks/{election}/{year}`, the
+„Zgodność z PKW” button on the election card). Among them:
 
 - seats: 460 Sejm, 100 Senate, 552 sejmik councillors, EP seats per district; elected counts match;
 - every precinct in a result file exists in the precinct register or protocol file;

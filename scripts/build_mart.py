@@ -59,6 +59,7 @@ from api.services.mart.build_common import (  # noqa: E402
     YearSources,
     load_tables,
     open_duckdb,
+    record_checks,
     record_elections,
 )
 from api.services.mart.build_sejm import available_layout, build_sejm  # noqa: E402
@@ -155,6 +156,7 @@ def build_one(roots: list[Path], name: str, family: Family, year: int, ensure: b
                 schema.ensure_schema(pg)
             load_tables(pg, con, year, family.tables)
             record_elections(pg, family.kinds, year, elections)
+            record_checks(pg, con, name, family.kinds, year)
         log.info("%s %s built in %.1fs", name, year, time.monotonic() - started)
         return True
     finally:

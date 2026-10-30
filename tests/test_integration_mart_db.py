@@ -78,6 +78,27 @@ class TestPersonEndpointsDb(unittest.TestCase):
 
 
 @unittest.skipUnless(_RUN, "Set PLUJKA_RUN_DB_TESTS=1 to run DB integration tests")
+class TestBuildChecksDb(unittest.TestCase):
+    """Every loaded election keeps the consistency checks it passed (``GET /checks``)."""
+
+    def test_every_loaded_election_has_passed_checks(self) -> None:
+        from fastapi.testclient import TestClient
+
+        from api.main import app
+        from api.services.mart.safe_sql import run_readonly
+
+        elections = run_readonly("SELECT DISTINCT election, year FROM mart.elections ORDER BY 1, 2")
+        if not elections:
+            self.skipTest("mart has no elections; build it first")
+        client = TestClient(app)
+        for e in elections:
+            with self.subTest(**e):
+                checks = client.get(f"/checks/{e['election']}/{e['year']}").json()
+                self.assertGreater(len(checks), 0)
+                self.assertEqual({c["failing_rows"] for c in checks}, {0})
+
+
+@unittest.skipUnless(_RUN, "Set PLUJKA_RUN_DB_TESTS=1 to run DB integration tests")
 class TestPersonLinking(unittest.TestCase):
     CANDIDATE_TABLES = ("sejm_candidates", "senat_candidates", "prezydent_candidates", "pe_candidates",
                         "sejmik_candidates", "wbp_candidates", "rada_candidates")

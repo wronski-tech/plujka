@@ -618,9 +618,11 @@ def district_files(paths: list[str], pattern: str) -> dict[int, str]:
 def run_checks(con: duckdb.DuckDBPyConnection, year: int, checks: dict[str, str]) -> None:
     """Run ``SELECT count(*)`` checks; every one must return 0 or the build fails."""
     failures = []
+    con.execute("CREATE TEMP TABLE IF NOT EXISTS check_log (label VARCHAR, failing_rows BIGINT)")
     for label, query in checks.items():
         bad = con.execute(query).fetchone()[0]
         log.info("year %s check %-70s %s", year, label, bad)
+        con.execute("INSERT INTO check_log VALUES (?, ?)", [label, bad])
         if bad:
             failures.append(f"{label} ({bad})")
     if failures:
@@ -668,6 +670,18 @@ class Election:
     round: int
     election_date: str
     description: str
+
+
+def record_checks(pg: psycopg.Connection, con: duckdb.DuckDBPyConnection, family: str, kinds: tuple[str, ...], year: int) -> None:
+    """Replace ``mart.build_checks`` of one family-year with the checks ``run_checks`` passed (caller's transaction)."""
+    pg.execute("DELETE FROM mart.build_checks WHERE family = %s AND year = %s", (family, year))
+    rows = con.execute("SELECT label, failing_rows FROM check_log").fetchall() if con.execute(
+        "SELECT count(*) FROM duckdb_tables() WHERE table_name = 'check_log' AND temporary").fetchone()[0] else []
+    with pg.cursor() as cur:
+        cur.executemany(
+            "INSERT INTO mart.build_checks (family, year, elections, check_no, label, failing_rows) VALUES (%s, %s, %s, %s, %s, %s)",
+            [(family, year, list(kinds), n, label, bad) for n, (label, bad) in enumerate(rows, 1)],
+        )
 
 
 def record_elections(pg: psycopg.Connection, families: tuple[str, ...], year: int, elections: list[Election]) -> None:

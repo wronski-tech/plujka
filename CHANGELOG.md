@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- PKW compliance report: the build stores every consistency check a family-year passed in `mart.build_checks`; `GET /checks/{election}/{year}` and the „Zgodność z PKW” button on the election card list them.
 - Source files per result: `GET /sources?election=&year=` lists the KBW files an election was built from (one chamber's files in the shared Sejm/Senate directory, plus the PKW bundle page for 2019/2023); the election card and the answer's SQL panel link them.
 - UI: answers with one row per year (and optionally per party) draw a line chart over time; the person card has a „Zgłoś błędne połączenie osoby” form (`POST /feedback/person`, appended to `feedback.jsonl`).
 - Exports: every table also downloads as XLSX and Parquet; `GET /packages/{election}/{year}` and an election-card button give a zip with turnout and results at every level and round (plain CSV) and a README with the column dictionary.
