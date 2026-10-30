@@ -1,0 +1,29 @@
+# TLS (Let's Encrypt) for {$DOMAIN}: /api/* goes to FastAPI (uvicorn --root-path /api), the rest to
+# Streamlit (websockets are proxied as is).
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	handle_path /api/* {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		reverse_proxy streamlit:8501
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}

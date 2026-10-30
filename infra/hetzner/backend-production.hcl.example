@@ -1,0 +1,4 @@
+bucket    = "plujka-terraform-state"
+key       = "production/terraform.tfstate"
+region    = "eu-central"
+endpoints = { s3 = "https://fsn1.your-objectstorage.com" }

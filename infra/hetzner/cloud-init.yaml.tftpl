@@ -1,0 +1,76 @@
+#cloud-config
+# First boot of the Plujka server: Docker, the data volume on /mnt/data, the repository in
+# /srv/plujka and a systemd unit that starts the stack once /srv/plujka/.env exists (secrets are
+# copied by the operator, never stored in Terraform or Git). See infra/hetzner/README.md.
+disable_root: true
+ssh_pwauth: false
+
+# Created before the users, so deploy can join it before docker.io is installed.
+groups:
+  - docker
+
+users:
+  - name: deploy
+    groups: [docker, sudo]
+    shell: /bin/bash
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+
+package_update: true
+package_upgrade: true
+packages:
+  - docker.io
+  - docker-compose-v2
+  - git
+  - jq
+  - fail2ban
+  - unattended-upgrades
+
+write_files:
+  - path: /etc/sysctl.d/90-opensearch.conf
+    content: |
+      vm.max_map_count=262144
+  - path: /etc/systemd/system/plujka.service
+    content: |
+      [Unit]
+      Description=Plujka (docker compose)
+      After=docker.service mnt-data.mount
+      Requires=docker.service mnt-data.mount
+      ConditionPathExists=/srv/plujka/.env
+
+      [Service]
+      Type=oneshot
+      RemainAfterExit=true
+      WorkingDirectory=/srv/plujka
+      ExecStart=/usr/bin/docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml up -d --build --remove-orphans
+      ExecStop=/usr/bin/docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml stop
+      TimeoutStartSec=1800
+
+      [Install]
+      WantedBy=multi-user.target
+  - path: /etc/systemd/system/mnt-data.mount
+    content: |
+      [Unit]
+      Description=Plujka data volume
+
+      [Mount]
+      What=/dev/disk/by-id/scsi-0HC_Volume_${volume_id}
+      Where=/mnt/data
+      Type=ext4
+      Options=defaults,discard
+
+      [Install]
+      WantedBy=multi-user.target
+
+runcmd:
+  - sysctl --system
+  - systemctl daemon-reload
+  - systemctl enable --now mnt-data.mount
+  - mkdir -p /mnt/data/postgres /mnt/data/opensearch /mnt/data/feedback /mnt/data/caddy /mnt/data/backups
+  - chown 1000:1000 /mnt/data/opensearch
+  - git clone --branch ${git_ref} ${repo_url} /srv/plujka
+  - printf 'DOMAIN=%s\nACME_EMAIL=%s\n' '${domain}' '${acme_email}' > /srv/plujka/deploy/caddy.env
+  - chown -R deploy:deploy /srv/plujka
+  - systemctl enable plujka.service
+  - systemctl enable --now unattended-upgrades fail2ban

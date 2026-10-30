@@ -45,3 +45,10 @@ data/kbw_mirror/
 # DuckDB spill directory of the in-memory mart builds
 .tmp/
 backups/
+
+# Terraform (infra/hetzner): local state, plugins and real variable files
+infra/**/.terraform/
+infra/**/*.tfstate*
+infra/**/*.tfvars
+infra/**/backend-*.hcl
+deploy/caddy.env

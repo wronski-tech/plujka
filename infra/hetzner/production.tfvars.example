@@ -1,0 +1,9 @@
+environment    = "production"
+server_type    = "cx43"
+volume_size_gb = 100
+domain         = "plujka.example.org"
+acme_email     = "ops@example.org"
+ssh_public_key = "ssh-ed25519 AAAA... operator"
+admin_cidrs    = ["203.0.113.10/32"]
+git_ref        = "main"
+# storage_box_password via TF_VAR_storage_box_password, not in this file

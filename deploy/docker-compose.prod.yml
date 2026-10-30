@@ -1,0 +1,60 @@
+# Production override (Hetzner server, see infra/hetzner): data on the volume /mnt/data, no published
+# Paths are relative to the repository root (the project directory of the first compose file).
+# ports except Caddy, owner password from .env, uvicorn behind the proxy under /api.
+#   docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml up -d
+services:
+  postgres:
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    ports: !reset []
+    volumes: !override
+      - /mnt/data/postgres:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  opensearch:
+    ports: !reset []
+    volumes: !override
+      - /mnt/data/opensearch:/usr/share/opensearch/data
+    restart: unless-stopped
+
+  api:
+    environment:
+      DATABASE_URL: postgresql://plujka:${POSTGRES_PASSWORD}@postgres:5432/plujka
+      MART_DATABASE_URL: postgresql://plujka_mart_reader:${MART_READER_PASSWORD:?set MART_READER_PASSWORD in .env}@postgres:5432/plujka
+      PLUJKA_ENV: production
+      FEEDBACK_JSONL_PATH: /app/feedback/feedback.jsonl
+    # Client addresses from Caddy's X-Forwarded-For (the API is reachable only inside the compose network).
+    command: ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000", "--root-path", "/api",
+              "--proxy-headers", "--forwarded-allow-ips", "*", "--workers", "2"]
+    ports: !reset []
+    volumes: !override
+      - /mnt/data/feedback:/app/feedback
+    restart: unless-stopped
+
+  streamlit:
+    ports: !reset []
+    restart: unless-stopped
+
+  loader:
+    environment:
+      DATABASE_URL: postgresql://plujka:${POSTGRES_PASSWORD}@postgres:5432/plujka
+
+  redis:
+    profiles: !reset []
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    container_name: plujka-caddy
+    env_file: deploy/caddy.env
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - /mnt/data/caddy:/data
+    depends_on:
+      - api
+      - streamlit
+    restart: unless-stopped

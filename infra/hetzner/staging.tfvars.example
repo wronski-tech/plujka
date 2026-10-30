@@ -1,0 +1,8 @@
+environment      = "staging"
+server_type      = "cx33"
+volume_size_gb   = 60
+domain           = "staging.plujka.example.org"
+acme_email       = "ops@example.org"
+ssh_public_key   = "ssh-ed25519 AAAA... operator"
+admin_cidrs      = ["203.0.113.10/32"]
+storage_box_type = "" # staging restores from production backups, keeps none of its own
