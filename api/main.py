@@ -51,14 +51,16 @@ FROM mart.persons WHERE person_id = %(person_id)s
 """
 # Councils are one election ('rada') in mart.elections; the date orders rounds and same-year elections.
 PERSON_CANDIDACIES_SQL = """
-SELECT h.year, e.election_date, h.chamber, h.round, h.district_no, h.area, h.committee_name, h.list_no,
+SELECT h.year, coalesce(e.election_date, b.election_date) AS election_date, h.chamber, h.round, h.district_no, h.area, h.committee_name, h.list_no,
        h.list_position, h.votes, h.elected, h.age
 FROM mart.v_person_history h
 LEFT JOIN mart.elections e
   ON e.election = CASE WHEN left(h.chamber, 5) = 'rada_' THEN 'rada' ELSE h.chamber END
  AND e.year = h.year AND e.round = h.round
+LEFT JOIN (SELECT DISTINCT year, district_no, election_date FROM mart.senat_byelections) b
+  ON h.chamber = 'senat_uzup' AND b.year = h.year AND b.district_no = h.district_no
 WHERE h.person_id = %(person_id)s
-ORDER BY e.election_date NULLS LAST, h.year, h.chamber, h.round, h.district_no, h.area
+ORDER BY 2 NULLS LAST, h.year, h.chamber, h.round, h.district_no, h.area
 """
 # Every word of the query must start a word of the name, and one of them must start the surname.
 # Searches entity_lexicon: national persons plus elected mayors and sejmik councillors among local persons.
@@ -573,7 +575,7 @@ class PersonCandidacy(BaseModel):
 
     year: int
     election_date: str | None = Field(default=None, description="ISO date of the election round (mart.elections)")
-    chamber: str = Field(description="sejm, senat, prezydent, pe, sejmik, wbp (mayor), rada_gminy, rada_powiatu, rada_dzielnicy")
+    chamber: str = Field(description="sejm, senat, senat_uzup (by-election), prezydent, pe, sejmik, wbp (mayor), rada_gminy, rada_powiatu, rada_dzielnicy")
     round: int
     district_no: int | None = None
     area: str | None = Field(default=None, description="sejmik: voivodeship; wbp: gmina; councils: council name")

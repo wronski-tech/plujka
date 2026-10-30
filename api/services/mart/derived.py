@@ -67,7 +67,12 @@ FROM mart.prezydent_candidates
 UNION ALL
 SELECT 'pe', year, 1, candidate_id, full_name, last_name, first_names, gender, residence, residence_teryt, occupation,
        NULL::int
-FROM mart.pe_candidates;
+FROM mart.pe_candidates
+UNION ALL
+-- Senate by-elections publish names and committees only. round: the district, so that every by-election
+-- is its own election event (two in one year, e.g. 2013 and 2014, are separate events).
+SELECT 'senat_uzup', year, district_no, candidate_id, full_name, last_name, first_names, NULL, NULL, NULL, NULL, NULL
+FROM mart.senat_byelections;
 
 -- Place name (folded) -> powiat, learned from the residence text and residence_teryt pairs published
 -- since 2019: the powiat of at least 90% of the pairs of that place name. (Learned from 2019-2020, 98%
@@ -262,6 +267,8 @@ UPDATE mart.prezydent_candidates k SET person_id = c.person_id FROM candidacy_id
 WHERE c.chamber = 'prezydent' AND c.year = k.year AND c.round = k.round AND c.candidate_id = k.candidate_id;
 UPDATE mart.pe_candidates k SET person_id = c.person_id FROM candidacy_ids c
 WHERE c.chamber = 'pe' AND c.year = k.year AND c.candidate_id = k.candidate_id;
+UPDATE mart.senat_byelections k SET person_id = c.person_id FROM candidacy_ids c
+WHERE c.chamber = 'senat_uzup' AND c.year = k.year AND c.candidate_id = k.candidate_id;
 """
 
 # Local candidates (sejmik, mayors, councils) are linked to a national person only when the link is
@@ -819,7 +826,6 @@ PRE1999_UNITS_NOTE = (
 )
 
 DROP_SQL = r"""
-DROP TABLE IF EXISTS mart.senat_byelections;
 DROP VIEW IF EXISTS mart.v_precinct_results;
 DROP VIEW IF EXISTS mart.v_candidate_gmina_votes;
 -- v_person_history was a plain view before it was materialized; drop either kind.
@@ -1204,6 +1210,10 @@ JOIN (
          NULL, NULL, s.votes, s.elected, s.age
   FROM mart.senat_candidates s
   UNION ALL
+  SELECT k.person_id, k.year, 'senat_uzup', 1, k.district_no, k.wojewodztwo, k.committee_name, NULL, NULL, NULL, k.votes,
+         k.elected, NULL
+  FROM mart.senat_byelections k
+  UNION ALL
   SELECT k.person_id, k.year, 'prezydent', k.round, NULL, NULL, k.committee_name, NULL, NULL, NULL, k.votes, k.elected,
          NULL
   FROM mart.prezydent_candidates k
@@ -1237,8 +1247,8 @@ CREATE INDEX ON mart.v_person_history (person_id);
 CREATE INDEX ON mart.v_person_history USING gin (full_name gin_trgm_ops);
 COMMENT ON MATERIALIZED VIEW mart.v_person_history IS 'Every candidacy of a person (one row per candidacy and round): Sejm, Senate, President, European Parliament, sejmik, mayor and council candidacies of the same person (national persons, or local persons matched by name, gender, birth year and powiat). Use for "w których wyborach startował X", "kto zmienił komitet", "kto przeszedł z Sejmu do Senatu".';
 COMMENT ON COLUMN mart.v_person_history.age IS 'Age on election day as published: local registers (sejmik, wbp, councils) and the Sejm/Senate registers of 1991, 1993 and 1997; NULL for other national candidacies.';
-COMMENT ON COLUMN mart.v_person_history.chamber IS 'Election: sejm, senat, prezydent, pe, sejmik, wbp (mayor), rada_gminy, rada_powiatu or rada_dzielnicy (councils).';
-COMMENT ON COLUMN mart.v_person_history.area IS 'sejmik: voivodeship; wbp: gmina; councils: council name (2014: unit name). NULL otherwise.';
+COMMENT ON COLUMN mart.v_person_history.chamber IS 'Election: sejm, senat, senat_uzup (Senate by-election, mart.senat_byelections), prezydent, pe, sejmik, wbp (mayor), rada_gminy, rada_powiatu or rada_dzielnicy (councils).';
+COMMENT ON COLUMN mart.v_person_history.area IS 'sejmik and senat_uzup: voivodeship; wbp: gmina; councils: council name (2014: unit name). NULL otherwise.';
 COMMENT ON COLUMN mart.v_person_history.committee_aliases IS 'Aliases of the committee (Senate and mayor rows: only when a Sejm / sejmik committee of that year has the same name). Compare aliases, not committee_name, to find party switches across years.';
 
 UPDATE mart.persons p SET candidacies = h.n
@@ -1630,13 +1640,18 @@ def check_seat_allocation(pg: psycopg.Connection) -> None:
 SENAT_BYELECTIONS = Path(__file__).resolve().parents[3] / "data" / "pkw_html" / "senat_byelections.csv"
 
 SENAT_BYELECTIONS_SQL = r"""
+-- Built before persons are linked; views over it are rebuilt afterwards.
+DROP TABLE IF EXISTS mart.senat_byelections CASCADE;
 CREATE TABLE mart.senat_byelections AS
-SELECT election_date, extract(year FROM election_date)::int AS year, district_no, wojewodztwo, eligible_voters,
+SELECT (row_number() OVER (ORDER BY election_date, district_no, candidate_no))::int AS candidate_id, NULL::int AS person_id,
+       election_date, extract(year FROM election_date)::int AS year, district_no, wojewodztwo, eligible_voters,
        ballots_issued, valid_votes, round(100.0 * ballots_issued / eligible_voters, 2) AS turnout_pct,
        candidate_no, first_names || ' ' || last_name AS full_name, last_name, first_names, committee_name, votes,
        round(100.0 * votes / NULLIF(valid_votes, 0), 2) AS pct, elected, source_url
 FROM senat_byelection_src;
 COMMENT ON TABLE mart.senat_byelections IS 'Senate by-elections (wybory uzupełniające do Senatu, 2003-2025): one vacant seat filled in one district between general elections, one row per candidate. District totals repeat on every row of a by-election. Not part of senat_candidates or v_turnout; the district numbers are those of the term (1-40 until 2011, then 1-100). Source: PKW result announcements (source_url).';
+COMMENT ON COLUMN mart.senat_byelections.candidate_id IS 'Candidacy id, unique in the table.';
+COMMENT ON COLUMN mart.senat_byelections.person_id IS 'mart.persons id (same matching as other national candidacies; v_person_history chamber ''senat_uzup'').';
 COMMENT ON COLUMN mart.senat_byelections.election_date IS 'Voting day; a by-election is identified by (election_date, district_no).';
 COMMENT ON COLUMN mart.senat_byelections.year IS 'Year of election_date (the term began earlier).';
 COMMENT ON COLUMN mart.senat_byelections.wojewodztwo IS 'Voivodeship of the district, e.g. ''śląskie''.';
@@ -1683,6 +1698,7 @@ def load_senat_byelections(pg: psycopg.Connection, path: Path = SENAT_BYELECTION
 
 def rebuild(pg: psycopg.Connection) -> None:
     """Rebuild persons, views and the entity lexicon from everything loaded (caller's transaction)."""
+    log.info("Senate by-elections: %s", load_senat_byelections(pg))
     link_persons(pg)
     persons = pg.execute(
         "SELECT count(*) FILTER (WHERE match_rule NOT LIKE 'local:%'), count(*) FILTER (WHERE match_rule LIKE 'local:%')"
@@ -1699,7 +1715,6 @@ def rebuild(pg: psycopg.Connection) -> None:
     pg.execute(_precinct_results_sql())
     pg.execute(CANDIDATE_GMINA_VOTES_SQL)
     pg.execute(GUS_VIEW_SQL)
-    log.info("Senate by-elections: %s", load_senat_byelections(pg))
     linked = pg.execute(
         "SELECT (SELECT count(*) FROM mart.sejmik_candidates WHERE person_id IS NOT NULL),"
         " (SELECT count(*) FROM mart.wbp_candidates WHERE person_id IS NOT NULL)"

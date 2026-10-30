@@ -114,7 +114,7 @@ count only in `country`.
 | `v_precinct_results` | plain (not materialized) view: votes per list or candidate in each precinct (Sejm, president, EP) with protocol counts, `short_name` and official `turnout_pct`; filter by election, year and `teryt_gmina` (`GET /precincts`, panel „Wyniki obwodowe”) |
 | `v_candidate_gmina_votes` | plain view: a Sejm (2007+), Senate (2001+) or EP (2014+) candidate's votes per gmina summed from precinct files, with the gmina's valid votes and `pct`; filter by election, year and `person_id`/`candidate_id` (`GET /persons/{id}/gminas`, person card „Głosy w gminach”) |
 | `v_party_results` | party families across Sejm, EP and sejmik per level (`unit_key` joins elections) |
-| `senat_byelections` | table rebuilt with the views from `data/pkw_html/senat_byelections.csv` (PKW result announcements read by `scripts/scrape_senat_byelections.py`): every Senate by-election 2003–2025, one row per candidate with the district's totals, `turnout_pct`, `pct` and `elected`; the build fails when candidate votes do not sum to the valid votes or the winner lacks the most votes |
+| `senat_byelections` | table rebuilt with the views from `data/pkw_html/senat_byelections.csv` (PKW result announcements read by `scripts/scrape_senat_byelections.py`): every Senate by-election 2003–2025, one row per candidate with the district's totals, `turnout_pct`, `pct` and `elected`; the build fails when candidate votes do not sum to the valid votes or the winner lacks the most votes; built before persons are linked, so candidates get `person_id` and appear in `v_person_history` as `senat_uzup` |
 | `v_party_change` | change against the previous election of the same kind, with a `comparable` flag |
 | `v_gmina_continuity` | which gmina TERYT codes appear in which elections |
 | `v_person_history` | every candidacy of a person (materialized, indexed by `person_id` and by `full_name` trigrams) |
@@ -147,7 +147,9 @@ new column in `schema.py` (tables) or `derived.py` (views).
 ### Persons
 
 PKW files carry no personal identifier. National candidacies (Sejm, Senate, President, European
-Parliament) with the same normalized full name and gender are one person. When a name is shared by
+Parliament, Senate by-elections) with the same normalized full name and gender are one person. Each
+by-election is its own election event; its announcement gives no gender or residence, so the gender
+comes from other candidacies of the name. When a name is shared by
 several candidates within one election event (Sejm+Senate of a year, a presidential round, an EP
 election), residence must match too; namesakes of one event with the same residence text are a person
 each. A missing gender (2015 presidential files) is taken from other candidacies with the same name

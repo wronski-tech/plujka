@@ -118,6 +118,7 @@ EN = {
     "Rada gminy": "Gmina council",
     "Rada powiatu": "Powiat council",
     "Rada dzielnicy (Warszawa)": "Warsaw district council",
+    "Senat (uzupełniające)": "Senate (by-election)",
     "Rady gmin, powiatów i dzielnic": "Gmina, powiat and district councils",
     "Porównania między wyborami": "Comparisons across elections",
     "Kraj": "Country",

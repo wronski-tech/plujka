@@ -1388,16 +1388,18 @@ def _seat_simulator() -> None:
 CHAMBER_LABELS = {
     "sejm": "Sejm", "senat": "Senat", "pe": "Parlament Europejski", "prezydent": "Prezydent", "sejmik": "Sejmiki",
     "wbp": "Wójtowie / burmistrzowie", "rada_gminy": "Rady gmin", "rada_powiatu": "Rady powiatów",
-    "rada_dzielnicy": "Rady dzielnic Warszawy",
+    "rada_dzielnicy": "Rady dzielnic Warszawy", "senat_uzup": "Senat (uzupełniające)",
 }
 CHAMBER_LABELS = {k: _t(v) for k, v in CHAMBER_LABELS.items()}
+# Elections the candidate statistics and rankings accept (by-elections appear only on person cards).
+CHAMBER_CHOICES = [c for c in CHAMBER_LABELS if c != "senat_uzup"]
 
 
 @st.fragment
 def _candidates() -> None:
     """"Kandydaci": women's share and age of candidates and elected per election year."""
     with st.expander(_t("👥 Kandydaci: kobiety i wiek"), expanded=False):
-        chamber = st.selectbox(_t("Wybory"), list(CHAMBER_LABELS), format_func=CHAMBER_LABELS.get, key="cand_chamber")
+        chamber = st.selectbox(_t("Wybory"), CHAMBER_CHOICES, format_func=CHAMBER_LABELS.get, key="cand_chamber")
         rows = _api_get("/candidates/stats", {"chamber": chamber}) or []
         if not rows:
             st.caption("Brak danych.")
@@ -1585,7 +1587,7 @@ def _rankings() -> None:
     with st.expander(_t("🏅 Rankingi osób i zmiany komitetów"), expanded=False):
         c1, c2 = st.columns(2)
         by = c1.selectbox(_t("Ranking według"), list(RANKING_LABELS), format_func=RANKING_LABELS.get, key="rank_by")
-        chamber = c2.selectbox(_t("Wybory"), [None, *CHAMBER_LABELS], key="rank_chamber",
+        chamber = c2.selectbox(_t("Wybory"), [None, *CHAMBER_CHOICES], key="rank_chamber",
                                format_func=lambda c: "osoby z kandydowaniem krajowym (wszystkie wybory)" if c is None else CHAMBER_LABELS[c])
         rows = _api_get("/rankings/persons", {"by": by, **({"chamber": chamber} if chamber else {})}) or []
         if rows:
