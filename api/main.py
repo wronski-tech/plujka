@@ -77,6 +77,33 @@ ELECTIONS_SQL = """
 SELECT election, year, round, election_date, description FROM mart.elections
 ORDER BY election_date, election, round
 """
+# Candidacies per chamber and year from v_person_history: candidates count once (round 1), women
+# share among those with a published gender, median age where the files give it.
+CANDIDATE_STATS_SQL = """
+SELECT year,
+       count(*) FILTER (WHERE round = 1) AS candidates,
+       round(100.0 * count(*) FILTER (WHERE round = 1 AND gender = 'Kobieta')
+             / NULLIF(count(gender) FILTER (WHERE round = 1), 0), 1) AS women_pct,
+       count(*) FILTER (WHERE elected) AS elected,
+       round(100.0 * count(*) FILTER (WHERE elected AND gender = 'Kobieta')
+             / NULLIF(count(gender) FILTER (WHERE elected), 0), 1) AS elected_women_pct,
+       percentile_cont(0.5) WITHIN GROUP (ORDER BY age) FILTER (WHERE round = 1) AS median_age,
+       percentile_cont(0.5) WITHIN GROUP (ORDER BY age) FILTER (WHERE elected) AS elected_median_age
+FROM mart.v_person_history
+WHERE chamber = %(chamber)s
+GROUP BY year ORDER BY year
+"""
+CANDIDATE_AGES_SQL = """
+(SELECT 'youngest' AS end_, person_id, full_name, gender, age, area, committee_name, elected
+ FROM mart.v_person_history
+ WHERE chamber = %(chamber)s AND year = %(year)s AND round = 1 AND age IS NOT NULL AND (NOT %(elected)s OR elected)
+ ORDER BY age, full_name LIMIT 10)
+UNION ALL
+(SELECT 'oldest', person_id, full_name, gender, age, area, committee_name, elected
+ FROM mart.v_person_history
+ WHERE chamber = %(chamber)s AND year = %(year)s AND round = 1 AND age IS NOT NULL AND (NOT %(elected)s OR elected)
+ ORDER BY age DESC, full_name LIMIT 10)
+"""
 DATA_VERSION_SQL = """
 SELECT max(loaded_at) AS mart_loaded_at, count(*) AS elections, max(election_date) AS latest_election_date
 FROM mart.elections
@@ -598,6 +625,48 @@ def _unit_params(level: str, unit: str | None) -> dict[str, Any]:
 def list_elections() -> list[BrowseElection]:
     """Every loaded election and round with its date (``mart.elections``)."""
     return [BrowseElection.model_validate(r) for r in _mart_rows(ELECTIONS_SQL, {})]
+
+
+Chamber = Literal["sejm", "senat", "pe", "prezydent", "sejmik", "wbp", "rada_gminy", "rada_powiatu", "rada_dzielnicy"]
+
+
+class CandidateYear(BaseModel):
+    year: int
+    candidates: int
+    women_pct: float | None
+    elected: int
+    elected_women_pct: float | None
+    median_age: float | None
+    elected_median_age: float | None
+
+
+class CandidateAge(BaseModel):
+    end_: Literal["youngest", "oldest"]
+    person_id: int | None
+    full_name: str
+    gender: str | None
+    age: int
+    area: str | None
+    committee_name: str | None
+    elected: bool | None
+
+
+@app.get("/candidates/stats", response_model=list[CandidateYear], tags=["browse"], dependencies=[Depends(require_api_key)])
+def candidate_stats(chamber: Chamber = Query(description="Election (chamber in v_person_history)")) -> list[CandidateYear]:
+    """Per election year: candidates, elected, women's share of both and median age (ages: local
+    elections and Sejm/Senate 1991-1997 only)."""
+    return [CandidateYear.model_validate(r) for r in _mart_rows(CANDIDATE_STATS_SQL, {"chamber": chamber})]
+
+
+@app.get("/candidates/ages", response_model=list[CandidateAge], tags=["browse"], dependencies=[Depends(require_api_key)])
+def candidate_ages(
+    chamber: Chamber = Query(description="Election (chamber in v_person_history)"),
+    year: int = Query(ge=1989, le=2100),
+    elected: bool = Query(False, description="Only elected candidates"),
+) -> list[CandidateAge]:
+    """The 10 youngest and 10 oldest candidates (or elected) of one election (``end_``: youngest/oldest)."""
+    rows = _mart_rows(CANDIDATE_AGES_SQL, {"chamber": chamber, "year": year, "elected": elected})
+    return [CandidateAge.model_validate(r) for r in rows]
 
 
 class DataVersion(BaseModel):

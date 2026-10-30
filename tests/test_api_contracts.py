@@ -250,3 +250,4 @@ class TestBrowseEndpoints(unittest.TestCase):
         self.assertEqual(self.client.get("/units/999999").status_code, 404)
         self.assertEqual(self.client.get("/results", params={"election": "senat", "year": 2023}).status_code, 422)
         self.assertEqual(self.client.get("/change", params={"election": "prezydent", "year": 2025}).status_code, 422)
+        self.assertEqual(self.client.get("/candidates/stats", params={"chamber": "rada"}).status_code, 422)

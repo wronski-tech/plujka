@@ -32,8 +32,8 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 16. Rankingi osób: kandydowania, długość kariery, suma głosów.
 - [ ] 17. Przejścia między komitetami w czasie.
 - [ ] 18. Wójtowie i burmistrzowie: ciągłość władzy, liczba kadencji.
-- [ ] 19. Najmłodsi i najstarsi kandydaci i wybrani.
-- [ ] 20. Kobiety wśród kandydatów i wybranych w czasie.
+- [x] 19. Najmłodsi i najstarsi kandydaci i wybrani.
+- [x] 20. Kobiety wśród kandydatów i wybranych w czasie.
 - [ ] 21. „Zgłoś błędne połączenie osoby” → `feedback.jsonl`.
 
 **Dane**

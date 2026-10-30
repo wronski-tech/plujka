@@ -928,6 +928,55 @@ def _seat_simulator() -> None:
                    + (" Połączona lista ma sumę głosów połączonych komitetów, tak jakby wyborcy głosowali tak samo." if len(merge) > 1 else ""))
 
 
+CHAMBER_LABELS = {
+    "sejm": "Sejm", "senat": "Senat", "pe": "Parlament Europejski", "prezydent": "Prezydent", "sejmik": "Sejmiki",
+    "wbp": "Wójtowie / burmistrzowie", "rada_gminy": "Rady gmin", "rada_powiatu": "Rady powiatów",
+    "rada_dzielnicy": "Rady dzielnic Warszawy",
+}
+
+
+@st.fragment
+def _candidates() -> None:
+    """"Kandydaci": women's share and age of candidates and elected per election year."""
+    with st.expander("👥 Kandydaci: kobiety i wiek", expanded=False):
+        chamber = st.selectbox("Wybory", list(CHAMBER_LABELS), format_func=CHAMBER_LABELS.get, key="cand_chamber")
+        rows = _api_get("/candidates/stats", {"chamber": chamber}) or []
+        if not rows:
+            st.caption("Brak danych.")
+            return
+        stats = pd.DataFrame(rows)
+        long = stats.melt(id_vars="year", value_vars=["women_pct", "elected_women_pct"], var_name="grupa", value_name="kobiety %")
+        long["grupa"] = long["grupa"].map({"women_pct": "kandydaci", "elected_women_pct": "wybrani"})
+        chart = (
+            alt.Chart(long.dropna())
+            .mark_line(point=True)
+            .encode(x=alt.X("year:Q", title=None, axis=alt.Axis(format="d"), scale=alt.Scale(zero=False)),
+                    y=alt.Y("kobiety %:Q"), color=alt.Color("grupa:N", title=None), tooltip=["year", "grupa", "kobiety %"])
+            .properties(height=240, padding={"left": 5, "right": 5, "top": 5, "bottom": 25})
+        )
+        st.altair_chart(chart, use_container_width=True)
+        table = stats.assign(year=stats["year"].astype(str)).rename(columns={
+            "year": "rok", "candidates": "kandydaci", "women_pct": "kobiety %", "elected": "wybrani",
+            "elected_women_pct": "kobiety wśród wybranych %", "median_age": "mediana wieku",
+            "elected_median_age": "mediana wieku wybranych"})
+        st.dataframe(table.dropna(axis=1, how="all"), hide_index=True, use_container_width=True)
+        aged = [r["year"] for r in rows if r.get("median_age") is not None]
+        if not aged:
+            st.caption("Pliki PKW dla tych wyborów nie podają wieku kandydatów.")
+            return
+        c1, c2 = st.columns(2)
+        year = c1.selectbox("Rok", sorted(aged, reverse=True), key="cand_year")
+        elected = c2.checkbox("Tylko wybrani", key="cand_elected")
+        ages = _api_get("/candidates/ages", {"chamber": chamber, "year": year, "elected": elected}) or []
+        columns = {"full_name": "imię i nazwisko", "age": "wiek", "area": "obszar", "committee_name": "komitet", "elected": "wybrany"}
+        for end, title in (("youngest", "Najmłodsi"), ("oldest", "Najstarsi")):
+            st.markdown(f"**{title}**")
+            part = pd.DataFrame([r for r in ages if r["end_"] == end])
+            if not part.empty:
+                st.dataframe(part[list(columns)].rename(columns=columns), hide_index=True, use_container_width=True)
+        st.caption("Wiek z dnia wyborów, jak w plikach PKW (wybory samorządowe od 1998 r., Sejm i Senat 1991–1997).")
+
+
 @st.fragment
 def _data_coverage() -> None:
     """"Co jest w bazie": loaded elections and years (``GET /elections``)."""
@@ -1043,6 +1092,7 @@ _person_search()
 _browse()
 _unit_card()
 _seat_simulator()
+_candidates()
 _data_coverage()
 
 if submitted:
