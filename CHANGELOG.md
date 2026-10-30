@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Source files per result: `GET /sources?election=&year=` lists the KBW files an election was built from (one chamber's files in the shared Sejm/Senate directory, plus the PKW bundle page for 2019/2023); the election card and the answer's SQL panel link them.
 - UI: answers with one row per year (and optionally per party) draw a line chart over time; the person card has a „Zgłoś błędne połączenie osoby” form (`POST /feedback/person`, appended to `feedback.jsonl`).
 - Exports: every table also downloads as XLSX and Parquet; `GET /packages/{election}/{year}` and an election-card button give a zip with turnout and results at every level and round (plain CSV) and a README with the column dictionary.
 - Mart: Sejm and Senate 1991, 1993 and 1997 (precinct level; Senate 1991 candidates only), reconciled with PKW, with the national lists as district 0, list blocs, pre-1999 geography and seat checks (Hare-Niemeyer and modified Sainte-Laguë 1991, D'Hondt 1993/1997); party families for UD/KLD (UW/PD), POC/PC, NSZZ Solidarność (AWS), WAK/Ojczyzna.

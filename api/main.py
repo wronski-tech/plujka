@@ -1019,13 +1019,47 @@ def known_gaps() -> KnownGaps:
     return KnownGaps(markdown=section.group(1).strip() if section else "", caveats=[c for c, _ in answer.CAVEATS])
 
 
+# KBW mirror directories (<year>/<dir>/...) holding each election's files; Sejm/Senate also read the
+# year's root files named *parl* (turnout 2005, precincts 2015).
+SOURCE_DIRS = {"sejm": ("sejm", "sejmsenat"), "senat": ("senat", "sejmsenat"), "prezydent": ("prezydent",),
+               "pe": ("parlament_eu",), "referendum": ("referendum",), "sejmik": ("samorzad",),
+               "rada": ("samorzad",), "wbp": ("samorzad",)}
+CHAMBER_MARKERS = {"sejm": re.compile(r"sejm"), "senat": re.compile(r"senat|(^|[-_])sen([-_.]|$)")}
+# PKW bundles preferred over the mirror for these Sejm/Senate years (scripts/download_all_pkw_csv.py).
+PKW_BUNDLE_PAGES = {year: f"https://sejmsenat{year}.pkw.gov.pl/sejmsenat{year}/pl/dane_w_arkuszach" for year in (2019, 2023)}
+
+
+def _source_of(path: str, election: str | None, year: int | None) -> bool:
+    """Whether a manifest path belongs to the election and year (no filter when both are None)."""
+    parts = path.split("/")
+    if year is not None and parts[0] != str(year):
+        return False
+    if election is None:
+        return True
+    if len(parts) == 2:
+        return election in ("sejm", "senat") and "parl" in parts[1]
+    if parts[1] == "sejmsenat":  # shared directory: skip files naming only the other chamber
+        named = {c for c, marker in CHAMBER_MARKERS.items() if marker.search(parts[-1].lower())}
+        return election in named or not named
+    return parts[1] in SOURCE_DIRS.get(election, ())
+
+
 @app.get("/sources", response_model=list[SourceFile], tags=["browse"], dependencies=[Depends(require_api_key)])
-def sources(limit: int = Query(50, ge=1, le=1000)) -> list[SourceFile]:
-    """KBW/PKW source files of this release (data/source_manifest.json), most recently republished first."""
+def sources(
+    limit: int = Query(50, ge=1, le=1000),
+    election: Literal[tuple(SOURCE_DIRS)] | None = Query(None, description="Only this election's files"),  # type: ignore[valid-type]
+    year: int | None = Query(None, ge=1989, le=2100),
+) -> list[SourceFile]:
+    """KBW/PKW source files of this release (data/source_manifest.json), most recently republished first.
+
+    With ``election`` and ``year``, the files that election was built from; Sejm/Senate 2019 and 2023 also
+    list the PKW bundle page (path ``pkw``), which the mart prefers over the mirror."""
     files = json.loads(SOURCE_MANIFEST.read_text(encoding="utf-8")) if SOURCE_MANIFEST.exists() else {}
     rows = [{"path": path, "url": f["url"], "bytes": f.get("bytes"),
              "last_modified": parsedate_to_datetime(f["last_modified"]) if f.get("last_modified") else None}
-            for path, f in files.items()]
+            for path, f in files.items() if _source_of(path, election, year)]
+    if election in ("sejm", "senat") and year in PKW_BUNDLE_PAGES:
+        rows.append({"path": f"pkw/sejmsenat{year}", "url": PKW_BUNDLE_PAGES[year], "bytes": None, "last_modified": None})
     rows.sort(key=lambda r: r["last_modified"] or datetime.min.replace(tzinfo=timezone.utc), reverse=True)
     return [SourceFile.model_validate(r) for r in rows[:limit]]
 

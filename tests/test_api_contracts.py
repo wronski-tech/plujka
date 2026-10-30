@@ -255,6 +255,18 @@ class TestBrowseEndpoints(unittest.TestCase):
         self.assertEqual(results[1:], ["sejm,2023,1,KO,100,40.5"] * 4)  # country, voivodeship, powiat, gmina
         self.assertEqual(self.client.get("/packages/sejm/2019").status_code, 404)
 
+    def test_sources_of_one_chamber_in_the_shared_directory(self) -> None:
+        def names(election: str, year: int) -> set[str]:
+            files = self.client.get("/sources", params={"election": election, "year": year, "limit": 1000}).json()
+            return {f["path"].rsplit("/", 1)[-1] for f in files}
+        sejm, senat = names("sejm", 2011), names("senat", 2011)
+        self.assertIn("2011-kand-sejm.xls", sejm)
+        self.assertNotIn("2011-kand-sen.zip", sejm)
+        self.assertIn("2011-kand-sen.zip", senat)
+        self.assertNotIn("2011-kand-sejm.xls", senat)
+        self.assertIn("komitety.zip", sejm & senat)
+        self.assertIn("sejmsenat2023", names("sejm", 2023))  # PKW bundle page
+
     def test_data_version_reads_the_source_manifest(self) -> None:
         version = self.client.get("/data-version").json()
         self.assertGreater(version["source_files"], 0)

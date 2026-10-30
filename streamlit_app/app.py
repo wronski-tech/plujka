@@ -850,6 +850,26 @@ def _election_card(kind: str, year: int, rnd: int) -> None:
     st.caption(" · ".join(n for n in notes if n))
     if kind in RESULT_ELECTIONS:
         _package_download(kind, year)
+    sources = _source_files_markdown([(kind, year)])
+    if sources:
+        with st.popover("Pliki źródłowe KBW/PKW"):
+            st.markdown(sources)
+
+
+SOURCE_LINKS_SHOWN = 8
+
+
+def _source_files_markdown(pairs: list[tuple[str, int]]) -> str:
+    """Markdown list of the KBW/PKW files each (election, year) was built from (GET /sources)."""
+    lines = []
+    for election, year in pairs:
+        files = _api_get("/sources", {"election": election, "year": year, "limit": 1000}) or []
+        if not files:
+            continue
+        links = ", ".join(f"[{f['path'].rsplit('/', 1)[-1]}]({f['url']})" for f in files[:SOURCE_LINKS_SHOWN])
+        more = f" i jeszcze {len(files) - SOURCE_LINKS_SHOWN}" if len(files) > SOURCE_LINKS_SHOWN else ""
+        lines.append(f"- **{ELECTION_LABELS.get(election, election)} {year}:** {links}{more}")
+    return "\n".join(lines)
 
 
 def _package_download(kind: str, year: int) -> None:
@@ -1556,6 +1576,12 @@ if last:
                 "Dane statystyczne: [GUS, Bank Danych Lokalnych](https://bdl.stat.gov.pl) "
                 "(licencja [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/deed.pl))."
             )
+        pairs = list(dict.fromkeys(
+            (r["election"], r["year"]) for r in data.get("result") or []
+            if r.get("election") in ELECTION_LABELS and isinstance(r.get("year"), int)))
+        sources = _source_files_markdown(pairs[:3])
+        if sources:
+            st.markdown("Pliki źródłowe:\n" + sources)
         st.caption("Parametry (diagnostyka)")
         st.json(data["params"])
 
