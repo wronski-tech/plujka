@@ -15,6 +15,9 @@ GUS statistics (data/gus)
 PKW results pages for 2006 list blocs (data/pkw_html/list_groups_2006.csv)
   Source: PKW, https://wybory2006.pkw.gov.pl. Official public information.
 
+PKW announcements of Senate by-election results (data/pkw_html/senat_byelections.csv)
+  Source: PKW, https://pkw.gov.pl (obwieszczenia o wynikach wyborów uzupełniających). Official public information.
+
 Boundaries (streamlit_app/geo)
   gminy.json, powiaty.json, wojewodztwa.json, wojewodztwa_1975.json: public domain, derived from the
   GUGiK national register of boundaries (PRG) through jusuff/PolandGeoJson (Unlicense).

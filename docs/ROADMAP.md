@@ -42,7 +42,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 24. Wybory samorządowe 1994 i 1990 (jeśli KBW publikuje pliki).
 - [x] 25. Głosy kandydatów na poziomie gminy z plików obwodowych.
 - [ ] 26. Więcej GUS: struktura wieku, wykształcenie (NSP 2002/2011/2021), dochody gmin.
-- [ ] 27. Wybory uzupełniające do Senatu.
+- [x] 27. Wybory uzupełniające do Senatu.
 - [ ] 28. Referenda lokalne i odwołania wójtów (jeśli dane są dostępne).
 - [x] 29. Granice okręgów sejmowych i senackich na mapie.
 - [x] 30. Adresy obwodów i wyszukiwarka „mój obwód”.

@@ -114,6 +114,7 @@ count only in `country`.
 | `v_precinct_results` | plain (not materialized) view: votes per list or candidate in each precinct (Sejm, president, EP) with protocol counts, `short_name` and official `turnout_pct`; filter by election, year and `teryt_gmina` (`GET /precincts`, panel „Wyniki obwodowe”) |
 | `v_candidate_gmina_votes` | plain view: a Sejm (2007+), Senate (2001+) or EP (2014+) candidate's votes per gmina summed from precinct files, with the gmina's valid votes and `pct`; filter by election, year and `person_id`/`candidate_id` (`GET /persons/{id}/gminas`, person card „Głosy w gminach”) |
 | `v_party_results` | party families across Sejm, EP and sejmik per level (`unit_key` joins elections) |
+| `senat_byelections` | table rebuilt with the views from `data/pkw_html/senat_byelections.csv` (PKW result announcements read by `scripts/scrape_senat_byelections.py`): every Senate by-election 2003–2025, one row per candidate with the district's totals, `turnout_pct`, `pct` and `elected`; the build fails when candidate votes do not sum to the valid votes or the winner lacks the most votes |
 | `v_party_change` | change against the previous election of the same kind, with a `comparable` flag |
 | `v_gmina_continuity` | which gmina TERYT codes appear in which elections |
 | `v_person_history` | every candidacy of a person (materialized, indexed by `person_id` and by `full_name` trigrams) |

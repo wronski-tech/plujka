@@ -819,6 +819,7 @@ PRE1999_UNITS_NOTE = (
 )
 
 DROP_SQL = r"""
+DROP TABLE IF EXISTS mart.senat_byelections;
 DROP VIEW IF EXISTS mart.v_precinct_results;
 DROP VIEW IF EXISTS mart.v_candidate_gmina_votes;
 -- v_person_history was a plain view before it was materialized; drop either kind.
@@ -1625,6 +1626,61 @@ def check_seat_allocation(pg: psycopg.Connection) -> None:
         raise ValueError(f"official seats differ from the recomputed allocation in {len(errors)} districts: {errors[:5]}")
 
 
+# Senate by-elections from PKW's result announcements (scripts/scrape_senat_byelections.py).
+SENAT_BYELECTIONS = Path(__file__).resolve().parents[3] / "data" / "pkw_html" / "senat_byelections.csv"
+
+SENAT_BYELECTIONS_SQL = r"""
+CREATE TABLE mart.senat_byelections AS
+SELECT election_date, extract(year FROM election_date)::int AS year, district_no, wojewodztwo, eligible_voters,
+       ballots_issued, valid_votes, round(100.0 * ballots_issued / eligible_voters, 2) AS turnout_pct,
+       candidate_no, first_names || ' ' || last_name AS full_name, last_name, first_names, committee_name, votes,
+       round(100.0 * votes / NULLIF(valid_votes, 0), 2) AS pct, elected, source_url
+FROM senat_byelection_src;
+COMMENT ON TABLE mart.senat_byelections IS 'Senate by-elections (wybory uzupełniające do Senatu, 2003-2025): one vacant seat filled in one district between general elections, one row per candidate. District totals repeat on every row of a by-election. Not part of senat_candidates or v_turnout; the district numbers are those of the term (1-40 until 2011, then 1-100). Source: PKW result announcements (source_url).';
+COMMENT ON COLUMN mart.senat_byelections.election_date IS 'Voting day; a by-election is identified by (election_date, district_no).';
+COMMENT ON COLUMN mart.senat_byelections.year IS 'Year of election_date (the term began earlier).';
+COMMENT ON COLUMN mart.senat_byelections.wojewodztwo IS 'Voivodeship of the district, e.g. ''śląskie''.';
+COMMENT ON COLUMN mart.senat_byelections.ballots_issued IS 'Voters who were issued ballots (in person and by post).';
+COMMENT ON COLUMN mart.senat_byelections.turnout_pct IS 'Turnout in percent (0-100): ballots_issued / eligible_voters. 2010 by-elections were held together with the presidential election.';
+COMMENT ON COLUMN mart.senat_byelections.candidate_no IS 'Ballot order of the candidate (alphabetical).';
+COMMENT ON COLUMN mart.senat_byelections.full_name IS 'Given names and surname in capitals, e.g. ''Anna Maria ANDERS'' (as in senat_candidates).';
+COMMENT ON COLUMN mart.senat_byelections.committee_name IS 'Nominating committee as written in the announcement.';
+COMMENT ON COLUMN mart.senat_byelections.pct IS 'votes / valid_votes in percent (0-100).';
+COMMENT ON COLUMN mart.senat_byelections.elected IS 'The winner (most votes); 2010 district 21 had a single candidate.';
+"""
+
+
+def load_senat_byelections(pg: psycopg.Connection, path: Path = SENAT_BYELECTIONS) -> int:
+    """Create ``mart.senat_byelections`` from ``path``; return its number of by-elections.
+
+    Raises ValueError when a district's candidate votes do not sum to its valid votes, or when it has
+    no single winner with the most votes (a mistyped number would otherwise go unnoticed).
+    """
+    with path.open(encoding="utf-8", newline="") as fh:
+        rows = [
+            (r["election_date"], int(r["district_no"]), r["wojewodztwo"], int(r["eligible_voters"]),
+             int(r["ballots_issued"]), int(r["valid_votes"]), int(r["candidate_no"]), r["last_name"], r["first_names"],
+             r["committee_name"] or None, int(r["votes"]), r["elected"] == "True", r["source_url"])
+            for r in csv.DictReader(fh)
+        ]
+    pg.execute(
+        "CREATE TEMP TABLE senat_byelection_src (election_date DATE, district_no INT, wojewodztwo TEXT, eligible_voters INT,"
+        " ballots_issued INT, valid_votes INT, candidate_no INT, last_name TEXT, first_names TEXT, committee_name TEXT,"
+        " votes INT, elected BOOLEAN, source_url TEXT) ON COMMIT DROP"
+    )
+    with pg.cursor() as cur:
+        cur.executemany("INSERT INTO senat_byelection_src VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", rows)
+    errors = pg.execute(
+        """SELECT election_date, district_no FROM senat_byelection_src GROUP BY 1, 2
+           HAVING sum(votes) <> min(valid_votes) OR count(*) FILTER (WHERE elected) <> 1
+               OR max(votes) <> max(votes) FILTER (WHERE elected)"""
+    ).fetchall()
+    if errors:
+        raise ValueError(f"Senate by-elections whose votes or winner do not reconcile: {errors}")
+    pg.execute(SENAT_BYELECTIONS_SQL)
+    return pg.execute("SELECT count(DISTINCT (election_date, district_no)) FROM mart.senat_byelections").fetchone()[0]
+
+
 def rebuild(pg: psycopg.Connection) -> None:
     """Rebuild persons, views and the entity lexicon from everything loaded (caller's transaction)."""
     link_persons(pg)
@@ -1643,6 +1699,7 @@ def rebuild(pg: psycopg.Connection) -> None:
     pg.execute(_precinct_results_sql())
     pg.execute(CANDIDATE_GMINA_VOTES_SQL)
     pg.execute(GUS_VIEW_SQL)
+    log.info("Senate by-elections: %s", load_senat_byelections(pg))
     linked = pg.execute(
         "SELECT (SELECT count(*) FROM mart.sejmik_candidates WHERE person_id IS NOT NULL),"
         " (SELECT count(*) FROM mart.wbp_candidates WHERE person_id IS NOT NULL)"

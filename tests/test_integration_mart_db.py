@@ -355,5 +355,29 @@ class TestPersonLinking(unittest.TestCase):
                 conn.rollback()
 
 
+@unittest.skipUnless(_RUN, "Set PLUJKA_RUN_DB_TESTS=1 to run DB integration tests")
+class TestSenatByelectionsDb(unittest.TestCase):
+    def test_mistyped_votes_fail_the_build(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        import psycopg
+
+        from api.services.config import DATABASE_URL
+        from api.services.mart import derived
+
+        lines = derived.SENAT_BYELECTIONS.read_text(encoding="utf-8").splitlines(keepends=True)
+        # 2016 district 59: Anna Maria ANDERS won with 30 661 of 64 881 valid votes.
+        row = next(i for i, line in enumerate(lines) if ",ANDERS,Anna Maria," in line)
+        with tempfile.TemporaryDirectory() as tmp, psycopg.connect(DATABASE_URL) as conn:
+            path = Path(tmp) / "byelections.csv"
+            path.write_text("".join(lines[:row] + [lines[row].replace(",30661,", ",30616,")] + lines[row + 1:]), encoding="utf-8")
+            try:
+                with self.assertRaisesRegex(ValueError, r"2016, 3, 6\), 59"):
+                    derived.load_senat_byelections(conn, path)
+            finally:
+                conn.rollback()
+
+
 if __name__ == "__main__":
     unittest.main()
