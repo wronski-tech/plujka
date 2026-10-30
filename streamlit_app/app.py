@@ -20,7 +20,17 @@ import streamlit as st
 import vl_convert as vlc
 
 from chart_columns import line_series, numeric_columns, scatter_columns
+from i18n import EN
 from map_units import boundaries, feature_key, features_svg, is_osm, unit_values, visible_features, voivodeship_level
+
+# UI language: ?lang=en shows English labels (i18n.EN); answers and data stay Polish.
+LANG = "en" if st.query_params.get("lang") == "en" else "pl"
+
+
+def _t(text: str) -> str:
+    """English label for ``text`` when the page is in English, else ``text``."""
+    return EN.get(text, text) if LANG == "en" else text
+
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 # Sent as X-API-Key when the API requires keys (API_KEYS on the API side).
@@ -50,6 +60,7 @@ CHAMBER_LABELS = {
     "rada_powiatu": "Rada powiatu",
     "rada_dzielnicy": "Rada dzielnicy (Warszawa)",
 }
+CHAMBER_LABELS = {k: _t(v) for k, v in CHAMBER_LABELS.items()}
 # Same wording as the person caveat in api/services/answer.py (CAVEATS).
 PERSON_CAVEAT = (
     "PKW nie publikuje identyfikatorów osób: kandydatury łączone są po imieniu, nazwisku, płci "
@@ -137,14 +148,14 @@ def _history_sidebar() -> None:
     """Questions asked in this session; a click shows that answer again without asking the API."""
     history = st.session_state.get("ask_history") or []
     with st.sidebar:
-        st.markdown("**Historia pytań**")
+        st.markdown(f"**{_t('Historia pytań')}**")
         if not history:
-            st.caption("Pytania z tej sesji pojawią się tutaj.")
+            st.caption(_t("Pytania z tej sesji pojawią się tutaj."))
             return
         for i, turn in enumerate(history):
             if st.button(turn["question"][:80], key=f"history_{i}", use_container_width=True):
                 st.session_state["last_ask"] = turn
-        if st.button("Wyczyść historię", key="history_clear"):
+        if st.button(_t("Wyczyść historię"), key="history_clear"):
             st.session_state["ask_history"] = []
             st.rerun()
 
@@ -213,7 +224,7 @@ def _render_line(rows: list[dict], series: str | None) -> None:
 
 def _image_export(svg: Callable[[], str], name: str, key: str) -> None:
     """On request, download a chart or map as SVG and PNG (vl-convert renders the PNG from the SVG)."""
-    if not st.toggle("Pobierz jako obraz (PNG/SVG)", key=key):
+    if not st.toggle(_t("Pobierz jako obraz (PNG/SVG)"), key=key):
         return
     data = svg()
     file_name = _csv_file_name(name).removesuffix(".csv")
@@ -343,8 +354,9 @@ def _render_map(rows: list[dict], key: str = "answer") -> None:
         return
     low, high = min(drawn), max(drawn)
     c1, c2 = st.columns(2)
-    scale = c1.radio("Skala mapy", ["ciągła", f"{MAP_CLASSES} przedziałów (kwantyle)"], horizontal=True, key=f"map_scale_{key}")
-    stops = MAP_PALETTES[c2.radio("Paleta", list(MAP_PALETTES), horizontal=True, key=f"map_palette_{key}")]
+    scale = c1.radio(_t("Skala mapy"), ["ciągła", f"{MAP_CLASSES} przedziałów (kwantyle)"], horizontal=True, format_func=_t,
+                     key=f"map_scale_{key}")
+    stops = MAP_PALETTES[c2.radio(_t("Paleta"), list(MAP_PALETTES), horizontal=True, format_func=_t, key=f"map_palette_{key}")]
     ordered = sorted(drawn)
     # Upper bounds of the quantile classes (the last one is the maximum).
     breaks = [ordered[min(len(ordered) - 1, (len(ordered) * (i + 1)) // MAP_CLASSES - 1)] for i in range(MAP_CLASSES)]
@@ -524,7 +536,7 @@ def _csv_download(rows: list[dict], name: str, key: str) -> None:
     c1, c2, c3, _ = st.columns([1, 1, 1, 3])
     file_name = _csv_file_name(name)
     c1.download_button(
-        "Pobierz CSV", data=_csv_bytes(rows), file_name=file_name, mime="text/csv", key=key,
+        _t("Pobierz CSV"), data=_csv_bytes(rows), file_name=file_name, mime="text/csv", key=key,
         help="Separator „;” i przecinek dziesiętny — plik otwiera się poprawnie w polskim Excelu.",
     )
     c2.download_button("XLSX", data=_table_bytes(rows, "xlsx"), file_name=file_name.removesuffix(".csv") + ".xlsx",
@@ -658,7 +670,7 @@ def _render_person_timeline(person_id: int, view_key: str = "person_view") -> No
     with st.container(border=True):
         head, close = st.columns([5, 1])
         head.markdown(f"#### 🗂️ {person['full_name']}")
-        if close.button("Zamknij", key=f"{view_key}_close_{person_id}", use_container_width=True):
+        if close.button(_t("Zamknij"), key=f"{view_key}_close_{person_id}", use_container_width=True):
             st.session_state.pop(view_key, None)
             st.rerun()
         first, last = person.get("first_year"), person.get("last_year")
@@ -720,7 +732,7 @@ def _person_gmina_votes(person_id: int, candidacies: list[dict], view_key: str) 
                      key=lambda o: o[1], reverse=True)
     if not options:
         return
-    chosen = st.selectbox("Głosy w gminach", [None, *options], key=f"{view_key}_gminas_{person_id}",
+    chosen = st.selectbox(_t("Głosy w gminach"), [None, *options], key=f"{view_key}_gminas_{person_id}",
                           format_func=lambda o: "— wybierz kandydowanie —" if o is None else f"{CHAMBER_LABELS[o[0]]} {o[1]}")
     if chosen is None:
         return
@@ -738,11 +750,11 @@ def _person_gmina_votes(person_id: int, candidacies: list[dict], view_key: str) 
 
 def _person_link_report(person_id: int, rows: list[dict], view_key: str) -> None:
     """Form sending a wrongly joined or split person to POST /feedback/person."""
-    with st.popover("Zgłoś błędne połączenie osoby"):
+    with st.popover(_t("Zgłoś błędne połączenie osoby")):
         with st.form(key=f"{view_key}_report_{person_id}", clear_on_submit=True, border=False):
             labels = [f"{r['Data']} · {r['Wybory']} · {r['Obszar'] or 'okręg ' + str(r['Okręg'])}" for r in rows]
-            chosen = st.multiselect("Kandydatury innej osoby", labels, placeholder="Wybierz kandydatury (opcjonalnie)")
-            note = st.text_area("Co się nie zgadza?", max_chars=2000,
+            chosen = st.multiselect(_t("Kandydatury innej osoby"), labels, placeholder="Wybierz kandydatury (opcjonalnie)")
+            note = st.text_area(_t("Co się nie zgadza?"), max_chars=2000,
                                 placeholder="Np. to dwie różne osoby albo brakuje kandydatury z 2014 r.")
             if not st.form_submit_button("Wyślij zgłoszenie"):
                 return
@@ -773,9 +785,9 @@ def _render_person_links(data: dict, entity_refs: list[dict] | None, key: str) -
                 st.caption(labels[chosen])
             else:
                 chosen = st.selectbox(
-                    "Osoba", [p for p, _ in persons], format_func=labels.get, key=f"person_pick_{key}"
+                    _t("Osoba"), [p for p, _ in persons], format_func=labels.get, key=f"person_pick_{key}"
                 )
-            if st.button("Zobacz wszystkie kandydatury", key=f"person_open_{key}", use_container_width=True):
+            if st.button(_t("Zobacz wszystkie kandydatury"), key=f"person_open_{key}", use_container_width=True):
                 st.session_state["person_view"] = chosen
     if st.session_state.get("person_view"):
         _render_person_timeline(st.session_state["person_view"])
@@ -788,9 +800,9 @@ def _person_search() -> None:
     A fragment, so typing and picking here rerun only this box, not the answer below. Its session keys
     (``person_search_*``) are separate from the answer's ``person_view``.
     """
-    with st.expander("🔎 Szukaj osoby", expanded=False):
+    with st.expander(_t("🔎 Szukaj osoby"), expanded=False):
         name = st.text_input(
-            "Imię i nazwisko", placeholder="np. Kwaśniewski · Szymon Hołow", key="person_search_name"
+            _t("Imię i nazwisko"), placeholder="np. Kwaśniewski · Szymon Hołow", key="person_search_name"
         ).strip()
         if st.session_state.get("person_search_for") != name:
             # A new search closes the timeline of the previous one.
@@ -817,7 +829,7 @@ def _person_search() -> None:
                 text.markdown(f"**{person['full_name']}** · kandydatury: {person['candidacies']}")
                 if person.get("detail"):
                     text.caption(person["detail"])
-                if button.button("Pokaż", key=f"person_search_open_{person['person_id']}", use_container_width=True):
+                if button.button(_t("Pokaż"), key=f"person_search_open_{person['person_id']}", use_container_width=True):
                     st.session_state["person_search_view"] = person["person_id"]
         if st.session_state.get("person_search_view"):
             _render_person_timeline(st.session_state["person_search_view"], view_key="person_search_view")
@@ -890,10 +902,14 @@ st.markdown(
 )
 
 if "widget" not in st.query_params:
+    other = "Polski" if LANG == "en" else "English"
+    switch = "?" + urlencode({**{k: v for k, v in st.query_params.items() if k != "lang"}, **({} if LANG == "en" else {"lang": "en"})})
     st.markdown(
-        """
+        f"""
         <div class="plujka-hero">
-            <h2>Pluj faktami</h2>
+            <h2>{_t("Pluj faktami")}</h2>
+            <p><a href="{switch}" target="_self" hreflang="{"pl" if LANG == "en" else "en"}">{other}</a>{
+            " · " + _t("Odpowiedzi i dane są po polsku.") if LANG == "en" else ""}</p>
         </div>
         """,
         unsafe_allow_html=True,
@@ -904,10 +920,12 @@ ELECTION_LABELS = {
     "sejm": "Sejm", "senat": "Senat", "prezydent": "Prezydent", "pe": "Parlament Europejski",
     "referendum": "Referendum", "sejmik": "Sejmiki", "wbp": "Wójtowie / burmistrzowie", "rada": "Rady",
 }
+ELECTION_LABELS = {k: _t(v) for k, v in ELECTION_LABELS.items()}
 RESULT_ELECTIONS = ("sejm", "sejmik", "pe", "prezydent")
 CHANGE_ELECTIONS = ("sejm", "sejmik", "pe")
 LEVEL_LABELS = {"country": "Kraj", "wojewodztwo": "Województwa", "powiat": "Powiaty", "gmina": "Gminy",
                 "wojewodztwo_1975": "Województwa 1975–1998"}
+LEVEL_LABELS = {k: _t(v) for k, v in LEVEL_LABELS.items()}
 UNIT_NAME = {"wojewodztwo": "wojewodztwo", "powiat": "powiat", "gmina": "gmina", "wojewodztwo_1975": "wojewodztwo"}
 UNIT_SINGULAR = {"wojewodztwo": "województwo", "powiat": "powiat", "gmina": "gmina"}
 UNIT_CODE = {"powiat": "teryt_powiat", "gmina": "teryt_gmina"}
@@ -924,7 +942,7 @@ def _election_card(kind: str, year: int, rnd: int) -> None:
              ("Mandaty", card.get("seats"))]
     facts = [(label, value) for label, value in facts if value is not None]
     for column, (label, value) in zip(st.columns(len(facts)), facts):
-        column.metric(label, f"{value:,}".replace(",", " ") if isinstance(value, int) else value)
+        column.metric(_t(label), f"{value:,}".replace(",", " ") if isinstance(value, int) else value)
     notes = [f"{card['election_date']}" if card.get("election_date") else None,
              f"metoda: {card['seat_method']}" if card.get("seat_method") else None,
              "progi: " + " / ".join(f"{t:g}%" for t in card["thresholds_pct"]) if card.get("thresholds_pct") else None]
@@ -935,7 +953,7 @@ def _election_card(kind: str, year: int, rnd: int) -> None:
     checks = _api_get(f"/checks/{kind}/{year}") or []
     left, right, _ = st.columns([1, 1, 2])
     if sources:
-        with left.popover("Pliki źródłowe KBW/PKW", use_container_width=True):
+        with left.popover(_t("Pliki źródłowe KBW/PKW"), use_container_width=True):
             st.markdown(sources)
     if checks:
         with right.popover(f"Zgodność z PKW: {len(checks)} kontroli ✓", use_container_width=True):
@@ -969,7 +987,7 @@ def _package_download(kind: str, year: int) -> None:
     name = f"plujka-{kind}-{year}.zip"
     slot = st.empty()
     if st.session_state.get("package_name") != name:
-        if not slot.button("Przygotuj paczkę danych (zip)", key="package_prepare",
+        if not slot.button(_t("Przygotuj paczkę danych (zip)"), key="package_prepare",
                          help="Frekwencja i wyniki we wszystkich jednostkach i turach (CSV) oraz słownik kolumn."):
             return
         try:
@@ -1011,7 +1029,7 @@ def _from_link(key: str, options: list) -> None:
 @st.fragment
 def _browse() -> None:
     """"Przeglądaj wyniki": turnout or results of one election per unit, with fixed SQL (no LLM)."""
-    with st.expander("📊 Przeglądaj wyniki (bez pytania)", expanded="wybory" in st.query_params):
+    with st.expander(_t("📊 Przeglądaj wyniki (bez pytania)"), expanded="wybory" in st.query_params):
         elections = _api_get("/elections")
         if not elections:
             st.caption("Brak załadowanych wyborów.")
@@ -1019,13 +1037,13 @@ def _browse() -> None:
         kinds = [k for k in ELECTION_LABELS if any(e["election"] == k for e in elections) and k != "rada"]
         c1, c2, c3 = st.columns(3)
         _from_link("browse_kind", kinds)
-        kind = c1.selectbox("Wybory", kinds, format_func=ELECTION_LABELS.get, key="browse_kind")
+        kind = c1.selectbox(_t("Wybory"), kinds, format_func=ELECTION_LABELS.get, key="browse_kind")
         years = sorted({e["year"] for e in elections if e["election"] == kind}, reverse=True)
         _from_link("browse_year", years)
-        year = c2.selectbox("Rok", years, key="browse_year")
+        year = c2.selectbox(_t("Rok"), years, key="browse_year")
         rounds = sorted({e["round"] for e in elections if e["election"] == kind and e["year"] == year})
         _from_link("browse_round", rounds)
-        rnd = c3.selectbox("Tura", rounds, key="browse_round") if len(rounds) > 1 else rounds[0]
+        rnd = c3.selectbox(_t("Tura"), rounds, key="browse_round") if len(rounds) > 1 else rounds[0]
         _election_card(kind, year, rnd)
         c4, c5, c6 = st.columns(3)
         views = ["Wyniki", "Frekwencja"] if kind in RESULT_ELECTIONS else ["Frekwencja"]
@@ -1036,12 +1054,12 @@ def _browse() -> None:
         if kind == "sejm":
             views.insert(-1, "Głosy zmarnowane")
         _from_link("browse_view", views)
-        view = c4.radio("Pokaż", views, horizontal=True, key="browse_view")
+        view = c4.radio(_t("Pokaż"), views, horizontal=True, format_func=_t, key="browse_view")
         levels = [k for k in LEVEL_LABELS if year < 1999 or k != "wojewodztwo_1975"]
         _from_link("browse_level", levels)
         if st.session_state.get("browse_level") not in levels:
             st.session_state["browse_level"] = "wojewodztwo"  # default without index=, which clashes with linked state
-        level = c5.selectbox("Poziom", levels, format_func=LEVEL_LABELS.get, key="browse_level")
+        level = c5.selectbox(_t("Poziom"), levels, format_func=LEVEL_LABELS.get, key="browse_level")
         if year < 1999 and level in ("powiat", "gmina"):
             st.caption("Gminy sprzed 1999 r. przypisane do dzisiejszych przez mart.gmina_codes_pre1999; przed 1995 r. "
                        "gmina obejmuje też gminy wydzielone później, a dzielnice Warszawy z lat 1990–1994 są tylko w powiecie.")
@@ -1050,11 +1068,11 @@ def _browse() -> None:
             if "woj" in st.query_params and not st.session_state.get("_linked_browse_woj"):
                 st.session_state["_linked_browse_woj"] = True
                 st.session_state["browse_woj"] = st.query_params["woj"][:40]
-            voivodeship = c6.text_input("Województwo (opcjonalnie)", placeholder="np. mazowieckie", key="browse_woj")
+            voivodeship = c6.text_input(_t("Województwo (opcjonalnie)"), placeholder="np. mazowieckie", key="browse_woj")
         params = {"election": kind, "year": year, "round": rnd, "level": level,
                   "wojewodztwo": (voivodeship or "").strip().lower() or None}
         link = {"wybory": kind, "rok": year, "tura": rnd, "pokaz": view, "poziom": level, "woj": params["wojewodztwo"]}
-        st.query_params.from_dict({k: str(v) for k, v in link.items() if v is not None})
+        st.query_params.from_dict({k: str(v) for k, v in {**link, "lang": "en" if LANG == "en" else None}.items() if v is not None})
         st.caption("Adres strony w przeglądarce otwiera ten widok — skopiuj go, aby go udostępnić.")
         if view in ("Wyniki", "Frekwencja") and level != "country":
             link["nazwa"] = st.session_state.get("browse_name") if view == "Wyniki" else None
@@ -1095,7 +1113,7 @@ def _browse() -> None:
                           value: r[value]} for r in winners.values()]
             else:
                 names = list(dict.fromkeys(r["name"] for r in rows))
-                name = st.selectbox("Kandydat na mapie", names, key="browse_runoff_name")
+                name = st.selectbox(_t("Kandydat na mapie"), names, key="browse_runoff_name")
                 shown = _unit_rows([r for r in rows if r["name"] == name], level, value)
         elif view == "Zmiana":
             data = _api_get("/change", {k: v for k, v in params.items() if k != "round"})
@@ -1111,7 +1129,7 @@ def _browse() -> None:
                           "porównywalny": r["comparable"]} for r in rows]
             else:
                 names = list(dict.fromkeys(r["name"] for r in rows))
-                name = st.selectbox("Komitet na mapie", names, key="browse_change_name")
+                name = st.selectbox(_t("Komitet na mapie"), names, key="browse_change_name")
                 shown = _unit_rows([r for r in rows if r["name"] == name], level, value)
         elif view == "Frekwencja":
             data = _api_get("/turnout", params)
@@ -1132,10 +1150,11 @@ def _browse() -> None:
             if level == "country":
                 shown = [{"name": r["name"], "votes": r["votes"], "pct": r["pct"]} for r in rows]
             else:
-                name = st.selectbox("Komitet / kandydat na mapie", names, key="browse_name")
+                name = st.selectbox(_t("Komitet / kandydat na mapie"), names, key="browse_name")
                 shown = _unit_rows([r for r in rows if r["name"] == name], level, value)
         if level != "country":
-            order = st.radio("Jednostki", ["Wszystkie", "20 najwyższych", "20 najniższych"], horizontal=True, key="browse_rank")
+            order = st.radio(_t("Jednostki"), ["Wszystkie", "20 najwyższych", "20 najniższych"], horizontal=True, format_func=_t,
+                         key="browse_rank")
             if order != "Wszystkie":
                 ranked = sorted((r for r in shown if r.get(value) is not None), key=lambda r: r[value],
                                 reverse=order == "20 najwyższych")
@@ -1157,8 +1176,8 @@ def _page_url() -> str:
 
 def _embed_code(link: dict) -> None:
     """<iframe> code embedding the current map or chart (``?widget=``) on another page."""
-    with st.popover("Osadź na stronie"):
-        what = st.radio("Co osadzić", ["mapa", "wykres"], horizontal=True, key="embed_what")
+    with st.popover(_t("Osadź na stronie")):
+        what = st.radio(_t("Co osadzić"), ["mapa", "wykres"], horizontal=True, format_func=_t, key="embed_what")
         query = urlencode({"embed": "true", "widget": what, **{k: v for k, v in link.items() if v is not None}})
         st.code(f'<iframe src="{_page_url()}?{query}" width="100%" height="560" style="border:0" '
                 f'title="Plujka: {ELECTION_LABELS[link["wybory"]]} {link["rok"]}"></iframe>', language="html", wrap_lines=True)
@@ -1201,8 +1220,8 @@ def _widget() -> None:
 @st.fragment
 def _unit_card() -> None:
     """"Karta jednostki": one gmina, powiat or voivodeship across every election, with GUS statistics."""
-    with st.expander("🏛️ Karta gminy / powiatu / województwa", expanded=False):
-        name = st.text_input("Nazwa jednostki", placeholder="np. Wieliczka · krakowski · śląskie", key="unit_search").strip()
+    with st.expander(_t("🏛️ Karta gminy / powiatu / województwa"), expanded=False):
+        name = st.text_input(_t("Nazwa jednostki"), placeholder="np. Wieliczka · krakowski · śląskie", key="unit_search").strip()
         if len(name) < 2:
             st.caption("Wpisz początek nazwy gminy, powiatu lub województwa.")
             return
@@ -1211,7 +1230,7 @@ def _unit_card() -> None:
             st.caption(f"Nie znaleziono jednostki „{name}”.")
             return
         hit = st.selectbox(
-            "Jednostka", hits, key="unit_pick",
+            _t("Jednostka"), hits, key="unit_pick",
             format_func=lambda h: f"{h['name']} ({UNIT_SINGULAR[h['level']]}{', ' + h['detail'] if h.get('detail') else ''})",
         )
         card = _api_get(f"/units/{hit['unit']}")
@@ -1265,14 +1284,14 @@ SEAT_METHODS = {
 
 def _compare_units(card: dict) -> None:
     """Turnout of the unit next to a second unit, for one kind of election."""
-    other = st.text_input("Porównaj z jednostką", placeholder="np. Niepołomice", key="unit_compare").strip()
+    other = st.text_input(_t("Porównaj z jednostką"), placeholder="np. Niepołomice", key="unit_compare").strip()
     if len(other) < 2:
         return
     hits = _api_get("/units", {"name": other}) or []
     if not hits:
         st.caption(f"Nie znaleziono jednostki „{other}”.")
         return
-    hit = st.selectbox("Druga jednostka", hits, key="unit_compare_pick",
+    hit = st.selectbox(_t("Druga jednostka"), hits, key="unit_compare_pick",
                        format_func=lambda h: f"{h['name']} ({UNIT_SINGULAR[h['level']]}{', ' + h['detail'] if h.get('detail') else ''})")
     second = _api_get(f"/units/{hit['unit']}")
     if not second:
@@ -1285,7 +1304,7 @@ def _compare_units(card: dict) -> None:
         frames.append(frame)
     both = pd.concat(frames)
     kinds = [k for k in ELECTION_LABELS if k in set(both["election"])]
-    kind = st.selectbox("Wybory do porównania", kinds, format_func=ELECTION_LABELS.get, key="unit_compare_kind")
+    kind = st.selectbox(_t("Wybory do porównania"), kinds, format_func=ELECTION_LABELS.get, key="unit_compare_kind")
     both = both[(both["election"] == kind) & (both["round"] == 1)]
     chart = (
         alt.Chart(both)
@@ -1301,23 +1320,23 @@ def _compare_units(card: dict) -> None:
 @st.fragment
 def _seat_simulator() -> None:
     """"Symulator mandatów": Sejm seats under another method, threshold or one national district."""
-    with st.expander("🧮 Symulator mandatów do Sejmu", expanded=False):
+    with st.expander(_t("🧮 Symulator mandatów do Sejmu"), expanded=False):
         elections = _api_get("/elections") or []
         years = sorted({e["year"] for e in elections if e["election"] == "sejm" and e["year"] >= 2001}, reverse=True)
         if not years:
             st.caption("Brak wyborów do Sejmu od 2001 r.")
             return
         c1, c2 = st.columns(2)
-        year = c1.selectbox("Wybory do Sejmu", years, key="seats_year")
-        method = c2.selectbox("Metoda", list(SEAT_METHODS), format_func=SEAT_METHODS.get, key="seats_method")
+        year = c1.selectbox(_t("Wybory do Sejmu"), years, key="seats_year")
+        method = c2.selectbox(_t("Metoda"), list(SEAT_METHODS), format_func=SEAT_METHODS.get, key="seats_method")
         c3, c4 = st.columns(2)
-        threshold = c3.slider("Próg dla komitetów (%)", 0.0, 15.0, 5.0, 0.5, key="seats_threshold")
-        coalition = c4.slider("Próg dla koalicji (%)", 0.0, 15.0, 8.0, 0.5, key="seats_coalition")
+        threshold = c3.slider(_t("Próg dla komitetów (%)"), 0.0, 15.0, 5.0, 0.5, key="seats_threshold")
+        coalition = c4.slider(_t("Próg dla koalicji (%)"), 0.0, 15.0, 8.0, 0.5, key="seats_coalition")
         c5, c6 = st.columns(2)
-        minority = c5.checkbox("Mniejszości narodowe bez progu", value=True, key="seats_minority")
-        national = c6.checkbox("Jeden okręg krajowy (460 mandatów)", value=False, key="seats_national")
+        minority = c5.checkbox(_t("Mniejszości narodowe bez progu"), value=True, key="seats_minority")
+        national = c6.checkbox(_t("Jeden okręg krajowy (460 mandatów)"), value=False, key="seats_national")
         committees = {r["committee_ids"][0]: r["party"] for r in _api_get("/seats/simulate", {"year": year}) or []}
-        merge = st.multiselect("Połącz komitety we wspólną listę (próg dla koalicji)", list(committees),
+        merge = st.multiselect(_t("Połącz komitety we wspólną listę (próg dla koalicji)"), list(committees),
                                format_func=committees.get, key=f"seats_merge_{year}")
         rows = _api_get("/seats/simulate", {"year": year, "method": method, "threshold": threshold,
                                             "coalition_threshold": coalition, "exempt_minority": minority,
@@ -1352,13 +1371,14 @@ CHAMBER_LABELS = {
     "wbp": "Wójtowie / burmistrzowie", "rada_gminy": "Rady gmin", "rada_powiatu": "Rady powiatów",
     "rada_dzielnicy": "Rady dzielnic Warszawy",
 }
+CHAMBER_LABELS = {k: _t(v) for k, v in CHAMBER_LABELS.items()}
 
 
 @st.fragment
 def _candidates() -> None:
     """"Kandydaci": women's share and age of candidates and elected per election year."""
-    with st.expander("👥 Kandydaci: kobiety i wiek", expanded=False):
-        chamber = st.selectbox("Wybory", list(CHAMBER_LABELS), format_func=CHAMBER_LABELS.get, key="cand_chamber")
+    with st.expander(_t("👥 Kandydaci: kobiety i wiek"), expanded=False):
+        chamber = st.selectbox(_t("Wybory"), list(CHAMBER_LABELS), format_func=CHAMBER_LABELS.get, key="cand_chamber")
         rows = _api_get("/candidates/stats", {"chamber": chamber}) or []
         if not rows:
             st.caption("Brak danych.")
@@ -1386,8 +1406,8 @@ def _candidates() -> None:
             st.caption("Pliki PKW dla tych wyborów nie podają wieku kandydatów.")
             return
         c1, c2 = st.columns(2)
-        year = c1.selectbox("Rok", sorted(aged, reverse=True), key="cand_year")
-        elected = c2.checkbox("Tylko wybrani", key="cand_elected")
+        year = c1.selectbox(_t("Rok"), sorted(aged, reverse=True), key="cand_year")
+        elected = c2.checkbox(_t("Tylko wybrani"), key="cand_elected")
         ages = _api_get("/candidates/ages", {"chamber": chamber, "year": year, "elected": elected}) or []
         columns = {"full_name": "imię i nazwisko", "age": "wiek", "area": "obszar", "committee_name": "komitet", "elected": "wybrany"}
         for end, title in (("youngest", "Najmłodsi"), ("oldest", "Najstarsi")):
@@ -1417,15 +1437,15 @@ def _mayor_terms() -> None:
 @st.fragment
 def _elected() -> None:
     """"Wybrani": elected candidates of one election by district, with a committee filter."""
-    with st.expander("🗳️ Wybrani według okręgu", expanded=False):
+    with st.expander(_t("🗳️ Wybrani według okręgu"), expanded=False):
         elections = _api_get("/elections") or []
         kinds = [k for k in ("sejm", "senat", "pe", "sejmik") if any(e["election"] == k for e in elections)]
         if not kinds:
             return
         c1, c2 = st.columns(2)
-        chamber = c1.selectbox("Wybory", kinds, format_func=CHAMBER_LABELS.get, key="elected_chamber")
+        chamber = c1.selectbox(_t("Wybory"), kinds, format_func=CHAMBER_LABELS.get, key="elected_chamber")
         years = sorted({e["year"] for e in elections if e["election"] == chamber}, reverse=True)
-        year = c2.selectbox("Rok", years, key="elected_year")
+        year = c2.selectbox(_t("Rok"), years, key="elected_year")
         rows = _api_get("/elected", {"chamber": chamber, "year": year}) or []
         if not rows:
             st.caption("Brak wybranych w danych.")
@@ -1433,9 +1453,9 @@ def _elected() -> None:
         table = pd.DataFrame(rows)
         c3, c4 = st.columns(2)
         parties = ["wszystkie", *table["party"].value_counts().index]
-        party = c3.selectbox("Komitet", parties, key=f"elected_party_{chamber}_{year}")
+        party = c3.selectbox(_t("Komitet"), parties, key=f"elected_party_{chamber}_{year}")
         districts = ["wszystkie", *sorted(table["district_no"].dropna().astype(int).unique())]
-        district = c4.selectbox("Okręg", districts, key=f"elected_district_{chamber}_{year}")
+        district = c4.selectbox(_t("Okręg"), districts, key=f"elected_district_{chamber}_{year}")
         if party != "wszystkie":
             table = table[table["party"] == party]
         if district != "wszystkie":
@@ -1450,17 +1470,17 @@ def _elected() -> None:
 @st.fragment
 def _precinct_results() -> None:
     """"Wyniki obwodowe": every precinct of one gmina with turnout and winner, and one precinct in full."""
-    with st.expander("🏫 Wyniki obwodowe", expanded=False):
+    with st.expander(_t("🏫 Wyniki obwodowe"), expanded=False):
         elections = [e for e in _api_get("/elections") or [] if e["election"] in ("sejm", "prezydent", "pe") and e["year"] >= 2000]
         if not elections:
             return
         c1, c2, c3 = st.columns(3)
-        kind = c1.selectbox("Wybory", ["sejm", "prezydent", "pe"], format_func=CHAMBER_LABELS.get, key="precinct_kind")
+        kind = c1.selectbox(_t("Wybory"), ["sejm", "prezydent", "pe"], format_func=CHAMBER_LABELS.get, key="precinct_kind")
         years = sorted({e["year"] for e in elections if e["election"] == kind}, reverse=True)
-        year = c2.selectbox("Rok", years, key=f"precinct_year_{kind}")
+        year = c2.selectbox(_t("Rok"), years, key=f"precinct_year_{kind}")
         rounds = sorted({e["round"] for e in elections if (e["election"], e["year"]) == (kind, year)})
-        rnd = c3.selectbox("Tura", rounds, key=f"precinct_round_{kind}_{year}") if len(rounds) > 1 else 1
-        name = st.text_input("Gmina", placeholder="np. Wieliczka", key="precinct_gmina").strip()
+        rnd = c3.selectbox(_t("Tura"), rounds, key=f"precinct_round_{kind}_{year}") if len(rounds) > 1 else 1
+        name = st.text_input(_t("Gmina"), placeholder="np. Wieliczka", key="precinct_gmina").strip()
         if len(name) < 2:
             st.caption("Wpisz początek nazwy gminy.")
             return
@@ -1468,7 +1488,7 @@ def _precinct_results() -> None:
         if not gminas:
             st.caption(f"Nie znaleziono gminy „{name}”.")
             return
-        gmina = st.selectbox("Wybierz gminę", gminas, key="precinct_pick",
+        gmina = st.selectbox(_t("Wybierz gminę"), gminas, key="precinct_pick",
                              format_func=lambda h: f"{h['name']}{' (' + h['detail'] + ')' if h.get('detail') else ''}")
         params = {"election": kind, "year": year, "round": rnd, "teryt_gmina": gmina["unit"]}
         rows = (_api_get("/precincts", params) or {}).get("rows", [])
@@ -1483,7 +1503,7 @@ def _precinct_results() -> None:
         st.caption(f"{len(rows)} obwodów. Wybierz numer, aby zobaczyć wszystkie wyniki obwodu.")
         st.dataframe(table, hide_index=True, use_container_width=True)
         _csv_download(table, f"obwody {gmina['name']} {kind} {year}", key="csv_precincts")
-        number = st.selectbox("Obwód nr", [r["precinct_no"] for r in rows], key="precinct_no",
+        number = st.selectbox(_t("Obwód nr"), [r["precinct_no"] for r in rows], key="precinct_no",
                               format_func=lambda n: f"{n} — {next(r['address'] or '' for r in rows if r['precinct_no'] == n)}")
         detail = (_api_get("/precincts", {**params, "precinct_no": number}) or {}).get("rows", [])
         if detail:
@@ -1494,20 +1514,21 @@ def _precinct_results() -> None:
 
 
 REPORT_FAMILIES = {**CHAMBER_LABELS, "referendum": "Referendum", "rada": "Rady gmin, powiatów i dzielnic", "inne": "Porównania między wyborami"}
+REPORT_FAMILIES = {k: _t(v) for k, v in REPORT_FAMILIES.items()}
 
 
 @st.fragment
 def _reports() -> None:
     """"Gotowe zestawienia": the curated, verified SQL examples run without the LLM."""
-    with st.expander("📋 Gotowe zestawienia (bez LLM)", expanded=False):
+    with st.expander(_t("📋 Gotowe zestawienia (bez LLM)"), expanded=False):
         reports = _api_get("/reports") or []
         if not reports:
             return
         families = list(dict.fromkeys(r["family"] for r in reports))
         c1, c2 = st.columns([1, 2])
-        family = c1.selectbox("Wybory", families, format_func=lambda f: REPORT_FAMILIES.get(f, f), key="report_family")
+        family = c1.selectbox(_t("Wybory"), families, format_func=lambda f: REPORT_FAMILIES.get(f, f), key="report_family")
         options = [r for r in reports if r["family"] == family]
-        report = c2.selectbox("Zestawienie", options, format_func=lambda r: r["question"], key=f"report_{family}")
+        report = c2.selectbox(_t("Zestawienie"), options, format_func=lambda r: r["question"], key=f"report_{family}")
         data = _api_get(f"/reports/{report['id']}")
         if not data:
             return
@@ -1527,10 +1548,10 @@ RANKING_LABELS = {"candidacies": "liczba kandydowań", "elected": "liczba wygran
 @st.fragment
 def _rankings() -> None:
     """"Rankingi osób": top persons by candidacies, wins, career or votes, and moves between party families."""
-    with st.expander("🏅 Rankingi osób i zmiany komitetów", expanded=False):
+    with st.expander(_t("🏅 Rankingi osób i zmiany komitetów"), expanded=False):
         c1, c2 = st.columns(2)
-        by = c1.selectbox("Ranking według", list(RANKING_LABELS), format_func=RANKING_LABELS.get, key="rank_by")
-        chamber = c2.selectbox("Wybory", [None, *CHAMBER_LABELS], key="rank_chamber",
+        by = c1.selectbox(_t("Ranking według"), list(RANKING_LABELS), format_func=RANKING_LABELS.get, key="rank_by")
+        chamber = c2.selectbox(_t("Wybory"), [None, *CHAMBER_LABELS], key="rank_chamber",
                                format_func=lambda c: "osoby z kandydowaniem krajowym (wszystkie wybory)" if c is None else CHAMBER_LABELS[c])
         rows = _api_get("/rankings/persons", {"by": by, **({"chamber": chamber} if chamber else {})}) or []
         if rows:
@@ -1542,7 +1563,7 @@ def _rankings() -> None:
                 "votes": "głosy"}), hide_index=True, use_container_width=True)
             st.caption("Głosy: suma ze wszystkich kandydowań i tur. Osoby łączone po imionach i nazwisku (zob. „Szukaj osoby”).")
         st.markdown("**Przejścia między rodzinami partyjnymi (Sejm, Senat, PE)**")
-        since = st.slider("Kandydowania od roku", 1991, 2023, 1991, key="switch_since")
+        since = st.slider(_t("Kandydowania od roku"), 1991, 2023, 1991, key="switch_since")
         switches = _api_get("/rankings/party-switches", {"since": since}) or []
         if switches:
             flows = pd.DataFrame(switches)
@@ -1556,7 +1577,7 @@ def _rankings() -> None:
 @st.fragment
 def _data_coverage() -> None:
     """"Co jest w bazie": loaded elections and years (``GET /elections``)."""
-    with st.expander("ℹ️ Co jest w bazie", expanded=False):
+    with st.expander(_t("ℹ️ Co jest w bazie"), expanded=False):
         elections = _api_get("/elections") or []
         years: dict[str, list[int]] = {}
         for e in elections:
@@ -1577,11 +1598,11 @@ def _data_coverage() -> None:
 @st.fragment
 def _data_dictionary() -> None:
     """"Słownik danych": mart relations and columns with their descriptions (``GET /data-dictionary``)."""
-    with st.expander("📖 Słownik danych", expanded=False):
+    with st.expander(_t("📖 Słownik danych"), expanded=False):
         relations = _api_get("/data-dictionary") or []
         if not relations:
             return
-        search = st.text_input("Szukaj tabeli lub kolumny", placeholder="np. turnout, teryt_gmina", key="dict_search").strip().lower()
+        search = st.text_input(_t("Szukaj tabeli lub kolumny"), placeholder="np. turnout, teryt_gmina", key="dict_search").strip().lower()
         if search:
             relations = [r for r in relations if search in r["relation"] or search in (r["comment"] or "").lower()
                          or any(search in c["name"] for c in r["columns"])]
@@ -1604,7 +1625,7 @@ def _data_dictionary() -> None:
 @st.fragment
 def _gaps_and_sources() -> None:
     """"Znane luki i źródła": documented data gaps, answer caveats and the source files by republication date."""
-    with st.expander("⚠️ Znane luki w danych i pliki źródłowe", expanded=False):
+    with st.expander(_t("⚠️ Znane luki w danych i pliki źródłowe"), expanded=False):
         gaps_tab, sources_tab = st.tabs(["Znane luki", "Pliki źródłowe"])
         with gaps_tab:
             gaps = _api_get("/known-gaps") or {}
@@ -1704,8 +1725,8 @@ _kbw_table_stats_expander()
 
 with st.container(border=True):
     question = st.text_input(
-        "Twoje pytanie",
-        placeholder="np. Ile głosów miała KO w 2023? · posłowie PiS z Wrocławia",
+        _t("Twoje pytanie"),
+        placeholder=_t("np. Ile głosów miała KO w 2023? · posłowie PiS z Wrocławia"),
         label_visibility="visible",
         key="plujka_question_input",
     )
@@ -1714,11 +1735,11 @@ with st.container(border=True):
     # A follow-up ("a w 2019?") reuses the previous answered question and its SQL.
     can_follow = bool(earlier and earlier["data"].get("intent") == "dynamic_sql" and earlier["data"].get("sql"))
     follow_up = can_follow and st.toggle(
-        "Dopytaj o poprzedni wynik",
+        _t("Dopytaj o poprzedni wynik"),
         value=_looks_like_follow_up(q_val),
         help=f"Poprzednie pytanie: {earlier['question']}" if can_follow else None,
     )
-    submitted = st.button("Wyślij zapytanie", type="primary", use_container_width=True)
+    submitted = st.button(_t("Wyślij zapytanie"), type="primary", use_container_width=True)
 
 _person_search()
 _browse()
@@ -1771,7 +1792,7 @@ if last:
         _render_chart(data["result"])
         _render_map(data["result"])
 
-    with st.expander("Co zrozumiał system", expanded=False):
+    with st.expander(_t("Co zrozumiał system"), expanded=False):
         c1, c2 = st.columns(2)
         with c1:
             st.caption("Intencja")
@@ -1790,7 +1811,7 @@ if last:
                 meta_lines.append(f"`mandate_extremes_source` → **{mand_src}**")
             st.markdown(" · ".join(meta_lines))
 
-    with st.expander("Zapytanie SQL i źródło danych", expanded=False):
+    with st.expander(_t("Zapytanie SQL i źródło danych"), expanded=False):
         st.caption("Każda liczba w wyniku pochodzi z tego zapytania do bazy:")
         st.code(data["sql"], language="sql", wrap_lines=True)
         st.markdown(
@@ -1831,7 +1852,7 @@ if last:
     if st.session_state.get("_feedback_ack_fp") == fp:
         st.caption("Dziękujemy — ocena została zapisana.")
     else:
-        if st.button("👍 Dobra odpowiedź", key=f"fb_up_{fp}", use_container_width=True):
+        if st.button(_t("👍 Dobra odpowiedź"), key=f"fb_up_{fp}", use_container_width=True):
             try:
                 fb = requests.post(
                     f"{API_URL}/feedback",
@@ -1848,7 +1869,7 @@ if last:
             "Jeśli wynik jest błędny, niepełny albo nie na temat, wyślij go do poprawy. "
             "Zapiszemy pytanie, SQL i odpowiedź, żeby poprawić logikę systemu."
         )
-        if st.button("⚠️ Zgłoś odpowiedź do poprawy", key=f"fb_down_{fp}", use_container_width=True):
+        if st.button(_t("⚠️ Zgłoś odpowiedź do poprawy"), key=f"fb_down_{fp}", use_container_width=True):
             try:
                 fb = requests.post(
                     f"{API_URL}/feedback",

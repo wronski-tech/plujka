@@ -65,7 +65,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [x] 43. Legenda map z wyborem przedziałów.
 - [x] 44. Eksport mapy i wykresu do PNG/SVG.
 - [x] 45. Historia zapytań w sesji.
-- [ ] 46. Angielska wersja interfejsu (etykiety).
+- [x] 46. Angielska wersja interfejsu (etykiety).
 
 **Jakość danych dla użytkownika**
 - [x] 47. Strona „Znane luki w danych” z `docs/MART.md` i `CAVEATS`.

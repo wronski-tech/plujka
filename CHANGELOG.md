@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- English UI labels: `?lang=en` (switch link in the header) translates panel titles, controls, buttons and election/level names (`streamlit_app/i18n.py`); answers, captions and data stay Polish; browse links keep the language.
 - Candidate votes per gmina: plain view `mart.v_candidate_gmina_votes` (Sejm, Senate, EP; in the prompt with those elections), `GET /persons/{id}/gminas` and a „Głosy w gminach” map with top gminas on the person card.
 - Image export and phone layout: charts and maps download as SVG and PNG on request (charts via vl-convert, maps drawn as SVG from the boundaries, `map_units.features_svg`); a compact layout below 640px.
 - Dark mode and accessibility: the hero and custom styles follow the system dark theme (Streamlit's default „Use system setting”; maps switch to a dark basemap), visible keyboard focus, screen-reader descriptions of the answer/browse charts (what they show, highest and lowest bar) and of the map legend. Browse links with `poziom=` no longer show Streamlit's „created with a default value” warning.
