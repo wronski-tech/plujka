@@ -1746,9 +1746,84 @@ def load_senat_byelections(pg: psycopg.Connection, path: Path = SENAT_BYELECTION
     return pg.execute("SELECT count(DISTINCT (election_date, district_no)) FROM mart.senat_byelections").fetchone()[0]
 
 
+# Local recall referendums from PKW's term sites on wybory.gov.pl (scripts/fetch_local_referenda.py).
+LOCAL_REFERENDA = Path(__file__).resolve().parents[3] / "data" / "pkw_html" / "local_referenda.csv"
+_LOCAL_REFERENDA_COLUMNS = {
+    "term": "TEXT", "referendum_id": "INT", "referendum_date": "DATE", "teryt_wojewodztwo": "TEXT", "wojewodztwo": "TEXT",
+    "teryt_powiat": "TEXT", "powiat": "TEXT", "teryt_gmina": "TEXT", "gmina": "TEXT", "organ": "TEXT", "question_no": "INT",
+    "question": "TEXT", "eligible_voters": "INT", "ballots_cast": "INT", "valid_votes": "INT", "yes_votes": "INT",
+    "no_votes": "INT", "recall_election_voters": "INT", "recall_election_date": "DATE", "validity": "TEXT", "outcome": "TEXT",
+    "source_url": "TEXT",
+}
+
+LOCAL_REFERENDA_SQL = r"""
+DROP TABLE IF EXISTS mart.local_referenda;
+CREATE TABLE mart.local_referenda AS
+SELECT term, referendum_id, referendum_date, extract(year FROM referendum_date)::int AS year,
+       CASE WHEN teryt_gmina IS NULL THEN 'powiat' ELSE 'gmina' END AS level, teryt_wojewodztwo, wojewodztwo, teryt_powiat,
+       powiat, teryt_gmina, gmina, organ, question_no, question, eligible_voters, ballots_cast,
+       round(100.0 * ballots_cast / eligible_voters, 2) AS turnout_pct, valid_votes, yes_votes, no_votes,
+       round(100.0 * yes_votes / NULLIF(valid_votes, 0), 2) AS yes_pct, recall_election_voters, recall_election_date,
+       is_valid, recalled, validity, outcome, source_url
+FROM local_referendum_src;
+COMMENT ON TABLE mart.local_referenda IS 'Local referendums to recall an organ before the end of its term (referenda w sprawie odwołania wójta / burmistrza / prezydenta miasta, rady gminy or rady powiatu), held 2015-2026 (terms 2014-2018, 2018-2024 and 2024-2029), one row per question (a referendum can ask about the mayor and the council). Referendums on other local matters are not published by PKW and are not included; there is no data for recall referendums before the 2014 term. Source: the territorial commission''s result protocol on PKW''s wybory.gov.pl term sites (source_url).';
+COMMENT ON COLUMN mart.local_referenda.term IS 'Term of the local authorities the referendum took place in, e.g. ''2018-2024''.';
+COMMENT ON COLUMN mart.local_referenda.referendum_id IS 'PKW''s id of the referendum on its term site (unique within a term).';
+COMMENT ON COLUMN mart.local_referenda.level IS '''gmina'' (gmina council or mayor) or ''powiat'' (powiat council; teryt_gmina NULL).';
+COMMENT ON COLUMN mart.local_referenda.teryt_gmina IS '6-digit TERYT of the gmina (NULL for powiat referendums).';
+COMMENT ON COLUMN mart.local_referenda.gmina IS 'Gmina name as published, e.g. ''gm. Bałtów'', ''m. Sulmierzyce''.';
+COMMENT ON COLUMN mart.local_referenda.organ IS 'Organ the referendum concerned, e.g. ''Wójt Gminy Werbkowice'', ''Rada Powiatu w Hrubieszowie''.';
+COMMENT ON COLUMN mart.local_referenda.question IS 'Matter of the question, e.g. ''odwołania Wójta Gminy Werbkowice przed upływem kadencji''.';
+COMMENT ON COLUMN mart.local_referenda.ballots_cast IS 'Ballot papers taken from the ballot box: the number of people who took part.';
+COMMENT ON COLUMN mart.local_referenda.turnout_pct IS 'ballots_cast / eligible_voters in percent (0-100).';
+COMMENT ON COLUMN mart.local_referenda.yes_votes IS 'Valid votes for recalling the organ (tak).';
+COMMENT ON COLUMN mart.local_referenda.yes_pct IS 'yes_votes / valid_votes in percent (0-100).';
+COMMENT ON COLUMN mart.local_referenda.recall_election_voters IS 'People who took part in the election of the organ to be recalled; a recall referendum is valid when ballots_cast is at least 3/5 of this number.';
+COMMENT ON COLUMN mart.local_referenda.recall_election_date IS 'Date of that election.';
+COMMENT ON COLUMN mart.local_referenda.is_valid IS 'The referendum was valid (ważne): at least 3/5 of recall_election_voters took part.';
+COMMENT ON COLUMN mart.local_referenda.recalled IS 'The organ was recalled: the referendum was valid and more than half of the valid votes were for recalling it.';
+COMMENT ON COLUMN mart.local_referenda.validity IS 'The commission''s statement on validity, e.g. ''Referendum jest nieważne, gdyż wzięło w nim udział mniej niż 3/5 ...''.';
+COMMENT ON COLUMN mart.local_referenda.outcome IS 'The commission''s statement on the result, e.g. ''Wójt Gminy Werbkowice nie został odwołany''.';
+"""
+
+
+def load_local_referenda(pg: psycopg.Connection, path: Path = LOCAL_REFERENDA) -> int:
+    """Create ``mart.local_referenda`` from ``path``; return its number of referendums.
+
+    Raises ValueError when a question's votes do not reconcile (yes + no = valid <= cast <= eligible),
+    or when the commission's validity or outcome statement disagrees with the 3/5 rule and the
+    majority of valid votes.
+    """
+    with path.open(encoding="utf-8", newline="") as fh:
+        rows = [tuple(r[c] or None for c in _LOCAL_REFERENDA_COLUMNS) for r in csv.DictReader(fh)]
+    columns = ", ".join(f"{c} {t}" for c, t in _LOCAL_REFERENDA_COLUMNS.items())
+    pg.execute("DROP TABLE IF EXISTS local_referendum_src")
+    pg.execute(f"CREATE TEMP TABLE local_referendum_src ({columns}) ON COMMIT DROP")
+    with pg.cursor() as cur:
+        cur.executemany(f"INSERT INTO local_referendum_src VALUES ({', '.join(['%s'] * len(_LOCAL_REFERENDA_COLUMNS))})", rows)
+    # Statements: 'Referendum jest (nie)ważne, ...' and '<organ> (nie) został(a) odwołany/odwołana, ...'.
+    pg.execute(
+        r"""ALTER TABLE local_referendum_src ADD COLUMN is_valid BOOLEAN, ADD COLUMN recalled BOOLEAN;
+            UPDATE local_referendum_src SET is_valid = validity ~* '^referendum jest ważne',
+                   recalled = outcome !~* '\mnie zosta(ł|ła) odwołan' AND outcome ~* '\mzosta(ł|ła) odwołan'"""
+    )
+    errors = pg.execute(
+        """SELECT term, referendum_id, question_no FROM local_referendum_src
+           WHERE yes_votes + no_votes <> valid_votes OR NOT valid_votes <= ballots_cast OR NOT ballots_cast <= eligible_voters
+              OR validity !~* '^referendum jest (nie)?ważne' OR is_valid <> (5 * ballots_cast >= 3 * recall_election_voters)
+              OR recalled <> (is_valid AND 2 * yes_votes > valid_votes)
+              OR (teryt_gmina IS NULL) <> (organ ILIKE 'Rada Powiatu%')"""
+    ).fetchall()
+    if errors:
+        raise ValueError(f"local referendums whose votes, validity or outcome do not reconcile: {errors}")
+    pg.execute(LOCAL_REFERENDA_SQL)
+    return pg.execute("SELECT count(DISTINCT (term, referendum_id)) FROM mart.local_referenda").fetchone()[0]
+
+
 def rebuild(pg: psycopg.Connection) -> None:
     """Rebuild persons, views and the entity lexicon from everything loaded (caller's transaction)."""
     log.info("Senate by-elections: %s", load_senat_byelections(pg))
+    log.info("local recall referendums: %s", load_local_referenda(pg))
     pg.execute(DROP_SQL)
     link_persons(pg)
     persons = pg.execute(

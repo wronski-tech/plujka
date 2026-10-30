@@ -383,5 +383,42 @@ class TestSenatByelectionsDb(unittest.TestCase):
                 conn.rollback()
 
 
+@unittest.skipUnless(_RUN, "Set PLUJKA_RUN_DB_TESTS=1 to run DB integration tests")
+class TestLocalReferendaDb(unittest.TestCase):
+    def test_statements_follow_the_votes(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        import psycopg
+
+        from api.services.config import DATABASE_URL
+        from api.services.mart import derived
+
+        lines = derived.LOCAL_REFERENDA.read_text(encoding="utf-8").splitlines(keepends=True)
+        # 2021-06-20 Werbkowice: 1,737 of the 3,999 voters of 2018 took part (less than 3/5): invalid.
+        row = next(i for i, line in enumerate(lines) if ",2391,2021-06-20," in line)
+        with tempfile.TemporaryDirectory() as tmp, psycopg.connect(DATABASE_URL) as conn:
+            try:
+                derived.load_local_referenda(conn)
+                # 2019-11-24 Bałtów: valid (1,277 of 2,055) and 1,208 of 1,251 valid votes for recalling the council.
+                self.assertEqual(
+                    conn.execute("SELECT is_valid, recalled, level FROM mart.local_referenda WHERE term = '2018-2024' AND referendum_id = 1950"
+                                 ).fetchone(),
+                    (True, True, "gmina"),
+                )
+                self.assertEqual(
+                    conn.execute("SELECT is_valid, recalled FROM mart.local_referenda WHERE term = '2018-2024' AND referendum_id = 2391"
+                                 ).fetchone(),
+                    (False, False),
+                )
+                path = Path(tmp) / "referenda.csv"
+                path.write_text("".join(lines[:row] + [lines[row].replace('"Referendum jest nieważne', '"Referendum jest ważne')]
+                                        + lines[row + 1:]), encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, r"'2018-2024', 2391, 1"):
+                    derived.load_local_referenda(conn, path)
+            finally:
+                conn.rollback()
+
+
 if __name__ == "__main__":
     unittest.main()

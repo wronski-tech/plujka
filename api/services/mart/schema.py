@@ -61,6 +61,7 @@ DERIVED_RELATIONS = (
     "persons",
     "party_families",
     "senat_byelections",
+    "local_referenda",
     "v_seat_methods",
     "v_gus_units",
     "gmina_codes_pre1999",

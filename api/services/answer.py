@@ -177,6 +177,11 @@ CAVEATS: tuple[tuple[str, Any], ...] = (
         _about_rada_1994,
     ),
     (
+        "Referenda lokalne w danych to tylko referenda w sprawie odwołania organów gminy lub powiatu od kadencji "
+        "2014–2018; PKW nie publikuje wyników referendów lokalnych w innych sprawach ani wcześniejszych.",
+        lambda rows, sql: "local_referenda" in sql.lower(),
+    ),
+    (
         "PKW nie publikuje identyfikatorów osób: kandydatury łączone są po imieniu, nazwisku, płci "
         "(i roku urodzenia w wyborach samorządowych), więc imiennicy mogą być połączeni lub rozdzieleni błędnie.",
         lambda rows, sql: "v_person_history" in sql.lower() or "persons" in sql.lower(),

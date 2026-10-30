@@ -548,6 +548,7 @@ class TestAnswerNumbers(unittest.TestCase):
         councils = "SELECT year, committee_name, seats FROM mart.v_rada_results WHERE level = 'country'"
         self.assertIn("1994", answer.caveats([{"year": 1994, "committee_name": "PSL", "seats": 10}], councils)[0])
         self.assertEqual(answer.caveats([{"year": 1998, "committee_name": "PSL", "seats": 10}], councils), [])
+        self.assertIn("odwołania", answer.caveats([{"gmina": "gm. Bałtów"}], "SELECT gmina FROM mart.local_referenda WHERE recalled")[0])
         with patch.object(answer, "OPENAI_API_KEY", ""):
             self.assertEqual(len(answer.compose_answer("Frekwencja PE 2014?", pe2014, turnout)["caveats"]), 1)
 
@@ -812,7 +813,7 @@ class TestPromptRelations(unittest.TestCase):
     AVAILABLE = [
         "elections", "persons", "v_turnout", "precincts", "sejm_lists", "senat_candidates",
         "prezydent_results", "wbp_candidates", "sejmik_lists", "rada_candidates", "pe_lists", "v_seat_methods",
-        "gmina_codes_pre1999", "v_precinct_results", "v_candidate_gmina_votes",
+        "gmina_codes_pre1999", "v_precinct_results", "v_candidate_gmina_votes", "local_referenda",
     ]
 
     def test_named_election_kind_limits_the_schema(self) -> None:
@@ -841,6 +842,14 @@ class TestPromptRelations(unittest.TestCase):
         self.assertIn("sejm_lists", relations)
         self.assertNotIn("pe_lists", relations)
         self.assertNotIn("v_precinct_results", dynamic_sql.relevant_relations("Kto wygrał wybory prezydenckie w 2020?", self.AVAILABLE))
+
+    def test_recall_questions_get_the_local_referendums(self) -> None:
+        for question in ("Ile było referendów w sprawie odwołania wójta?", "Kiedy odwołano burmistrza Chrzanowa?",
+                         "Które referenda lokalne były ważne?"):
+            with self.subTest(question=question):
+                self.assertIn("local_referenda", dynamic_sql.relevant_relations(question, self.AVAILABLE))
+        # "Wodzisław" or a question about councils without recall must not pull in the referendum table.
+        self.assertNotIn("local_referenda", dynamic_sql.relevant_relations("Ilu radnych ma gmina Wodzisław?", self.AVAILABLE))
 
     def test_seat_method_questions_get_the_seat_view(self) -> None:
         relations = dynamic_sql.relevant_relations("Ile mandatów miałby PiS metodą Sainte-Laguë?", self.AVAILABLE)

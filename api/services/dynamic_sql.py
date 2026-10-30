@@ -146,7 +146,9 @@ FAMILY_KEYWORDS: dict[str, tuple[str, ...]] = {
     r"senat|senac|parlament(?!\w*\s+europ)": ("senat_", "precincts", "v_candidate_"),
     r"prezyden": ("prezydent_", "v_prezydent_", "wbp_"),
     r"europ|\bpe\b": ("pe_", "v_pe_", "v_candidate_"),
-    r"referend": ("referendum_", "v_referendum_"),
+    r"referend": ("referendum_", "v_referendum_", "local_referenda"),
+    # Recall referendums (odwołanie wójta, burmistrza, rady) are local referendums too.
+    r"odwola|odwoln": ("local_referenda",),
     r"sejmik|wojewodzk": ("sejmik_", "v_sejmik_"),
     r"samorzad": ("sejmik_", "v_sejmik_", "wbp_", "rada_", "v_rada_"),
     r"wojt|burmistrz|mayor": ("wbp_",),
