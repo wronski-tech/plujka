@@ -187,7 +187,7 @@ def _render_scatter(rows: list[dict], label: str, x: str, y: str) -> None:
             y=alt.Y(f"{y}:Q", title=y, scale=alt.Scale(zero=False)),
             tooltip=[label, x, y],
         )
-        .properties(height=420)
+        .properties(height=420, description=f"Wykres punktowy: {x} i {y} dla {len(frame)} jednostek ({label}).")
     )
     st.altair_chart(chart, use_container_width=True)
     st.caption(f"Każdy punkt to jedna jednostka ({len(frame)}): {x} (oś pozioma) i {y} (oś pionowa).")
@@ -203,9 +203,18 @@ def _render_line(rows: list[dict], series: str | None) -> None:
         .mark_line(point=True, **({} if series else {"color": "#6366f1"}))
         .encode(x=alt.X("year:O", title="Rok"), y=alt.Y(f"{value}:Q", title=value),
                 tooltip=["year", value] + ([series] if series else []), **encoding)
-        .properties(height=360)
+        .properties(height=360, description=(
+            f"Wykres liniowy: {value} w latach {frame['year'].min()}–{frame['year'].max()}"
+            + (f", serie: {', '.join(map(str, frame[series].unique()))}." if series else ".")))
     )
     st.altair_chart(chart, use_container_width=True)
+
+
+def _bar_description(frame: pd.DataFrame, label: str, value: str) -> str:
+    """Screen-reader text of a bar chart: what it shows and its highest and lowest bar (values from the rows)."""
+    top, bottom = frame.loc[frame[value].idxmax()], frame.loc[frame[value].idxmin()]
+    return (f"Wykres słupkowy: {value} dla {len(frame)} pozycji ({label}). "
+            f"Najwyżej: {top[label]} ({top[value]}); najniżej: {bottom[label]} ({bottom[value]}).")
 
 
 def _render_chart(rows: list[dict]) -> None:
@@ -237,7 +246,7 @@ def _render_chart(rows: list[dict]) -> None:
             y=alt.Y(f"{label}:N", sort="-x", title=None, axis=alt.Axis(labelOverlap=False, labelLimit=240)),
             tooltip=[label, value],
         )
-        .properties(height=max(120, 26 * len(frame)))
+        .properties(height=max(120, 26 * len(frame)), description=_bar_description(frame, label, value))
     )
     st.altair_chart(chart, use_container_width=True)
 
@@ -286,7 +295,8 @@ def _map_legend(items: list[tuple[list[int], str]]) -> None:
         f'margin-right:5px;display:inline-block"></span>{label}</span>'
         for c, label in items
     )
-    st.markdown(f'<div style="font-size:0.85rem;line-height:1.9">{swatches}</div>', unsafe_allow_html=True)
+    st.markdown(f'<div role="img" aria-label="Legenda mapy: {"; ".join(label for _, label in items)}" '
+                f'style="font-size:0.85rem;line-height:1.9">{swatches}</div>', unsafe_allow_html=True)
 
 
 def _render_map(rows: list[dict], key: str = "answer") -> None:
@@ -805,6 +815,18 @@ st.markdown(
             font-size: 0.98rem;
             line-height: 1.45;
         }
+        /* Streamlit follows the system theme by default ("Use system setting"); keep the hero readable in dark mode. */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --plujka-ink: #e0e7ff;
+                --plujka-muted: #a5b4fc;
+                --plujka-line: rgba(165, 180, 252, 0.25);
+                --plujka-glow: rgba(0, 0, 0, 0.3);
+            }
+            .plujka-hero { background: linear-gradient(125deg, #1e1b4b 0%, #312e81 52%, #3b0764 100%); }
+        }
+        /* Visible keyboard focus on every control. */
+        :focus-visible { outline: 2px solid #6366f1 !important; outline-offset: 2px; }
     </style>
     """,
     unsafe_allow_html=True,
@@ -960,7 +982,9 @@ def _browse() -> None:
         view = c4.radio("Pokaż", views, horizontal=True, key="browse_view")
         levels = [k for k in LEVEL_LABELS if year < 1999 or k != "wojewodztwo_1975"]
         _from_link("browse_level", levels)
-        level = c5.selectbox("Poziom", levels, index=1, format_func=LEVEL_LABELS.get, key="browse_level")
+        if st.session_state.get("browse_level") not in levels:
+            st.session_state["browse_level"] = "wojewodztwo"  # default without index=, which clashes with linked state
+        level = c5.selectbox("Poziom", levels, format_func=LEVEL_LABELS.get, key="browse_level")
         if year < 1999 and level in ("powiat", "gmina"):
             st.caption("Gminy sprzed 1999 r. przypisane do dzisiejszych przez mart.gmina_codes_pre1999; przed 1995 r. "
                        "gmina obejmuje też gminy wydzielone później, a dzielnice Warszawy z lat 1990–1994 są tylko w powiecie.")
