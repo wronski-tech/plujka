@@ -61,6 +61,7 @@ EN = {
     "Jeden okręg krajowy (460 mandatów)": "One national district (460 seats)",
     "Szukaj tabeli lub kolumny": "Search a table or column",
     "Głosy w gminach": "Votes by gmina",
+    "Granice okręgów wyborczych": "Electoral district borders",
     "Zobacz wszystkie kandydatury": "See all candidacies",
     "Zamknij": "Close",
     "Skala mapy": "Map scale",

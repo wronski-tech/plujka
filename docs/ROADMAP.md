@@ -44,7 +44,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 26. Więcej GUS: struktura wieku, wykształcenie (NSP 2002/2011/2021), dochody gmin.
 - [ ] 27. Wybory uzupełniające do Senatu.
 - [ ] 28. Referenda lokalne i odwołania wójtów (jeśli dane są dostępne).
-- [ ] 29. Granice okręgów sejmowych i senackich na mapie.
+- [x] 29. Granice okręgów sejmowych i senackich na mapie.
 - [ ] 30. Adresy obwodów i wyszukiwarka „mój obwód”.
 
 **API i otwarte dane**

@@ -21,7 +21,7 @@ import vl_convert as vlc
 
 from chart_columns import line_series, numeric_columns, scatter_columns
 from i18n import EN
-from map_units import boundaries, feature_key, features_svg, is_osm, unit_values, visible_features, voivodeship_level
+from map_units import boundaries, district_borders, feature_key, features_svg, is_osm, unit_values, visible_features, voivodeship_level
 
 # UI language: ?lang=en shows English labels (i18n.EN); answers and data stay Polish.
 LANG = "en" if st.query_params.get("lang") == "en" else "pl"
@@ -331,7 +331,16 @@ def _map_legend(items: list[tuple[list[int], str]]) -> None:
                 f'style="font-size:0.85rem;line-height:1.9">{swatches}</div>', unsafe_allow_html=True)
 
 
-def _render_map(rows: list[dict], key: str = "answer") -> None:
+@st.cache_data(max_entries=8)
+def _district_borders(pairs: tuple[tuple[str, int], ...]) -> dict:
+    """District borders from (teryt_gmina, district_no) pairs, drawn on the gmina boundaries."""
+    districts: dict[str, set[int]] = {}
+    for teryt, number in pairs:
+        districts.setdefault(teryt, set()).add(number)
+    return district_borders(boundaries("gminy")["features"], districts, "gminy")
+
+
+def _render_map(rows: list[dict], key: str = "answer", borders: dict | None = None) -> None:
     """Choropleth of a number per gmina, powiat or voivodeship when the rows carry the unit code."""
     value = _value_column(rows) if rows else None
     if not value:
@@ -387,9 +396,11 @@ def _render_map(rows: list[dict], key: str = "answer") -> None:
         get_line_color=[100, 116, 139, 120],
         line_width_min_pixels=0.5,
     )
+    lines = [pdk.Layer("GeoJsonLayer", borders, stroked=True, filled=False, get_line_color=[30, 27, 75, 230],
+                       line_width_min_pixels=1.6)] if borders else []
     st.pydeck_chart(
         pdk.Deck(
-            layers=[layer],
+            layers=[layer, *lines],
             initial_view_state=_view_of(matched_points),
             map_style=None,
             tooltip={"text": f"{{name}}\n{value}: {{value}}"},
@@ -1163,7 +1174,15 @@ def _browse() -> None:
         st.dataframe(pd.DataFrame(shown).drop(columns=["year"], errors="ignore"), hide_index=True, use_container_width=True)
         _csv_download(rows, f"{kind}_{year}_{view}_{level}", key="csv_browse")
         _render_chart(shown)
-        _render_map(shown, key="browse")
+        borders = None
+        if kind in ("sejm", "senat") and year >= 2001 and level != "country" and st.toggle(
+                _t("Granice okręgów wyborczych"), key="browse_districts"):
+            pairs = tuple((r["teryt_gmina"], r["district_no"]) for r in _api_get("/districts", {"election": kind, "year": year}) or []
+                          if r["district_no"] is not None)
+            borders = _district_borders(pairs) if pairs else None
+            if kind == "senat":
+                st.caption("Wrocław, Łódź i Kraków są podzielone między dwa okręgi senackie; mapa nie rysuje granicy w ich obrębie.")
+        _render_map(shown, key="browse", borders=borders)
 
 
 def _page_url() -> str:

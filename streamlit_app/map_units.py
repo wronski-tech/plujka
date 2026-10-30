@@ -222,3 +222,25 @@ def features_svg(features: list[dict], title: str, legend: list[tuple[list[int],
     return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{total:.0f}" viewBox="0 0 {width} {total:.0f}" '
             f'font-family="sans-serif"><rect width="100%" height="100%" fill="white"/>'
             f'<text x="10" y="26" font-size="16" font-weight="bold">{escape(title)}</text>{"".join(paths)}{swatches}</svg>')
+
+
+def district_borders(features: list[dict], districts: dict[str, set[int]], level: str) -> dict:
+    """MultiLineString of the borders between electoral districts made of whole units.
+
+    ``districts`` maps a unit key (``feature_key``) to its district numbers. An edge shared by two units
+    is a border when their district sets differ; an edge of one unit only is the outer border. The
+    boundary files share vertices along common borders, so shared edges match exactly. A unit split
+    between districts (a set of two) draws no inner line; a unit missing from ``districts`` draws none of its edges.
+    """
+    owners: dict[tuple, list[frozenset[int] | None]] = defaultdict(list)
+    for feature in features:
+        if "parts" in feature["properties"]:
+            continue
+        found = districts.get(feature_key(feature["properties"], level))
+        for ring in _rings(feature["geometry"]):
+            for a, b in zip(ring, ring[1:]):
+                owners[(tuple(a), tuple(b)) if a <= b else (tuple(b), tuple(a))].append(frozenset(found) if found else None)
+    # A unit without a district (e.g. a gmina created after the election) hides its edges instead of drawing them.
+    lines = [[list(a), list(b)] for (a, b), sides in owners.items()
+             if None not in sides and (len(sides) == 1 or len(set(sides)) > 1)]
+    return {"type": "Feature", "geometry": {"type": "MultiLineString", "coordinates": lines}, "properties": {}}

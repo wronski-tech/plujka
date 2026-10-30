@@ -6,7 +6,7 @@ import json
 import unittest
 
 from streamlit_app.map_units import (
-    GEO_DIR, boundaries, feature_key, features_svg, is_additive, is_osm, pre1999_codes, teryt_changes, unit_values,
+    GEO_DIR, boundaries, district_borders, feature_key, features_svg, is_additive, is_osm, pre1999_codes, teryt_changes, unit_values,
     visible_features, voivodeship_level,
 )
 
@@ -353,6 +353,23 @@ class TestFeaturesSvg(unittest.TestCase):
         self.assertAlmostEqual((max(ys) - min(ys)) / (max(xs) - min(xs)), 2.0, places=2)
         self.assertIn("<title>A &amp; B: 7</title>", svg)
         self.assertIn("Tytuł &lt;x&gt;", svg)
+
+
+
+class TestDistrictBorders(unittest.TestCase):
+    def test_only_edges_between_districts_and_the_outer_border_are_drawn(self) -> None:
+        def square(teryt: str, x: int) -> dict:
+            ring = [[x, 0], [x + 1, 0], [x + 1, 1], [x, 1], [x, 0]]
+            return {"geometry": {"type": "Polygon", "coordinates": [ring]}, "properties": {"teryt": teryt}}
+
+        units = [square("A", 0), square("B", 1), square("C", 2), square("D", 3)]
+        lines = district_borders(units, {"A": {1}, "B": {1}, "C": {2}}, "gminy")["geometry"]["coordinates"]
+        segments = {tuple(map(tuple, line)) for line in lines}
+        self.assertIn(((2, 0), (2, 1)), segments)  # B | C: different districts
+        self.assertNotIn(((1, 0), (1, 1)), segments)  # A | B: same district
+        self.assertIn(((0, 0), (0, 1)), segments)  # outer edge of A
+        self.assertNotIn(((3, 0), (3, 1)), segments)  # C | D: D has no district, so nothing is drawn
+        self.assertNotIn(((4, 0), (4, 1)), segments)
 
 
 if __name__ == "__main__":

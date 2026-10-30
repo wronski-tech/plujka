@@ -14,6 +14,8 @@ matching rules in `map_units.py`).
 | `teryt_changes.json` | old code → current code | | applied to `teryt_gmina` / `teryt_powiat` before matching | |
 | `gminy_pre1999.json` | pre-1999 gmina code → 1999 TERYT and current gmina(s); gmina → 1975-1998 voivodeship | | applied to `teryt_gmina_pre1999` before matching | |
 
+District borders (`map_units.district_borders`) rely on neighbouring features sharing their border vertices exactly: an edge of two gminas in different districts is drawn, an edge of one gmina is the national border.
+
 `map_units.boundaries` merges `<level>.json` with `<level>_osm.json`, so the map uses both (2479
 gminas, Warsaw as its 18 districts).
 

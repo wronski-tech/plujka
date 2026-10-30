@@ -1240,6 +1240,27 @@ def data_package(
                     headers={"Content-Disposition": f'attachment; filename="plujka-{election}-{year}.zip"'})
 
 
+DISTRICT_GMINAS_SQL = """
+SELECT DISTINCT teryt_gmina, CASE WHEN %(election)s = 'sejm' THEN sejm_district_no ELSE senat_district_no END AS district_no
+FROM mart.precincts WHERE year = %(year)s AND teryt_gmina IS NOT NULL
+ORDER BY 1, 2
+"""
+
+
+class DistrictGmina(BaseModel):
+    teryt_gmina: str
+    district_no: int | None = Field(description="Sejm or Senate district; a gmina split between districts has one row each")
+
+
+@app.get("/districts", response_model=list[DistrictGmina], tags=["browse"], dependencies=[Depends(require_api_key)])
+def districts(
+    election: Literal["sejm", "senat"] = Query(),
+    year: int = Query(ge=2001, le=2100, description="2001 onwards (earlier precincts have no current gmina code)"),
+) -> list[DistrictGmina]:
+    """Gminas of every Sejm or Senate district in one election, from the precinct register (for map borders)."""
+    return [DistrictGmina.model_validate(r) for r in _mart_rows(DISTRICT_GMINAS_SQL, {"election": election, "year": year})]
+
+
 CANDIDATE_GMINAS_SQL = """
 SELECT election, year, 1 AS round, 'gmina' AS level, wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina,
        full_name AS name, district_no, votes, valid_votes, pct
