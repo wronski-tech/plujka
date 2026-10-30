@@ -233,9 +233,9 @@ Limits: namesakes with one given name who never ran in different voivodeships, o
 happen to be alike, can still be merged; movers whose occupation changed are split (overrides:
 Hofman, Kośla, Hatka); people who changed surname are linked only by an override.
 
-Current build: 60,681 national persons (56,422 by name and gender, 2,349 with abbreviated given
-names joined, 1,014 by residence, 728 split by voivodeship, 163 by birth year, 5 manual) and
-1,058,801 local persons.
+Current build: 60,709 national persons (56,448 by name and gender, 2,348 with abbreviated given
+names joined, 1,016 by residence, 728 split by voivodeship, 163 by birth year, 6 manual) and
+1,145,815 local persons.
 
 ## Building it
 
@@ -620,8 +620,15 @@ would answer it from Sejm data.
    matched places, except that a given name or a capitalized word inside the sentence beats a
    voivodeship or powiat, whose names are lower-case adjectives ("Mazowieckiego" is the person,
    "w województwie mazowieckim" the place); places named like the given name of a matched person;
-   places matched only by a party alias ("PiS" is not Pisz); and 1975–1998 voivodeships when a
-   current place matched and the question names neither an earlier year nor "województwo".
+   places matched only by a party alias ("PiS" is not Pisz); 1975–1998 voivodeships when a
+   current place matched and the question names neither an earlier year nor "województwo"; places
+   whose question words a place of the same kind matches more closely or with more words, or a
+   person named with given name and surname ("Szczecin" is not Szczecinek, "Bielsko-Biała" not
+   Biała, "Przemysław Czarnek" neither Przemyśl nor Czarne); persons without a candidacy in the
+   years the question names when another matched person has one; and rural gminas named like a
+   town gmina when the question says "miasto". Round words („turę”, „turze”) and „mieli” are stop
+   words. `scripts/run_eval.py --check` lists evaluation questions whose entity resolution differs
+   from the expected one.
 2. **Clarification.** If several persons or same-name gminas remain, the API returns
    `intent = "clarification"` with options instead of guessing. The UI shows them as buttons; a
    choice is sent back as `entity_refs: [{"kind": "person", "ref": "<person_id>"}]`, which pins that

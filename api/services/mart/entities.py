@@ -39,6 +39,7 @@ _STOPWORDS = frozenset(
     wojewodztwo wojewodztwie glosow glosy glos procent poparcie frekwencja frekwencji kandydat kandydaci
     kandydatow partia partii komitet komitetu lista listy roku rok wynik wyniki mandat mandaty mandatow
     posel poslow posla senator senatora miasto miescie wies wsi oraz czy jak dla przez jest byl byla bylo
+    tura ture turze tury turach mieli mial miala mialo
     """.split()
 )
 
@@ -245,8 +246,49 @@ def narrow_matches(question: str, matches: list[EntityMatch]) -> list[EntityMatc
     - Voivodeships of 1975-1998 when the same question also matched a current gmina or powiat and
       names neither a year before 1999 nor "województwo" ("w Krakowie" is the city, not the
       voivodeship krakowskie).
+    - Places whose question words another match names more closely or together with more words
+      ("Szczecin" is not Szczecinek, "Bielsko-Biała" not Biała, "Przemysław Czarnek" neither
+      Przemyśl nor Czarne).
+    - Persons without a candidacy in the years the question names, when another matched person has
+      one ("Jarosław Kaczyński w 2023" is the one who ran in 2023).
+    - Rural gminas named like a town gmina when the question says "miasto" ("w mieście Elbląg").
     """
     stems, _ = question_terms(question)
+    question_words = [_word_stems(fold(raw)) for raw in re.findall(r"[^\W_]+", question)]
+
+    def rests(m: EntityMatch) -> dict[int, int]:
+        """Question word index -> fewest letters any name word of ``m`` leaves uncovered there."""
+        out: dict[int, int] = {}
+        for word in re.split(r"[\s\-]+", _PLACE_PREFIX.sub("", fold(m.name))):
+            for i, word_stems in enumerate(question_words):
+                if word and (rest := _match_rest(word, word_stems)) is not None:
+                    out[i] = min(rest, out.get(i, rest))
+        return out
+
+    covered = {id(m): rests(m) for m in matches if m.kind in PLACE_KINDS or m.kind == "person"}
+
+    def dominated(place: EntityMatch) -> bool:
+        mine = covered[id(place)]
+        name = _PLACE_PREFIX.sub("", fold(place.name))
+        for other in matches:
+            theirs = covered.get(id(other))
+            # Places compete with places of their kind; a person only when named with more words
+            # (the surname alone may be the place: KRAK in "w Krakowie").
+            if theirs is None or other is place or other.kind not in (place.kind, "person") or (
+                other.kind == place.kind and _PLACE_PREFIX.sub("", fold(other.name)) == name
+            ):
+                continue
+            if mine and all(i in theirs and theirs[i] <= r for i, r in mine.items()) and (
+                len(theirs) > len(mine) or (other.kind != "person" and any(theirs[i] < r for i, r in mine.items()))
+            ):
+                return True
+        return False
+
+    towns = {_PLACE_PREFIX.sub("", fold(m.name)): m.ref for m in matches if m.kind == "gmina" and m.name.startswith("m. ")}
+    town_named = bool(towns) and re.search(r"\bmiast|\bmiesc", fold(question)) is not None
+    shadowed = {id(m) for m in matches if m.kind in PLACE_KINDS and dominated(m)}
+    years = {int(y) for y in re.findall(r"\b(?:19|20)\d{2}\b", question)}
+    in_years = [m for m in matches if m.kind == "person" and years & set(m.years)]
     aliases = {fold(m.name) for m in matches if m.kind == "committee"}
     other_stems = {s for raw in re.findall(r"[^\W_]+", question) if fold(raw) not in aliases
                    for s in _word_stems(fold(raw))}
@@ -260,8 +302,8 @@ def narrow_matches(question: str, matches: list[EntityMatch]) -> list[EntityMatc
         surname = fold(person.name.split()[-1])
         if len(surname) < 4:
             return []
-        return [p for p in matches if p.kind in PLACE_KINDS
-                and _PLACE_PREFIX.sub("", fold(p.name)).split()[-1].startswith(surname[:4])]
+        return [p for p in matches if p.kind in PLACE_KINDS and id(p) not in shadowed
+                and re.split(r"[\s\-]+", _PLACE_PREFIX.sub("", fold(p.name)))[-1].startswith(surname[:4])]
 
     person_wins, beaten = set(), set()
     for m in persons:
@@ -273,7 +315,11 @@ def narrow_matches(question: str, matches: list[EntityMatch]) -> list[EntityMatc
             beaten.update(id(p) for p in clash)
     out = []
     for m in matches:
-        if id(m) in beaten:
+        if id(m) in beaten or id(m) in shadowed:
+            continue
+        if m.kind == "person" and in_years and m not in in_years:
+            continue
+        if town_named and m.kind == "gmina" and towns.get(_PLACE_PREFIX.sub("", fold(m.name)), m.ref) != m.ref:
             continue
         if m.kind in PLACE_KINDS and _PLACE_PREFIX.sub("", fold(m.name)) in given:
             continue

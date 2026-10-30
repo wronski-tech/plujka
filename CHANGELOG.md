@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- False clarifications: 45 of the 306 evaluation questions ended in a clarification before the model was asked, now none. Round words no longer match the gmina Turek, „mieli” no longer Mielec; a closer or longer place name beats a look-alike (Szczecin/Szczecinek, Bielsko-Biała/Biała), a person named in full beats places like the given name or surname (Przemysław Czarnek: Przemyśl, Czarne); namesakes without a candidacy in the question's year are dropped; „w mieście X” picks the town gmina. Marek Borowski's candidacies 1991–2023 are one person (override).
+
 ### Added
 
 - Evaluation of LLM-written SQL: `tests/eval/questions.jsonl` (306 questions across all election families, each with a reference query or an expected clarification) and `scripts/run_eval.py`, which grades the model's rows against the reference rows and reports accuracy, clarifications, repairs, tokens, cost and time per family. CI checks every reference query against the built mart (`--check`); the nightly `Eval` workflow restores the published mart and runs the evaluation with the real model when the `OPENAI_API_KEY` secret is set.

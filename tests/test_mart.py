@@ -635,6 +635,31 @@ class TestClarification(unittest.TestCase):
         self.assertEqual(narrowed, [self.JAROSLAW])
         self.assertIsNone(entities.find_ambiguity(narrowed))
 
+    def test_closer_or_longer_names_beat_look_alike_places(self) -> None:
+        def gmina(name: str, ref: str) -> entities.EntityMatch:
+            return entities.EntityMatch("gmina", name, ref, "", [2023])
+
+        szczecin, szczecinek = gmina("m. Szczecin", "326201"), [gmina("gm. Szczecinek", "321506"), gmina("m. Szczecinek", "321501")]
+        self.assertEqual(entities.narrow_matches("Frekwencja w mieście Szczecin", [*szczecinek, szczecin]), [szczecin])
+        self.assertEqual(entities.narrow_matches("Frekwencja w Szczecinku", szczecinek), szczecinek)
+        bielsko, biala = gmina("m. Bielsko-Biała", "246101"), gmina("gm. Biała", "161001")
+        self.assertEqual(entities.narrow_matches("Frekwencja: Bielsko-Biała", [biala, bielsko]), [bielsko])
+        czarnek = _person("Przemysław CZARNEK", "7")
+        places = [gmina("gm. Czarne", "220302"), gmina("m. Przemyśl", "186201")]
+        self.assertEqual(entities.narrow_matches("Ile głosów dostał Przemysław Czarnek?", [*places, czarnek]), [czarnek])
+        # "drugą turę" is not the gmina Turek.
+        self.assertNotIn("ture", entities.question_terms("Kto wygrał drugą turę?")[0])
+
+    def test_question_years_and_town_narrow_namesakes(self) -> None:
+        older = entities.EntityMatch("person", "Jarosław KACZYŃSKI", "8", "sejm 2011", [2011])
+        narrowed = entities.narrow_matches("Ile głosów dostał Jarosław Kaczyński w 2023?", [self.JAROSLAW, older])
+        self.assertEqual(narrowed, [self.JAROSLAW])
+        self.assertEqual(len(entities.narrow_matches("Ile głosów dostał Jarosław Kaczyński w 2019?", [self.JAROSLAW, older])), 2)
+        town = entities.EntityMatch("gmina", "m. Elbląg", "286101", "", [2023])
+        rural = entities.EntityMatch("gmina", "gm. Elbląg", "280401", "", [2023])
+        self.assertEqual(entities.narrow_matches("Frekwencja w mieście Elbląg", [rural, town]), [town])
+        self.assertEqual(entities.find_ambiguity(entities.narrow_matches("Frekwencja w Elblągu", [rural, town]))["kind"], "gmina")
+
     def test_surname_only_asks_which_person(self) -> None:
         narrowed = entities.narrow_matches("Ile głosów dostał Kaczyński?", [self.JAROSLAW, self.LECH])
         clarification = entities.find_ambiguity(narrowed)
