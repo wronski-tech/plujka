@@ -1310,6 +1310,52 @@ def _elected() -> None:
                      hide_index=True, use_container_width=True)
 
 
+@st.fragment
+def _precinct_results() -> None:
+    """"Wyniki obwodowe": every precinct of one gmina with turnout and winner, and one precinct in full."""
+    with st.expander("🏫 Wyniki obwodowe", expanded=False):
+        elections = [e for e in _api_get("/elections") or [] if e["election"] in ("sejm", "prezydent", "pe") and e["year"] >= 2000]
+        if not elections:
+            return
+        c1, c2, c3 = st.columns(3)
+        kind = c1.selectbox("Wybory", ["sejm", "prezydent", "pe"], format_func=CHAMBER_LABELS.get, key="precinct_kind")
+        years = sorted({e["year"] for e in elections if e["election"] == kind}, reverse=True)
+        year = c2.selectbox("Rok", years, key=f"precinct_year_{kind}")
+        rounds = sorted({e["round"] for e in elections if (e["election"], e["year"]) == (kind, year)})
+        rnd = c3.selectbox("Tura", rounds, key=f"precinct_round_{kind}_{year}") if len(rounds) > 1 else 1
+        name = st.text_input("Gmina", placeholder="np. Wieliczka", key="precinct_gmina").strip()
+        if len(name) < 2:
+            st.caption("Wpisz początek nazwy gminy.")
+            return
+        gminas = [h for h in _api_get("/units", {"name": name}) or [] if h["level"] == "gmina"]
+        if not gminas:
+            st.caption(f"Nie znaleziono gminy „{name}”.")
+            return
+        gmina = st.selectbox("Wybierz gminę", gminas, key="precinct_pick",
+                             format_func=lambda h: f"{h['name']}{' (' + h['detail'] + ')' if h.get('detail') else ''}")
+        params = {"election": kind, "year": year, "round": rnd, "teryt_gmina": gmina["unit"]}
+        rows = (_api_get("/precincts", params) or {}).get("rows", [])
+        if not rows:
+            st.caption("Brak wyników obwodowych tej gminy w tych wyborach.")
+            return
+        if rows[0]["precinct_no"] == 0:
+            st.caption("PKW opublikowała te wybory tylko w podziale na gminy: poniżej wynik całej gminy.")
+        columns = {"precinct_no": "nr obwodu", "winner": "zwycięzca", "winner_pct": "zwycięzca %",
+                   "turnout_pct": "frekwencja %", "eligible_voters": "uprawnieni", "address": "siedziba"}
+        table = [{label: r[key] for key, label in columns.items()} for r in rows]
+        st.caption(f"{len(rows)} obwodów. Wybierz numer, aby zobaczyć wszystkie wyniki obwodu.")
+        st.dataframe(table, hide_index=True, use_container_width=True)
+        _csv_download(table, f"obwody {gmina['name']} {kind} {year}", key="csv_precincts")
+        number = st.selectbox("Obwód nr", [r["precinct_no"] for r in rows], key="precinct_no",
+                              format_func=lambda n: f"{n} — {next(r['address'] or '' for r in rows if r['precinct_no'] == n)}")
+        detail = (_api_get("/precincts", {**params, "precinct_no": number}) or {}).get("rows", [])
+        if detail:
+            first = detail[0]
+            st.caption(f"Uprawnieni: {first['eligible_voters']} · ważne głosy: {first['valid_votes']} · "
+                       f"frekwencja: {first['turnout_pct']}%".replace(".", ","))
+            _render_chart([{"komitet / kandydat": r["short_name"], "votes": r["votes"], "pct": r["pct"]} for r in detail])
+
+
 REPORT_FAMILIES = {**CHAMBER_LABELS, "referendum": "Referendum", "rada": "Rady gmin, powiatów i dzielnic", "inne": "Porównania między wyborami"}
 
 
@@ -1536,6 +1582,7 @@ with st.container(border=True):
 _person_search()
 _browse()
 _unit_card()
+_precinct_results()
 _seat_simulator()
 _candidates()
 _elected()

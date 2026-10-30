@@ -819,6 +819,7 @@ PRE1999_UNITS_NOTE = (
 )
 
 DROP_SQL = r"""
+DROP VIEW IF EXISTS mart.v_precinct_results;
 -- v_person_history was a plain view before it was materialized; drop either kind.
 DO $$
 BEGIN
@@ -1491,6 +1492,42 @@ CREATE INDEX ON mart.v_gus_units (year, level);
 """
 
 
+def _precinct_results_sql() -> str:
+    """Plain view: votes per list or candidate in every precinct (Sejm, president, EP) with official turnout."""
+    basis = _turnout_basis_sql("election", "year")
+    return f"""
+CREATE VIEW mart.v_precinct_results AS
+SELECT election, year, round, precinct_id, teryt_gmina, teryt_gmina_pre1999, gmina, powiat, wojewodztwo,
+       precinct_no, address, eligible_voters, ballots_issued, valid_ballots, valid_votes, {basis} AS turnout_basis,
+       {_turnout_pct_sql(basis, "ballots_issued", "valid_ballots", "eligible_voters")} AS turnout_pct,
+       name, short_name, votes, round(100.0 * votes / NULLIF(valid_votes, 0), 2) AS pct
+FROM (
+  SELECT 'sejm' AS election, p.year, 1 AS round, p.precinct_id, p.teryt_gmina, p.teryt_gmina_pre1999, p.gmina, p.powiat, p.wojewodztwo,
+         p.precinct_no, p.address, r.eligible_voters, r.ballots_issued, r.valid_ballots, r.valid_votes,
+         c.committee_name AS name, coalesce(c.aliases[1], c.committee_name) AS short_name, v.votes
+  FROM mart.precincts p JOIN mart.sejm_precinct_protocols r USING (year, precinct_id)
+  JOIN mart.sejm_precinct_list_votes v USING (year, precinct_id) JOIN mart.sejm_committees c USING (year, committee_id)
+  UNION ALL
+  SELECT 'prezydent', r.year, r.round, r.precinct_id, r.teryt_gmina, r.teryt_gmina_pre1999, r.gmina, r.powiat, r.wojewodztwo,
+         r.precinct_no, r.address, r.eligible_voters, r.ballots_issued, r.valid_ballots, r.valid_votes, c.full_name, c.full_name, v.votes
+  FROM mart.prezydent_precinct_protocols r JOIN mart.prezydent_precinct_candidate_votes v USING (year, round, precinct_id)
+  JOIN mart.prezydent_candidates c USING (year, round, candidate_id)
+  UNION ALL
+  SELECT 'pe', r.year, 1, r.precinct_id, r.teryt_gmina, NULL, r.gmina, r.powiat, r.wojewodztwo,
+         r.precinct_no, r.address, r.eligible_voters, r.ballots_issued, r.valid_ballots, r.valid_votes, c.committee_name, coalesce(c.aliases[1], c.committee_name), v.votes
+  FROM mart.pe_precinct_protocols r JOIN mart.pe_precinct_list_votes v USING (year, precinct_id)
+  JOIN mart.pe_committees c USING (year, committee_id)
+) x;
+COMMENT ON VIEW mart.v_precinct_results IS 'Votes of every list (Sejm, European Parliament) or candidate (president, both rounds) in one polling station (obwód głosowania), with the precinct''s protocol counts and official turnout. One row per election, year, round, precinct and list or candidate. Always filter by election, year and teryt_gmina (or precinct_id): the view is not materialized. teryt_gmina is the gmina code of that year (NULL abroad and on ships); Sejm 1991-1997 and president 1990/1995 precincts have only teryt_gmina_pre1999 (join mart.gmina_codes_pre1999 for today''s units). European Parliament 2004 and 2009 were published per gmina: one row per gmina with precinct_no 0. For territorial totals use mart.v_turnout and the result views instead of summing precincts.';
+COMMENT ON COLUMN mart.v_precinct_results.precinct_no IS 'Precinct number within its gmina (numer obwodu), as on the protocol.';
+COMMENT ON COLUMN mart.v_precinct_results.name IS 'Committee name (Sejm, EP) or candidate full name (president).';
+COMMENT ON COLUMN mart.v_precinct_results.short_name IS 'Committee short name (its first alias, e.g. KO, PiS) or candidate full name.';
+COMMENT ON COLUMN mart.v_precinct_results.pct IS 'votes / valid_votes of the precinct in percent (0-100).';
+COMMENT ON COLUMN mart.v_precinct_results.turnout_basis IS '{TURNOUT_BASIS_COMMENT}';
+COMMENT ON COLUMN mart.v_precinct_results.turnout_pct IS 'Official turnout of the precinct in percent (0-100): turnout_basis / eligible_voters.';
+"""
+
+
 SEAT_METHODS_VIEW_SQL = r"""
 CREATE MATERIALIZED VIEW mart.v_seat_methods AS
 WITH sejmik_share AS (
@@ -1573,6 +1610,7 @@ def rebuild(pg: psycopg.Connection) -> None:
     pg.execute(_cross_election_views_sql())
     pg.execute(PERSON_HISTORY_SQL)
     pg.execute(SEAT_METHODS_VIEW_SQL)
+    pg.execute(_precinct_results_sql())
     pg.execute(GUS_VIEW_SQL)
     linked = pg.execute(
         "SELECT (SELECT count(*) FROM mart.sejmik_candidates WHERE person_id IS NOT NULL),"

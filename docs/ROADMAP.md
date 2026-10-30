@@ -15,7 +15,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [x] 3. Porównanie dwóch jednostek obok siebie.
 - [x] 4. Porównanie dwóch wyborów dla jednej jednostki (`v_party_change`).
 - [x] 5. Ranking jednostek według miary, z filtrem województwa.
-- [ ] 6. Wyniki obwodowe z wyszukiwaniem obwodu po numerze i gminie.
+- [x] 6. Wyniki obwodowe z wyszukiwaniem obwodu po numerze i gminie.
 - [x] 7. Wykres liniowy jednostki w czasie (`chart_columns.py`).
 - [x] 8. Karta wyborów: frekwencja, mandaty, progi, metoda, liczba obwodów.
 - [x] 9. Lista wybranych według okręgu z filtrem komitetu.

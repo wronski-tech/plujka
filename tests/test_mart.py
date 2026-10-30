@@ -808,7 +808,7 @@ class TestPromptRelations(unittest.TestCase):
     AVAILABLE = [
         "elections", "persons", "v_turnout", "precincts", "sejm_lists", "senat_candidates",
         "prezydent_results", "wbp_candidates", "sejmik_lists", "rada_candidates", "pe_lists", "v_seat_methods",
-        "gmina_codes_pre1999",
+        "gmina_codes_pre1999", "v_precinct_results",
     ]
 
     def test_named_election_kind_limits_the_schema(self) -> None:
@@ -829,6 +829,13 @@ class TestPromptRelations(unittest.TestCase):
         self.assertIn("gmina_codes_pre1999", relations)
         self.assertNotIn("sejm_lists", relations)
         self.assertNotIn("gmina_codes_pre1999", dynamic_sql.relevant_relations("Kto wygrał wybory prezydenckie w 2020?", self.AVAILABLE))
+
+    def test_precinct_questions_add_the_precinct_view(self) -> None:
+        relations = dynamic_sql.relevant_relations("Wyniki w obwodzie nr 5 w Wieliczce w wyborach do Sejmu 2023", self.AVAILABLE)
+        self.assertIn("v_precinct_results", relations)
+        self.assertIn("sejm_lists", relations)
+        self.assertNotIn("pe_lists", relations)
+        self.assertNotIn("v_precinct_results", dynamic_sql.relevant_relations("Kto wygrał wybory prezydenckie w 2020?", self.AVAILABLE))
 
     def test_seat_method_questions_get_the_seat_view(self) -> None:
         relations = dynamic_sql.relevant_relations("Ile mandatów miałby PiS metodą Sainte-Laguë?", self.AVAILABLE)

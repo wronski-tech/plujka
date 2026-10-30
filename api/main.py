@@ -1240,6 +1240,39 @@ def data_package(
                     headers={"Content-Disposition": f'attachment; filename="plujka-{election}-{year}.zip"'})
 
 
+PRECINCT_FILTER = """election = %(election)s AND year = %(year)s AND round = %(round)s AND teryt_gmina = %(teryt_gmina)s"""
+# One row per precinct of a gmina with its winner (v_precinct_results), or every list/candidate of one precinct.
+PRECINCTS_SQL = f"""
+SELECT * FROM (
+  SELECT DISTINCT ON (precinct_id) election, year, round, 'precinct' AS level, wojewodztwo, powiat, teryt_gmina, gmina,
+         precinct_no, address, eligible_voters, valid_votes, turnout_pct,
+         short_name AS winner, votes AS winner_votes, pct AS winner_pct
+  FROM mart.v_precinct_results WHERE {PRECINCT_FILTER}
+  ORDER BY precinct_id, votes DESC
+) p ORDER BY precinct_no
+"""
+PRECINCT_SQL = f"""
+SELECT election, year, round, 'precinct' AS level, wojewodztwo, powiat, teryt_gmina, gmina,
+       precinct_no, address, eligible_voters, valid_votes, turnout_pct, name, short_name, votes, pct
+FROM mart.v_precinct_results WHERE {PRECINCT_FILTER} AND precinct_no = %(precinct_no)s
+ORDER BY votes DESC
+"""
+
+
+@app.get("/precincts", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])
+def precincts(
+    election: Literal["sejm", "prezydent", "pe"] = Query(),
+    year: int = Query(ge=2000, le=2100, description="2000 onwards (earlier precincts carry only pre-1999 codes)"),
+    round: int = Query(1, ge=1, le=2),
+    teryt_gmina: str = Query(pattern=r"^\d{6}$"),
+    precinct_no: int | None = Query(None, ge=1, description="One precinct: every list or candidate"),
+) -> BrowseRowsResponse:
+    """Precinct results of one gmina: each precinct with turnout and winner, or one precinct in full."""
+    params = {"election": election, "year": year, "round": round, "teryt_gmina": teryt_gmina, "precinct_no": precinct_no}
+    sql = PRECINCTS_SQL if precinct_no is None else PRECINCT_SQL
+    return BrowseRowsResponse.model_validate({"rows": _mart_rows(sql, params)})
+
+
 @app.get("/results", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])
 def get_results(
     election: Literal[RESULT_ELECTIONS] = Query(description="Election kind"),  # type: ignore[valid-type]

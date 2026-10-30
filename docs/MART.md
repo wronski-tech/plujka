@@ -109,6 +109,7 @@ count only in `country`.
 | `v_sejmik_results` | sejmik committee support per level; seats at country and voivodeship level |
 | `v_rada_results` | council committee votes and seats per council, voivodeship and country (`council_level`; `votes_exact = false` where struck-off candidates make list totals unknown) |
 | `v_turnout` | official turnout of **every** election per level (`election`, `year`, `round`; `turnout_basis` says whether PKW counted ballots issued or valid ballots) |
+| `v_precinct_results` | plain (not materialized) view: votes per list or candidate in each precinct (Sejm, president, EP) with protocol counts, `short_name` and official `turnout_pct`; filter by election, year and `teryt_gmina` (`GET /precincts`, panel „Wyniki obwodowe”) |
 | `v_party_results` | party families across Sejm, EP and sejmik per level (`unit_key` joins elections) |
 | `v_party_change` | change against the previous election of the same kind, with a `comparable` flag |
 | `v_gmina_continuity` | which gmina TERYT codes appear in which elections |
