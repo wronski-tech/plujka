@@ -1,0 +1,77 @@
+# Deploy to a server created by infra/hetzner: staging after every successful Images run on main,
+# production (or staging) by hand. Each GitHub environment holds the variables DEPLOY_HOST and
+# DEPLOY_KNOWN_HOSTS (`ssh-keyscan <host>`) and the secret DEPLOY_SSH_KEY (key of user deploy);
+# add required reviewers to the "production" environment so that its deployments wait for approval.
+# An environment without DEPLOY_HOST is skipped.
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: [Images]
+    types: [completed]
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [staging, production]
+        default: staging
+      ref:
+        description: Commit, branch or tag whose images to deploy (images must exist on GHCR)
+        default: main
+      mart:
+        description: Also deploy the mart from the mart-latest release
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: deploy-${{ inputs.environment || 'staging' }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment || 'staging' }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || inputs.ref }}
+
+      - id: target
+        env:
+          HOST: ${{ vars.DEPLOY_HOST }}
+        run: |
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+          if [ -z "$HOST" ]; then
+            echo "::notice::DEPLOY_HOST is not set for this environment; nothing deployed"
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: SSH key
+        if: steps.target.outputs.configured == 'true'
+        env:
+          KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          KNOWN_HOSTS: ${{ vars.DEPLOY_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$KEY" > ~/.ssh/id_deploy && chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Update the application
+        if: steps.target.outputs.configured == 'true'
+        env:
+          HOST: ${{ vars.DEPLOY_HOST }}
+          SHA: ${{ steps.target.outputs.sha }}
+        run: ssh -i ~/.ssh/id_deploy "deploy@$HOST" "/srv/plujka/deploy/update_app.sh $SHA"
+
+      - name: Deploy the mart
+        if: steps.target.outputs.configured == 'true' && inputs.mart
+        env:
+          HOST: ${{ vars.DEPLOY_HOST }}
+        run: ssh -i ~/.ssh/id_deploy "deploy@$HOST" "/srv/plujka/deploy/deploy_mart.sh mart-latest"

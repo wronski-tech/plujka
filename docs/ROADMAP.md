@@ -175,10 +175,10 @@ gdy nowy serwer powstaje z Terraformu, przechodzi próbę odtworzenia i ma alert
 - [x] 23. Wdrożenie martu bez przestoju (druga baza, przełączenie `MART_DATABASE_URL`).
 - [x] 24. Cache martu w CI (hash danych i kodu buildu).
 - [x] 25. Pomiar w CI: rozmiar martu i dumpu, wolny dysk, czas buildu.
-- [ ] 26. Obrazy Dockera w GHCR z tagiem commita.
-- [ ] 27. Skanowanie obrazów i zależności.
-- [ ] 28. Wdrożenie staging przy pushu, produkcja po zatwierdzeniu.
-- [ ] 29. Test dymny po wdrożeniu.
+- [x] 26. Obrazy Dockera w GHCR z tagiem commita.
+- [x] 27. Skanowanie obrazów i zależności.
+- [x] 28. Wdrożenie staging przy pushu, produkcja po zatwierdzeniu.
+- [x] 29. Test dymny po wdrożeniu.
 - [x] 30. Lint i sprawdzanie typów w CI.
 
 **Testy**

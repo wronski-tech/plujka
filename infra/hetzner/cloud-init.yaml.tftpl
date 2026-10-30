@@ -43,7 +43,7 @@ write_files:
       Type=oneshot
       RemainAfterExit=true
       WorkingDirectory=/srv/plujka
-      ExecStart=/usr/bin/docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml up -d --build --remove-orphans
+      ExecStart=/usr/bin/docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml up -d --remove-orphans
       ExecStop=/usr/bin/docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml stop
       TimeoutStartSec=1800
 

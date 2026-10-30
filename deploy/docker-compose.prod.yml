@@ -1,6 +1,7 @@
 # Production override (Hetzner server, see infra/hetzner): data on the volume /mnt/data, no published
 # Paths are relative to the repository root (the project directory of the first compose file).
-# ports except Caddy, owner password from .env, uvicorn behind the proxy under /api.
+# ports except Caddy, owner password from .env, uvicorn behind the proxy under /api, images from GHCR
+# (workflow Images; PLUJKA_IMAGE_TAG in .env, set by deploy/update_app.sh).
 #   docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml up -d
 services:
   postgres:
@@ -18,6 +19,7 @@ services:
     restart: unless-stopped
 
   api:
+    image: ghcr.io/wronski-tech/plujka-api:${PLUJKA_IMAGE_TAG:-latest}
     environment:
       DATABASE_URL: postgresql://plujka:${POSTGRES_PASSWORD}@postgres:5432/plujka
       # The mart lives in its own database, switched by deploy/deploy_mart.sh (plujka_mart_a / _b).
@@ -33,10 +35,12 @@ services:
     restart: unless-stopped
 
   streamlit:
+    image: ghcr.io/wronski-tech/plujka-streamlit:${PLUJKA_IMAGE_TAG:-latest}
     ports: !reset []
     restart: unless-stopped
 
   loader:
+    image: ghcr.io/wronski-tech/plujka-loader:${PLUJKA_IMAGE_TAG:-latest}
     environment:
       DATABASE_URL: postgresql://plujka:${POSTGRES_PASSWORD}@postgres:5432/plujka
 

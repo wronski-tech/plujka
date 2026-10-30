@@ -41,7 +41,9 @@ Step by step:
 4. `deploy/deploy_mart.sh` restores the mart CI published (below).
 5. Check `https://<domain>/api/health?details=true` (`data_ready: true`) and ask one question in the UI.
 
-Updating the code: `git pull && sudo systemctl restart plujka` in `/srv/plujka` (rebuilds the images).
+Updating the code: the Deploy workflow, or by hand `deploy/update_app.sh <commit-sha>` (images of that
+commit from GHCR, then the smoke test). `deploy/smoke_test.sh https://<domain> [api-key]` checks a
+deployment at any time.
 
 ### Mart deployment
 
@@ -152,10 +154,21 @@ The bundled OpenSearch runs without its security plugin; do not expose ports 920
 
 ## CI, images and releases
 
-`.github/workflows/ci.yml` runs three jobs: unit tests; integration on PostgreSQL 16 (DB tests, full
-mart build from the committed parquet, curated SQL examples); and `compose`, which validates every
-Compose file and profile, builds all images, starts postgres, OpenSearch, the API and the UI, and
-checks `/health`, one `/ask` request and the Streamlit health endpoint.
+`.github/workflows/ci.yml` runs four jobs: unit tests; lint (ruff, mypy, pip-audit, offline links
+between Markdown files); integration on PostgreSQL 16 (DB tests, mart build from the committed parquet
+or the cached dump, curated SQL examples, size report, `mart.dump` to the `mart-latest` release on
+main); and `compose`, which validates every Compose file and profile, builds all images, starts
+postgres, OpenSearch, the API and the UI, and checks `/health`, one `/ask` request and the Streamlit
+health endpoint. Dependabot opens weekly update pull requests (pip, Docker, Actions, Terraform).
+
+`images.yml` pushes `ghcr.io/wronski-tech/plujka-{api,streamlit,loader}` tagged with the commit SHA
+(and `latest` on main) and prints a Trivy report of fixed HIGH/CRITICAL vulnerabilities. New GHCR
+packages are private: make them public once (package settings) or `docker login ghcr.io` on the server
+with a `read:packages` token. `deploy.yml` then runs `deploy/update_app.sh <sha>` on staging over SSH
+(images of that commit, `docker compose up -d`, `deploy/smoke_test.sh`); production and mart
+deployments are started by hand (Run workflow) and wait for the reviewers of the `production`
+environment. Each environment needs `DEPLOY_HOST`, `DEPLOY_KNOWN_HOSTS` (variables) and
+`DEPLOY_SSH_KEY` (secret); without `DEPLOY_HOST` the job deploys nothing.
 
 Releases: move the `[Unreleased]` section of `CHANGELOG.md` to `## [x.y.z] - YYYY-MM-DD`, commit,
 then `git tag vx.y.z && git push origin vx.y.z`. `.github/workflows/release.yml` builds the images
