@@ -158,23 +158,23 @@ gdy nowy serwer powstaje z Terraformu, przechodzi próbę odtworzenia i ma alert
 - [x] 10. Sprawdzanie linków w dokumentacji w CI.
 
 **Terraform dla Hetznera**
-- [ ] 11. Moduł `infra/hetzner`: serwer, firewall, klucz SSH.
-- [ ] 12. Hetzner Volume na dane Postgresa i OpenSearch.
-- [ ] 13. Cloud-init: Docker, aktualizacje, start compose.
-- [ ] 14. Caddy z TLS przed API i UI.
+- [x] 11. Moduł `infra/hetzner`: serwer, firewall, klucz SSH.
+- [x] 12. Hetzner Volume na dane Postgresa i OpenSearch.
+- [x] 13. Cloud-init: Docker, aktualizacje, start compose.
+- [x] 14. Caddy z TLS przed API i UI.
 - [ ] 15. DNS.
-- [ ] 16. Storage Box na backupy.
-- [ ] 17. Stan Terraformu w Object Storage.
-- [ ] 18. Sekrety poza repo.
-- [ ] 19. Środowiska staging i production.
+- [x] 16. Storage Box na backupy.
+- [x] 17. Stan Terraformu w Object Storage.
+- [x] 18. Sekrety poza repo.
+- [x] 19. Środowiska staging i production.
 - [ ] 20. Resize i wymiana serwera bez utraty danych.
 
 **CI i wdrożenia**
-- [ ] 21. Dump martu z CI jako asset release'u z sumą kontrolną.
-- [ ] 22. Skrypt wdrożenia martu: pobranie, `pg_trgm`, restore, `derived.rebuild`, uprawnienia.
-- [ ] 23. Wdrożenie martu bez przestoju (druga baza, przełączenie `MART_DATABASE_URL`).
-- [ ] 24. Cache martu w CI (hash danych i kodu buildu).
-- [ ] 25. Pomiar w CI: rozmiar martu i dumpu, wolny dysk, czas buildu.
+- [x] 21. Dump martu z CI jako asset release'u z sumą kontrolną.
+- [x] 22. Skrypt wdrożenia martu: pobranie, `pg_trgm`, restore, `derived.rebuild`, uprawnienia.
+- [x] 23. Wdrożenie martu bez przestoju (druga baza, przełączenie `MART_DATABASE_URL`).
+- [x] 24. Cache martu w CI (hash danych i kodu buildu).
+- [x] 25. Pomiar w CI: rozmiar martu i dumpu, wolny dysk, czas buildu.
 - [ ] 26. Obrazy Dockera w GHCR z tagiem commita.
 - [ ] 27. Skanowanie obrazów i zależności.
 - [ ] 28. Wdrożenie staging przy pushu, produkcja po zatwierdzeniu.
