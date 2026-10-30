@@ -640,7 +640,7 @@ def _kbw_legacy_sejm_sql(
     geo_pattern_folded: str | None,
 ) -> tuple[str, dict]:
     """Kbw legacy sejm sql."""
-    sql = f"""
+    sql = """
         SELECT
             er.year,
             trim(f.subject->>'column') AS candidate,

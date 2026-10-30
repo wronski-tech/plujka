@@ -1,5 +1,5 @@
 # Local checks (default test suite does not require PostgreSQL).
-.PHONY: test test-integration compile
+.PHONY: test test-integration compile lint
 
 PYTHON ?= python3
 
@@ -11,3 +11,7 @@ test-integration:
 
 compile:
 	$(PYTHON) -m compileall -q api scripts streamlit_app tests
+
+lint:
+	$(PYTHON) -m ruff check api scripts streamlit_app tests
+	$(PYTHON) -m mypy

@@ -9,7 +9,7 @@ Dokument uzupełnia [`ANALYTICS_ARCHITECTURE.md`](./ANALYTICS_ARCHITECTURE.md): 
 | `kbw_candidates` | Jedna encja kandydata na wybory (powiązanie z `election_run_id`, nazwa znormalizowana, opcjonalnie `person_id`) — **schemat + sync z person facts:** `db.sync_kbw_candidates_from_person_facts`, flaga importu `--sync-kbw-candidates`, skrypt `scripts/sync_kbw_candidates.py` |
 | `kbw_committee_list` | Lista / komitet w danym runie |
 | `kbw_candidate_results` | Głosy po jednostce (gmina / obwód) lub zdenormalizowany rollup — **częściowo:** `kbw_candidate_geo_votes` (PK = `kbw_facts.id`, JOIN po `geography`) |
-| Źródło | Istniejący staging Parquet + [`kbw_import.py`](../api/services/kbw_import.py) |
+| Źródło | Istniejący staging Parquet + [`kbw_import.py`](../../api/services/kbw_import.py) |
 
 **Kryterium ukończenia:** jednoznaczne powiązanie „ta sama osoba” między latami bez polegania wyłącznie na md5 nazwy z nagłówka CSV.
 

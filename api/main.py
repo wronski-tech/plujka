@@ -122,7 +122,20 @@ class PreviousTurn(BaseModel):
 
 
 class AskRequest(BaseModel):
-    question: str = Field(max_length=1000)
+    model_config = ConfigDict(
+        json_schema_extra={
+            "examples": [
+                {"question": "Frekwencja w wyborach do Sejmu 2023 w województwach"},
+                {
+                    "question": "A w 2019?",
+                    "previous": {"question": "Frekwencja w wyborach do Sejmu 2023 w województwach"},
+                },
+                {"question": "Wyniki Kwaśniewskiego w 1995", "entity_refs": [{"kind": "person", "ref": "1920"}]},
+            ]
+        }
+    )
+
+    question: str = Field(max_length=1000, description="Question in Polish")
     entity_refs: list[EntityRef] | None = Field(
         default=None, description="Entity choices from a previous clarification (kind + ref from its options)"
     )
@@ -177,12 +190,18 @@ class AskResponse(BaseModel):
 
 
 class FeedbackRequest(BaseModel):
+    model_config = ConfigDict(
+        json_schema_extra={"examples": [{"rating": "thumbs_up", "question": "Frekwencja w wyborach do Sejmu 2023"}]}
+    )
+
     rating: Literal["thumbs_up", "thumbs_down"]
     question: str
     ask_response: dict[str, Any] | None = None
 
 
 class QuestionHintsRequest(BaseModel):
+    model_config = ConfigDict(json_schema_extra={"examples": [{"q": "frekwencja w", "limit": 5}]})
+
     q: str
     limit: int = Field(default=8, ge=1, le=20)
     exclude_question: str | None = None

@@ -43,7 +43,7 @@ From the repo root (no Docker DB needed for the default suite):
 make test
 ```
 
-Integration tests against PostgreSQL: `make test-integration` with `DATABASE_URL` set and `PLUJKA_RUN_DB_TESTS=1` (see `tests/test_integration_kbw_db.py`). CI runs the same against `pgvector/pgvector:pg16` after the unit job passes, then builds the whole mart from the committed parquet and checks the curated SQL examples; a separate job builds the Docker images and smoke-tests `docker compose`.
+Integration tests against PostgreSQL: `make test-integration` with `DATABASE_URL` set and `PLUJKA_RUN_DB_TESTS=1` (see `tests/test_integration_kbw_db.py`). CI runs the same against `pgvector/pgvector:pg16` after the unit job passes, then builds the whole mart from the committed parquet and checks the curated SQL examples; a separate job builds the Docker images and smoke-tests `docker compose`. `make lint` runs ruff (`ruff.toml`, errors only) and mypy (`mypy.ini`; modules in its baseline still have old type errors, remove a module once it passes); the CI lint job also checks links between Markdown files.
 
 ## Pull requests
 

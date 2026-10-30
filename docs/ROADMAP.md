@@ -153,9 +153,9 @@ gdy nowy serwer powstaje z Terraformu, przechodzi próbę odtworzenia i ma alert
 - [x] 5. Runbook incydentów.
 - [ ] 6. Odtwarzanie z backupu, przetestowane.
 - [ ] 7. Licencja kodu (decyzja właściciela) i atrybucja danych (NOTICE — zrobione; brak LICENSE).
-- [ ] 8. CHANGELOG i wydania z tagów.
-- [ ] 9. Dokumentacja API (OpenAPI) z przykładami.
-- [ ] 10. Sprawdzanie linków w dokumentacji w CI.
+- [x] 8. CHANGELOG i wydania z tagów.
+- [x] 9. Dokumentacja API (OpenAPI) z przykładami.
+- [x] 10. Sprawdzanie linków w dokumentacji w CI.
 
 **Terraform dla Hetznera**
 - [ ] 11. Moduł `infra/hetzner`: serwer, firewall, klucz SSH.
@@ -179,7 +179,7 @@ gdy nowy serwer powstaje z Terraformu, przechodzi próbę odtworzenia i ma alert
 - [ ] 27. Skanowanie obrazów i zależności.
 - [ ] 28. Wdrożenie staging przy pushu, produkcja po zatwierdzeniu.
 - [ ] 29. Test dymny po wdrożeniu.
-- [ ] 30. Lint i sprawdzanie typów w CI.
+- [x] 30. Lint i sprawdzanie typów w CI.
 
 **Testy**
 - [ ] 31. Testy end-to-end z zaślepionym LLM.

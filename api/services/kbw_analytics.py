@@ -83,7 +83,7 @@ def sql_committee_gap_by_district_from_view(
 
 def sql_max_turnout_precinct(*, year: int, limit: int = 5) -> tuple[str, dict[str, Any]]:
     """Precinct-level rows whose metric/name suggests turnout (%); highest first."""
-    sql = f"""
+    sql = """
         SELECT
           er.year,
           f.geography AS geography,
@@ -420,7 +420,7 @@ def sql_coalition_candidate_vote_sum(
     matching the committee name fragment.
     """
     _ = limit_files_hint
-    sql = f"""
+    sql = """
         SELECT
           %(committee_pattern)s::text AS committee_filter,
           COUNT(*)::bigint AS fact_rows,
