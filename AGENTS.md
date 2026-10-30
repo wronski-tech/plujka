@@ -21,12 +21,12 @@ SQL safety), `docs/DATA.md` (sources), `docs/DEPLOYMENT.md` (API keys, Redis lim
 | `api/services/mart/build_common.py`, `build_precincts.py` | Shared DuckDB macros, header matching, loading; precinct geography/protocol columns |
 | `api/services/mart/build_<family>.py` | DuckDB build per family and year (`sejm`+`senat`, `prezydent`, `pe`, `referendum`, `samorzad`) with consistency checks; `build_rady.py` builds councils inside `samorzad` |
 | `api/services/mart/derived.py`, `person_overrides.csv` | Persons (name rules, birth-year check for local candidacies, manual overrides), result and cross-election views, party families (`party_families`), turnout basis, seat views and the seat-allocation check (`mart.allocate_seats`), entity lexicon (rebuilt after every load) |
-| `api/services/mart/examples.py`, `sql_examples.jsonl` | Verified question → SQL few-shot examples (curated file + thumbs-up, OpenSearch) |
+| `api/services/mart/examples.py`, `sql_examples.jsonl` | Verified question → SQL few-shot examples (curated file, OpenSearch; thumbs-up answers join after `add_sql_example.py --review`) |
 | `api/services/mart/safe_sql.py` | `validate_mart_sql` (sqlglot) and `run_readonly` |
 | `api/services/mart/entities.py` | Question → lexicon matches (inflected Polish names → TERYT / person_id / committee), narrowing, ambiguity |
 | `scripts/kbw_stage_duckdb.py` | Strict CSV/XLS/XLSX → Parquet staging |
 | `scripts/build_mart.py` | Builds `mart`: every family-year that is staged (`--years`, `--elections`) |
-| `scripts/add_sql_example.py` | Adds a curated SQL example after running it; `--check` runs them all |
+| `scripts/add_sql_example.py` | Adds a curated SQL example after running it; `--check` runs them all; `--review` accepts queued thumbs-up answers |
 | `scripts/run_eval.py`, `tests/eval/questions.jsonl` | Evaluation set (question → reference SQL or expected clarification); `--check` runs the reference queries, otherwise grades the model per family (nightly `eval.yml`) |
 | `scripts/backup_db.sh` | `pg_dump` backup with retention |
 | `scripts/check_sources.py`, `data/source_manifest.json` | Detects republished KBW files (HEAD vs manifest), re-stages them, names the family-years to rebuild |

@@ -667,9 +667,12 @@ schemas.
 
 **SQL examples** (`mart/examples.py`). Curated pairs live in `api/services/mart/sql_examples.jsonl`
 (add one with `scripts/add_sql_example.py --question ... --sql ...`, which validates and runs it).
-A thumbs-up on a `dynamic_sql` answer stores the pair as `user_confirmed`. Both are indexed in the
-OpenSearch index `SQL_EXAMPLES_INDEX` and retrieved by kNN on the question embedding plus text
-match; without OpenSearch the curated file is searched by word overlap.
+A thumbs-up on a `dynamic_sql` answer only queues the pair in the feedback log (`sql` on the
+thumbs-up line); `scripts/add_sql_example.py --review` runs each queued pair, shows the rows and
+appends it to the curated file when accepted (decisions in `example_reviews.jsonl` next to the log).
+Curated pairs are indexed in the OpenSearch index `SQL_EXAMPLES_INDEX` (anything else is removed at
+startup) and retrieved by kNN on the question embedding plus text match; without OpenSearch the
+curated file is searched by word overlap.
 
 **Answer text** (`api/services/answer.py`). The LLM may describe the rows in Polish, but every number
 in its text must appear in the rows (rounding and Polish formatting allowed) or in the question.

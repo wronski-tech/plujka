@@ -106,6 +106,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Thumbs-up no longer turns an answer's SQL into a few-shot example by itself: the pair is queued in the feedback log and `scripts/add_sql_example.py --review` runs it, shows the rows and adds it to the curated file only when accepted. Unreviewed `user_confirmed` examples are removed from the OpenSearch index at startup.
 - Production setup: Terraform for Hetzner (`infra/hetzner`: server with in-place rescale, data volume, firewall, Storage Box, cloud-init), `deploy/docker-compose.prod.yml` with Caddy (TLS, `/api` to FastAPI), GHCR images (`images.yml`), a deploy workflow (staging after every main build, production after approval) with `deploy/update_app.sh` and `deploy/smoke_test.sh`.
 - Mart deployment without downtime: CI publishes `mart.dump` (release `mart-latest`); `deploy/deploy_mart.sh` restores it into the unused mart database and switches the API (`MART_DB`); `build_mart.py --derived-only`.
 - CI: lint job (ruff, mypy with a baseline, pip-audit, offline Markdown links), mart dump cache keyed by data and builders, size report; Dependabot.

@@ -1517,17 +1517,18 @@ def feedback(request: FeedbackRequest) -> FeedbackOkResponse:
             }
         )
     else:
+        # A confirmed LLM-written query is queued as a few-shot example candidate; it prompts the
+        # model only after review (scripts/add_sql_example.py --review).
+        response = request.ask_response or {}
+        candidate = {"sql": response["sql"]} if response.get("intent") == "dynamic_sql" and response.get("sql") else {}
         feedback_store.append_feedback(
             {
                 "rating": request.rating,
                 "question": request.question.strip(),
                 "needs_fix": False,
+                **candidate,
             }
         )
-        # A confirmed LLM-written query becomes a few-shot example for similar questions.
-        response = request.ask_response or {}
-        if response.get("intent") == "dynamic_sql" and response.get("sql"):
-            sql_examples.add_example(request.question.strip(), response["sql"], source="user_confirmed")
     return FeedbackOkResponse()
 
 

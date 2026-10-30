@@ -3,7 +3,8 @@
 Sources of examples:
 - ``sql_examples.jsonl`` next to this file: curated pairs, reviewed in git (``source = curated``).
   Add one with ``scripts/add_sql_example.py``, which validates and executes the SQL first.
-- Thumbs-up feedback on a ``dynamic_sql`` answer (``source = user_confirmed``).
+- Thumbs-up feedback on a ``dynamic_sql`` answer is only a candidate: it is queued in the feedback
+  log and becomes a curated example after review (``scripts/add_sql_example.py --review``).
 
 Examples live in the OpenSearch index ``SQL_EXAMPLES_INDEX`` and are retrieved by text match plus
 kNN on the question embedding. When OpenSearch is unavailable the curated file is searched locally by
@@ -22,7 +23,6 @@ from typing import Any
 
 from api.services.config import SQL_EXAMPLES_INDEX, SQL_EXAMPLES_K
 from api.services.mart import entities
-from api.services.mart.safe_sql import validate_mart_sql
 
 log = logging.getLogger(__name__)
 
@@ -80,6 +80,8 @@ def ensure_index() -> None:
                 },
             },
         )
+    # Only reviewed examples prompt the model: drop pairs stored before thumbs-up needed approval.
+    client.delete_by_query(index=SQL_EXAMPLES_INDEX, body={"query": {"bool": {"must_not": {"term": {"source": "curated"}}}}})
     for example in load_seed():
         _index(client, example["question"], example["sql"], "curated")
     log.info("sql examples index ready (%s curated)", len(load_seed()))
@@ -98,26 +100,6 @@ def _index(client, question: str, sql: str, source: str) -> None:
             "question_embedding": _embedding(question),
         },
     )
-
-
-def add_example(question: str, sql: str, source: str = "user_confirmed") -> bool:
-    """Validate ``sql`` and store the pair; return False when it is rejected or OpenSearch fails.
-
-    A user-confirmed example never overwrites a curated one with the same question.
-    """
-    try:
-        sql = validate_mart_sql(sql)
-    except ValueError as exc:
-        log.warning("sql example rejected: %s", exc)
-        return False
-    if source != "curated" and example_id(question) in {example_id(e["question"]) for e in load_seed()}:
-        return False
-    try:
-        _index(_client(), question, sql, source)
-    except Exception as exc:  # examples are an optimisation; never fail the request
-        log.warning("could not store sql example: %s", exc)
-        return False
-    return True
 
 
 def _local_similar(question: str, k: int) -> list[dict[str, Any]]:

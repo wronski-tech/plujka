@@ -82,7 +82,7 @@ Cel: lepsze rozumienie pytań i odpowiedzi bez faktów spoza SQL. Gotowe, gdy fu
 - [x] 1. Zestaw ewaluacyjny (300 pytań z oczekiwanym wynikiem), nocne CI z prawdziwym modelem.
 - [x] 2. Metryki: trafność, doprecyzowania, naprawy, koszt, czas — według rodziny wyborów.
 - [ ] 3. Grupowanie pytań z kciukiem w dół przez LLM, propozycje przykładów do zatwierdzenia.
-- [ ] 4. Kolejka „kciuk w górę → przykład SQL” z ręcznym zatwierdzeniem.
+- [x] 4. Kolejka „kciuk w górę → przykład SQL” z ręcznym zatwierdzeniem.
 - [ ] 5. Wykrywanie regresji po zmianie modelu lub promptu.
 
 **Rozumienie pytań**

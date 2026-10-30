@@ -8,6 +8,7 @@ the LLM and the database stubbed.
 from __future__ import annotations
 
 import importlib.util
+import json
 import logging
 import tempfile
 import unittest
@@ -716,6 +717,35 @@ class TestCuratedExamples(unittest.TestCase):
                 validate_mart_sql(example["sql"])
         ids = [examples.example_id(e["question"]) for e in seed]
         self.assertEqual(len(ids), len(set(ids)), "duplicate questions in sql_examples.jsonl")
+
+    def test_thumbs_up_is_queued_and_added_only_after_review(self) -> None:
+        from fastapi.testclient import TestClient
+
+        from api.main import app
+
+        spec = importlib.util.spec_from_file_location("add_sql_example", Path(__file__).resolve().parents[1] / "scripts" / "add_sql_example.py")
+        review = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(review)
+        sql = "SELECT turnout_pct FROM mart.v_turnout WHERE election = 'pe' AND year = 2019 AND level = 'country'"
+        with tempfile.TemporaryDirectory() as tmp:
+            feedback, seed = Path(tmp) / "feedback.jsonl", Path(tmp) / "seed.jsonl"
+            seed.write_text(json.dumps({"question": "Jakie wybory są w bazie?", "sql": "SELECT 1"}) + "\n", encoding="utf-8")
+            with patch("api.services.feedback_store.FEEDBACK_JSONL_PATH", str(feedback)), \
+                    patch.object(examples, "SEED_PATH", seed), patch.object(review, "check_example", return_value=(True, "1 rows")):
+                examples.load_seed.cache_clear()
+                client = TestClient(app)
+                for question, intent in (("Frekwencja w eurowyborach 2019", "dynamic_sql"), ("Frekwencja 2019", "dynamic_sql"),
+                                         ("Wynik PiS", "sql_template")):
+                    response = client.post("/feedback", json={"rating": "thumbs_up", "question": question,
+                                                              "ask_response": {"intent": intent, "sql": sql}})
+                    self.assertEqual(response.status_code, 200)
+                self.assertEqual(len(examples.load_seed()), 1, "a thumbs-up alone must not become an example")
+                answers = iter(["y", "n"])
+                self.assertEqual(review.review_candidates(feedback, ask=lambda _: next(answers)), 1)
+                self.assertEqual([e["question"] for e in examples.load_seed()][1:], ["Frekwencja w eurowyborach 2019"])
+                # Decided candidates are not asked again; template answers were never candidates.
+                self.assertEqual(review.review_candidates(feedback, ask=lambda _: self.fail("asked again")), 0)
+            examples.load_seed.cache_clear()
 
     def test_local_search_ranks_by_shared_words(self) -> None:
         hits = examples._local_similar("frekwencja w drugiej turze wyborów prezydenckich 2025", k=2)
