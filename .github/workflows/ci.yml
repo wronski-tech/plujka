@@ -138,6 +138,10 @@ jobs:
       - name: Check curated SQL examples against the built mart
         run: PYTHONPATH=. python scripts/add_sql_example.py --check
 
+      # Reference queries of the evaluation set (the nightly Eval workflow grades the model against them).
+      - name: Check the evaluation set against the built mart
+        run: PYTHONPATH=. python scripts/run_eval.py --check
+
       - name: Dump the mart
         run: |
           docker exec ${{ job.services.postgres.id }} pg_dump -U plujka -n mart -Fc -Z 6 plujka > mart.dump

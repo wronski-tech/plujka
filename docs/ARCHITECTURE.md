@@ -77,6 +77,7 @@ Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `
 | Routing rules        | `api/services/router.py`          |
 | Rate limit / API keys| `api/services/rate_limit.py`, `require_api_key` in `api/main.py` |
 | LLM SQL over `mart`  | `api/services/dynamic_sql.py`, `api/services/mart/safe_sql.py`, `api/services/mart/entities.py`, `api/services/mart/examples.py` |
+| Evaluation of LLM SQL | `scripts/run_eval.py`, `tests/eval/questions.jsonl`, `.github/workflows/eval.yml` (nightly, real model) |
 | Answer text          | `api/services/answer.py`          |
 | `mart` schema / build| `api/services/mart/`, `scripts/build_mart.py` |
 | LLM prompts / parsing| `api/services/llm.py`             |

@@ -40,6 +40,9 @@ _spec = importlib.util.spec_from_file_location(
 )
 stage = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(stage)
+_spec = importlib.util.spec_from_file_location("run_eval", Path(__file__).resolve().parents[1] / "scripts" / "run_eval.py")
+run_eval = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(run_eval)
 
 
 class TestSafeSql(unittest.TestCase):
@@ -682,6 +685,35 @@ class TestCuratedExamples(unittest.TestCase):
     def test_local_search_ranks_by_shared_words(self) -> None:
         hits = examples._local_similar("frekwencja w drugiej turze wyborów prezydenckich 2025", k=2)
         self.assertIn("frekwencja", hits[0]["question"].lower())
+
+
+class TestEvaluationSet(unittest.TestCase):
+    def test_items_are_well_formed_and_not_curated_examples(self) -> None:
+        items = run_eval.load_items()
+        self.assertGreaterEqual(len(items), 300)
+        self.assertEqual(len({i["id"] for i in items}), len(items))
+        curated = {entities.fold(e["question"]) for e in examples.load_seed()}
+        for item in items:
+            with self.subTest(id=item["id"]):
+                self.assertNotIn(entities.fold(item["question"]), curated, "the few-shot example would leak the answer")
+                if "sql" in item:
+                    validate_mart_sql(item["sql"])
+                else:
+                    self.assertEqual(item.get("expect"), "clarify")
+
+    def test_grading(self) -> None:
+        expected = [{"name": "A", "seats": 1, "pct": Decimal("74.25")}, {"name": "B", "seats": 1, "pct": Decimal("25.75")}]
+        # Rounded percentages, other names, extra columns and rows still pass.
+        self.assertTrue(run_eval.rows_match(expected, [
+            {"party": "x", "pct": 25.8, "seats": 1}, {"party": "y", "pct": 74.2, "seats": 1, "votes": 9}, {"pct": 0.0, "seats": 0},
+        ]))
+        # One generated row cannot stand for two expected rows; fractions are not percentages.
+        self.assertFalse(run_eval.rows_match(expected, [{"seats": 1, "pct": 74.25, "other": 25.75}]))
+        self.assertFalse(run_eval.rows_match(expected, [{"seats": 1, "pct": 0.7425}, {"seats": 1, "pct": 0.2575}]))
+        # Rows without numbers compare folded texts.
+        self.assertTrue(run_eval.rows_match([{"full_name": "Lech WAŁĘSA"}], [{"winner": "lech walesa"}]))
+        self.assertFalse(run_eval.rows_match([{"full_name": "Lech WAŁĘSA"}], [{"winner": "Stanisław Tymiński"}]))
+        self.assertFalse(run_eval.rows_match([], [{"x": 1}]))
 
 
 class TestDynamicQueryFlow(unittest.TestCase):

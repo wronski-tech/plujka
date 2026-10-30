@@ -1,0 +1,97 @@
+# Nightly evaluation of LLM-written SQL (scripts/run_eval.py) against the mart published by CI
+# (release mart-latest) with the real model. Needs the OPENAI_API_KEY secret; without it the job only
+# checks the evaluation set. Optional repository variables: OPENAI_CHAT_MODEL, EVAL_USD_PER_1M_INPUT,
+# EVAL_USD_PER_1M_OUTPUT (prices for the cost column).
+name: Eval
+
+on:
+  schedule:
+    - cron: "30 2 * * *"
+  workflow_dispatch:
+    inputs:
+      family:
+        description: "Only this family (sejm, prezydent, pe, ...); empty for all"
+        required: false
+      limit:
+        description: "At most this many questions; empty for all"
+        required: false
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: plujka
+          POSTGRES_PASSWORD: plujka
+          POSTGRES_DB: plujka
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U plujka -d plujka"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      DATABASE_URL: postgresql://plujka:plujka@localhost:5432/plujka
+      MART_DATABASE_URL: postgresql://plujka_mart_reader:plujka_mart_reader@localhost:5432/plujka
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      EVAL_USD_PER_1M_INPUT: ${{ vars.EVAL_USD_PER_1M_INPUT }}
+      EVAL_USD_PER_1M_OUTPUT: ${{ vars.EVAL_USD_PER_1M_OUTPUT }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: |
+            api/requirements.txt
+            loader/requirements.txt
+
+      - name: Install dependencies
+        run: pip install -r api/requirements.txt -r loader/requirements.txt
+
+      # Same restore as CI on a cache hit: tables from the dump, persons and views rebuilt.
+      - name: Restore the mart from release mart-latest
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download mart-latest -p 'mart.dump*'
+          sha256sum -c mart.dump.sha256
+          docker exec -i ${{ job.services.postgres.id }} psql -U plujka -d plujka -v ON_ERROR_STOP=1 \
+            -c "CREATE EXTENSION IF NOT EXISTS pg_trgm"
+          docker exec -i ${{ job.services.postgres.id }} pg_restore -U plujka -d plujka --no-owner --no-privileges \
+            --exit-on-error --section=pre-data --section=data < mart.dump
+          PYTHONPATH=. python -u scripts/build_mart.py --derived-only
+
+      - name: Check the evaluation set
+        run: PYTHONPATH=. python scripts/run_eval.py --check
+
+      - name: Evaluate with the model
+        if: env.OPENAI_API_KEY != ''
+        env:
+          CHAT_MODEL: ${{ vars.OPENAI_CHAT_MODEL }}
+          FAMILY: ${{ inputs.family }}
+          LIMIT: ${{ inputs.limit }}
+        run: |
+          # An empty variable must not override the default model in api/services/config.py.
+          if [ -n "$CHAT_MODEL" ]; then export OPENAI_CHAT_MODEL="$CHAT_MODEL"; fi
+          args=(--out eval_report.json)
+          if [ -n "$FAMILY" ]; then args+=(--family "$FAMILY"); fi
+          if [ -n "$LIMIT" ]; then args+=(--limit "$LIMIT"); fi
+          PYTHONPATH=. python -u scripts/run_eval.py "${args[@]}"
+          python -c "import json; print(json.load(open('eval_report.json'))['summary'])" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: No OpenAI key
+        if: env.OPENAI_API_KEY == ''
+        run: echo "::notice::OPENAI_API_KEY secret is not set; only the evaluation set was checked"
+
+      - uses: actions/upload-artifact@v4
+        if: always() && hashFiles('eval_report.json') != ''
+        with:
+          name: eval-report
+          path: eval_report.json
