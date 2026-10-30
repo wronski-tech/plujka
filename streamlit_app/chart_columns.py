@@ -42,3 +42,21 @@ def scatter_columns(rows: list[dict]) -> tuple[str, str, str] | None:
     if len(set(units)) != len(units):
         return None
     return labels[0], measures[0], measures[1]
+
+
+def line_series(rows: list[dict], max_series: int = 12) -> tuple[str | None] | None:
+    """(series column or None,) when rows form a time series: two or more years, at most one varying text
+    column (e.g. party) with up to ``max_series`` values, and one row per year and series; else None."""
+    if not rows or "year" not in rows[0] or not numeric_columns(rows):
+        return None
+    if len({row.get("year") for row in rows}) < 2:
+        return None
+    texts = [n for n, v in rows[0].items() if isinstance(v, str) and not n.startswith("teryt")]
+    varying = [n for n in texts if len({row.get(n) for row in rows}) > 1]
+    if len(varying) > 1:
+        return None
+    series = varying[0] if varying else None
+    keys = [(row.get("year"), row.get(series) if series else None) for row in rows]
+    if len(set(keys)) != len(keys) or (series and len({k[1] for k in keys}) > max_series):
+        return None
+    return (series,)

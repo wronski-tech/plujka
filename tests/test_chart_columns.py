@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import unittest
 
-from streamlit_app.chart_columns import numeric_columns, scatter_columns
+from streamlit_app.chart_columns import line_series, numeric_columns, scatter_columns
 
 
 class TestChartColumns(unittest.TestCase):
@@ -60,3 +60,13 @@ class TestChartColumns(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+    def test_line_series_one_row_per_year_and_party(self) -> None:
+        rows = [{"gmina": "Gdów", "year": y, "party": p, "pct": 10.0} for y in (2019, 2023) for p in ("KO", "PiS")]
+        self.assertEqual(line_series(rows), ("party",))
+        self.assertEqual(line_series([r for r in rows if r["party"] == "KO"]), (None,))
+        # Two rounds in one year, or one year only, are not a time series.
+        self.assertIsNone(line_series([{**r, "round": n} for r in rows[:1] for n in (1, 2)]))
+        self.assertIsNone(line_series([r for r in rows if r["year"] == 2023]))
+        # Two varying labels (party and unit) would draw tangled lines.
+        self.assertIsNone(line_series([{**r, "gmina": r["party"]} for r in rows]))

@@ -17,7 +17,7 @@ import pydeck as pdk
 import requests
 import streamlit as st
 
-from chart_columns import numeric_columns, scatter_columns
+from chart_columns import line_series, numeric_columns, scatter_columns
 from map_units import boundaries, feature_key, is_osm, unit_values, visible_features, voivodeship_level
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
@@ -192,12 +192,31 @@ def _render_scatter(rows: list[dict], label: str, x: str, y: str) -> None:
     st.caption(f"Każdy punkt to jedna jednostka ({len(frame)}): {x} (oś pozioma) i {y} (oś pionowa).")
 
 
+def _render_line(rows: list[dict], series: str | None) -> None:
+    """Value over the years, one line per series (e.g. party) when the rows have one."""
+    value = _value_column(rows)
+    frame = pd.DataFrame(rows)[["year", value] + ([series] if series else [])].dropna()
+    encoding = {"color": alt.Color(f"{series}:N", title=None)} if series else {}
+    chart = (
+        alt.Chart(frame)
+        .mark_line(point=True, **({} if series else {"color": "#6366f1"}))
+        .encode(x=alt.X("year:O", title="Rok"), y=alt.Y(f"{value}:Q", title=value),
+                tooltip=["year", value] + ([series] if series else []), **encoding)
+        .properties(height=360)
+    )
+    st.altair_chart(chart, use_container_width=True)
+
+
 def _render_chart(rows: list[dict]) -> None:
-    """Scatter plot for two measures per territorial unit, otherwise a horizontal bar chart when each row is
-    one labelled unit with a number (e.g. results by party)."""
+    """Scatter plot for two measures per territorial unit, a line chart for a time series (one row per year
+    and series), otherwise a horizontal bar chart when each row is one labelled unit with a number."""
     scatter = scatter_columns(rows)
     if scatter:
         _render_scatter(rows, *scatter)
+        return
+    line = line_series(rows)
+    if line:
+        _render_line(rows, *line)
         return
     if not 2 <= len(rows) <= MAX_CHART_ROWS:
         return
@@ -652,6 +671,32 @@ def _render_person_timeline(person_id: int, view_key: str = "person_view") -> No
             st.altair_chart(chart, use_container_width=True)
         st.dataframe(rows, use_container_width=True, hide_index=True)
         _csv_download(rows, f"kandydatury {person['full_name']}", key=f"csv_{view_key}_{person_id}")
+        _person_link_report(person_id, rows, view_key)
+
+
+def _person_link_report(person_id: int, rows: list[dict], view_key: str) -> None:
+    """Form sending a wrongly joined or split person to POST /feedback/person."""
+    with st.popover("Zgłoś błędne połączenie osoby"):
+        with st.form(key=f"{view_key}_report_{person_id}", clear_on_submit=True, border=False):
+            labels = [f"{r['Data']} · {r['Wybory']} · {r['Obszar'] or 'okręg ' + str(r['Okręg'])}" for r in rows]
+            chosen = st.multiselect("Kandydatury innej osoby", labels, placeholder="Wybierz kandydatury (opcjonalnie)")
+            note = st.text_area("Co się nie zgadza?", max_chars=2000,
+                                placeholder="Np. to dwie różne osoby albo brakuje kandydatury z 2014 r.")
+            if not st.form_submit_button("Wyślij zgłoszenie"):
+                return
+        if not chosen and not note.strip():
+            st.warning("Wybierz kandydatury albo opisz problem.")
+            return
+        try:
+            response = requests.post(f"{API_URL}/feedback/person", headers=API_HEADERS, timeout=30,
+                                     json={"person_id": person_id, "candidacies": chosen, "note": note})
+        except requests.RequestException as error:
+            st.error(f"Coś poszło nie tak z API: {error}")
+            return
+        if response.ok:
+            st.success("Dziękujemy — zgłoszenie trafi do poprawek łączenia osób.")
+        else:
+            st.error(f"Nie udało się wysłać zgłoszenia: HTTP {response.status_code}")
 
 
 def _render_person_links(data: dict, entity_refs: list[dict] | None, key: str) -> None:

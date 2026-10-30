@@ -46,7 +46,7 @@ The Streamlit app calls this while the user types (≥ 2 characters) and after a
 
 ## Feedback (`POST /feedback`)
 
-The Streamlit UI sends thumbs-up/down after each answer. A thumbs-up on a `dynamic_sql` answer also stores the question and its validated SQL as a few-shot example (`mart/examples.py`). **Thumbs-down** requests append one JSON line per event to `FEEDBACK_JSONL_PATH` (default `data/feedback/feedback.jsonl`) via `api/services/feedback_store.py`, including `needs_fix: true` and the full **`ask_response`** payload (question routing snapshot: `result`, `intent`, `sql`, `params`, etc.) for offline review. Thumbs-up lines omit `ask_response` and set `needs_fix: false`. In Docker, `./data` is mounted into the API container so logs land on the host under `data/feedback/`.
+The Streamlit UI sends thumbs-up/down after each answer. A thumbs-up on a `dynamic_sql` answer also stores the question and its validated SQL as a few-shot example (`mart/examples.py`). **Thumbs-down** requests append one JSON line per event to `FEEDBACK_JSONL_PATH` (default `data/feedback/feedback.jsonl`) via `api/services/feedback_store.py`, including `needs_fix: true` and the full **`ask_response`** payload (question routing snapshot: `result`, `intent`, `sql`, `params`, etc.) for offline review. Thumbs-up lines omit `ask_response` and set `needs_fix: false`. The person card's **„Zgłoś błędne połączenie osoby”** form posts to `POST /feedback/person`, which appends a `kind: "person_link"` line (person id, the candidacies the user marked, a note) to the same file; fixes go to `person_overrides.csv`. In Docker, `./data` is mounted into the API container so logs land on the host under `data/feedback/`.
 
 ## Person timeline (`GET /persons/{person_id}`, `GET /persons?name=`)
 

@@ -513,6 +513,15 @@ class FeedbackRequest(BaseModel):
     ask_response: dict[str, Any] | None = None
 
 
+class PersonLinkReport(BaseModel):
+    model_config = ConfigDict(json_schema_extra={"examples": [{
+        "person_id": 123, "candidacies": ["2018-10-21 · Rada gminy · Gdów"], "note": "To dwie różne osoby."}]})
+
+    person_id: int
+    candidacies: list[str] = Field(default_factory=list, max_length=200, description="Candidacies the user thinks are wrongly linked")
+    note: str = Field(default="", max_length=2000)
+
+
 class QuestionHintsRequest(BaseModel):
     model_config = ConfigDict(json_schema_extra={"examples": [{"q": "frekwencja w", "limit": 5}]})
 
@@ -1269,6 +1278,14 @@ def ask(request: AskRequest, http_request: Request, api_key: str | None = Depend
         telemetry=telemetry,
     )
     return AskResponse.model_validate(result)
+
+
+@app.post("/feedback/person", response_model=FeedbackOkResponse, tags=["feedback"], dependencies=[Depends(require_api_key)])
+def feedback_person(report: PersonLinkReport) -> FeedbackOkResponse:
+    """A wrongly linked or split person, appended to feedback.jsonl for a person_overrides.csv fix."""
+    feedback_store.append_feedback({"kind": "person_link", "needs_fix": True, "person_id": report.person_id,
+                                    "candidacies": report.candidacies, "note": report.note.strip()})
+    return FeedbackOkResponse()
 
 
 @app.post("/feedback", response_model=FeedbackOkResponse, tags=["feedback"], dependencies=[Depends(require_api_key)])

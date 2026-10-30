@@ -16,7 +16,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [x] 4. Porównanie dwóch wyborów dla jednej jednostki (`v_party_change`).
 - [x] 5. Ranking jednostek według miary, z filtrem województwa.
 - [ ] 6. Wyniki obwodowe z wyszukiwaniem obwodu po numerze i gminie.
-- [ ] 7. Wykres liniowy jednostki w czasie (`chart_columns.py`).
+- [x] 7. Wykres liniowy jednostki w czasie (`chart_columns.py`).
 - [x] 8. Karta wyborów: frekwencja, mandaty, progi, metoda, liczba obwodów.
 - [x] 9. Lista wybranych według okręgu z filtrem komitetu.
 - [x] 10. Druga tura (prezydent, wójtowie): przepływ wyników między turami w jednostce.
@@ -34,7 +34,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [x] 18. Wójtowie i burmistrzowie: ciągłość władzy, liczba kadencji.
 - [x] 19. Najmłodsi i najstarsi kandydaci i wybrani.
 - [x] 20. Kobiety wśród kandydatów i wybranych w czasie.
-- [ ] 21. „Zgłoś błędne połączenie osoby” → `feedback.jsonl`.
+- [x] 21. „Zgłoś błędne połączenie osoby” → `feedback.jsonl`.
 
 **Dane**
 - [x] 22. Mapowanie kodów gmin sprzed 1999 jako tabela w marcie (odtwarzalny skrypt, kontrole).
