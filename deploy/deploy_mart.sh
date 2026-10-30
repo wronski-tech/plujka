@@ -33,7 +33,7 @@ psql -d plujka -c "DROP DATABASE IF EXISTS $target" -c "CREATE DATABASE $target"
 psql -d "$target" -c "CREATE EXTENSION IF NOT EXISTS pg_trgm"
 # Tables and data only: the materialized views are rebuilt by build_mart.py --derived-only, which
 # analyzes them in order (pg_restore's own REFRESH runs without statistics and takes far longer).
-"${dc[@]}" exec -T postgres pg_restore -U plujka -d "$target" --no-owner --no-privileges \
+"${dc[@]}" exec -T postgres pg_restore -U plujka -d "$target" --no-owner --no-privileges --exit-on-error \
   --section=pre-data --section=data < "$work/mart.dump"
 "${dc[@]}" run --rm \
   -e DATABASE_URL="postgresql://plujka:$POSTGRES_PASSWORD@postgres:5432/$target" \

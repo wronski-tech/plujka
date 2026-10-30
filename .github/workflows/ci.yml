@@ -127,9 +127,11 @@ jobs:
         if: steps.mart-cache.outputs.cache-hit == 'true'
         run: |
           start=$(date +%s)
-          docker exec -i ${{ job.services.postgres.id }} psql -U plujka -d plujka -c "CREATE EXTENSION IF NOT EXISTS pg_trgm"
+          # The DB tests above created an empty mart schema; the dump brings its own.
+          docker exec -i ${{ job.services.postgres.id }} psql -U plujka -d plujka -v ON_ERROR_STOP=1 \
+            -c "DROP SCHEMA IF EXISTS mart CASCADE" -c "CREATE EXTENSION IF NOT EXISTS pg_trgm"
           docker exec -i ${{ job.services.postgres.id }} pg_restore -U plujka -d plujka --no-owner --no-privileges \
-            --section=pre-data --section=data < mart.dump
+            --exit-on-error --section=pre-data --section=data < mart.dump
           PYTHONPATH=. python -u scripts/build_mart.py --derived-only
           echo "MART_BUILD_SECONDS=$(( $(date +%s) - start ))" >> "$GITHUB_ENV"
 
