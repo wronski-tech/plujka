@@ -21,6 +21,7 @@ Examples:
   python3 scripts/build_mart.py                                   # everything staged
   python3 scripts/build_mart.py --years 2023                      # every family of 2023
   python3 scripts/build_mart.py --elections prezydent,pe          # some families, all years
+  python3 scripts/build_mart.py --derived-only                    # after restoring a dump of the base tables
 """
 
 from __future__ import annotations
@@ -177,6 +178,14 @@ def _init_worker() -> None:
     logging.basicConfig(level=logging.INFO, format="[mart] %(levelname)s %(message)s", force=True)
 
 
+def rebuild_derived() -> None:
+    """Persons, views, entity lexicon and seat check from everything loaded; then the read-only role."""
+    with psycopg.connect(DATABASE_URL) as pg:
+        schema.ensure_schema(pg)
+        derived.rebuild(pg)
+        schema.ensure_reader_role(pg, statement_timeout_ms=MART_STATEMENT_TIMEOUT_MS)
+
+
 def main() -> None:
     """CLI entry point."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -201,6 +210,11 @@ def main() -> None:
         "--skip-derived", action="store_true",
         help="Load family-years only; leave persons, views and the seat check to a later full run",
     )
+    parser.add_argument(
+        "--derived-only", action="store_true",
+        help="Only rebuild persons, views, the seat check and the reader role from the loaded base tables "
+             "(e.g. after pg_restore of a CI mart dump)",
+    )
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="[mart] %(levelname)s %(message)s")
 
@@ -216,6 +230,10 @@ def main() -> None:
         parser.error("no supported family-year matches --years/--elections")
     if args.wait_db_seconds:
         wait_for_database(args.wait_db_seconds)
+    if args.derived_only:
+        rebuild_derived()
+        log.info("done: derived objects rebuilt")
+        return
 
     by_family = {n: [y for m, y in jobs if m == n] for n in dict.fromkeys(n for n, _ in jobs)}
     built, failed = [], []
@@ -238,10 +256,7 @@ def main() -> None:
         raise SystemExit(f"[mart] nothing to build: no staged results under {roots}")
 
     if not args.skip_derived:
-        with psycopg.connect(DATABASE_URL) as pg:
-            schema.ensure_schema(pg)
-            derived.rebuild(pg)
-            schema.ensure_reader_role(pg, statement_timeout_ms=MART_STATEMENT_TIMEOUT_MS)
+        rebuild_derived()
     if failed:
         raise SystemExit(f"[mart] failed consistency checks and were not loaded: {failed}")
     log.info("done: %s", built)

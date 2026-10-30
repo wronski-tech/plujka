@@ -20,7 +20,8 @@ services:
   api:
     environment:
       DATABASE_URL: postgresql://plujka:${POSTGRES_PASSWORD}@postgres:5432/plujka
-      MART_DATABASE_URL: postgresql://plujka_mart_reader:${MART_READER_PASSWORD:?set MART_READER_PASSWORD in .env}@postgres:5432/plujka
+      # The mart lives in its own database, switched by deploy/deploy_mart.sh (plujka_mart_a / _b).
+      MART_DATABASE_URL: postgresql://plujka_mart_reader:${MART_READER_PASSWORD:?set MART_READER_PASSWORD in .env}@postgres:5432/${MART_DB:-plujka_mart_a}
       PLUJKA_ENV: production
       FEEDBACK_JSONL_PATH: /app/feedback/feedback.jsonl
     # Client addresses from Caddy's X-Forwarded-For (the API is reachable only inside the compose network).

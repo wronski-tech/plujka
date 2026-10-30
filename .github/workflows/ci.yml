@@ -61,6 +61,8 @@ jobs:
   integration:
     runs-on: ubuntu-latest
     needs: test
+    permissions:
+      contents: write
     services:
       postgres:
         image: pgvector/pgvector:pg16
@@ -98,15 +100,79 @@ jobs:
       - name: Run tests (including DB integration)
         run: PYTHONPATH=. python -m unittest discover -s tests -p 'test*.py' -v
 
+      # The base tables depend only on the data and the family builders: when neither changed, restore
+      # them from the cached dump; persons, views and the seat check are always rebuilt.
+      - name: Mart cache
+        id: mart-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: mart.dump
+          key: mart-${{ hashFiles('data/kbw_stage_parquet/**', 'data/pkw_stage_parquet/**', 'data/gus/**', 'data/pkw_html/**', 'api/services/mart/build_*.py', 'api/services/mart/person_overrides.csv', 'api/services/mart/schema.py', 'scripts/build_mart.py') }}
+
       # Every consistency check in the builders must pass on PostgreSQL 16 with the committed data.
       # Families build in three processes (4 vCPU, 16 GB runner); persons and views follow serially.
       - name: Build the mart from committed parquet
+        if: steps.mart-cache.outputs.cache-hit != 'true'
         env:
           MART_DUCKDB_MEMORY_LIMIT: 3GB
-        run: PYTHONPATH=. python -u scripts/build_mart.py --jobs 3
+        run: |
+          start=$(date +%s)
+          PYTHONPATH=. python -u scripts/build_mart.py --jobs 3
+          echo "MART_BUILD_SECONDS=$(( $(date +%s) - start ))" >> "$GITHUB_ENV"
+
+      - name: Restore cached base tables and rebuild derived objects
+        if: steps.mart-cache.outputs.cache-hit == 'true'
+        run: |
+          start=$(date +%s)
+          docker exec -i ${{ job.services.postgres.id }} psql -U plujka -d plujka -c "CREATE EXTENSION IF NOT EXISTS pg_trgm"
+          docker exec -i ${{ job.services.postgres.id }} pg_restore -U plujka -d plujka --no-owner --no-privileges \
+            --section=pre-data --section=data < mart.dump
+          PYTHONPATH=. python -u scripts/build_mart.py --derived-only
+          echo "MART_BUILD_SECONDS=$(( $(date +%s) - start ))" >> "$GITHUB_ENV"
 
       - name: Check curated SQL examples against the built mart
         run: PYTHONPATH=. python scripts/add_sql_example.py --check
+
+      - name: Dump the mart
+        run: |
+          docker exec ${{ job.services.postgres.id }} pg_dump -U plujka -n mart -Fc -Z 6 plujka > mart.dump
+          sha256sum mart.dump > mart.dump.sha256
+
+      - name: Save mart cache
+        if: steps.mart-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: mart.dump
+          key: ${{ steps.mart-cache.outputs.cache-primary-key }}
+
+      # Sizes that limit this setup: the release asset (2 GB per file) and the runner's disk.
+      - name: Mart sizes
+        run: |
+          mart=$(docker exec ${{ job.services.postgres.id }} psql -U plujka -d plujka -Atc \
+            "SELECT sum(pg_total_relation_size(c.oid)) FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'mart'")
+          dump=$(stat -c %s mart.dump)
+          free=$(df --output=avail -B1 . | tail -1)
+          {
+            echo "| measure | value |"
+            echo "| --- | --- |"
+            echo "| mart in PostgreSQL | $(numfmt --to=iec "$mart") |"
+            echo "| mart.dump | $(numfmt --to=iec "$dump") |"
+            echo "| free disk | $(numfmt --to=iec "$free") |"
+            echo "| build (cache hit: ${{ steps.mart-cache.outputs.cache-hit == 'true' }}) | ${MART_BUILD_SECONDS} s |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ "$dump" -gt 1500000000 ]; then echo "::warning::mart.dump is $(numfmt --to=iec "$dump"); release assets are limited to 2 GB"; fi
+          if [ "$free" -lt 5000000000 ]; then echo "::warning::only $(numfmt --to=iec "$free") free on the runner"; fi
+
+      # deploy/deploy_mart.sh downloads this asset; only main publishes it.
+      - name: Publish the mart dump (release mart-latest)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view mart-latest >/dev/null 2>&1 || gh release create mart-latest --prerelease \
+            --title "Mart (latest main)" --notes "pg_dump -n mart of the mart built and checked by CI; deploy with deploy/deploy_mart.sh."
+          gh release upload mart-latest mart.dump mart.dump.sha256 --clobber
+          gh release edit mart-latest --notes "Built from ${GITHUB_SHA} by CI run ${GITHUB_RUN_ID}. pg_dump -n mart; deploy with deploy/deploy_mart.sh."
 
   # The images and docker-compose.yml as users run them: build, start, and answer one request.
   compose:
