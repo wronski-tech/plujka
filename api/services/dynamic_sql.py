@@ -242,6 +242,85 @@ def _llm_sql(
     return sql, tokens
 
 
+MAX_INTERPRETATIONS = 4
+
+
+def _llm_interpretations(question: str, context: str, options: list[dict]) -> tuple[list[dict], dict[str, int]]:
+    """Ask the chat model for one query per clarification option; return ([{ref, description, sql}], tokens)."""
+    listing = "\n".join(f"- ref {o['ref']} ({o['kind']}): {o['label']}" for o in options)
+    rules = SQL_RULES.rsplit("\n", 1)[0]
+    response = OpenAI(api_key=OPENAI_API_KEY).chat.completions.create(
+        model=OPENAI_CHAT_MODEL,
+        temperature=0,
+        response_format={"type": "json_object"},
+        messages=[
+            {
+                "role": "system",
+                "content": "You write SQL for a Polish election analytics database. Facts come only from the database.\n"
+                f"{rules}\n\n{context}\n\nThe question is ambiguous between these options:\n{listing}\n"
+                "Write one query per option, each answering the question for that option only (use its key), "
+                "and a short Polish description of that interpretation without numbers.\n"
+                'Return JSON: {"interpretations": [{"ref": "...", "description": "...", "sql": "..."}]}',
+            },
+            {"role": "user", "content": question},
+        ],
+    )
+    usage = response.usage
+    tokens = {"prompt_tokens": usage.prompt_tokens, "completion_tokens": usage.completion_tokens} if usage else {}
+    try:
+        found = json.loads(response.choices[0].message.content or "{}").get("interpretations") or []
+    except json.JSONDecodeError:
+        found = []
+    return [i for i in found if isinstance(i, dict)], tokens
+
+
+def add_interpretations(
+    question: str, matches: list[entities.EntityMatch], clarification: dict, previous: dict | None, tokens: dict[str, int]
+) -> dict:
+    """``clarification`` with at most MAX_INTERPRETATIONS options, each with a ready, validated query.
+
+    One model call writes a query per option. Each valid query is cached under the request the UI
+    sends when the option is picked (same question, ``entity_refs`` = that option, same previous
+    turn), so the choice runs without another model call. Without a key or on any failure the
+    options are returned without queries (the choice then asks the model as before).
+    """
+    options: list[dict] = []
+    for option in clarification["options"]:
+        if (option["kind"], str(option["ref"])) not in {(o["kind"], str(o["ref"])) for o in options}:
+            options.append(option)
+    options = options[:MAX_INTERPRETATIONS]
+    plain = {**clarification, "options": options}
+    if not OPENAI_API_KEY:
+        return plain
+    try:
+        context, version, _ = build_context(question, matches, previous)
+        found, used = _llm_interpretations(question, context, options)
+    except Exception as exc:  # interpretations are an optimisation; the plain choice still works
+        log.warning("clarification interpretations skipped: %s", exc)
+        return plain
+    for name, value in used.items():
+        tokens[name] = tokens.get(name, 0) + value
+    by_ref = {str(i.get("ref")): i for i in found}
+    out = []
+    for option in options:
+        found_one = by_ref.get(str(option["ref"])) or {}
+        try:
+            sql = safe_sql.validate_mart_sql(str(found_one.get("sql") or ""))
+        except ValueError:
+            out.append(option)
+            continue
+        refs = [{"kind": option["kind"], "ref": str(option["ref"])}]
+        SQL_CACHE.put(_cache_key(question, refs, previous, version), sql)
+        out.append({**option, "description": str(found_one.get("description") or ""), "sql": sql})
+    return {**clarification, "options": out}
+
+
+def _cache_key(question: str, entity_refs: list[dict] | None, previous: dict | None, version: str) -> tuple:
+    """SQL cache key of one request."""
+    turn = json.dumps({k: previous.get(k) for k in ("question", "sql")}, sort_keys=True) if previous else ""
+    return (" ".join(entities.fold(question).split()), json.dumps(entity_refs or [], sort_keys=True), turn, version)
+
+
 def resolve_question_entities(
     question: str, entity_refs: list[dict] | None = None, previous: dict | None = None
 ) -> tuple[list[entities.EntityMatch], dict | None]:
@@ -322,6 +401,8 @@ def try_dynamic_query(
         meta: dict[str, Any] = {"entities": [m.__dict__ for m in matches], "timings_ms": timings, "tokens": tokens}
         if clarification:
             timings["entities"] = _ms(started)
+            clarification = add_interpretations(question, matches, clarification, previous, tokens)
+            timings["interpretations"] = _ms(started)
             return [], None, None, {**meta, "status": "clarify", "clarification": clarification}
         context, version, used = build_context(question, matches, previous)
     except psycopg.Error as exc:
@@ -330,8 +411,7 @@ def try_dynamic_query(
     timings["context"] = _ms(started)
     meta.update(used)
 
-    turn = json.dumps({k: previous.get(k) for k in ("question", "sql")}, sort_keys=True) if previous else ""
-    cache_key = (" ".join(entities.fold(question).split()), json.dumps(entity_refs or [], sort_keys=True), turn, version)
+    cache_key = _cache_key(question, entity_refs, previous, version)
     cached = SQL_CACHE.get(cache_key)
     if cached:
         try:

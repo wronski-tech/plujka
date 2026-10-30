@@ -634,7 +634,11 @@ would answer it from Sejm data.
 2. **Clarification.** If several persons or same-name gminas remain, the API returns
    `intent = "clarification"` with options instead of guessing. The UI shows them as buttons; a
    choice is sent back as `entity_refs: [{"kind": "person", "ref": "<person_id>"}]`, which pins that
-   entity.
+   entity. With an OpenAI key, one model call writes a query and a short Polish description for each
+   of at most four options (`dynamic_sql.add_interpretations`); options carry `description` and the
+   validated `sql`, and each query is put in the SQL cache under the request the choice sends, so a
+   picked option runs without another model call (an option whose query fails the guard stays,
+   without `sql`).
 3. **Follow-ups.** With `previous` (`{question, sql, entity_refs}` of the preceding turn), entity
    kinds the new question does not name are inherited from the previous question, and the previous
    question and SQL are added to the prompt with the instruction to keep their filters unless the

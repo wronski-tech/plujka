@@ -471,7 +471,11 @@ def _render_clarification(question: str, data: dict) -> None:
     clarification = data["clarification"]
     st.info(clarification.get("prompt") or "Doprecyzuj pytanie.")
     for i, option in enumerate(clarification.get("options") or []):
-        if st.button(option["label"], key=f"clarify_{i}_{option['ref']}", use_container_width=True):
+        clicked = st.button(option["label"], key=f"clarify_{i}_{option['ref']}", use_container_width=True)
+        # Options with a ready query (API: one model call per clarification) run at once when picked.
+        if option.get("description"):
+            st.caption(option["description"])
+        if clicked:
             refs = [{"kind": option["kind"], "ref": str(option["ref"])}]
             previous = st.session_state["last_ask"].get("asked_with")
             with st.spinner("Szukam odpowiedzi…"):
