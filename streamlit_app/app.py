@@ -1310,6 +1310,33 @@ def _elected() -> None:
                      hide_index=True, use_container_width=True)
 
 
+REPORT_FAMILIES = {**CHAMBER_LABELS, "referendum": "Referendum", "rada": "Rady gmin, powiatów i dzielnic", "inne": "Porównania między wyborami"}
+
+
+@st.fragment
+def _reports() -> None:
+    """"Gotowe zestawienia": the curated, verified SQL examples run without the LLM."""
+    with st.expander("📋 Gotowe zestawienia (bez LLM)", expanded=False):
+        reports = _api_get("/reports") or []
+        if not reports:
+            return
+        families = list(dict.fromkeys(r["family"] for r in reports))
+        c1, c2 = st.columns([1, 2])
+        family = c1.selectbox("Wybory", families, format_func=lambda f: REPORT_FAMILIES.get(f, f), key="report_family")
+        options = [r for r in reports if r["family"] == family]
+        report = c2.selectbox("Zestawienie", options, format_func=lambda r: r["question"], key=f"report_{family}")
+        data = _api_get(f"/reports/{report['id']}")
+        if not data:
+            return
+        st.caption("Sprawdzone zapytanie z zestawu przykładów; wynik prosto z bazy, bez modelu językowego.")
+        rows = data["rows"]
+        st.dataframe(rows, use_container_width=True, hide_index=True, column_config=_code_columns(rows))
+        _csv_download(rows, report["question"], key=f"csv_report_{report['id']}")
+        _render_chart(rows)
+        _render_map(rows, key=f"report_{report['id']}")
+        st.code(data["sql"], language="sql", wrap_lines=True)
+
+
 RANKING_LABELS = {"candidacies": "liczba kandydowań", "elected": "liczba wygranych", "career": "długość kariery",
                   "votes": "suma głosów"}
 
@@ -1512,6 +1539,7 @@ _unit_card()
 _seat_simulator()
 _candidates()
 _elected()
+_reports()
 _rankings()
 _data_coverage()
 _data_dictionary()

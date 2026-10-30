@@ -217,7 +217,8 @@ class TestBrowseEndpoints(unittest.TestCase):
         self.addCleanup(patch.stopall)
         self.client = TestClient(app)
 
-    def _rows(self, sql: str, params: dict) -> list[dict]:
+    def _rows(self, sql: str, params: dict | None = None) -> list[dict]:
+        params = params or {}
         self.calls.append(params)
         if "FROM mart.v_turnout" in sql and params.get("teryt_gmina") == "999999":
             return []
@@ -266,6 +267,14 @@ class TestBrowseEndpoints(unittest.TestCase):
         self.assertNotIn("2011-kand-sejm.xls", senat)
         self.assertIn("komitety.zip", sejm & senat)
         self.assertIn("sejmsenat2023", names("sejm", 2023))  # PKW bundle page
+
+    def test_reports_cover_every_election_family(self) -> None:
+        reports = self.client.get("/reports").json()
+        self.assertEqual({r["family"] for r in reports} - {"inne"},
+                         {"sejm", "senat", "prezydent", "pe", "referendum", "sejmik", "wbp", "rada"})
+        report = self.client.get(f"/reports/{reports[0]['id']}").json()
+        self.assertEqual(report["rows"][0]["votes"], 100)
+        self.assertEqual(self.client.get("/reports/000000000000").status_code, 404)
 
     def test_data_version_reads_the_source_manifest(self) -> None:
         version = self.client.get("/data-version").json()

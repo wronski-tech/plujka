@@ -1089,6 +1089,58 @@ def build_checks(
     return [BuildCheck.model_validate(r) for r in _mart_rows(CHECKS_SQL, {"election": election, "year": year})]
 
 
+# Ready-made reports: the curated question -> SQL examples (sql_examples.jsonl, checked by
+# scripts/add_sql_example.py --check), run as they are, without the LLM. Family: the first election-specific
+# relation, else an election literal, else "inne" (cross-election).
+_REPORT_RELATION = re.compile(r"\bmart\.(?:v_)?(prezydent|referendum|sejmik|wbp|rada|senat|pe|sejm)_")
+_REPORT_LITERAL = re.compile(r"\belection\s*=\s*'(prezydent|referendum|sejmik|wbp|rada|senat|pe|sejm)'")
+
+
+class ReportInfo(BaseModel):
+    id: str
+    question: str
+    family: str = Field(description="sejm, senat, prezydent, pe, referendum, sejmik, wbp, rada or inne")
+
+
+class ReportResult(ReportInfo):
+    sql: str
+    rows: list[dict[str, Any]]
+
+
+@functools.cache
+def _reports() -> dict[str, dict[str, str]]:
+    """Curated examples by id, with their election family."""
+    out = {}
+    for example in sql_examples.load_seed():
+        match = _REPORT_RELATION.search(example["sql"]) or _REPORT_LITERAL.search(example["sql"])
+        out[sql_examples.example_id(example["question"])[:12]] = {
+            "question": example["question"], "sql": example["sql"], "family": match.group(1) if match else "inne"}
+    return out
+
+
+@app.get("/reports", response_model=list[ReportInfo], tags=["browse"], dependencies=[Depends(require_api_key)])
+def reports() -> list[ReportInfo]:
+    """Ready-made reports (the curated, verified SQL examples), runnable without an LLM."""
+    return [ReportInfo(id=k, question=v["question"], family=v["family"]) for k, v in _reports().items()]
+
+
+@app.get("/reports/{report_id}", response_model=ReportResult, tags=["browse"], dependencies=[Depends(require_api_key)],
+         responses={404: {"description": "Unknown report"}})
+def run_report(report_id: str = Path(pattern=r"^[0-9a-f]{12}$")) -> ReportResult:
+    """Run one ready-made report through the SQL guard and the read-only role."""
+    report = _reports().get(report_id)
+    if report is None:
+        raise HTTPException(status_code=404, detail="Unknown report.")
+    sql = safe_sql.validate_mart_sql(report["sql"])
+    try:
+        rows = safe_sql.run_readonly(sql)
+    except psycopg.Error as exc:
+        log.warning("report %s failed: %s", report_id, exc)
+        raise HTTPException(status_code=503, detail="Election database is unavailable; try again later.") from exc
+    return ReportResult(id=report_id, question=report["question"], family=report["family"], sql=report["sql"],
+                        rows=[{k: _json_value(v) for k, v in row.items()} for row in rows])
+
+
 class DataVersion(BaseModel):
     mart_loaded_at: datetime | None = Field(description="When the newest election was loaded into the mart")
     elections: int = Field(description="Elections and rounds in the mart")
