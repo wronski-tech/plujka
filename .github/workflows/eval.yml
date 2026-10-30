@@ -1,7 +1,8 @@
 # Nightly evaluation of LLM-written SQL (scripts/run_eval.py) against the mart published by CI
 # (release mart-latest) with the real model. Needs the OPENAI_API_KEY secret; without it the job only
 # checks the evaluation set. Optional repository variables: OPENAI_CHAT_MODEL, EVAL_USD_PER_1M_INPUT,
-# EVAL_USD_PER_1M_OUTPUT (prices for the cost column).
+# EVAL_USD_PER_1M_OUTPUT (prices for the cost column), EVAL_MAX_REGRESSIONS (questions that may stop
+# passing compared with the last successful full run before the job fails; default 5).
 name: Eval
 
 on:
@@ -19,6 +20,9 @@ on:
 jobs:
   eval:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: read
     services:
       postgres:
         image: pgvector/pgvector:pg16
@@ -71,20 +75,38 @@ jobs:
       - name: Check the evaluation set
         run: PYTHONPATH=. python scripts/run_eval.py --check
 
+      # The report of the last successful full run is the baseline for the regression check.
+      - name: Baseline report
+        if: env.OPENAI_API_KEY != '' && inputs.family == '' && inputs.limit == ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run=$(gh run list --workflow eval.yml --status success --limit 20 --json databaseId,event \
+            --jq '[.[] | select(.event == "schedule")][0].databaseId // empty')
+          if [ -n "$run" ] && gh run download "$run" -n eval-report -D baseline; then
+            echo "BASELINE=baseline/eval_report.json" >> "$GITHUB_ENV"
+          else
+            echo "::notice::no earlier full evaluation report; regressions are not checked"
+          fi
+
       - name: Evaluate with the model
         if: env.OPENAI_API_KEY != ''
         env:
           CHAT_MODEL: ${{ vars.OPENAI_CHAT_MODEL }}
           FAMILY: ${{ inputs.family }}
           LIMIT: ${{ inputs.limit }}
+          MAX_REGRESSIONS: ${{ vars.EVAL_MAX_REGRESSIONS }}
         run: |
           # An empty variable must not override the default model in api/services/config.py.
           if [ -n "$CHAT_MODEL" ]; then export OPENAI_CHAT_MODEL="$CHAT_MODEL"; fi
           args=(--out eval_report.json)
           if [ -n "$FAMILY" ]; then args+=(--family "$FAMILY"); fi
           if [ -n "$LIMIT" ]; then args+=(--limit "$LIMIT"); fi
-          PYTHONPATH=. python -u scripts/run_eval.py "${args[@]}"
+          if [ -n "${BASELINE:-}" ]; then args+=(--baseline "$BASELINE" --max-regressions "${MAX_REGRESSIONS:-5}"); fi
+          status=0
+          PYTHONPATH=. python -u scripts/run_eval.py "${args[@]}" || status=$?
           python -c "import json; print(json.load(open('eval_report.json'))['summary'])" >> "$GITHUB_STEP_SUMMARY"
+          exit $status
 
       - name: No OpenAI key
         if: env.OPENAI_API_KEY == ''

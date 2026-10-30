@@ -780,6 +780,17 @@ class TestEvaluationSet(unittest.TestCase):
         self.assertFalse(run_eval.rows_match([{"full_name": "Lech WAŁĘSA"}], [{"winner": "Stanisław Tymiński"}]))
         self.assertFalse(run_eval.rows_match([], [{"x": 1}]))
 
+    def test_regressions_against_a_baseline(self) -> None:
+        def item(id_: str, passed: bool) -> dict:
+            return {"id": id_, "passed": passed, "status": "first_pass", "question": id_}
+
+        baseline = {"model": "m1", "prompt_version": "p1", "results": [item("a", True), item("b", False), item("c", True)]}
+        # "a" regressed, "b" was fixed, "c" still passes, "d" is new (not comparable).
+        text, regressed = run_eval.compare(baseline, [item("a", False), item("b", True), item("c", True), item("d", False)])
+        self.assertEqual([r["id"] for r in regressed], ["a"])
+        self.assertIn("Same 3 questions: 2 -> 2 passed; 1 regressed, 1 fixed.", text)
+        self.assertIn("model m1, prompt p1", text)
+
 
 class TestDynamicQueryFlow(unittest.TestCase):
     """``try_dynamic_query`` with the LLM, the mart context and the database stubbed."""

@@ -11,10 +11,15 @@ texts instead. Extra columns and extra rows do not fail an item.
             (no OpenAI key needed; CI runs it against the built mart)
   (default) asks the model for every question and writes a report with accuracy, clarifications,
             repairs, tokens, cost and time per election family
+  --baseline REPORT  compares with an earlier report (same questions only): lists questions that
+            passed there and fail now, and exits with an error when there are more than
+            --max-regressions of them; the report records the model and the prompt version, so a
+            regression after changing either is attributed to that change
 
 Examples:
   python3 scripts/run_eval.py --check
   python3 scripts/run_eval.py --family sejm --limit 20 --out eval_report.json
+  python3 scripts/run_eval.py --out eval_report.json --baseline previous/eval_report.json --max-regressions 5
 
 Needs ``MART_DATABASE_URL`` (the read-only role) pointing at a built mart; the evaluation itself also
 needs ``OPENAI_API_KEY``. Cost uses ``EVAL_USD_PER_1M_INPUT`` / ``EVAL_USD_PER_1M_OUTPUT`` when set.
@@ -24,6 +29,7 @@ from __future__ import annotations
 
 import argparse
 import datetime as dt
+import hashlib
 import json
 import os
 import sys
@@ -166,6 +172,28 @@ def summarize(results: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def prompt_version() -> str:
+    """Short hash of the fixed SQL rules sent with every question (changes when the prompt does)."""
+    return hashlib.sha256(dynamic_sql.SQL_RULES.encode()).hexdigest()[:12]
+
+
+def compare(baseline: dict, results: list[dict]) -> tuple[str, list[dict]]:
+    """Markdown comparison with ``baseline`` (a report written by --out) and the regressed items."""
+    before = {r["id"]: r for r in baseline["results"]}
+    common = [r for r in results if r["id"] in before]
+    regressed = [r for r in common if before[r["id"]]["passed"] and not r["passed"]]
+    fixed = [r for r in common if not before[r["id"]]["passed"] and r["passed"]]
+    old = sum(before[r["id"]]["passed"] for r in common)
+    new = sum(r["passed"] for r in common)
+    lines = [
+        f"Baseline: model {baseline.get('model', '?')}, prompt {baseline.get('prompt_version', '?')}; "
+        f"now: model {dynamic_sql.OPENAI_CHAT_MODEL}, prompt {prompt_version()}.",
+        f"Same {len(common)} questions: {old} -> {new} passed; {len(regressed)} regressed, {len(fixed)} fixed.",
+    ]
+    lines += [f"- regressed {r['id']} ({r['status']}): {r['question']}" for r in regressed]
+    return "\n".join(lines), regressed
+
+
 def main() -> None:
     """CLI entry point."""
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -173,6 +201,8 @@ def main() -> None:
     parser.add_argument("--family", help="Only items of this family")
     parser.add_argument("--limit", type=int, help="At most this many items")
     parser.add_argument("--out", type=Path, help="Write the per-item report as JSON")
+    parser.add_argument("--baseline", type=Path, help="Earlier report to compare with (regression check)")
+    parser.add_argument("--max-regressions", type=int, default=0, help="Regressed questions tolerated (default 0)")
     args = parser.parse_args()
 
     items = [i for i in load_items() if not args.family or i["family"] == args.family][: args.limit]
@@ -180,15 +210,23 @@ def main() -> None:
         if check(items):
             raise SystemExit("evaluation set has failing items")
         return
+    dynamic_sql.SQL_CACHE.ttl = 0  # grade the model, not SQL cached from an earlier run in this process
     results = []
     for item in items:
         result = evaluate(item)
         results.append(result)
         print(f"[{'ok' if result['passed'] else 'FAIL'}] {result['id']} {result['status']}: {item['question']}", flush=True)
     summary = summarize(results)
+    regressed: list[dict] = []
+    if args.baseline:
+        comparison, regressed = compare(json.loads(args.baseline.read_text(encoding="utf-8")), results)
+        summary += "\n\n" + comparison
     print(summary)
     if args.out:
-        args.out.write_text(json.dumps({"summary": summary, "results": results}, ensure_ascii=False, indent=1), encoding="utf-8")
+        report = {"model": dynamic_sql.OPENAI_CHAT_MODEL, "prompt_version": prompt_version(), "summary": summary, "results": results}
+        args.out.write_text(json.dumps(report, ensure_ascii=False, indent=1), encoding="utf-8")
+    if len(regressed) > args.max_regressions:
+        raise SystemExit(f"{len(regressed)} regressed question(s), more than --max-regressions {args.max_regressions}")
 
 
 if __name__ == "__main__":

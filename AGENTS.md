@@ -27,7 +27,7 @@ SQL safety), `docs/DATA.md` (sources), `docs/DEPLOYMENT.md` (API keys, Redis lim
 | `scripts/kbw_stage_duckdb.py` | Strict CSV/XLS/XLSX → Parquet staging |
 | `scripts/build_mart.py` | Builds `mart`: every family-year that is staged (`--years`, `--elections`) |
 | `scripts/add_sql_example.py` | Adds a curated SQL example after running it; `--check` runs them all; `--review` accepts queued thumbs-up answers |
-| `scripts/run_eval.py`, `tests/eval/questions.jsonl` | Evaluation set (question → reference SQL or expected clarification); `--check` runs the reference queries, otherwise grades the model per family (nightly `eval.yml`) |
+| `scripts/run_eval.py`, `tests/eval/questions.jsonl` | Evaluation set (question → reference SQL or expected clarification); `--check` runs the reference queries, otherwise grades the model per family (nightly `eval.yml`, `--baseline` flags regressions after a model or prompt change) |
 | `scripts/backup_db.sh` | `pg_dump` backup with retention |
 | `scripts/check_sources.py`, `data/source_manifest.json` | Detects republished KBW files (HEAD vs manifest), re-stages them, names the family-years to rebuild |
 | `scripts/scrape_list_groups_2006.py`, `data/pkw_html/` | 2006 list blocs scraped from PKW's results pages (not in KBW files), read by `build_rady.add_list_groups` |
