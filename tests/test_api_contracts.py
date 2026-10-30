@@ -221,6 +221,8 @@ class TestBrowseEndpoints(unittest.TestCase):
             return []
         if "FROM mart.v_turnout" in sql:
             return [{"election": "sejm", "year": 2023, "round": 1, "unit_name": "gm. Gdów", "turnout_pct": Decimal("71.50")}]
+        if "max(loaded_at)" in sql:
+            return [{"mart_loaded_at": None, "elections": 0, "latest_election_date": None}]
         if "v_gus_units" in sql:
             return [{"year": 2024, "name": "Gdów", "population": Decimal("21000")}]
         return [{"election": "sejm", "year": 2023, "round": 1, "name": "KO", "votes": Decimal("100"), "pct": Decimal("40.5")}]
@@ -237,6 +239,12 @@ class TestBrowseEndpoints(unittest.TestCase):
         self.assertEqual(card["name"], "Gdów")
         self.assertEqual(card["turnout"], [{"election": "sejm", "year": 2023, "round": 1, "turnout_pct": 71.5}])
         self.assertEqual(card["winners"][0]["votes"], 100)
+
+    def test_data_version_reads_the_source_manifest(self) -> None:
+        version = self.client.get("/data-version").json()
+        self.assertGreater(version["source_files"], 0)
+        self.assertEqual(len(version["manifest_sha256"]), 64)
+        self.assertIsNotNone(version["sources_last_modified"])
 
     def test_unknown_unit_and_unsupported_election(self) -> None:
         self.assertEqual(self.client.get("/units/999999").status_code, 404)

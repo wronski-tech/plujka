@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+import functools
+import hashlib
+import json
 import logging
+import pathlib
 import re
 import secrets
 import time
 from contextlib import asynccontextmanager
 from datetime import date, datetime
 from decimal import Decimal
+from email.utils import parsedate_to_datetime
 from typing import Any, Literal
 
 import psycopg
@@ -72,6 +77,11 @@ ELECTIONS_SQL = """
 SELECT election, year, round, election_date, description FROM mart.elections
 ORDER BY election_date, election, round
 """
+DATA_VERSION_SQL = """
+SELECT max(loaded_at) AS mart_loaded_at, count(*) AS elections, max(election_date) AS latest_election_date
+FROM mart.elections
+"""
+SOURCE_MANIFEST = pathlib.Path(__file__).resolve().parents[1] / "data" / "source_manifest.json"
 _UNIT_FILTER = """
   AND level = %(level)s
   AND (%(wojewodztwo)s::text IS NULL OR wojewodztwo = %(wojewodztwo)s)
@@ -588,6 +598,35 @@ def _unit_params(level: str, unit: str | None) -> dict[str, Any]:
 def list_elections() -> list[BrowseElection]:
     """Every loaded election and round with its date (``mart.elections``)."""
     return [BrowseElection.model_validate(r) for r in _mart_rows(ELECTIONS_SQL, {})]
+
+
+class DataVersion(BaseModel):
+    mart_loaded_at: datetime | None = Field(description="When the newest election was loaded into the mart")
+    elections: int = Field(description="Elections and rounds in the mart")
+    latest_election_date: date | None
+    source_files: int = Field(description="KBW/PKW files in this release's source manifest")
+    sources_last_modified: datetime | None = Field(description="Newest Last-Modified among those files")
+    manifest_sha256: str | None = Field(description="Hash of data/source_manifest.json, to compare releases")
+
+
+@functools.cache
+def _manifest_summary() -> dict[str, Any]:
+    """Source manifest summary, read once (the file ships with the image)."""
+    try:
+        raw = SOURCE_MANIFEST.read_bytes()
+    except FileNotFoundError:
+        return {"source_files": 0, "sources_last_modified": None, "manifest_sha256": None}
+    files = json.loads(raw).values()
+    modified = [parsedate_to_datetime(f["last_modified"]) for f in files if f.get("last_modified")]
+    return {"source_files": len(files), "sources_last_modified": max(modified, default=None),
+            "manifest_sha256": hashlib.sha256(raw).hexdigest()}
+
+
+@app.get("/data-version", response_model=DataVersion, tags=["browse"], dependencies=[Depends(require_api_key)])
+def data_version() -> DataVersion:
+    """Mart load time and size (``mart.elections``) and the source files this release was built from."""
+    rows = _mart_rows(DATA_VERSION_SQL, {})
+    return DataVersion.model_validate({**(rows[0] if rows else {"elections": 0}), **_manifest_summary()})
 
 
 @app.get("/turnout", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])

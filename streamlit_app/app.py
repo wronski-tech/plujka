@@ -940,7 +940,11 @@ def _data_coverage() -> None:
             pd.DataFrame([{"wybory": ELECTION_LABELS.get(k, k), "lata": ", ".join(map(str, v))} for k, v in years.items()]),
             hide_index=True, use_container_width=True,
         )
-        st.caption("Dane PKW/KBW; statystyki GUS dla gmin z lat 1995–2024. Znane luki: docs/MART.md.")
+        version = _api_get("/data-version") or {}
+        loaded = (version.get("mart_loaded_at") or "")[:10]
+        sources = (version.get("sources_last_modified") or "")[:10]
+        st.caption("Dane PKW/KBW; statystyki GUS dla gmin z lat 1995–2024. Znane luki: docs/MART.md."
+                   + (f" Baza zbudowana {loaded}; {version['source_files']} plików źródłowych, najnowszy z {sources}." if loaded else ""))
 
 
 @st.fragment(run_every=_READINESS_POLL_INTERVAL)
