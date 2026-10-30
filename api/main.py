@@ -132,6 +132,42 @@ SELECT year, name, population, urban_pct, area_km2, density, unemployed_share_wo
 FROM mart.v_gus_units WHERE level = %(level)s AND unit_key = %(unit)s
 ORDER BY year DESC LIMIT 1
 """
+# Sejm seats under another method, threshold or one national district (2001 on: 460 district seats).
+# A committee passes with threshold % of the national valid list votes (coalition committees with
+# coalition_threshold %); with exempt_minority, national-minority committees pass regardless.
+SEAT_SIMULATION_SQL = """
+WITH lists AS (
+  SELECT l.district_no, l.committee_id, l.votes, l.seats, d.seats AS district_seats
+  FROM mart.sejm_district_lists l JOIN mart.sejm_districts d USING (year, district_no)
+  WHERE l.year = %(year)s AND l.district_no > 0
+), national AS (
+  SELECT committee_id, sum(votes) AS votes, sum(seats) AS seats, 100.0 * sum(votes) / sum(sum(votes)) OVER () AS pct
+  FROM lists GROUP BY committee_id
+), passed AS (
+  SELECT n.committee_id FROM national n
+  JOIN mart.sejm_committees c ON c.year = %(year)s AND c.committee_id = n.committee_id
+  WHERE n.pct >= CASE WHEN c.is_coalition THEN %(coalition_threshold)s ELSE %(threshold)s END
+     OR (%(exempt_minority)s AND c.is_minority)
+), districts AS (
+  SELECT CASE WHEN %(national)s THEN 0 ELSE district_no END AS district, committee_id, sum(votes) AS votes
+  FROM lists JOIN passed USING (committee_id) GROUP BY 1, 2
+), sizes AS (
+  SELECT CASE WHEN %(national)s THEN 0 ELSE district_no END AS district, sum(district_seats) AS seats
+  FROM (SELECT DISTINCT district_no, district_seats FROM lists) d GROUP BY 1
+), allocated AS (
+  SELECT unnest(ids) AS committee_id, unnest(mart.allocate_seats(v, seats, %(method)s)) AS seats
+  FROM (SELECT d.district, s.seats, array_agg(d.committee_id ORDER BY d.committee_id) AS ids,
+               array_agg(d.votes::numeric ORDER BY d.committee_id) AS v
+        FROM districts d JOIN sizes s USING (district) GROUP BY d.district, s.seats) x
+)
+SELECT c.committee_name, coalesce(c.aliases[1], c.committee_name) AS party, n.votes, round(n.pct, 2) AS pct,
+       n.seats AS seats_official, coalesce(sum(a.seats), 0) AS seats_simulated
+FROM national n
+JOIN mart.sejm_committees c ON c.year = %(year)s AND c.committee_id = n.committee_id
+LEFT JOIN allocated a ON a.committee_id = n.committee_id
+GROUP BY c.committee_name, c.aliases, n.votes, n.pct, n.seats
+ORDER BY seats_simulated DESC, n.votes DESC
+"""
 BROWSE_ELECTIONS = ("sejm", "senat", "prezydent", "pe", "referendum", "sejmik", "wbp")
 # Letters only (hyphenated and apostrophe surnames kept), so LIKE wildcards never reach the query.
 _NAME_TOKEN_RE = re.compile(r"[^\W\d_]+(?:[-'][^\W\d_]+)*")
@@ -413,11 +449,11 @@ def _json_value(value: Any) -> Any:
 
 
 def _mart_rows(sql: str, params: dict[str, Any]) -> list[dict[str, Any]]:
-    """Run a fixed person query as the read-only mart role; JSON-friendly values; 503 when the mart fails."""
+    """Run a fixed query as the read-only mart role; JSON-friendly values; 503 when the mart fails."""
     try:
         rows = safe_sql.run_readonly(sql, params=params)
     except psycopg.Error as exc:
-        log.warning("person query failed: %s", exc)
+        log.warning("mart query failed: %s", exc)
         raise HTTPException(status_code=503, detail="Election database is unavailable; try again later.") from exc
     return [{k: _json_value(v) for k, v in row.items()} for row in rows]
 
@@ -590,6 +626,35 @@ def get_unit(unit: str = Path(max_length=40, description="Gmina TERYT (6 digits)
         "winners": _mart_rows(UNIT_WINNERS_SQL, params),
         "gus": gus[0] if gus else None,
     })
+
+
+class SeatSimulationRow(BaseModel):
+    committee_name: str
+    party: str
+    votes: int
+    pct: float
+    seats_official: int
+    seats_simulated: int
+
+
+@app.get("/seats/simulate", response_model=list[SeatSimulationRow], tags=["browse"], dependencies=[Depends(require_api_key)])
+def simulate_seats(
+    year: int = Query(ge=2001, le=2100, description="Sejm election year (2001 on)"),
+    method: Literal["dhondt", "sainte_lague", "sainte_lague_modified", "hare_niemeyer"] = Query("dhondt"),
+    threshold: float = Query(5.0, ge=0, le=50, description="Share of national list votes a committee needs, in %"),
+    coalition_threshold: float = Query(8.0, ge=0, le=50, description="The same for coalition committees, in %"),
+    exempt_minority: bool = Query(True, description="National-minority lists pass below the threshold, as in the law"),
+    national: bool = Query(False, description="One national district with all 460 seats instead of the 41 districts"),
+) -> list[SeatSimulationRow]:
+    """Sejm seats per committee under another method, threshold or district layout, recomputed with
+    ``mart.allocate_seats`` from the official list votes; ``seats_official`` is the real result. Fixed SQL,
+    no LLM."""
+    params = {"year": year, "method": method, "threshold": threshold, "coalition_threshold": coalition_threshold,
+              "exempt_minority": exempt_minority, "national": national}
+    rows = _mart_rows(SEAT_SIMULATION_SQL, params)
+    if not rows:
+        raise HTTPException(status_code=404, detail="No Sejm election in this year.")
+    return [SeatSimulationRow.model_validate(r) for r in rows]
 
 
 @app.post("/ask", response_model=AskResponse, tags=["ask"])

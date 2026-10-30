@@ -22,9 +22,9 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 10. Druga tura (prezydent, wójtowie): przepływ wyników między turami w jednostce.
 
 **Symulacje**
-- [ ] 11. Symulator mandatów: metoda i próg suwakami (`mart.allocate_seats`).
+- [x] 11. Symulator mandatów: metoda i próg suwakami (`mart.allocate_seats`).
 - [ ] 12. Symulacja koalicji (komitety jako jedna lista).
-- [ ] 13. Inny podział na okręgi (np. jeden okręg krajowy).
+- [x] 13. Inny podział na okręgi (np. jeden okręg krajowy).
 - [ ] 14. Koszt mandatu: głosy na mandat według komitetu.
 - [ ] 15. Głosy zmarnowane według województwa.
 

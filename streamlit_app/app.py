@@ -810,6 +810,53 @@ def _unit_card() -> None:
                                                  "votes": "głosy", "pct": "%"}), hide_index=True, use_container_width=True)
 
 
+SEAT_METHODS = {
+    "dhondt": "D'Hondt", "sainte_lague": "Sainte-Laguë", "sainte_lague_modified": "Sainte-Laguë zmodyfikowana (1,4)",
+    "hare_niemeyer": "Hare-Niemeyer",
+}
+
+
+@st.fragment
+def _seat_simulator() -> None:
+    """"Symulator mandatów": Sejm seats under another method, threshold or one national district."""
+    with st.expander("🧮 Symulator mandatów do Sejmu", expanded=False):
+        elections = _api_get("/elections") or []
+        years = sorted({e["year"] for e in elections if e["election"] == "sejm" and e["year"] >= 2001}, reverse=True)
+        if not years:
+            st.caption("Brak wyborów do Sejmu od 2001 r.")
+            return
+        c1, c2 = st.columns(2)
+        year = c1.selectbox("Wybory do Sejmu", years, key="seats_year")
+        method = c2.selectbox("Metoda", list(SEAT_METHODS), format_func=SEAT_METHODS.get, key="seats_method")
+        c3, c4 = st.columns(2)
+        threshold = c3.slider("Próg dla komitetów (%)", 0.0, 15.0, 5.0, 0.5, key="seats_threshold")
+        coalition = c4.slider("Próg dla koalicji (%)", 0.0, 15.0, 8.0, 0.5, key="seats_coalition")
+        c5, c6 = st.columns(2)
+        minority = c5.checkbox("Mniejszości narodowe bez progu", value=True, key="seats_minority")
+        national = c6.checkbox("Jeden okręg krajowy (460 mandatów)", value=False, key="seats_national")
+        rows = _api_get("/seats/simulate", {"year": year, "method": method, "threshold": threshold,
+                                            "coalition_threshold": coalition, "exempt_minority": minority,
+                                            "national": national})
+        if not rows:
+            return
+        table = pd.DataFrame(rows)[["party", "votes", "pct", "seats_official", "seats_simulated"]]
+        table["zmiana"] = table["seats_simulated"] - table["seats_official"]
+        shown = table[(table["seats_official"] > 0) | (table["seats_simulated"] > 0)]
+        st.dataframe(shown.rename(columns={"party": "komitet", "votes": "głosy", "pct": "%", "seats_official": "mandaty (oficjalnie)",
+                                           "seats_simulated": "mandaty (symulacja)"}), hide_index=True, use_container_width=True)
+        long = shown.melt(id_vars="party", value_vars=["seats_official", "seats_simulated"], var_name="wariant", value_name="mandaty")
+        long["wariant"] = long["wariant"].map({"seats_official": "oficjalnie", "seats_simulated": "symulacja"})
+        chart = (
+            alt.Chart(long)
+            .mark_bar()
+            .encode(y=alt.Y("party:N", title=None, sort="-x"), x=alt.X("mandaty:Q"), color=alt.Color("wariant:N", title=None),
+                    yOffset="wariant:N", tooltip=["party", "wariant", "mandaty"])
+            .properties(height=max(160, 52 * len(shown)), padding={"left": 5, "right": 5, "top": 5, "bottom": 25})
+        )
+        st.altair_chart(chart, use_container_width=True)
+        st.caption("Przeliczone z oficjalnych głosów na listy (mart.allocate_seats); próg liczony od głosów ważnych na listy w kraju.")
+
+
 @st.fragment
 def _data_coverage() -> None:
     """"Co jest w bazie": loaded elections and years (``GET /elections``)."""
@@ -920,6 +967,7 @@ with st.container(border=True):
 _person_search()
 _browse()
 _unit_card()
+_seat_simulator()
 _data_coverage()
 
 if submitted:
