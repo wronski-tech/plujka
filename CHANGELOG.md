@@ -66,6 +66,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Production setup: Terraform for Hetzner (`infra/hetzner`: server with in-place rescale, data volume, firewall, Storage Box, cloud-init), `deploy/docker-compose.prod.yml` with Caddy (TLS, `/api` to FastAPI), GHCR images (`images.yml`), a deploy workflow (staging after every main build, production after approval) with `deploy/update_app.sh` and `deploy/smoke_test.sh`.
+- Mart deployment without downtime: CI publishes `mart.dump` (release `mart-latest`); `deploy/deploy_mart.sh` restores it into the unused mart database and switches the API (`MART_DB`); `build_mart.py --derived-only`.
+- CI: lint job (ruff, mypy with a baseline, pip-audit, offline Markdown links), mart dump cache keyed by data and builders, size report; Dependabot.
+- Docs: `docs/RUNBOOK.md`, `NOTICE` (data sources and licences), `docs/ROADMAP.md`; superseded design notes moved to `docs/history/`.
+- Dependencies: FastAPI 0.162 (Starlette 1.10), uvicorn 0.54, pydantic 2.14, pyarrow 26 (published advisories for Starlette 0.38 and pyarrow 18).
 - `build_mart.py --jobs N` builds families in parallel processes (CI uses 3); `--skip-derived` loads family-years without rebuilding persons and views.
 - Entity resolution: a capitalized or named surname beats a voivodeship or powiat adjective ("Mazowieckiego", "Tadeusz Mazowiecki" are the person; "w województwie mazowieckim" the place); a matched party alias is not a place ("PiS" is not Pisz); 1975–1998 voivodeships are dropped when a current place matched and the question names no earlier year or "województwo".
 - Entity resolution: a person matches only through a word that names the surname (capitalized and not a party name when no given name is given, never the given-name word), so common words such as "w gminach", "turę", "zdobyły" or "PiS" no longer suggest persons (Gmiński, Tur, Zdobylak, Piś).
