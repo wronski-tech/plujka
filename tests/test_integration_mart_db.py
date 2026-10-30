@@ -124,10 +124,14 @@ class TestPersonLinking(unittest.TestCase):
             derived.link_persons(conn, path)
 
     def _fixture(self, conn) -> None:
-        from api.services.mart import schema
+        from api.services.mart import derived, schema
 
         schema.ensure_schema(conn)
         conn.execute("TRUNCATE " + ", ".join(f"mart.{t}" for t in self.CANDIDATE_TABLES))
+        with tempfile.TemporaryDirectory() as tmp:  # no by-election candidates (the build creates the table first)
+            path = Path(tmp) / "senat_byelections.csv"
+            path.write_text(derived.SENAT_BYELECTIONS.read_text(encoding="utf-8").splitlines()[0] + "\n", encoding="utf-8")
+            derived.load_senat_byelections(conn, path)
         sejm = [  # year, id, district, full name, last, first, gender
             (2019, 1, 1, "Jan KOWALSKI", "KOWALSKI", "Jan", "Mężczyzna"),
             (2023, 1, 5, "Jan KOWALSKI", "KOWALSKI", "Jan", "Mężczyzna"),
