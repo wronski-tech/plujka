@@ -1,7 +1,7 @@
 """Parameterized analytics SQL on `kbw_facts` (Sejm / sejmsenat).
 
 Heuristics (geography keys, column names) follow KBW CSV headers; may need
-year-specific tuning — see docs/ANALYTICS_ARCHITECTURE.md.
+year-specific tuning — see docs/history/ANALYTICS_ARCHITECTURE.md.
 """
 
 from __future__ import annotations

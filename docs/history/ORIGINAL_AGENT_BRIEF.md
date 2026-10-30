@@ -5,7 +5,7 @@
 
 # Agent Instructions
 
-> Current, detailed rules for coding agents are in [`AGENTS.md`](AGENTS.md). This brief keeps the original principles.
+> Current, detailed rules for coding agents are in [`AGENTS.md`](../../AGENTS.md). This brief keeps the original principles.
 
 You are building a deterministic analytics system over election data.
 

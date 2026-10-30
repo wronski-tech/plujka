@@ -2,7 +2,7 @@
 """Populate ``kbw_person_election_fact`` from ``kbw_facts`` (candidate-level Sejm files).
 
 Run after ``import_kbw_facts.py`` when you want cross-election person analytics without waiting
-for the full relational KBW model. See ``docs/ANALYTICS_ARCHITECTURE.md``.
+for the full relational KBW model. See ``docs/history/ANALYTICS_ARCHITECTURE.md``.
 """
 
 from __future__ import annotations

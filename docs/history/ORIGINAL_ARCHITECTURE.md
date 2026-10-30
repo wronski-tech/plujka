@@ -137,6 +137,6 @@ docker compose --profile tools run --rm loader python -u scripts/import_kbw_fact
 
 ## Analytics roadmap
 
-Complex NL→SQL intents, KBW view `kbw_v_sejm_district_list_agg`, person backfill, mandate KBW fallback: **`docs/ANALYTICS_ARCHITECTURE.md`**, next-phase backlog **`docs/ANALYTICS_ROADMAP_PHASE2.md`**.
+Complex NL→SQL intents, KBW view `kbw_v_sejm_district_list_agg`, person backfill, mandate KBW fallback: **`ANALYTICS_ARCHITECTURE.md`**, next-phase backlog **`ANALYTICS_ROADMAP_PHASE2.md`**.
 
 Observability: **`GET /health?details=1`** — przybliżone liczniki KBW (`kbw_stats`). **`GET /kbw/catalog/summary`** — zgrupowanie wpisów `kbw_dane_files`. W Streamlit — dwie zwijane sekcje pod banerem gotowości (katalog plików + `kbw_stats`).

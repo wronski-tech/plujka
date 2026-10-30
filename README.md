@@ -4,14 +4,31 @@ Polish election (PKW/KBW) analytics: a question in Polish becomes one checked, r
 
 **Flow:** question (+ previous turn) → entity resolution → LLM SQL over `mart` → sqlglot guard → read-only role → rows → Polish answer checked against the rows. Without OpenAI, legacy Sejm SQL templates answer what they can.
 
+## Data
+
+| Election | Years |
+| -------- | ----- |
+| Sejm, Senate | 1991, 1993, 1997, 2001, 2005, 2007, 2011, 2015, 2019, 2023 |
+| President | 1990, 1995, 2000, 2005, 2010, 2015, 2020, 2025 |
+| European Parliament | 2004, 2009, 2014, 2019, 2024 |
+| Referendums | 1996, 1997, 2003, 2015, 2023 |
+| Sejmiki, councils | 1998, 2002, 2006, 2010, 2014, 2018, 2024 |
+| Mayors (wójt / burmistrz / prezydent miasta) | 2002, 2006, 2010, 2014, 2018, 2024 |
+| GUS statistics per gmina (population, unemployment, salary) | 1995–2024 |
+
+Mostly at precinct level, reconciled with the official PKW figures by build checks; persons are linked
+across elections. Details and known gaps: [docs/MART.md](docs/MART.md).
+
 ## Stack
 
 | Piece        | Role                                                |
 | ------------ | --------------------------------------------------- |
-| FastAPI      | `/health`, `/ask`                                   |
-| Streamlit    | Web UI (`8501`)                                     |
-| PostgreSQL   | Data store (pgvector image)                         |
-| OpenSearch   | Logs / audit of questions                           |
+| FastAPI      | `/ask`, `/persons`, `/health`, `/feedback`          |
+| Streamlit    | Web UI (`8501`): answer, table, charts, maps, person search |
+| PostgreSQL   | `mart` schema (pgvector image)                      |
+| DuckDB       | Mart build from the committed parquet (`scripts/build_mart.py`) |
+| OpenSearch   | Question log and few-shot SQL examples              |
+| Redis        | Optional shared rate limit and token budget         |
 
 ## Documentation
 
@@ -22,6 +39,7 @@ Polish election (PKW/KBW) analytics: a question in Polish becomes one checked, r
 | [docs/DATA.md](docs/DATA.md) | Sample CSVs, PKW downloads, attribution |
 | [docs/MART.md](docs/MART.md) | Relational election model (`mart`), build, checks, guarded LLM SQL |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | API keys, shared rate limit, backups, dashboards, data in Git |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Planned work |
 | [AGENTS.md](AGENTS.md) | Rules and commands for AI coding agents |
 | [SECURITY.md](SECURITY.md) | Reporting vulnerabilities |
 | [CHANGELOG.md](CHANGELOG.md) | Release notes |
@@ -51,7 +69,7 @@ Polish election (PKW/KBW) analytics: a question in Polish becomes one checked, r
    | OpenSearch  | http://localhost:9200     |
    | PostgreSQL  | localhost:5432 (`plujka` / `plujka`) |
 
-The API does **not** import election data on startup. Load KBW into PostgreSQL with the **`loader` container** (`docker compose --profile tools run --rm loader`). Until `kbw_facts` has rows, `GET /health` returns `data_ready: false`; Streamlit shows a short notice until data is present. Above the question box, expandable panels call **`/kbw/catalog/summary`** and **`/health?details=1`** for mirror inventory and approximate table sizes (Streamlit fragments refresh on an interval).
+The API does **not** import election data on startup. Build the mart with the **`loader` container**: `docker compose --profile tools run --rm loader python -u scripts/build_mart.py --jobs 3` builds it from the committed parquet (about 10 minutes); the default loader command also re-stages a local KBW mirror and imports the legacy `kbw_facts`. Until the mart or `kbw_facts` has rows, `GET /health` returns `data_ready: false`; Streamlit shows a short notice until data is present. Above the question box, expandable panels call **`/kbw/catalog/summary`** and **`/health?details=1`** for mirror inventory and approximate table sizes (Streamlit fragments refresh on an interval).
 
 ### Configuration (compose)
 
@@ -83,6 +101,7 @@ Uses `unittest` only (no DB). Optional Postgres-backed checks: `make test-integr
 - **`GET /health`** — `HealthResponse` w `/docs`: `status`, `data_ready`; opcjonalnie **`kbw_stats`** przy **`?details=1`** (przybliżone liczniki z `pg_stat_user_tables`).
 - **`GET /kbw/catalog/summary`** — `KbwCatalogSummaryResponse`: liczba wpisów w **`kbw_dane_files`** oraz rozbicie po roku i `file_kind` (po uruchomieniu profilowania katalogu, np. z loadera / `kbw_catalog.profile_kbw_dane_files`).
 - **`POST /ask`** — body `{"question": "...", "entity_refs": [...]?, "previous": {"question", "sql", "entity_refs"}?}` → JSON (`AskResponse` in `/docs`): `result` (numbers as JSON numbers), `intent`, `sql`, `params`, `answer`, `clarification`; `previous` makes it a follow-up ("A w 2019?"). With `API_KEYS` set, send `X-API-Key`.
+- **`GET /persons?name=`** and **`GET /persons/{person_id}`** — person search and every candidacy of a person (fixed SQL, read-only role).
 - **`POST /feedback`** — `{"rating": "thumbs_up"|"thumbs_down", "question": "...", "ask_response": {...}?}` → **`FeedbackOkResponse`** `{ "ok": true }`; thumbs-down dopisuje wpis do `data/feedback/feedback.jsonl` na hoście API (`needs_fix: true`, pełny snapshot `ask_response`).
 - **`POST /question-hints`** — `QuestionHintsRequest` → **`QuestionHintsResponse`** (`text_hits`, `semantic_hits`) — OpenSearch full-text + kNN nad zalogowanymi pytaniami. Semantyka wyłączona dla bardzo krótkiego `q` (patrz `QUESTION_HINTS_SEMANTIC_MIN_CHARS`).
 
