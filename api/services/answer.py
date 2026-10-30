@@ -121,6 +121,13 @@ def _about(rows: list[dict[str, Any]], sql: str, election: str, year: int) -> bo
     return election in elections and year in years
 
 
+def _pre1999_units(rows: list[dict[str, Any]], sql: str) -> bool:
+    """Whether 1990-1997 results are shown by gmina or powiat (through mart.gmina_codes_pre1999)."""
+    years = _values(rows, "year") or {int(y) for y in re.findall(r"\b(?:19|20)\d{2}\b", sql)}
+    by_unit = bool(_values(rows, "level") & {"gmina", "powiat"}) or "gmina_codes_pre1999" in sql.lower()
+    return by_unit and any(isinstance(y, int) and 1990 <= y <= 1997 for y in years)
+
+
 # Caveats of the data that a reader must know to interpret the rows. Each rule looks only at the rows
 # and the SQL, never at outside facts, so the text contains no numbers of its own. Details of each
 # gap are in docs/MART.md ("Known gaps").
@@ -151,6 +158,12 @@ CAVEATS: tuple[tuple[str, Any], ...] = (
         "Wyniki kandydatów na prezydenta są sumą wyników obwodów; kilka obwodów za granicą nie opublikowało "
         "wyników, więc sumy krajowe mogą być nieco niższe od oficjalnych (oficjalne są w prezydent_candidates).",
         lambda rows, sql: "v_prezydent_results" in sql.lower() and "country" in _values(rows, "level"),
+    ),
+    (
+        "Wyniki z lat 1990–1997 przypisano do dzisiejszych gmin i powiatów przez dawne kody gmin (klucz "
+        "nieoficjalny, dopasowany po nazwie); przed 1995 r. gmina obejmuje też gminy wydzielone z niej później, "
+        "a w 1991 r. część gmin wiejskich jest liczona razem z miastem o tej samej nazwie.",
+        _pre1999_units,
     ),
     (
         "PKW nie publikuje identyfikatorów osób: kandydatury łączone są po imieniu, nazwisku, płci "

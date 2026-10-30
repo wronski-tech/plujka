@@ -694,8 +694,9 @@ ELECTION_LABELS = {
 }
 RESULT_ELECTIONS = ("sejm", "sejmik", "pe", "prezydent")
 CHANGE_ELECTIONS = ("sejm", "sejmik", "pe")
-LEVEL_LABELS = {"country": "Kraj", "wojewodztwo": "Województwa", "powiat": "Powiaty", "gmina": "Gminy"}
-UNIT_NAME = {"wojewodztwo": "wojewodztwo", "powiat": "powiat", "gmina": "gmina"}
+LEVEL_LABELS = {"country": "Kraj", "wojewodztwo": "Województwa", "powiat": "Powiaty", "gmina": "Gminy",
+                "wojewodztwo_1975": "Województwa 1975–1998"}
+UNIT_NAME = {"wojewodztwo": "wojewodztwo", "powiat": "powiat", "gmina": "gmina", "wojewodztwo_1975": "wojewodztwo"}
 UNIT_SINGULAR = {"wojewodztwo": "województwo", "powiat": "powiat", "gmina": "gmina"}
 UNIT_CODE = {"powiat": "teryt_powiat", "gmina": "teryt_gmina"}
 
@@ -726,10 +727,11 @@ def _browse() -> None:
         if kind in CHANGE_ELECTIONS and year > min(years):
             views.insert(1, "Zmiana")
         view = c4.radio("Pokaż", views, horizontal=True, key="browse_view")
-        level = c5.selectbox("Poziom", list(LEVEL_LABELS), index=1, format_func=LEVEL_LABELS.get, key="browse_level")
-        if year < 1999 and level != "country":
-            st.info("Wyniki sprzed 1999 r. są w bazie tylko dla całego kraju (dawny podział terytorialny).")
-            level = "country"
+        levels = [k for k in LEVEL_LABELS if year < 1999 or k != "wojewodztwo_1975"]
+        level = c5.selectbox("Poziom", levels, index=1, format_func=LEVEL_LABELS.get, key="browse_level")
+        if year < 1999 and level in ("powiat", "gmina"):
+            st.caption("Gminy sprzed 1999 r. przypisane do dzisiejszych przez mart.gmina_codes_pre1999; przed 1995 r. "
+                       "gmina obejmuje też gminy wydzielone później, a dzielnice Warszawy z lat 1990–1994 są tylko w powiecie.")
         voivodeship = None
         if level in ("powiat", "gmina"):
             voivodeship = c6.text_input("Województwo (opcjonalnie)", placeholder="np. mazowieckie", key="browse_woj")

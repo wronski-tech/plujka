@@ -394,8 +394,11 @@ These are properties of the official files, not build errors. Each check names i
   official key maps their gmina codes to TERYT. Rows keep `teryt_gmina` / `powiat` NULL, the 5-digit
   code in `teryt_gmina_pre1999` and the historical voivodeship in `wojewodztwo`
   (`build_precincts.VOIVODESHIPS_1975`); 1990 uses KBW's gminas in the 1993 division. Result and
-  turnout views have only country rows for these years, because old voivodeship names (łódzkie,
-  lubelskie, …) covered other territory than today's. The 1990/1995 presidential and 1996 referendum
+  turnout views place these precincts in today's gminas, powiats and voivodeships through
+  `mart.gmina_codes_pre1999` (`derived.GEO_PRE1999`; Warsaw's gminas as their 1465xx districts, as in
+  2000–2001) and also give level `wojewodztwo_1975` with the old voivodeship name in `wojewodztwo`
+  (old names such as łódzkie or lubelskie covered other territory than today's). Gmina rows before
+  1995 are approximate (see below) and get a caveat in answers. The 1990/1995 presidential and 1996 referendum
   files publish no ballots issued; turnout is valid ballots / eligible, PKW's basis. Referendum 1996
   had two ballot papers (question 1, questions 2–5) with their own ballots and turnout, in
   `referendum_precinct_answers.valid_ballots`; `v_turnout` has no 1996 row. Referendum 1997 omits the

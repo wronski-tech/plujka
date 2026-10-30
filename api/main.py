@@ -537,7 +537,7 @@ def get_person(person_id: int = Path(ge=1, description="person_id from an answer
 
 
 RESULT_ELECTIONS = ("sejm", "sejmik", "pe", "prezydent")
-UnitLevel = Literal["country", "wojewodztwo", "powiat", "gmina"]
+UnitLevel = Literal["country", "wojewodztwo", "powiat", "gmina", "wojewodztwo_1975"]
 
 
 class BrowseElection(BaseModel):
@@ -685,7 +685,7 @@ def search_units(name: str = Query(min_length=2, max_length=60, description="Beg
          responses={404: {"description": "No results for this unit"}})
 def get_unit(unit: str = Path(max_length=40, description="Gmina TERYT (6 digits), powiat TERYT (4 digits) or voivodeship name")) -> UnitCard:
     """One unit across every loaded election: turnout, the winner of each election and the latest GUS
-    statistics. Units from before 1999 are not covered (results of that period are national only)."""
+    statistics. 1990-1997 results are included through mart.gmina_codes_pre1999 (today's units)."""
     level = "gmina" if re.fullmatch(r"\d{6}", unit) else "powiat" if re.fullmatch(r"\d{4}", unit) else "wojewodztwo"
     params = _unit_params(level, unit)
     turnout = _mart_rows(UNIT_TURNOUT_SQL, params)

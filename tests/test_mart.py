@@ -539,6 +539,11 @@ class TestAnswerNumbers(unittest.TestCase):
         self.assertIn("PO → KO", answer.caveats(change, "SELECT * FROM mart.v_party_change")[0])
         self.assertEqual(answer.caveats([{"family": "PiS", "comparable": True}], "SELECT * FROM mart.v_party_change"), [])
         self.assertEqual(answer.caveats([], turnout), [])
+        # 1990-1997 results by today's gmina or powiat go through the unofficial pre-1999 key.
+        by_gmina = "SELECT * FROM mart.v_turnout WHERE level = 'gmina'"
+        self.assertIn("1990–1997", answer.caveats([{"year": 1995, "level": "gmina", "turnout_pct": 64.7}], by_gmina)[0])
+        self.assertEqual(answer.caveats([{"year": 1998, "level": "gmina", "turnout_pct": 45.3}], by_gmina), [])
+        self.assertEqual(answer.caveats([{"year": 1997, "level": "wojewodztwo_1975", "turnout_pct": 47.9}], by_gmina), [])
         with patch.object(answer, "OPENAI_API_KEY", ""):
             self.assertEqual(len(answer.compose_answer("Frekwencja PE 2014?", pe2014, turnout)["caveats"]), 1)
 

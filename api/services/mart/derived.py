@@ -569,6 +569,7 @@ CREATE TABLE mart.gmina_codes_pre1999 (
     teryt_1999 TEXT,
     wojewodztwo TEXT,
     teryt_powiat TEXT,
+    powiat TEXT,
     teryt_gmina_current TEXT[] NOT NULL,
     match TEXT NOT NULL
 );
@@ -580,8 +581,20 @@ COMMENT ON COLUMN mart.gmina_codes_pre1999.years IS 'Election years in which PKW
 COMMENT ON COLUMN mart.gmina_codes_pre1999.teryt_1999 IS '6-digit TERYT of the same gmina on 1999-01-01; NULL for the 7 Warsaw dzielnice of 1990-1994, which cover several later districts (see teryt_gmina_current).';
 COMMENT ON COLUMN mart.gmina_codes_pre1999.wojewodztwo IS 'Today''s voivodeship (one of 16) containing the gmina; every old gmina lies inside one.';
 COMMENT ON COLUMN mart.gmina_codes_pre1999.teryt_powiat IS '4-digit powiat of teryt_1999 (the 1999 powiat; a few powiats were renumbered in 2002).';
+COMMENT ON COLUMN mart.gmina_codes_pre1999.powiat IS 'Powiat name as in the 2000-2001 result tables (Warsaw: warszawski); NULL when neither election is loaded.';
 COMMENT ON COLUMN mart.gmina_codes_pre1999.teryt_gmina_current IS 'Current TERYT gmina code(s) covering the gmina: one code, several for the Warsaw dzielnice of 1990-1994, none for Ostrowice (split in 2019).';
 COMMENT ON COLUMN mart.gmina_codes_pre1999.match IS 'How the code was matched (name and type, name only, renamed with the act, Warsaw dzielnica).';
+"""
+GMINA_CODES_PRE1999_POWIAT_SQL = """
+UPDATE mart.gmina_codes_pre1999 k SET powiat = n.powiat
+FROM (
+  SELECT teryt_powiat, mode() WITHIN GROUP (ORDER BY powiat) AS powiat
+  FROM (SELECT left(teryt_gmina, 4) AS teryt_powiat, powiat FROM mart.precincts WHERE year = 2001
+        UNION ALL SELECT left(teryt_gmina, 4), powiat FROM mart.prezydent_precinct_protocols WHERE year = 2000) x
+  WHERE teryt_powiat IS NOT NULL AND powiat IS NOT NULL
+  GROUP BY teryt_powiat
+) n
+WHERE n.teryt_powiat = {PRE1999_TERYT_POWIAT}
 """
 GMINA_CODES_PRE1999_CHECK_SQL = r"""
 SELECT d.teryt_gmina_pre1999, d.year, d.wojewodztwo, k.wojewodztwo_1975, k.years
@@ -612,7 +625,13 @@ def load_gmina_codes_pre1999(pg: psycopg.Connection, path: Path = GMINA_CODES_PR
                      current, c["match"]))
     pg.execute(GMINA_CODES_PRE1999_SQL)
     with pg.cursor() as cur:
-        cur.executemany("INSERT INTO mart.gmina_codes_pre1999 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)", rows)
+        cur.executemany(
+            "INSERT INTO mart.gmina_codes_pre1999 (teryt_gmina_pre1999, wojewodztwo_1975, gmina, years, teryt_1999,"
+            " wojewodztwo, teryt_powiat, teryt_gmina_current, match) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)",
+            rows,
+        )
+    # 1999 powiat codes are the ones the 2000-2001 files use (renumbering came in 2002).
+    pg.execute(GMINA_CODES_PRE1999_POWIAT_SQL.format(PRE1999_TERYT_POWIAT=PRE1999_TERYT_POWIAT))
     errors = pg.execute(GMINA_CODES_PRE1999_CHECK_SQL).fetchall()
     if errors:
         raise ValueError(f"{path.name}: {len(errors)} pre-1999 codes missing or inconsistent: {errors[:5]}")
@@ -704,42 +723,83 @@ def _party_family_sql(aliases: str) -> str:
 LEVEL_CASE = """CASE WHEN GROUPING(teryt_gmina) = 0 THEN 'gmina'
             WHEN GROUPING(teryt_powiat) = 0 THEN 'powiat'
             WHEN GROUPING(wojewodztwo) = 0 THEN 'wojewodztwo'
+            WHEN GROUPING(wojewodztwo_1975) = 0 THEN 'wojewodztwo_1975'
             ELSE 'country' END"""
+# Old voivodeships (level wojewodztwo_1975) report their name in the wojewodztwo column.
+WOJEWODZTWO_CASE = "CASE WHEN GROUPING(wojewodztwo_1975) = 0 THEN wojewodztwo_1975 ELSE wojewodztwo END"
+# Grouping sets whose unit is unknown (abroad, ships, Warsaw dzielnice of 1990-1994 at gmina level) are dropped.
+ROLLUP_HAVING = """(GROUPING(wojewodztwo) = 1 OR wojewodztwo IS NOT NULL)
+   AND (GROUPING(wojewodztwo_1975) = 1 OR wojewodztwo_1975 IS NOT NULL)
+   AND (GROUPING(teryt_powiat) = 1 OR teryt_powiat IS NOT NULL)
+   AND (GROUPING(teryt_gmina) = 1 OR teryt_gmina IS NOT NULL)"""
 
 
 def _rollup(source: str, keys: str, measures: str) -> str:
     """Aggregate ``source`` to country, voivodeship, powiat and gmina rows (column ``level``).
 
-    ``source`` must provide wojewodztwo, teryt_powiat, powiat, teryt_gmina and gmina besides
-    ``keys``. Rows abroad and on ships (no TERYT) count only in the country row.
+    ``source`` must provide wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina and
+    wojewodztwo_1975 besides ``keys`` (``GEO`` or ``GEO_PRE1999``). Rows abroad and on ships (no
+    TERYT) count only in the country row; pre-1999 rows also give level wojewodztwo_1975.
     """
     return f"""
-SELECT {keys}, {LEVEL_CASE} AS level, wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina, {measures}
+SELECT {keys}, {LEVEL_CASE} AS level, {WOJEWODZTWO_CASE} AS wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina,
+       {measures}
 FROM ({source}) s
 GROUP BY GROUPING SETS (
   ({keys}),
   ({keys}, wojewodztwo),
   ({keys}, wojewodztwo, teryt_powiat, powiat),
-  ({keys}, wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina)
+  ({keys}, wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina),
+  ({keys}, wojewodztwo_1975)
 )
-HAVING GROUPING(wojewodztwo) = 1 OR wojewodztwo IS NOT NULL"""
+HAVING {ROLLUP_HAVING}"""
 
 
 UNIT_WINDOW = "PARTITION BY {keys}, a.level, a.wojewodztwo, a.teryt_powiat, a.teryt_gmina"
 # Geography of a precinct/gmina row; abroad, ships and the pseudo codes some years use for ships
 # (powiat part 98/99, e.g. 229801 'Statki') get NULL so they count only in the country row.
 _DOMESTIC = "p.teryt_gmina IS NOT NULL AND substr(p.teryt_gmina, 3, 2) NOT IN ('98', '99')"
-GEO = ", ".join(
-    f"CASE WHEN {_DOMESTIC} THEN {expr} END AS {name}"
-    for expr, name in (
-        ("p.wojewodztwo", "wojewodztwo"),
-        ("left(p.teryt_gmina, 4)", "teryt_powiat"),
-        ("p.powiat", "powiat"),
-        ("p.teryt_gmina", "teryt_gmina"),
-        ("p.gmina", "gmina"),
-    )
+_GEO_COLUMNS = (
+    ("p.wojewodztwo", "wojewodztwo"),
+    ("left(p.teryt_gmina, 4)", "teryt_powiat"),
+    ("p.powiat", "powiat"),
+    ("p.teryt_gmina", "teryt_gmina"),
+    ("p.gmina", "gmina"),
 )
-LEVEL_COMMENT = "Aggregation level of the row: country, wojewodztwo, powiat or gmina. Abroad and ships count only in country."
+GEO = ", ".join(f"CASE WHEN {_DOMESTIC} THEN {expr} END AS {name}" for expr, name in _GEO_COLUMNS) + (
+    ", NULL::text AS wojewodztwo_1975"
+)
+# Tables with pre-1999 rows (precincts, prezydent_precinct_protocols, referendum_precinct_protocols):
+# 1990-1997 precincts get today's units through mart.gmina_codes_pre1999 (join PRE1999_JOIN) and keep
+# their old voivodeship as wojewodztwo_1975. The Warsaw dzielnice of 1990-1994 have no single gmina.
+# Warsaw's gminas (1999 powiat 1431) are keyed as their 1465xx districts, as in the 2000-2001 tables.
+PRE1999_TERYT_GMINA = (
+    "CASE WHEN k.teryt_1999 LIKE '1431%' AND cardinality(k.teryt_gmina_current) = 1"
+    " THEN k.teryt_gmina_current[1] ELSE k.teryt_1999 END"
+)
+PRE1999_TERYT_POWIAT = "CASE WHEN k.teryt_1999 LIKE '1431%' OR k.teryt_1999 IS NULL THEN '1465' ELSE k.teryt_powiat END"
+_PRE1999_COLUMNS = {
+    "wojewodztwo": "k.wojewodztwo",
+    "teryt_powiat": PRE1999_TERYT_POWIAT,
+    "powiat": "k.powiat",
+    "teryt_gmina": PRE1999_TERYT_GMINA,
+    "gmina": "CASE WHEN k.teryt_1999 IS NOT NULL THEN p.gmina END",
+}
+GEO_PRE1999 = ", ".join(
+    f"CASE WHEN {_DOMESTIC} THEN {expr} ELSE {_PRE1999_COLUMNS[name]} END AS {name}" for expr, name in _GEO_COLUMNS
+) + ", CASE WHEN k.teryt_gmina_pre1999 IS NOT NULL THEN p.wojewodztwo END AS wojewodztwo_1975"
+PRE1999_JOIN = "LEFT JOIN mart.gmina_codes_pre1999 k ON k.teryt_gmina_pre1999 = p.teryt_gmina_pre1999"
+LEVEL_COMMENT = (
+    "Aggregation level of the row: country, wojewodztwo, powiat or gmina (today''s units; 1990-1997 results through"
+    " mart.gmina_codes_pre1999), or wojewodztwo_1975 for the 49 voivodeships of 1975-1998 (1990-1997 only; name in"
+    " wojewodztwo). Abroad and ships count only in country."
+)
+PRE1999_UNITS_NOTE = (
+    "1990-1997 precincts are placed in today''s gminas, powiats and voivodeships through mart.gmina_codes_pre1999"
+    " (gmina = the 1999 gmina; before 1995 a parent gmina also covers gminas split off later, and in 1991 24 rural"
+    " gminas are counted with the town of the same name; the Warsaw dzielnice of 1990-1994 have only powiat rows)"
+    " and also in the 49 old voivodeships (level wojewodztwo_1975)."
+)
 
 DROP_SQL = r"""
 -- v_person_history was a plain view before it was materialized; drop either kind.
@@ -791,17 +851,12 @@ COMMENT ON COLUMN mart.v_sejm_national_results.pct IS 'Percent of all valid vote
 
 CREATE MATERIALIZED VIEW mart.v_sejm_list_results AS
 WITH unit_votes AS (
-  SELECT p.year, p.wojewodztwo, p.powiat, left(p.teryt_gmina, 4) AS teryt_powiat, p.gmina, p.teryt_gmina,
-         p.sejm_district_no, v.committee_id, v.votes
-  FROM mart.sejm_precinct_list_votes v JOIN mart.precincts p USING (year, precinct_id)
+  SELECT p.year, {GEO_PRE1999}, p.sejm_district_no, v.committee_id, v.votes
+  FROM mart.sejm_precinct_list_votes v JOIN mart.precincts p USING (year, precinct_id) {PRE1999_JOIN}
 ), agg AS (
   SELECT year,
-         CASE WHEN GROUPING(sejm_district_no) = 0 THEN 'sejm_district'
-              WHEN GROUPING(teryt_gmina) = 0 THEN 'gmina'
-              WHEN GROUPING(teryt_powiat) = 0 THEN 'powiat'
-              WHEN GROUPING(wojewodztwo) = 0 THEN 'wojewodztwo'
-              ELSE 'country' END AS level,
-         wojewodztwo, powiat, teryt_powiat, gmina, teryt_gmina, sejm_district_no, committee_id,
+         CASE WHEN GROUPING(sejm_district_no) = 0 THEN 'sejm_district' ELSE {LEVEL_CASE} END AS level,
+         {WOJEWODZTWO_CASE} AS wojewodztwo, powiat, teryt_powiat, gmina, teryt_gmina, sejm_district_no, committee_id,
          sum(votes) AS votes
   FROM unit_votes
   GROUP BY GROUPING SETS (
@@ -809,8 +864,10 @@ WITH unit_votes AS (
     (year, committee_id, wojewodztwo),
     (year, committee_id, wojewodztwo, teryt_powiat, powiat),
     (year, committee_id, wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina),
+    (year, committee_id, wojewodztwo_1975),
     (year, committee_id, sejm_district_no)
   )
+  HAVING {ROLLUP_HAVING}
 )
 SELECT a.year, a.level, a.wojewodztwo, a.powiat, a.teryt_powiat, a.gmina, a.teryt_gmina, a.sejm_district_no,
        a.committee_id, c.committee_name, c.aliases, a.votes,
@@ -818,8 +875,8 @@ SELECT a.year, a.level, a.wojewodztwo, a.powiat, a.teryt_powiat, a.gmina, a.tery
        round(100.0 * a.votes / NULLIF(sum(a.votes) OVER w, 0), 2) AS pct
 FROM agg a JOIN mart.sejm_committees c USING (year, committee_id)
 WINDOW w AS (PARTITION BY a.year, a.level, a.wojewodztwo, a.teryt_powiat, a.teryt_gmina, a.sejm_district_no);
-COMMENT ON MATERIALIZED VIEW mart.v_sejm_list_results IS 'Sejm list votes and support in percent per territorial unit. Filter by level: ''country'', ''wojewodztwo'', ''powiat'', ''gmina'' or ''sejm_district''. Precincts abroad and on ships have NULL wojewodztwo/powiat/gmina (they count in country and district 19). Use for "w której gminie PiS miał najwyższe poparcie".';
-COMMENT ON COLUMN mart.v_sejm_list_results.level IS 'Aggregation level of the row: country, wojewodztwo, powiat, gmina, sejm_district.';
+COMMENT ON MATERIALIZED VIEW mart.v_sejm_list_results IS 'Sejm list votes and support in percent per territorial unit. Filter by level: ''country'', ''wojewodztwo'', ''powiat'', ''gmina'', ''wojewodztwo_1975'' or ''sejm_district''. Precincts abroad and on ships count only in country and their district. {PRE1999_UNITS_NOTE} Use for "w której gminie PiS miał najwyższe poparcie".';
+COMMENT ON COLUMN mart.v_sejm_list_results.level IS 'Aggregation level of the row: country, wojewodztwo, powiat, gmina, wojewodztwo_1975 (1991-1997, name in wojewodztwo), sejm_district.';
 COMMENT ON COLUMN mart.v_sejm_list_results.teryt_powiat IS '4-digit powiat TERYT (powiat names are not unique; prefer this or wojewodztwo+powiat).';
 COMMENT ON COLUMN mart.v_sejm_list_results.unit_valid_votes IS 'Valid votes for all lists in the unit.';
 COMMENT ON COLUMN mart.v_sejm_list_results.pct IS 'votes / unit_valid_votes in percent (0-100).';
@@ -827,27 +884,28 @@ CREATE INDEX ON mart.v_sejm_list_results (year, level, committee_id);
 CREATE INDEX ON mart.v_sejm_list_results (teryt_gmina);
 
 CREATE MATERIALIZED VIEW mart.v_sejm_turnout AS
-SELECT p.year,
-       CASE WHEN GROUPING(p.sejm_district_no) = 0 THEN 'sejm_district'
-            WHEN GROUPING(p.teryt_gmina) = 0 THEN 'gmina'
-            WHEN GROUPING(left(p.teryt_gmina, 4)) = 0 THEN 'powiat'
-            WHEN GROUPING(p.wojewodztwo) = 0 THEN 'wojewodztwo'
-            ELSE 'country' END AS level,
-       p.wojewodztwo, p.powiat, left(p.teryt_gmina, 4) AS teryt_powiat, p.gmina, p.teryt_gmina, p.sejm_district_no,
+SELECT year,
+       CASE WHEN GROUPING(sejm_district_no) = 0 THEN 'sejm_district' ELSE {LEVEL_CASE} END AS level,
+       {WOJEWODZTWO_CASE} AS wojewodztwo, powiat, teryt_powiat, gmina, teryt_gmina, sejm_district_no,
        count(*) AS precincts,
-       sum(r.eligible_voters) AS eligible_voters,
-       sum(r.ballots_issued) AS ballots_issued,
-       sum(r.valid_ballots) AS valid_ballots,
-       {_turnout_basis_sql("'sejm'", "p.year")} AS turnout_basis,
-       {_turnout_pct_sql(_turnout_basis_sql("'sejm'", "p.year"), "sum(r.ballots_issued)", "sum(r.valid_ballots)", "sum(r.eligible_voters)")} AS turnout_pct
-FROM mart.precincts p JOIN mart.sejm_precinct_protocols r USING (year, precinct_id)
+       sum(eligible_voters) AS eligible_voters,
+       sum(ballots_issued) AS ballots_issued,
+       sum(valid_ballots) AS valid_ballots,
+       {_turnout_basis_sql("'sejm'", "year")} AS turnout_basis,
+       {_turnout_pct_sql(_turnout_basis_sql("'sejm'", "year"), "sum(ballots_issued)", "sum(valid_ballots)", "sum(eligible_voters)")} AS turnout_pct
+FROM (
+  SELECT p.year, {GEO_PRE1999}, p.sejm_district_no, r.eligible_voters, r.ballots_issued, r.valid_ballots
+  FROM mart.precincts p JOIN mart.sejm_precinct_protocols r USING (year, precinct_id) {PRE1999_JOIN}
+) s
 GROUP BY GROUPING SETS (
-  (p.year),
-  (p.year, p.wojewodztwo),
-  (p.year, p.wojewodztwo, left(p.teryt_gmina, 4), p.powiat),
-  (p.year, p.wojewodztwo, left(p.teryt_gmina, 4), p.powiat, p.teryt_gmina, p.gmina),
-  (p.year, p.sejm_district_no)
-);
+  (year),
+  (year, wojewodztwo),
+  (year, wojewodztwo, teryt_powiat, powiat),
+  (year, wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina),
+  (year, wojewodztwo_1975),
+  (year, sejm_district_no)
+)
+HAVING {ROLLUP_HAVING};
 COMMENT ON MATERIALIZED VIEW mart.v_sejm_turnout IS 'Official Sejm turnout per territorial unit, computed as PKW did (see turnout_basis); level as in v_sejm_list_results. For single precincts use mart.sejm_precinct_protocols. For other elections use mart.v_turnout.';
 COMMENT ON COLUMN mart.v_sejm_turnout.turnout_basis IS '{TURNOUT_BASIS_COMMENT}';
 COMMENT ON COLUMN mart.v_sejm_turnout.turnout_pct IS 'Official turnout in percent (0-100): turnout_basis / eligible_voters.';
@@ -857,13 +915,13 @@ COMMENT ON COLUMN mart.v_sejm_turnout.turnout_pct IS 'Official turnout in percen
 def _results_views_sql() -> str:
     """DDL of the per-election result views (president, EP, referendum, sejmik, councils)."""
     prez_source = f"""
-        SELECT p.year, p.round, {GEO}, v.candidate_id, v.votes
+        SELECT p.year, p.round, {GEO_PRE1999}, v.candidate_id, v.votes
         FROM mart.prezydent_precinct_candidate_votes v
-        JOIN mart.prezydent_precinct_protocols p USING (year, round, precinct_id)"""
+        JOIN mart.prezydent_precinct_protocols p USING (year, round, precinct_id) {PRE1999_JOIN}"""
     ref_source = f"""
-        SELECT p.year, a.question_no, {GEO}, p.eligible_voters,
+        SELECT p.year, a.question_no, {GEO_PRE1999}, p.eligible_voters,
                coalesce(a.valid_ballots, p.valid_ballots) AS valid_ballots, a.valid_votes, a.invalid_votes, a.yes_votes, a.no_votes
-        FROM mart.referendum_precinct_answers a JOIN mart.referendum_precinct_protocols p USING (year, precinct_id)"""
+        FROM mart.referendum_precinct_answers a JOIN mart.referendum_precinct_protocols p USING (year, precinct_id) {PRE1999_JOIN}"""
     sejmik_source = f"""
         SELECT p.year, {GEO}, v.committee_id, v.votes
         FROM mart.sejmik_gmina_list_votes v JOIN mart.sejmik_gmina_protocols p USING (year, teryt_gmina)"""
@@ -876,7 +934,7 @@ SELECT a.year, a.round, a.level, a.wojewodztwo, a.teryt_powiat, a.powiat, a.tery
        round(100.0 * a.votes / NULLIF(sum(a.votes) OVER w, 0), 2) AS pct
 FROM agg a JOIN mart.prezydent_candidates c USING (year, round, candidate_id)
 WINDOW w AS ({UNIT_WINDOW.format(keys="a.year, a.round")});
-COMMENT ON MATERIALIZED VIEW mart.v_prezydent_results IS 'Presidential votes and percent per candidate, round and territorial unit, summed from precincts. Official national totals (including a few unpublished military precincts) are in mart.prezydent_candidates; use this view for gminas, powiats and voivodeships ("gdzie Duda miał najwyższe poparcie"). 1990 and 1995 have only country rows: their gminas (49 old voivodeships) have no TERYT; query mart.prezydent_precinct_protocols by wojewodztwo / teryt_gmina_pre1999 instead.';
+COMMENT ON MATERIALIZED VIEW mart.v_prezydent_results IS 'Presidential votes and percent per candidate, round and territorial unit, summed from precincts. Official national totals (including a few unpublished military precincts) are in mart.prezydent_candidates; use this view for gminas, powiats and voivodeships ("gdzie Duda miał najwyższe poparcie"). {PRE1999_UNITS_NOTE}';
 COMMENT ON COLUMN mart.v_prezydent_results.level IS '{LEVEL_COMMENT}';
 COMMENT ON COLUMN mart.v_prezydent_results.teryt_powiat IS '4-digit powiat TERYT.';
 COMMENT ON COLUMN mart.v_prezydent_results.pct IS 'votes / unit_valid_votes in percent (0-100).';
@@ -906,7 +964,7 @@ SELECT a.year, a.question_no, q.topic, a.level, a.wojewodztwo, a.teryt_powiat, a
        round(100.0 * a.yes_votes / NULLIF(a.valid_votes, 0), 2) AS yes_pct,
        round(100.0 * a.no_votes / NULLIF(a.valid_votes, 0), 2) AS no_pct
 FROM agg a JOIN mart.referendum_questions q USING (year, question_no);
-COMMENT ON MATERIALIZED VIEW mart.v_referendum_results IS 'Referendum answers per question and territorial unit: turnout, yes/no votes and their percent of valid votes. Binding only when national turnout is above 50%. 1996: turnout per ballot paper (question 1 vs questions 2-5). 1996 and 1997 have only country rows (gminas of the 49 old voivodeships have no TERYT).';
+COMMENT ON MATERIALIZED VIEW mart.v_referendum_results IS 'Referendum answers per question and territorial unit: turnout, yes/no votes and their percent of valid votes. Binding only when national turnout is above 50%. 1996: turnout per ballot paper (question 1 vs questions 2-5). {PRE1999_UNITS_NOTE}';
 COMMENT ON COLUMN mart.v_referendum_results.level IS '{LEVEL_COMMENT}';
 COMMENT ON COLUMN mart.v_referendum_results.turnout_pct IS 'valid_ballots / eligible_voters in percent (0-100).';
 COMMENT ON COLUMN mart.v_referendum_results.yes_pct IS 'yes_votes / valid_votes in percent (0-100).';
@@ -990,17 +1048,19 @@ CREATE INDEX ON mart.v_rada_results (teryt);
 def _cross_election_views_sql() -> str:
     """DDL of v_turnout, v_party_results, v_party_change and v_gmina_continuity."""
     turnout_source = f"""
-        SELECT 'sejm' AS election, p.year, 1 AS round, {GEO}, r.eligible_voters, r.ballots_issued, r.valid_ballots
-        FROM mart.precincts p JOIN mart.sejm_precinct_protocols r USING (year, precinct_id)
+        SELECT 'sejm' AS election, p.year, 1 AS round, {GEO_PRE1999}, r.eligible_voters, r.ballots_issued, r.valid_ballots
+        FROM mart.precincts p JOIN mart.sejm_precinct_protocols r USING (year, precinct_id) {PRE1999_JOIN}
         UNION ALL
-        SELECT 'senat', p.year, 1, {GEO}, r.eligible_voters, r.ballots_issued, r.valid_ballots
-        FROM mart.precincts p JOIN mart.senat_precinct_protocols r USING (year, precinct_id)
+        SELECT 'senat', p.year, 1, {GEO_PRE1999}, r.eligible_voters, r.ballots_issued, r.valid_ballots
+        FROM mart.precincts p JOIN mart.senat_precinct_protocols r USING (year, precinct_id) {PRE1999_JOIN}
         UNION ALL
-        SELECT 'prezydent', p.year, p.round, {GEO}, p.eligible_voters, p.ballots_issued, p.valid_ballots FROM mart.prezydent_precinct_protocols p
+        SELECT 'prezydent', p.year, p.round, {GEO_PRE1999}, p.eligible_voters, p.ballots_issued, p.valid_ballots
+        FROM mart.prezydent_precinct_protocols p {PRE1999_JOIN}
         UNION ALL
         SELECT 'pe', p.year, 1, {GEO}, p.eligible_voters, p.ballots_issued, p.valid_ballots FROM mart.pe_precinct_protocols p
         UNION ALL
-        SELECT 'referendum', p.year, 1, {GEO}, p.eligible_voters, p.ballots_issued, p.valid_ballots FROM mart.referendum_precinct_protocols p
+        SELECT 'referendum', p.year, 1, {GEO_PRE1999}, p.eligible_voters, p.ballots_issued, p.valid_ballots
+        FROM mart.referendum_precinct_protocols p {PRE1999_JOIN}
         WHERE p.year <> 1996
         UNION ALL
         SELECT 'sejmik', p.year, 1, {GEO}, p.eligible_voters, p.ballots_issued, p.valid_ballots FROM mart.sejmik_gmina_protocols p
@@ -1008,8 +1068,8 @@ def _cross_election_views_sql() -> str:
         SELECT 'wbp', p.year, p.round, {GEO}, p.eligible_voters, p.ballots_issued, p.valid_ballots FROM mart.wbp_gmina_protocols p"""
     party = _party_family_sql("c.aliases")
     party_source = f"""
-        SELECT 'sejm' AS election, p.year, {GEO}, {party} AS party, c.aliases[1] AS lead_alias, c.committee_name, v.votes
-        FROM mart.sejm_precinct_list_votes v JOIN mart.precincts p USING (year, precinct_id)
+        SELECT 'sejm' AS election, p.year, {GEO_PRE1999}, {party} AS party, c.aliases[1] AS lead_alias, c.committee_name, v.votes
+        FROM mart.sejm_precinct_list_votes v JOIN mart.precincts p USING (year, precinct_id) {PRE1999_JOIN}
         JOIN mart.sejm_committees c USING (year, committee_id)
         UNION ALL
         SELECT 'pe', p.year, {GEO}, {party}, c.aliases[1], c.committee_name, v.votes
@@ -1033,7 +1093,7 @@ SELECT election, year, round, level, wojewodztwo, teryt_powiat, powiat, teryt_gm
        eligible_voters, ballots_issued, valid_ballots, {_turnout_basis_sql("election", "year")} AS turnout_basis,
        {_turnout_pct_sql(_turnout_basis_sql("election", "year"), "ballots_issued", "valid_ballots", "eligible_voters")} AS turnout_pct
 FROM ({_rollup(turnout_source, "election, year, round", "sum(eligible_voters) AS eligible_voters, sum(ballots_issued) AS ballots_issued, sum(valid_ballots) AS valid_ballots")}) t;
-COMMENT ON MATERIALIZED VIEW mart.v_turnout IS 'Official turnout (computed as PKW did, see turnout_basis) of every loaded election per territorial unit: election in (sejm, senat, prezydent, pe, referendum, sejmik, wbp), year, round. Compare turnout across elections by joining on level + teryt_gmina / teryt_powiat / wojewodztwo. Mayor (wbp) round 2 covers only gminas with a run-off, so its country row is not a national turnout. Referendum 1996 is missing: its two ballots had different turnouts, see mart.v_referendum_results per question. Elections before 1999 have only country rows (the gminas of the 49 old voivodeships have no TERYT).';
+COMMENT ON MATERIALIZED VIEW mart.v_turnout IS 'Official turnout (computed as PKW did, see turnout_basis) of every loaded election per territorial unit: election in (sejm, senat, prezydent, pe, referendum, sejmik, wbp), year, round. Compare turnout across elections by joining on level + teryt_gmina / teryt_powiat / wojewodztwo. Mayor (wbp) round 2 covers only gminas with a run-off, so its country row is not a national turnout. Referendum 1996 is missing: its two ballots had different turnouts, see mart.v_referendum_results per question. {PRE1999_UNITS_NOTE}';
 COMMENT ON COLUMN mart.v_turnout.level IS '{LEVEL_COMMENT}';
 COMMENT ON COLUMN mart.v_turnout.turnout_basis IS '{TURNOUT_BASIS_COMMENT}';
 COMMENT ON COLUMN mart.v_turnout.turnout_pct IS 'Official turnout in percent (0-100): turnout_basis / eligible_voters.';
@@ -1050,7 +1110,8 @@ CREATE MATERIALIZED VIEW mart.v_party_results AS
 WITH agg AS ({_rollup(party_source, "election, year, party", party_measures)})
 SELECT a.election, a.year, a.level, a.wojewodztwo, a.teryt_powiat, a.powiat, a.teryt_gmina, a.gmina,
        CASE a.level WHEN 'gmina' THEN a.teryt_gmina WHEN 'powiat' THEN a.teryt_powiat
-                    WHEN 'wojewodztwo' THEN a.wojewodztwo ELSE 'country' END AS unit_key,
+                    WHEN 'wojewodztwo' THEN a.wojewodztwo WHEN 'wojewodztwo_1975' THEN a.wojewodztwo
+                    ELSE 'country' END AS unit_key,
        a.party, a.lead_aliases, a.committees, a.votes,
        sum(a.votes) OVER w AS unit_valid_votes,
        round(100.0 * a.votes / NULLIF(sum(a.votes) OVER w, 0), 2) AS pct
@@ -1059,7 +1120,7 @@ WINDOW w AS ({UNIT_WINDOW.format(keys="a.election, a.year")});
 COMMENT ON MATERIALIZED VIEW mart.v_party_results IS 'Party support across Sejm, European Parliament (pe) and voivodeship assembly (sejmik) elections per territorial unit, with committees grouped into party families so elections can be compared ("jak zmieniło się poparcie PiS w gminie X między 2019 a 2023", "PiS w sejmiku vs w Sejmie"). Families ({families}; otherwise the first alias; committees without aliases = ''other''). For the change against the previous election of the same kind use mart.v_party_change.';
 COMMENT ON COLUMN mart.v_party_results.election IS 'sejm, pe or sejmik.';
 COMMENT ON COLUMN mart.v_party_results.level IS '{LEVEL_COMMENT}';
-COMMENT ON COLUMN mart.v_party_results.unit_key IS 'teryt_gmina, teryt_powiat, wojewodztwo or ''country'' depending on level; join key across elections.';
+COMMENT ON COLUMN mart.v_party_results.unit_key IS 'teryt_gmina, teryt_powiat, wojewodztwo (also for wojewodztwo_1975) or ''country'' depending on level; join key across elections (with level).';
 COMMENT ON COLUMN mart.v_party_results.party IS 'Party family, e.g. PiS, KO, Lewica, TD/PSL, Konfederacja, Razem, KE, other.';
 COMMENT ON COLUMN mart.v_party_results.lead_aliases IS 'First aliases of the committees in the family (e.g. ''PO'' in 2015, ''KO'' later); differing values mean a different committee or coalition.';
 COMMENT ON COLUMN mart.v_party_results.pct IS 'votes / unit_valid_votes in percent (0-100).';
@@ -1489,13 +1550,13 @@ def rebuild(pg: psycopg.Connection) -> None:
     ).fetchone()
     log.info("persons: %s national, %s local", *persons)
     pg.execute(DROP_SQL)
+    log.info("pre-1999 gmina codes: %s", load_gmina_codes_pre1999(pg))
     pg.execute(SEJM_VIEWS_SQL)
     pg.execute(_results_views_sql())
     pg.execute(_cross_election_views_sql())
     pg.execute(PERSON_HISTORY_SQL)
     pg.execute(SEAT_METHODS_VIEW_SQL)
     pg.execute(GUS_VIEW_SQL)
-    log.info("pre-1999 gmina codes: %s", load_gmina_codes_pre1999(pg))
     linked = pg.execute(
         "SELECT (SELECT count(*) FROM mart.sejmik_candidates WHERE person_id IS NOT NULL),"
         " (SELECT count(*) FROM mart.wbp_candidates WHERE person_id IS NOT NULL)"
