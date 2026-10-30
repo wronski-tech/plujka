@@ -23,7 +23,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 
 **Symulacje**
 - [x] 11. Symulator mandatów: metoda i próg suwakami (`mart.allocate_seats`).
-- [ ] 12. Symulacja koalicji (komitety jako jedna lista).
+- [x] 12. Symulacja koalicji (komitety jako jedna lista).
 - [x] 13. Inny podział na okręgi (np. jeden okręg krajowy).
 - [x] 14. Koszt mandatu: głosy na mandat według komitetu.
 - [ ] 15. Głosy zmarnowane według województwa. (Krajowo już w symulatorze mandatów.)

@@ -144,37 +144,46 @@ ORDER BY year DESC LIMIT 1
 # Sejm seats under another method, threshold or one national district (2001 on: 460 district seats).
 # A committee passes with threshold % of the national valid list votes (coalition committees with
 # coalition_threshold %); with exempt_minority, national-minority committees pass regardless.
+# Committees listed in merge run as one coalition list (votes summed per district, coalition threshold).
 SEAT_SIMULATION_SQL = """
-WITH lists AS (
-  SELECT l.district_no, l.committee_id, l.votes, l.seats, d.seats AS district_seats
+WITH comm AS (
+  SELECT committee_id, CASE WHEN committee_id::text = ANY(%(merge)s::text[]) THEN 'merged' ELSE committee_id::text END AS grp,
+         committee_name, coalesce(aliases[1], committee_name) AS party, is_coalition, is_minority
+  FROM mart.sejm_committees WHERE year = %(year)s
+), groups AS (
+  SELECT grp, string_agg(committee_name, ' + ' ORDER BY committee_id) AS committee_name,
+         string_agg(party, ' + ' ORDER BY committee_id) AS party, array_agg(committee_id ORDER BY committee_id) AS committee_ids,
+         bool_or(is_coalition) OR count(*) > 1 AS is_coalition, bool_and(is_minority) AS is_minority
+  FROM comm GROUP BY grp
+), lists AS (
+  SELECT l.district_no, c.grp, l.votes, l.seats, d.seats AS district_seats
   FROM mart.sejm_district_lists l JOIN mart.sejm_districts d USING (year, district_no)
+  JOIN comm c ON c.committee_id = l.committee_id
   WHERE l.year = %(year)s AND l.district_no > 0
 ), national AS (
-  SELECT committee_id, sum(votes) AS votes, sum(seats) AS seats, 100.0 * sum(votes) / sum(sum(votes)) OVER () AS pct
-  FROM lists GROUP BY committee_id
+  SELECT grp, sum(votes) AS votes, sum(seats) AS seats, 100.0 * sum(votes) / sum(sum(votes)) OVER () AS pct
+  FROM lists GROUP BY grp
 ), passed AS (
-  SELECT n.committee_id FROM national n
-  JOIN mart.sejm_committees c ON c.year = %(year)s AND c.committee_id = n.committee_id
-  WHERE n.pct >= CASE WHEN c.is_coalition THEN %(coalition_threshold)s ELSE %(threshold)s END
-     OR (%(exempt_minority)s AND c.is_minority)
+  SELECT n.grp FROM national n JOIN groups g USING (grp)
+  WHERE n.pct >= CASE WHEN g.is_coalition THEN %(coalition_threshold)s ELSE %(threshold)s END
+     OR (%(exempt_minority)s AND g.is_minority)
 ), districts AS (
-  SELECT CASE WHEN %(national)s THEN 0 ELSE district_no END AS district, committee_id, sum(votes) AS votes
-  FROM lists JOIN passed USING (committee_id) GROUP BY 1, 2
+  SELECT CASE WHEN %(national)s THEN 0 ELSE district_no END AS district, grp, sum(votes) AS votes
+  FROM lists JOIN passed USING (grp) GROUP BY 1, 2
 ), sizes AS (
   SELECT CASE WHEN %(national)s THEN 0 ELSE district_no END AS district, sum(district_seats) AS seats
   FROM (SELECT DISTINCT district_no, district_seats FROM lists) d GROUP BY 1
 ), allocated AS (
-  SELECT unnest(ids) AS committee_id, unnest(mart.allocate_seats(v, seats, %(method)s)) AS seats
-  FROM (SELECT d.district, s.seats, array_agg(d.committee_id ORDER BY d.committee_id) AS ids,
-               array_agg(d.votes::numeric ORDER BY d.committee_id) AS v
+  SELECT unnest(grps) AS grp, unnest(mart.allocate_seats(v, seats, %(method)s)) AS seats
+  FROM (SELECT d.district, s.seats, array_agg(d.grp ORDER BY d.grp) AS grps,
+               array_agg(d.votes::numeric ORDER BY d.grp) AS v
         FROM districts d JOIN sizes s USING (district) GROUP BY d.district, s.seats) x
 )
-SELECT c.committee_name, coalesce(c.aliases[1], c.committee_name) AS party, n.votes, round(n.pct, 2) AS pct,
+SELECT g.committee_name, g.party, g.committee_ids, n.votes, round(n.pct, 2) AS pct,
        n.seats AS seats_official, coalesce(sum(a.seats), 0) AS seats_simulated
-FROM national n
-JOIN mart.sejm_committees c ON c.year = %(year)s AND c.committee_id = n.committee_id
-LEFT JOIN allocated a ON a.committee_id = n.committee_id
-GROUP BY c.committee_name, c.aliases, n.votes, n.pct, n.seats
+FROM national n JOIN groups g USING (grp)
+LEFT JOIN allocated a USING (grp)
+GROUP BY g.committee_name, g.party, g.committee_ids, n.votes, n.pct, n.seats
 ORDER BY seats_simulated DESC, n.votes DESC
 """
 BROWSE_ELECTIONS = ("sejm", "senat", "prezydent", "pe", "referendum", "sejmik", "wbp")
@@ -655,6 +664,7 @@ def get_unit(unit: str = Path(max_length=40, description="Gmina TERYT (6 digits)
 class SeatSimulationRow(BaseModel):
     committee_name: str
     party: str
+    committee_ids: list[int]
     votes: int
     pct: float
     seats_official: int
@@ -669,12 +679,13 @@ def simulate_seats(
     coalition_threshold: float = Query(8.0, ge=0, le=50, description="The same for coalition committees, in %"),
     exempt_minority: bool = Query(True, description="National-minority lists pass below the threshold, as in the law"),
     national: bool = Query(False, description="One national district with all 460 seats instead of the 41 districts"),
+    merge: list[int] = Query([], description="Committee ids to run as one coalition list (votes summed per district)"),
 ) -> list[SeatSimulationRow]:
     """Sejm seats per committee under another method, threshold or district layout, recomputed with
     ``mart.allocate_seats`` from the official list votes; ``seats_official`` is the real result. Fixed SQL,
     no LLM."""
     params = {"year": year, "method": method, "threshold": threshold, "coalition_threshold": coalition_threshold,
-              "exempt_minority": exempt_minority, "national": national}
+              "exempt_minority": exempt_minority, "national": national, "merge": [str(m) for m in merge]}
     rows = _mart_rows(SEAT_SIMULATION_SQL, params)
     if not rows:
         raise HTTPException(status_code=404, detail="No Sejm election in this year.")

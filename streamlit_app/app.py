@@ -895,9 +895,12 @@ def _seat_simulator() -> None:
         c5, c6 = st.columns(2)
         minority = c5.checkbox("Mniejszości narodowe bez progu", value=True, key="seats_minority")
         national = c6.checkbox("Jeden okręg krajowy (460 mandatów)", value=False, key="seats_national")
+        committees = {r["committee_ids"][0]: r["party"] for r in _api_get("/seats/simulate", {"year": year}) or []}
+        merge = st.multiselect("Połącz komitety we wspólną listę (próg dla koalicji)", list(committees),
+                               format_func=committees.get, key=f"seats_merge_{year}")
         rows = _api_get("/seats/simulate", {"year": year, "method": method, "threshold": threshold,
                                             "coalition_threshold": coalition, "exempt_minority": minority,
-                                            "national": national})
+                                            "national": national, "merge": merge if len(merge) > 1 else []})
         if not rows:
             return
         table = pd.DataFrame(rows)[["party", "votes", "pct", "seats_official", "seats_simulated"]]
@@ -919,7 +922,8 @@ def _seat_simulator() -> None:
         )
         st.altair_chart(chart, use_container_width=True)
         st.caption(f"Głosy na komitety bez mandatu: {wasted:,} z {total:,} ({100 * wasted / total:.1f}%). ".replace(",", " ")
-                   + "Przeliczone z oficjalnych głosów na listy (mart.allocate_seats); próg liczony od głosów ważnych na listy w kraju.")
+                   + "Przeliczone z oficjalnych głosów na listy (mart.allocate_seats); próg liczony od głosów ważnych na listy w kraju."
+                   + (" Połączona lista ma sumę głosów połączonych komitetów, tak jakby wyborcy głosowali tak samo." if len(merge) > 1 else ""))
 
 
 @st.fragment
