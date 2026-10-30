@@ -48,7 +48,7 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 30. Adresy obwodów i wyszukiwarka „mój obwód”.
 
 **API i otwarte dane**
-- [ ] 31. Endpointy bez LLM: `/elections`, `/units/{teryt}`, `/results`, `/turnout`.
+- [x] 31. Endpointy bez LLM: `/elections`, `/units/{teryt}`, `/results`, `/turnout`.
 - [ ] 32. Eksport Parquet i XLSX.
 - [ ] 33. Paczki danych na wybory (zip ze słownikiem kolumn).
 - [ ] 34. `GET /data-version`: wersja martu i daty źródeł.

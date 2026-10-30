@@ -32,6 +32,7 @@ OPENAPI_TAGS: list[dict[str, str]] = [
     {"name": "feedback", "description": "Thumbs up/down for answer quality"},
     {"name": "hints", "description": "OpenSearch suggestions over logged questions"},
     {"name": "persons", "description": "Person timeline: every linked candidacy of one person (fixed read-only SQL over mart)"},
+    {"name": "browse", "description": "Results, turnout and territorial units without the LLM (fixed read-only SQL over mart)"},
 ]
 
 # Fixed, parameterized queries for the person endpoints, run as the read-only mart role.
@@ -65,6 +66,73 @@ ORDER BY l.folded = ANY(q.toks) DESC, p.candidacies DESC, l.name, p.person_id
 LIMIT %(limit)s
 """
 PERSON_SEARCH_MAX_ROWS = 50
+
+# Fixed queries for the browse endpoints (no LLM). Optional filters are NULL when not given.
+ELECTIONS_SQL = """
+SELECT election, year, round, election_date, description FROM mart.elections
+ORDER BY election_date, election, round
+"""
+_UNIT_FILTER = """
+  AND level = %(level)s
+  AND (%(wojewodztwo)s::text IS NULL OR wojewodztwo = %(wojewodztwo)s)
+  AND (%(teryt_powiat)s::text IS NULL OR teryt_powiat = %(teryt_powiat)s)
+  AND (%(teryt_gmina)s::text IS NULL OR teryt_gmina = %(teryt_gmina)s)
+"""
+TURNOUT_SQL = f"""
+SELECT election, year, round, level, wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina,
+       eligible_voters, valid_ballots, turnout_pct
+FROM mart.v_turnout
+WHERE election = %(election)s AND year = %(year)s AND round = %(round)s {_UNIT_FILTER}
+ORDER BY wojewodztwo, teryt_powiat, teryt_gmina
+"""
+# Party results (Sejm, sejmik, EP: v_party_results, lists grouped by lead alias) or candidates
+# (president: v_prezydent_results), as one shape: the unit, name, votes, pct.
+RESULTS_SQL = f"""
+SELECT * FROM (
+  SELECT election, year, 1 AS round, level, wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina,
+         party AS name, votes, pct
+  FROM mart.v_party_results
+  WHERE election = %(election)s AND %(election)s <> 'prezydent'
+  UNION ALL
+  SELECT 'prezydent', year, round, level, wojewodztwo, teryt_powiat, powiat, teryt_gmina, gmina,
+         full_name, votes, pct
+  FROM mart.v_prezydent_results
+  WHERE %(election)s = 'prezydent'
+) r
+WHERE year = %(year)s AND round = %(round)s {_UNIT_FILTER}
+ORDER BY wojewodztwo, teryt_powiat, teryt_gmina, votes DESC
+LIMIT 50000
+"""
+UNIT_SEARCH_SQL = """
+SELECT DISTINCT ON (kind, ref) kind AS level, ref AS unit, regexp_replace(name, '^(gm\.|m\.|pow\.) ', '') AS name, detail
+FROM mart.entity_lexicon
+WHERE kind IN ('gmina', 'powiat', 'wojewodztwo') AND folded LIKE mart.fold_name(%(name)s) || '%%'
+ORDER BY kind, ref, length(name)
+LIMIT 20
+"""
+# One unit across every loaded election: turnout per election and round, and the winner.
+UNIT_TURNOUT_SQL = f"""
+SELECT election, year, round, coalesce(gmina, powiat, wojewodztwo) AS unit_name, turnout_pct
+FROM mart.v_turnout WHERE true {_UNIT_FILTER}
+ORDER BY year, election, round
+"""
+UNIT_WINNERS_SQL = f"""
+SELECT DISTINCT ON (election, year, round) election, year, round, name, votes, pct FROM (
+  SELECT election, year, 1 AS round, level, wojewodztwo, teryt_powiat, teryt_gmina, party AS name, votes, pct
+  FROM mart.v_party_results
+  UNION ALL
+  SELECT 'prezydent', year, round, level, wojewodztwo, teryt_powiat, teryt_gmina, full_name, votes, pct
+  FROM mart.v_prezydent_results
+) r
+WHERE true {_UNIT_FILTER}
+ORDER BY election, year, round, votes DESC
+"""
+UNIT_GUS_SQL = """
+SELECT year, name, population, urban_pct, area_km2, density, unemployed_share_working_age, unemployment_rate, avg_salary
+FROM mart.v_gus_units WHERE level = %(level)s AND unit_key = %(unit)s
+ORDER BY year DESC LIMIT 1
+"""
+BROWSE_ELECTIONS = ("sejm", "senat", "prezydent", "pe", "referendum", "sejmik", "wbp")
 # Letters only (hyphenated and apostrophe surnames kept), so LIKE wildcards never reach the query.
 _NAME_TOKEN_RE = re.compile(r"[^\W\d_]+(?:[-'][^\W\d_]+)*")
 
@@ -402,6 +470,126 @@ def get_person(person_id: int = Path(ge=1, description="person_id from an answer
         "elected_count": sum(1 for row in candidacies if row["elected"]),
     }
     return PersonResponse.model_validate({"person": person, "candidacies": candidacies})
+
+
+RESULT_ELECTIONS = ("sejm", "sejmik", "pe", "prezydent")
+UnitLevel = Literal["country", "wojewodztwo", "powiat", "gmina"]
+
+
+class BrowseElection(BaseModel):
+    election: str
+    year: int
+    round: int
+    election_date: str | None = None
+    description: str | None = None
+
+
+class BrowseRow(BaseModel):
+    """One unit's turnout, or one party's / candidate's result in a unit."""
+
+    model_config = ConfigDict(extra="allow")
+
+    election: str
+    year: int
+    round: int
+    level: str
+    wojewodztwo: str | None = None
+    teryt_powiat: str | None = None
+    powiat: str | None = None
+    teryt_gmina: str | None = None
+    gmina: str | None = None
+
+
+class BrowseRowsResponse(BaseModel):
+    rows: list[BrowseRow]
+
+
+class UnitHit(BaseModel):
+    level: str
+    unit: str = Field(description="Gmina (6 digits) or powiat (4 digits) TERYT, or the voivodeship name")
+    name: str
+    detail: str | None = None
+
+
+class UnitCard(BaseModel):
+    level: str
+    unit: str
+    name: str | None
+    turnout: list[dict[str, Any]] = Field(description="Turnout per election and round (v_turnout)")
+    winners: list[dict[str, Any]] = Field(description="Party or candidate with most votes per election and round")
+    gus: dict[str, Any] | None = Field(description="Latest GUS statistics of the unit (v_gus_units)")
+
+
+def _unit_params(level: str, unit: str | None) -> dict[str, Any]:
+    """Filter parameters of _UNIT_FILTER for one unit (or all units of a level when unit is None)."""
+    return {
+        "level": level,
+        "wojewodztwo": unit if level == "wojewodztwo" else None,
+        "teryt_powiat": unit if level == "powiat" else None,
+        "teryt_gmina": unit if level == "gmina" else None,
+    }
+
+
+@app.get("/elections", response_model=list[BrowseElection], tags=["browse"], dependencies=[Depends(require_api_key)])
+def list_elections() -> list[BrowseElection]:
+    """Every loaded election and round with its date (``mart.elections``)."""
+    return [BrowseElection.model_validate(r) for r in _mart_rows(ELECTIONS_SQL, {})]
+
+
+@app.get("/turnout", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])
+def get_turnout(
+    election: Literal[BROWSE_ELECTIONS] = Query(description="Election kind"),  # type: ignore[valid-type]
+    year: int = Query(ge=1989, le=2100),
+    round: int = Query(1, ge=1, le=2),
+    level: UnitLevel = Query("wojewodztwo"),
+    wojewodztwo: str | None = Query(None, max_length=40, description="Only units in this voivodeship"),
+    teryt_powiat: str | None = Query(None, pattern=r"^\d{4}$", description="Only units in this powiat"),
+) -> BrowseRowsResponse:
+    """Turnout per unit (``v_turnout``: official basis per election). Fixed SQL, no LLM."""
+    params = {**_unit_params(level, None), "election": election, "year": year, "round": round,
+              "wojewodztwo": wojewodztwo, "teryt_powiat": teryt_powiat}
+    return BrowseRowsResponse.model_validate({"rows": _mart_rows(TURNOUT_SQL, params)})
+
+
+@app.get("/results", response_model=BrowseRowsResponse, tags=["browse"], dependencies=[Depends(require_api_key)])
+def get_results(
+    election: Literal[RESULT_ELECTIONS] = Query(description="Election kind"),  # type: ignore[valid-type]
+    year: int = Query(ge=1989, le=2100),
+    round: int = Query(1, ge=1, le=2),
+    level: UnitLevel = Query("country"),
+    wojewodztwo: str | None = Query(None, max_length=40, description="Only units in this voivodeship"),
+    teryt_powiat: str | None = Query(None, pattern=r"^\d{4}$", description="Only units in this powiat"),
+) -> BrowseRowsResponse:
+    """Votes and percentages per unit: parties (lists grouped by lead alias, ``v_party_results``) or
+    presidential candidates (``v_prezydent_results``). Fixed SQL, no LLM."""
+    params = {**_unit_params(level, None), "election": election, "year": year, "round": round,
+              "wojewodztwo": wojewodztwo, "teryt_powiat": teryt_powiat}
+    return BrowseRowsResponse.model_validate({"rows": _mart_rows(RESULTS_SQL, params)})
+
+
+@app.get("/units", response_model=list[UnitHit], tags=["browse"], dependencies=[Depends(require_api_key)])
+def search_units(name: str = Query(min_length=2, max_length=60, description="Beginning of a gmina, powiat or voivodeship name")) -> list[UnitHit]:
+    """Gminas, powiats and voivodeships whose name starts with ``name`` (case and diacritics ignored)."""
+    return [UnitHit.model_validate(r) for r in _mart_rows(UNIT_SEARCH_SQL, {"name": name.strip()})]
+
+
+@app.get("/units/{unit}", response_model=UnitCard, tags=["browse"], dependencies=[Depends(require_api_key)],
+         responses={404: {"description": "No results for this unit"}})
+def get_unit(unit: str = Path(max_length=40, description="Gmina TERYT (6 digits), powiat TERYT (4 digits) or voivodeship name")) -> UnitCard:
+    """One unit across every loaded election: turnout, the winner of each election and the latest GUS
+    statistics. Units from before 1999 are not covered (results of that period are national only)."""
+    level = "gmina" if re.fullmatch(r"\d{6}", unit) else "powiat" if re.fullmatch(r"\d{4}", unit) else "wojewodztwo"
+    params = _unit_params(level, unit)
+    turnout = _mart_rows(UNIT_TURNOUT_SQL, params)
+    if not turnout:
+        raise HTTPException(status_code=404, detail="No results for this unit.")
+    gus = _mart_rows(UNIT_GUS_SQL, {"level": level, "unit": unit})
+    return UnitCard.model_validate({
+        "level": level, "unit": unit, "name": gus[0]["name"] if gus else turnout[-1]["unit_name"],
+        "turnout": [{k: v for k, v in r.items() if k != "unit_name"} for r in turnout],
+        "winners": _mart_rows(UNIT_WINNERS_SQL, params),
+        "gus": gus[0] if gus else None,
+    })
 
 
 @app.post("/ask", response_model=AskResponse, tags=["ask"])

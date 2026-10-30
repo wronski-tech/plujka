@@ -204,3 +204,40 @@ class TestPersonEndpoints(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestBrowseEndpoints(unittest.TestCase):
+    """Browse endpoints (no LLM) with the read-only mart query stubbed: unit filters and response shape."""
+
+    def setUp(self) -> None:
+        self.calls: list[dict] = []
+        patch("api.main.safe_sql.run_readonly", side_effect=self._rows).start()
+        self.addCleanup(patch.stopall)
+        self.client = TestClient(app)
+
+    def _rows(self, sql: str, params: dict) -> list[dict]:
+        self.calls.append(params)
+        if "FROM mart.v_turnout" in sql and params.get("teryt_gmina") == "999999":
+            return []
+        if "FROM mart.v_turnout" in sql:
+            return [{"election": "sejm", "year": 2023, "round": 1, "unit_name": "gm. Gdów", "turnout_pct": Decimal("71.50")}]
+        if "v_gus_units" in sql:
+            return [{"year": 2024, "name": "Gdów", "population": Decimal("21000")}]
+        return [{"election": "sejm", "year": 2023, "round": 1, "name": "KO", "votes": Decimal("100"), "pct": Decimal("40.5")}]
+
+    def test_unit_level_from_key(self) -> None:
+        for unit, level, column in [("121903", "gmina", "teryt_gmina"), ("1219", "powiat", "teryt_powiat"),
+                                    ("małopolskie", "wojewodztwo", "wojewodztwo")]:
+            self.calls.clear()
+            card = self.client.get(f"/units/{unit}").json()
+            self.assertEqual(card["level"], level)
+            others = {"teryt_gmina", "teryt_powiat", "wojewodztwo"} - {column}
+            self.assertEqual(self.calls[0][column], unit)
+            self.assertTrue(all(self.calls[0][c] is None for c in others))
+        self.assertEqual(card["name"], "Gdów")
+        self.assertEqual(card["turnout"], [{"election": "sejm", "year": 2023, "round": 1, "turnout_pct": 71.5}])
+        self.assertEqual(card["winners"][0]["votes"], 100)
+
+    def test_unknown_unit_and_unsupported_election(self) -> None:
+        self.assertEqual(self.client.get("/units/999999").status_code, 404)
+        self.assertEqual(self.client.get("/results", params={"election": "senat", "year": 2023}).status_code, 422)
