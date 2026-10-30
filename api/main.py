@@ -205,6 +205,18 @@ FROM mart.v_sejm_national_results WHERE year = %(year)s AND threshold_pct IS NOT
 """
 SEAT_METHOD_LABELS = {"dhondt": "D'Hondt", "sainte_lague": "Sainte-Laguë", "sainte_lague_modified": "zmodyfikowana Sainte-Laguë",
                       "hare_niemeyer": "Hare-Niemeyer"}
+# Data dictionary: the COMMENT ON texts of every queryable mart relation and column (the same text
+# the SQL model reads).
+DATA_DICTIONARY_SQL = """
+SELECT c.relname AS relation, CASE c.relkind WHEN 'r' THEN 'table' WHEN 'v' THEN 'view' ELSE 'materialized view' END AS kind,
+       obj_description(c.oid, 'pg_class') AS comment, a.attname AS column_name,
+       format_type(a.atttypid, a.atttypmod) AS column_type, col_description(c.oid, a.attnum) AS column_comment
+FROM pg_class c
+JOIN pg_namespace n ON n.oid = c.relnamespace
+JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum > 0 AND NOT a.attisdropped
+WHERE n.nspname = 'mart' AND c.relkind IN ('r', 'v', 'm') AND c.relname = ANY(%(relations)s)
+ORDER BY c.relname, a.attnum
+"""
 DATA_VERSION_SQL = """
 SELECT max(loaded_at) AS mart_loaded_at, count(*) AS elections, max(election_date) AS latest_election_date
 FROM mart.elections
@@ -949,6 +961,29 @@ def election_card(
         "gminas": units.get("gminas"), "districts": units.get("districts"), "seats": units.get("seats"),
         "seat_method": method, "thresholds_pct": thresholds,
     })
+
+
+class DictionaryColumn(BaseModel):
+    name: str
+    type: str
+    comment: str | None
+
+
+class DictionaryRelation(BaseModel):
+    relation: str
+    kind: str
+    comment: str | None
+    columns: list[DictionaryColumn]
+
+
+@app.get("/data-dictionary", response_model=list[DictionaryRelation], tags=["browse"], dependencies=[Depends(require_api_key)])
+def data_dictionary() -> list[DictionaryRelation]:
+    """Every queryable mart relation with its columns, types and English descriptions (``COMMENT ON``)."""
+    relations: dict[str, dict[str, Any]] = {}
+    for r in _mart_rows(DATA_DICTIONARY_SQL, {"relations": sorted(mart_schema.QUERYABLE_RELATIONS)}):
+        rel = relations.setdefault(r["relation"], {"relation": r["relation"], "kind": r["kind"], "comment": r["comment"], "columns": []})
+        rel["columns"].append({"name": r["column_name"], "type": r["column_type"], "comment": r["column_comment"]})
+    return [DictionaryRelation.model_validate(r) for r in relations.values()]
 
 
 class DataVersion(BaseModel):

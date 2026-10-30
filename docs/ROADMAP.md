@@ -53,8 +53,8 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 33. Paczki danych na wybory (zip ze słownikiem kolumn).
 - [x] 34. `GET /data-version`: wersja martu i daty źródeł.
 - [ ] 35. Widget do osadzania (mapa / wykres dla jednostki).
-- [ ] 36. Stałe linki odtwarzające widok „Przeglądaj”.
-- [ ] 37. Słownik danych generowany z `COMMENT ON`.
+- [x] 36. Stałe linki odtwarzające widok „Przeglądaj”.
+- [x] 37. Słownik danych generowany z `COMMENT ON`.
 
 **UI i dostępność**
 - [x] 38. Panel „Co jest w bazie”.

@@ -221,6 +221,9 @@ class TestBrowseEndpoints(unittest.TestCase):
             return []
         if "FROM mart.v_turnout" in sql:
             return [{"election": "sejm", "year": 2023, "round": 1, "unit_name": "gm. Gdów", "turnout_pct": Decimal("71.50")}]
+        if "obj_description" in sql:
+            return [{"relation": "v_turnout", "kind": "materialized view", "comment": "Turnout.", "column_name": c,
+                     "column_type": "text", "column_comment": None} for c in ("election", "level")]
         if "max(loaded_at)" in sql:
             return [{"mart_loaded_at": None, "elections": 0, "latest_election_date": None}]
         if "v_gus_units" in sql:
@@ -245,6 +248,11 @@ class TestBrowseEndpoints(unittest.TestCase):
         self.assertGreater(version["source_files"], 0)
         self.assertEqual(len(version["manifest_sha256"]), 64)
         self.assertIsNotNone(version["sources_last_modified"])
+
+    def test_data_dictionary_groups_columns_by_relation(self) -> None:
+        relations = self.client.get("/data-dictionary").json()
+        self.assertEqual([(r["relation"], [c["name"] for c in r["columns"]]) for r in relations], [("v_turnout", ["election", "level"])])
+        self.assertIn("v_turnout", self.calls[-1]["relations"])
 
     def test_unknown_unit_and_unsupported_election(self) -> None:
         self.assertEqual(self.client.get("/units/999999").status_code, 404)

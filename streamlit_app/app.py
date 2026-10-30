@@ -725,20 +725,40 @@ def _unit_rows(rows: list[dict], level: str, value: str) -> list[dict]:
     return [{k: r.get(k) for k in keep} for r in rows]
 
 
+# "Przeglądaj wyniki" state in the page URL (?wybory=sejm&rok=2023&...), so a view can be shared.
+BROWSE_LINK = {"wybory": "browse_kind", "rok": "browse_year", "tura": "browse_round", "pokaz": "browse_view",
+               "poziom": "browse_level", "woj": "browse_woj"}
+
+
+def _from_link(key: str, options: list) -> None:
+    """Preselect widget ``key`` from the page URL once, when the linked value is one of ``options``."""
+    param = next(p for p, k in BROWSE_LINK.items() if k == key)
+    value = st.query_params.get(param)
+    if value is None or st.session_state.get(f"_linked_{key}"):
+        return
+    st.session_state[f"_linked_{key}"] = True
+    match = next((o for o in options if str(o) == value), None)
+    if match is not None:
+        st.session_state[key] = match
+
+
 @st.fragment
 def _browse() -> None:
     """"Przeglądaj wyniki": turnout or results of one election per unit, with fixed SQL (no LLM)."""
-    with st.expander("📊 Przeglądaj wyniki (bez pytania)", expanded=False):
+    with st.expander("📊 Przeglądaj wyniki (bez pytania)", expanded="wybory" in st.query_params):
         elections = _api_get("/elections")
         if not elections:
             st.caption("Brak załadowanych wyborów.")
             return
         kinds = [k for k in ELECTION_LABELS if any(e["election"] == k for e in elections) and k != "rada"]
         c1, c2, c3 = st.columns(3)
+        _from_link("browse_kind", kinds)
         kind = c1.selectbox("Wybory", kinds, format_func=ELECTION_LABELS.get, key="browse_kind")
         years = sorted({e["year"] for e in elections if e["election"] == kind}, reverse=True)
+        _from_link("browse_year", years)
         year = c2.selectbox("Rok", years, key="browse_year")
         rounds = sorted({e["round"] for e in elections if e["election"] == kind and e["year"] == year})
+        _from_link("browse_round", rounds)
         rnd = c3.selectbox("Tura", rounds, key="browse_round") if len(rounds) > 1 else rounds[0]
         _election_card(kind, year, rnd)
         c4, c5, c6 = st.columns(3)
@@ -749,17 +769,25 @@ def _browse() -> None:
             views.insert(1, "II tura")
         if kind == "sejm":
             views.insert(-1, "Głosy zmarnowane")
+        _from_link("browse_view", views)
         view = c4.radio("Pokaż", views, horizontal=True, key="browse_view")
         levels = [k for k in LEVEL_LABELS if year < 1999 or k != "wojewodztwo_1975"]
+        _from_link("browse_level", levels)
         level = c5.selectbox("Poziom", levels, index=1, format_func=LEVEL_LABELS.get, key="browse_level")
         if year < 1999 and level in ("powiat", "gmina"):
             st.caption("Gminy sprzed 1999 r. przypisane do dzisiejszych przez mart.gmina_codes_pre1999; przed 1995 r. "
                        "gmina obejmuje też gminy wydzielone później, a dzielnice Warszawy z lat 1990–1994 są tylko w powiecie.")
         voivodeship = None
         if level in ("powiat", "gmina"):
+            if "woj" in st.query_params and not st.session_state.get("_linked_browse_woj"):
+                st.session_state["_linked_browse_woj"] = True
+                st.session_state["browse_woj"] = st.query_params["woj"][:40]
             voivodeship = c6.text_input("Województwo (opcjonalnie)", placeholder="np. mazowieckie", key="browse_woj")
         params = {"election": kind, "year": year, "round": rnd, "level": level,
                   "wojewodztwo": (voivodeship or "").strip().lower() or None}
+        link = {"wybory": kind, "rok": year, "tura": rnd, "pokaz": view, "poziom": level, "woj": params["wojewodztwo"]}
+        st.query_params.from_dict({k: str(v) for k, v in link.items() if v is not None})
+        st.caption("Adres strony w przeglądarce otwiera ten widok — skopiuj go, aby go udostępnić.")
         if view == "Głosy zmarnowane":
             data = _api_get("/wasted", {k: v for k, v in params.items() if k not in ("round", "election")})
             rows = (data or {}).get("rows") or []
@@ -1151,6 +1179,33 @@ def _data_coverage() -> None:
                    + (f" Baza zbudowana {loaded}; {version['source_files']} plików źródłowych, najnowszy z {sources}." if loaded else ""))
 
 
+@st.fragment
+def _data_dictionary() -> None:
+    """"Słownik danych": mart relations and columns with their descriptions (``GET /data-dictionary``)."""
+    with st.expander("📖 Słownik danych", expanded=False):
+        relations = _api_get("/data-dictionary") or []
+        if not relations:
+            return
+        search = st.text_input("Szukaj tabeli lub kolumny", placeholder="np. turnout, teryt_gmina", key="dict_search").strip().lower()
+        if search:
+            relations = [r for r in relations if search in r["relation"] or search in (r["comment"] or "").lower()
+                         or any(search in c["name"] for c in r["columns"])]
+        if not relations:
+            st.caption("Nic nie pasuje.")
+            return
+        names = [r["relation"] for r in relations]
+        name = st.selectbox(f"Relacja ({len(names)})", names, key="dict_relation")
+        rel = next(r for r in relations if r["relation"] == name)
+        st.markdown(f"**mart.{rel['relation']}** ({rel['kind']})")
+        st.caption(rel["comment"] or "")
+        st.dataframe(pd.DataFrame(rel["columns"]).rename(columns={"name": "kolumna", "type": "typ", "comment": "opis"}),
+                     hide_index=True, use_container_width=True)
+        flat = [{"relation": r["relation"], "kind": r["kind"], "relation_comment": r["comment"], **{f"column_{k}": v for k, v in c.items()}}
+                for r in relations for c in r["columns"]]
+        _csv_download(flat, "slownik_danych", key="csv_dictionary")
+        st.caption("Opisy po angielsku, te same, które czyta model piszący SQL.")
+
+
 @st.fragment(run_every=_READINESS_POLL_INTERVAL)
 def _api_data_readiness_banner() -> None:
     """Api data readiness banner."""
@@ -1249,6 +1304,7 @@ _candidates()
 _elected()
 _rankings()
 _data_coverage()
+_data_dictionary()
 
 if submitted:
     if not q_val:
