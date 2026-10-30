@@ -81,6 +81,18 @@ class TestPersonEndpointsDb(unittest.TestCase):
 class TestBuildChecksDb(unittest.TestCase):
     """Every loaded election keeps the consistency checks it passed (``GET /checks``)."""
 
+    @classmethod
+    def setUpClass(cls) -> None:
+        import psycopg
+
+        from api.services.config import DATABASE_URL, MART_STATEMENT_TIMEOUT_MS
+        from api.services.mart import schema
+
+        # CI runs these tests before building the mart: the reader role may not exist yet.
+        with psycopg.connect(DATABASE_URL, autocommit=True) as conn:
+            schema.ensure_schema(conn)
+            schema.ensure_reader_role(conn, statement_timeout_ms=MART_STATEMENT_TIMEOUT_MS)
+
     def test_every_loaded_election_has_passed_checks(self) -> None:
         from fastapi.testclient import TestClient
 
