@@ -128,6 +128,25 @@ def _looks_like_follow_up(question: str) -> bool:
     return bool(words) and (words[0] in ("a", "i", "oraz", "to", "tam", "tylko") or len(words) <= 3)
 
 
+HISTORY_SIZE = 20
+
+
+def _history_sidebar() -> None:
+    """Questions asked in this session; a click shows that answer again without asking the API."""
+    history = st.session_state.get("ask_history") or []
+    with st.sidebar:
+        st.markdown("**Historia pytań**")
+        if not history:
+            st.caption("Pytania z tej sesji pojawią się tutaj.")
+            return
+        for i, turn in enumerate(history):
+            if st.button(turn["question"][:80], key=f"history_{i}", use_container_width=True):
+                st.session_state["last_ask"] = turn
+        if st.button("Wyczyść historię", key="history_clear"):
+            st.session_state["ask_history"] = []
+            st.rerun()
+
+
 def _remember(question: str, data: dict, entity_refs: list[dict] | None, previous: dict | None) -> None:
     """Store the answered turn; a follow-up keeps the earlier questions in its context text."""
     context = f"{previous['question']} {question}" if previous else question
@@ -139,6 +158,9 @@ def _remember(question: str, data: dict, entity_refs: list[dict] | None, previou
     }
     st.session_state.pop("_feedback_ack_fp", None)
     st.session_state.pop("person_view", None)
+    history = st.session_state.setdefault("ask_history", [])
+    history.insert(0, st.session_state["last_ask"])
+    del history[HISTORY_SIZE:]
 
 
 def _value_column(rows: list[dict]) -> str | None:
@@ -220,7 +242,34 @@ def _view_of(points: list[list[float]]) -> pdk.ViewState:
     return pdk.ViewState(latitude=(min(lats) + max(lats)) / 2, longitude=(min(lons) + max(lons)) / 2, zoom=zoom)
 
 
-def _render_map(rows: list[dict]) -> None:
+# Map palettes from the lowest to the highest value; viridis stays readable with colour blindness.
+MAP_PALETTES = {
+    "indygo": [(224, 231, 255), (67, 56, 202)],
+    "viridis (dla daltonistów)": [(253, 231, 37), (94, 201, 98), (33, 145, 140), (59, 82, 139), (68, 1, 84)],
+}
+MAP_CLASSES = 5
+
+
+def _palette_color(stops: list[tuple[int, int, int]], share: float) -> list[int]:
+    """Colour at ``share`` (0..1) along the palette stops."""
+    position = min(max(share, 0.0), 1.0) * (len(stops) - 1)
+    i = min(int(position), len(stops) - 2)
+    t = position - i
+    return [round(a + (b - a) * t) for a, b in zip(stops[i], stops[i + 1])]
+
+
+def _map_legend(items: list[tuple[list[int], str]]) -> None:
+    """Colour swatches with their labels under a map."""
+    swatches = "".join(
+        f'<span style="display:inline-flex;align-items:center;margin-right:14px">'
+        f'<span style="width:18px;height:12px;background:rgb({c[0]},{c[1]},{c[2]});border:1px solid #94a3b8;'
+        f'margin-right:5px;display:inline-block"></span>{label}</span>'
+        for c, label in items
+    )
+    st.markdown(f'<div style="font-size:0.85rem;line-height:1.9">{swatches}</div>', unsafe_allow_html=True)
+
+
+def _render_map(rows: list[dict], key: str = "answer") -> None:
     """Choropleth of a number per gmina, powiat or voivodeship when the rows carry the unit code."""
     value = _value_column(rows) if rows else None
     if not value:
@@ -242,6 +291,19 @@ def _render_map(rows: list[dict]) -> None:
     if not drawn:
         return
     low, high = min(drawn), max(drawn)
+    c1, c2 = st.columns(2)
+    scale = c1.radio("Skala mapy", ["ciągła", f"{MAP_CLASSES} przedziałów (kwantyle)"], horizontal=True, key=f"map_scale_{key}")
+    stops = MAP_PALETTES[c2.radio("Paleta", list(MAP_PALETTES), horizontal=True, key=f"map_palette_{key}")]
+    ordered = sorted(drawn)
+    # Upper bounds of the quantile classes (the last one is the maximum).
+    breaks = [ordered[min(len(ordered) - 1, (len(ordered) * (i + 1)) // MAP_CLASSES - 1)] for i in range(MAP_CLASSES)]
+    classes = scale != "ciągła"
+
+    def share_of(found: float) -> float:
+        if classes:
+            return next(i for i, b in enumerate(breaks) if found <= b) / (MAP_CLASSES - 1)
+        return (found - low) / (high - low) if high > low else 1.0
+
     features, matched_points = [], []
     for feature in shown:
         props = feature["properties"]
@@ -249,9 +311,7 @@ def _render_map(rows: list[dict]) -> None:
         if found is None:
             fill = [226, 232, 240, 90]
         else:
-            share = (found - low) / (high - low) if high > low else 1.0
-            # Light indigo (#e0e7ff) for the lowest value to dark indigo (#4338ca) for the highest.
-            fill = [int(224 - 157 * share), int(231 - 175 * share), int(255 - 53 * share), 230]
+            fill = [*_palette_color(stops, share_of(found)), 230]
             matched_points.extend(_points(feature["geometry"]["coordinates"]))
         features.append({**feature, "properties": {**props, "fill": fill, "value": "—" if found is None else found}})
     layer = pdk.Layer(
@@ -273,7 +333,14 @@ def _render_map(rows: list[dict]) -> None:
         ),
         use_container_width=True,
     )
-    st.caption(f"Kolor: {value} (jaśniej {low:g} → ciemniej {high:g}). Szare jednostki nie występują w wyniku.")
+    if classes:
+        bounds = [low, *breaks]
+        _map_legend([(_palette_color(stops, i / (MAP_CLASSES - 1)), f"{bounds[i]:g}–{bounds[i + 1]:g}")
+                     for i in range(MAP_CLASSES) if i == 0 or bounds[i + 1] > bounds[i]])
+    else:
+        _map_legend([(_palette_color(stops, i / (MAP_CLASSES - 1)), f"{low + (high - low) * i / (MAP_CLASSES - 1):.4g}")
+                     for i in range(MAP_CLASSES)])
+    st.caption(f"Kolor: {value}. Szare jednostki nie występują w wyniku.")
     if level == "wojewodztwa_1975":
         st.caption("Granice 49 województw z lat 1975–1998 złożone z obecnych gmin (przybliżone).")
     elif column == "teryt_gmina_pre1999":
@@ -873,7 +940,7 @@ def _browse() -> None:
         st.dataframe(pd.DataFrame(shown).drop(columns=["year"], errors="ignore"), hide_index=True, use_container_width=True)
         _csv_download(rows, f"{kind}_{year}_{view}_{level}", key="csv_browse")
         _render_chart(shown)
-        _render_map(shown)
+        _render_map(shown, key="browse")
 
 
 @st.fragment
@@ -1345,6 +1412,7 @@ if submitted:
         # A clarification re-asks the same turn, so it keeps the same previous turn.
         st.session_state["last_ask"]["asked_with"] = previous
 
+_history_sidebar()
 last = st.session_state.get("last_ask")
 if last:
     q = last["question"]

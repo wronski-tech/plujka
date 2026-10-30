@@ -59,12 +59,12 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 **UI i dostępność**
 - [x] 38. Panel „Co jest w bazie”.
 - [ ] 39. Gotowe zestawienia dla każdej rodziny wyborów, działające bez LLM.
-- [ ] 40. Tryb ciemny i palety map przyjazne daltonistom.
+- [ ] 40. Tryb ciemny i palety map przyjazne daltonistom. (Paleta viridis już jest.)
 - [ ] 41. Dostępność: klawiatura, kontrast, opisy wykresów.
 - [ ] 42. Widok mobilny.
-- [ ] 43. Legenda map z wyborem przedziałów.
+- [x] 43. Legenda map z wyborem przedziałów.
 - [ ] 44. Eksport mapy i wykresu do PNG/SVG.
-- [ ] 45. Historia zapytań w sesji.
+- [x] 45. Historia zapytań w sesji.
 - [ ] 46. Angielska wersja interfejsu (etykiety).
 
 **Jakość danych dla użytkownika**
