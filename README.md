@@ -39,6 +39,7 @@ across elections. Details and known gaps: [docs/MART.md](docs/MART.md).
 | [docs/DATA.md](docs/DATA.md) | Sample CSVs, PKW downloads, attribution |
 | [docs/MART.md](docs/MART.md) | Relational election model (`mart`), build, checks, guarded LLM SQL |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | API keys, shared rate limit, backups, dashboards, data in Git |
+| [infra/hetzner/README.md](infra/hetzner/README.md) | Terraform for the Hetzner servers |
 | [docs/RUNBOOK.md](docs/RUNBOOK.md) | What to check when production misbehaves |
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Planned work |
 | [NOTICE](NOTICE) | Data sources, licences and attribution |

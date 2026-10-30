@@ -149,7 +149,7 @@ gdy nowy serwer powstaje z Terraformu, przechodzi próbę odtworzenia i ma alert
 - [x] 1. Przegląd dokumentów: liczby, rozmiary, polecenia, ścieżki.
 - [x] 2. Duplikaty: `Architecture.md` / `docs/ARCHITECTURE.md`, `AGENT_INSTRUCTIONS.md` / `AGENTS.md`.
 - [x] 3. README: szybki start, zakres danych.
-- [ ] 4. `docs/DEPLOYMENT.md`: Hetzner krok po kroku.
+- [x] 4. `docs/DEPLOYMENT.md`: Hetzner krok po kroku.
 - [x] 5. Runbook incydentów.
 - [ ] 6. Odtwarzanie z backupu, przetestowane.
 - [ ] 7. Licencja kodu (decyzja właściciela) i atrybucja danych (NOTICE — zrobione; brak LICENSE).
@@ -162,12 +162,12 @@ gdy nowy serwer powstaje z Terraformu, przechodzi próbę odtworzenia i ma alert
 - [x] 12. Hetzner Volume na dane Postgresa i OpenSearch.
 - [x] 13. Cloud-init: Docker, aktualizacje, start compose.
 - [x] 14. Caddy z TLS przed API i UI.
-- [ ] 15. DNS.
+- [x] 15. DNS.
 - [x] 16. Storage Box na backupy.
 - [x] 17. Stan Terraformu w Object Storage.
 - [x] 18. Sekrety poza repo.
 - [x] 19. Środowiska staging i production.
-- [ ] 20. Resize i wymiana serwera bez utraty danych.
+- [x] 20. Resize i wymiana serwera bez utraty danych.
 
 **CI i wdrożenia**
 - [x] 21. Dump martu z CI jako asset release'u z sumą kontrolną.

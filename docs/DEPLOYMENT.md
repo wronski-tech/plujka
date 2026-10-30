@@ -16,6 +16,55 @@ dashboards and how the staged data is versioned. Configuration variables are lis
 5. A scheduled backup (`scripts/backup_db.sh`) and a restore test.
 6. `OPENAI_API_KEY`; without it every question falls back to the legacy Sejm templates.
 
+## Production on Hetzner
+
+The production setup is one server per environment, created by Terraform
+([infra/hetzner/README.md](../infra/hetzner/README.md)), running `docker compose` with
+[`deploy/docker-compose.prod.yml`](../deploy/docker-compose.prod.yml):
+
+```text
+Internet ─ 80/443 ─ Caddy (TLS) ─┬─ /api/* ─ api (uvicorn, 2 workers, --root-path /api) ─┬─ postgres (/mnt/data/postgres)
+                                 └─ /*     ─ streamlit ─────────────────────────────────┘  opensearch, redis
+```
+
+Only Caddy publishes ports; PostgreSQL, OpenSearch, the API and Streamlit are reachable inside the
+compose network only, and the Hetzner firewall allows SSH from admin networks only. All state is on
+the data volume `/mnt/data`, so rescaling or replacing the server keeps it.
+
+Step by step:
+
+1. `terraform apply` in `infra/hetzner` (server, volume, firewall, Storage Box).
+2. DNS A/AAAA records of the domain → outputs `ipv4` / `ipv6`.
+3. `/srv/plujka/.env` from [`deploy/env.production.example`](../deploy/env.production.example)
+   (strong `POSTGRES_PASSWORD` and `MART_READER_PASSWORD`, `API_KEYS` and the UI's `PLUJKA_API_KEY`,
+   `OPENAI_API_KEY`, `REDIS_URL`), then `sudo systemctl start plujka`.
+4. `deploy/deploy_mart.sh` restores the mart CI published (below).
+5. Check `https://<domain>/api/health?details=true` (`data_ready: true`) and ask one question in the UI.
+
+Updating the code: `git pull && sudo systemctl restart plujka` in `/srv/plujka` (rebuilds the images).
+
+### Mart deployment
+
+The server never builds the mart. On every push to `main` the CI integration job builds it with every
+consistency check, dumps the `mart` schema (`pg_dump -Fc`, about 260 MB) and uploads `mart.dump` and
+`mart.dump.sha256` to the pre-release `mart-latest`. `deploy/deploy_mart.sh [tag]`:
+
+1. downloads the dump and verifies its checksum;
+2. recreates the mart database not in use (`plujka_mart_a` / `plujka_mart_b`; the owner database
+   `plujka` keeps the question log), creates `pg_trgm` and restores tables and data (about 20 s);
+3. runs `build_mart.py --derived-only` in the loader image (persons, views, seat check and the
+   read-only role; about 5 minutes);
+4. switches `MART_DB` in `.env`, restarts the API and waits for `data_ready`.
+
+Questions keep using the old mart until the switch; the old database stays for rollback (set
+`MART_DB` back, `docker compose -f docker-compose.yml -f deploy/docker-compose.prod.yml up -d api`).
+A full `pg_restore` of the dump is not used: it refreshes the materialized views without statistics
+and takes far longer than the derived rebuild.
+
+Rate limits behind the UI: Streamlit calls the API server-side with `PLUJKA_API_KEY`, so all UI users
+share one rate-limit and token bucket (that key's). Size `ASK_RATE_LIMIT_PER_MINUTE` and
+`DAILY_TOKEN_LIMIT_PER_CLIENT` for the whole UI, or give API clients their own keys.
+
 ## Access: API keys
 
 `API_KEYS` is a comma-separated list. When it is set, `POST /ask` and `POST /feedback` return 401

@@ -66,7 +66,9 @@ write_files:
 runcmd:
   - sysctl --system
   - systemctl daemon-reload
-  - systemctl enable --now mnt-data.mount
+  # The volume is attached right after the server is created; wait for it before mounting.
+  - timeout 600 sh -c 'until [ -e /dev/disk/by-id/scsi-0HC_Volume_${volume_id} ]; do sleep 2; done' || exit 1
+  - systemctl enable --now mnt-data.mount || exit 1
   - mkdir -p /mnt/data/postgres /mnt/data/opensearch /mnt/data/feedback /mnt/data/caddy /mnt/data/backups
   - chown 1000:1000 /mnt/data/opensearch
   - git clone --branch ${git_ref} ${repo_url} /srv/plujka
