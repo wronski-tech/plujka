@@ -130,6 +130,41 @@ SELECT year, round, gmina, wojewodztwo, person_id, full_name, committee_name, pc
        person_id IS NOT DISTINCT FROM lag(person_id) OVER (ORDER BY year) AS same_as_before
 FROM m WHERE teryt_gmina = %(teryt_gmina)s ORDER BY year
 """
+# Persons with at least one national candidacy (Sejm, Senate, EP, President), ranked over all their
+# candidacies (national and local); with a chamber, only that election's candidacies count.
+PERSON_RANKING_SQL = """
+SELECT h.person_id, min(h.full_name) AS full_name, count(*) FILTER (WHERE h.round = 1) AS candidacies,
+       count(*) FILTER (WHERE h.elected) AS elected, min(h.year) AS first_year, max(h.year) AS last_year,
+       max(h.year) - min(h.year) AS career_years, sum(h.votes) AS votes,
+       array_agg(DISTINCT h.chamber) AS chambers
+FROM mart.v_person_history h JOIN mart.persons p USING (person_id)
+WHERE (%(chamber)s::text IS NULL AND p.match_rule NOT LIKE 'local:%%') OR h.chamber = %(chamber)s
+GROUP BY h.person_id
+ORDER BY CASE %(by)s WHEN 'candidacies' THEN count(*) FILTER (WHERE h.round = 1)
+                     WHEN 'elected' THEN count(*) FILTER (WHERE h.elected)
+                     WHEN 'career' THEN max(h.year) - min(h.year)
+                     ELSE coalesce(sum(h.votes), 0) END DESC, count(*) DESC, min(h.full_name)
+LIMIT 50
+"""
+# Consecutive Sejm, Senate and EP candidacies of one person under committees of different party
+# families (party_families; a lead alias not listed is its own family), e.g. PO -> PiS. Committees
+# without an alias (small or one-off) are left out.
+PARTY_SWITCH_SQL = """
+WITH c AS (
+  SELECT DISTINCT ON (h.person_id, h.year, h.chamber) h.person_id, h.full_name, h.year, h.chamber,
+         coalesce(f.family, h.committee_aliases[1]) AS family
+  FROM mart.v_person_history h LEFT JOIN mart.party_families f ON f.alias = h.committee_aliases[1]
+  WHERE h.chamber IN ('sejm', 'senat', 'pe') AND h.year >= %(since)s AND h.committee_aliases[1] IS NOT NULL
+  ORDER BY h.person_id, h.year, h.chamber
+), s AS (
+  SELECT person_id, full_name, year, family, lag(family) OVER w AS prev_family, lag(year) OVER w AS prev_year
+  FROM c WINDOW w AS (PARTITION BY person_id ORDER BY year, chamber)
+)
+SELECT prev_family AS from_family, family AS to_family, count(DISTINCT person_id) AS persons,
+       (array_agg(full_name || ' (' || prev_year || '→' || year || ')' ORDER BY year DESC, full_name))[1:5] AS examples
+FROM s WHERE prev_family IS NOT NULL AND prev_family <> family
+GROUP BY prev_family, family ORDER BY persons DESC, from_family, to_family LIMIT 50
+"""
 DATA_VERSION_SQL = """
 SELECT max(loaded_at) AS mart_loaded_at, count(*) AS elections, max(election_date) AS latest_election_date
 FROM mart.elections
@@ -735,6 +770,40 @@ def mayor_terms(wojewodztwo: str | None = Query(None, max_length=40, description
 def mayor_gmina(teryt_gmina: str = Path(pattern=r"^\d{6}$")) -> list[MayorTerm]:
     """Mayors of one gmina elected in each regular election since 2002, and whether the same person won again."""
     return [MayorTerm.model_validate(r) for r in _mart_rows(MAYOR_GMINA_SQL, {"teryt_gmina": teryt_gmina, "wojewodztwo": None})]
+
+
+class PersonRank(BaseModel):
+    person_id: int
+    full_name: str
+    candidacies: int
+    elected: int
+    first_year: int
+    last_year: int
+    career_years: int
+    votes: int | None
+    chambers: list[str]
+
+
+class PartySwitch(BaseModel):
+    from_family: str
+    to_family: str
+    persons: int
+    examples: list[str]
+
+
+@app.get("/rankings/persons", response_model=list[PersonRank], tags=["browse"], dependencies=[Depends(require_api_key)])
+def person_rankings(
+    by: Literal["candidacies", "elected", "career", "votes"] = Query("candidacies"),
+    chamber: Chamber | None = Query(None, description="Only this election; default: persons with a national candidacy"),
+) -> list[PersonRank]:
+    """Top 50 persons by candidacies, wins, career length (first to last candidacy) or votes (all rounds)."""
+    return [PersonRank.model_validate(r) for r in _mart_rows(PERSON_RANKING_SQL, {"by": by, "chamber": chamber})]
+
+
+@app.get("/rankings/party-switches", response_model=list[PartySwitch], tags=["browse"], dependencies=[Depends(require_api_key)])
+def party_switches(since: int = Query(1991, ge=1989, le=2100, description="Only candidacies from this year")) -> list[PartySwitch]:
+    """Moves between party families from one Sejm, Senate or EP candidacy to the next, with examples."""
+    return [PartySwitch.model_validate(r) for r in _mart_rows(PARTY_SWITCH_SQL, {"since": since})]
 
 
 class DataVersion(BaseModel):

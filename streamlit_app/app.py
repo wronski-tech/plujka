@@ -1003,6 +1003,39 @@ def _mayor_terms() -> None:
     st.caption("Wybory zwykłe (bez przedterminowych); osoby łączone po imionach, nazwisku, płci, roku urodzenia i powiecie.")
 
 
+RANKING_LABELS = {"candidacies": "liczba kandydowań", "elected": "liczba wygranych", "career": "długość kariery",
+                  "votes": "suma głosów"}
+
+
+@st.fragment
+def _rankings() -> None:
+    """"Rankingi osób": top persons by candidacies, wins, career or votes, and moves between party families."""
+    with st.expander("🏅 Rankingi osób i zmiany komitetów", expanded=False):
+        c1, c2 = st.columns(2)
+        by = c1.selectbox("Ranking według", list(RANKING_LABELS), format_func=RANKING_LABELS.get, key="rank_by")
+        chamber = c2.selectbox("Wybory", [None, *CHAMBER_LABELS], key="rank_chamber",
+                               format_func=lambda c: "osoby z kandydowaniem krajowym (wszystkie wybory)" if c is None else CHAMBER_LABELS[c])
+        rows = _api_get("/rankings/persons", {"by": by, **({"chamber": chamber} if chamber else {})}) or []
+        if rows:
+            table = pd.DataFrame(rows)
+            table["wybory"] = table["chambers"].map(lambda cs: ", ".join(CHAMBER_LABELS.get(c, c) for c in cs))
+            table["lata"] = table["first_year"].astype(str) + "–" + table["last_year"].astype(str)
+            st.dataframe(table[["full_name", "candidacies", "elected", "lata", "career_years", "votes", "wybory"]].rename(columns={
+                "full_name": "imię i nazwisko", "candidacies": "kandydowania", "elected": "wygrane", "career_years": "lat kariery",
+                "votes": "głosy"}), hide_index=True, use_container_width=True)
+            st.caption("Głosy: suma ze wszystkich kandydowań i tur. Osoby łączone po imionach i nazwisku (zob. „Szukaj osoby”).")
+        st.markdown("**Przejścia między rodzinami partyjnymi (Sejm, Senat, PE)**")
+        since = st.slider("Kandydowania od roku", 1991, 2023, 1991, key="switch_since")
+        switches = _api_get("/rankings/party-switches", {"since": since}) or []
+        if switches:
+            flows = pd.DataFrame(switches)
+            flows["przykłady"] = flows["examples"].map(", ".join)
+            st.dataframe(flows[["from_family", "to_family", "persons", "przykłady"]].rename(columns={
+                "from_family": "z", "to_family": "do", "persons": "osoby"}), hide_index=True, use_container_width=True)
+            st.caption("Kolejne kandydowania tej samej osoby z list różnych rodzin (mart.party_families); listy koalicyjne "
+                       "liczą się jako rodzina komitetu (np. Razem na liście Lewicy).")
+
+
 @st.fragment
 def _data_coverage() -> None:
     """"Co jest w bazie": loaded elections and years (``GET /elections``)."""
@@ -1119,6 +1152,7 @@ _browse()
 _unit_card()
 _seat_simulator()
 _candidates()
+_rankings()
 _data_coverage()
 
 if submitted:

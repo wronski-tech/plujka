@@ -29,8 +29,8 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [ ] 15. Głosy zmarnowane według województwa. (Krajowo już w symulatorze mandatów.)
 
 **Osoby**
-- [ ] 16. Rankingi osób: kandydowania, długość kariery, suma głosów.
-- [ ] 17. Przejścia między komitetami w czasie.
+- [x] 16. Rankingi osób: kandydowania, długość kariery, suma głosów.
+- [x] 17. Przejścia między komitetami w czasie.
 - [x] 18. Wójtowie i burmistrzowie: ciągłość władzy, liczba kadencji.
 - [x] 19. Najmłodsi i najstarsi kandydaci i wybrani.
 - [x] 20. Kobiety wśród kandydatów i wybranych w czasie.
