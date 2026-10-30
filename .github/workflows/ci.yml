@@ -107,7 +107,7 @@ jobs:
       # them from the cached dump; persons, views and the seat check are always rebuilt.
       - name: Mart cache
         id: mart-cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: mart.dump
           key: mart-${{ hashFiles('data/kbw_stage_parquet/**', 'data/pkw_stage_parquet/**', 'data/gus/**', 'data/pkw_html/**', 'api/services/mart/build_*.py', 'api/services/mart/person_overrides.csv', 'api/services/mart/schema.py', 'scripts/build_mart.py') }}
@@ -143,7 +143,7 @@ jobs:
 
       - name: Save mart cache
         if: steps.mart-cache.outputs.cache-hit != 'true'
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: mart.dump
           key: ${{ steps.mart-cache.outputs.cache-primary-key }}
