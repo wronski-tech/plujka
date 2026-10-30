@@ -18,7 +18,7 @@ jobs:
     outputs:
       stale: ${{ steps.check.outputs.stale }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           sparse-checkout: |
             scripts/check_sources.py
@@ -75,7 +75,7 @@ jobs:
       MART_DATABASE_URL: postgresql://plujka_mart_reader:plujka_mart_reader@localhost:5432/plujka
       PYTHONPATH: .
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - uses: actions/setup-python@v5
         with:
