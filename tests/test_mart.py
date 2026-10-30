@@ -871,6 +871,10 @@ class TestPromptRelations(unittest.TestCase):
             "Wynik KO w gminach miejskich a średnie wynagrodzenie",
             "Gęstość zaludnienia i frekwencja w wyborach do Sejmu",
             "Ludność powiatu tatrzańskiego według GUS",
+            "Poparcie Konfederacji a odsetek osób z wykształceniem wyższym w gminach",
+            "Czy gminy z dużym udziałem emerytów głosowały na PiS?",
+            "Frekwencja a dochody gmin na mieszkańca",
+            "Wynik KO w zamożnych gminach",
         ):
             with self.subTest(question=question):
                 self.assertIn("gus_indicators", dynamic_sql.relevant_relations(question, available))
@@ -889,6 +893,7 @@ class TestPromptRelations(unittest.TestCase):
             "Gdzie mieszka posłanka Nowak?",
             "Wynik Polskiego Stronnictwa Ludowego w wyborach do Sejmu 2019",
             "Kto został prezydentem miasta Gdańska?",
+            "Ile lat miał najstarszy kandydat do Sejmu w 2023?",
         ):
             with self.subTest(question=question):
                 self.assertNotIn("gus_indicators", dynamic_sql.relevant_relations(question, available))

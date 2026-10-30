@@ -1482,11 +1482,22 @@ SELECT u.year, u.level, u.unit_key, u.teryt, u.name, u.wojewodztwo, u.teryt_powi
        max(i.value) FILTER (WHERE i.indicator = 'unemployed_registered')::bigint AS unemployed_registered,
        max(i.value) FILTER (WHERE i.indicator = 'unemployed_share_working_age') AS unemployed_share_working_age,
        max(i.value) FILTER (WHERE i.indicator = 'unemployment_rate') AS unemployment_rate,
-       max(i.value) FILTER (WHERE i.indicator = 'avg_gross_salary') AS avg_salary
+       max(i.value) FILTER (WHERE i.indicator = 'avg_gross_salary') AS avg_salary,
+       max(i.value) FILTER (WHERE i.indicator = 'age_preworking_pct') AS age_preworking_pct,
+       max(i.value) FILTER (WHERE i.indicator = 'age_working_pct') AS age_working_pct,
+       max(i.value) FILTER (WHERE i.indicator = 'age_postworking_pct') AS age_postworking_pct,
+       max(i.value) FILTER (WHERE i.indicator = 'gmina_income_per_capita') AS gmina_income_per_capita,
+       max(i.value) FILTER (WHERE i.indicator IN ('nsp2011_population_13plus', 'nsp2021_population_13plus'))::bigint
+         AS census_population_13plus,
+       max(i.value) FILTER (WHERE i.indicator IN ('nsp2011_higher_education', 'nsp2021_higher_education'))::bigint
+         AS census_higher_education,
+       round(100 * max(i.value) FILTER (WHERE i.indicator IN ('nsp2011_higher_education', 'nsp2021_higher_education'))
+             / nullif(max(i.value) FILTER (WHERE i.indicator IN ('nsp2011_population_13plus', 'nsp2021_population_13plus')), 0), 2)
+         AS higher_education_pct
 FROM mart.gus_units u
 LEFT JOIN mart.gus_indicators i USING (year, level, unit_key)
 GROUP BY u.year, u.level, u.unit_key, u.teryt, u.name, u.wojewodztwo, u.teryt_powiat, u.gmina_type;
-COMMENT ON MATERIALIZED VIEW mart.v_gus_units IS 'Official GUS statistics (Bank Danych Lokalnych, 1995-2024), one row per territorial unit and year: the wide form of mart.gus_indicators (population, urban share, area, density, unemployment, salary). Not election data: join v_turnout, v_party_results or result views on level + unit_key, or on teryt = teryt_gmina / teryt_powiat, using the GUS year closest to the election (statistics refer to 31 December: October 2023 -> 2023, May 2025 -> 2024). At gmina level Warsaw is both the city (146501) and its districts (1465xx): do not sum both. Before 2002 Warsaw''s gminas are 1431xx.';
+COMMENT ON MATERIALIZED VIEW mart.v_gus_units IS 'Official GUS statistics (Bank Danych Lokalnych, 1995-2024), one row per territorial unit and year: the wide form of mart.gus_indicators (population, urban share, area, density, unemployment, salary, age structure, gmina budget income, census education). Not election data: join v_turnout, v_party_results or result views on level + unit_key, or on teryt = teryt_gmina / teryt_powiat, using the GUS year closest to the election (statistics refer to 31 December: October 2023 -> 2023, May 2025 -> 2024). At gmina level Warsaw is both the city (146501) and its districts (1465xx): do not sum both. Before 2002 Warsaw''s gminas are 1431xx.';
 COMMENT ON COLUMN mart.v_gus_units.level IS 'country, wojewodztwo, powiat or gmina (gmina level also holds Warsaw''s districts).';
 COMMENT ON COLUMN mart.v_gus_units.unit_key IS 'Join key like v_party_results.unit_key: gmina or powiat TERYT, voivodeship name, or country.';
 COMMENT ON COLUMN mart.v_gus_units.teryt IS 'TERYT of that year: 6 digits for gminas and Warsaw districts, 4 for powiats, 2 for voivodeships; NULL for Poland.';
@@ -1499,6 +1510,12 @@ COMMENT ON COLUMN mart.v_gus_units.unemployed_registered IS 'Registered unemploy
 COMMENT ON COLUMN mart.v_gus_units.unemployed_share_working_age IS 'Registered unemployed as percent of the working-age population (from 2003; gminas too, not Warsaw districts).';
 COMMENT ON COLUMN mart.v_gus_units.unemployment_rate IS 'Registered unemployment rate in percent (from 2004); powiat level and above only, NULL for gminas.';
 COMMENT ON COLUMN mart.v_gus_units.avg_salary IS 'Average monthly gross salary in PLN, firms with more than 9 employees (from 2002); powiat level and above only.';
+COMMENT ON COLUMN mart.v_gus_units.age_preworking_pct IS 'Residents in pre-working age (0-17) as percent of population (from 2002; gminas too). With age_working_pct (18-59 women, 18-64 men) and age_postworking_pct (60+ women, 65+ men) it sums to about 100.';
+COMMENT ON COLUMN mart.v_gus_units.age_postworking_pct IS 'Residents in post-working age (women 60+, men 65+) as percent of population (from 2002; gminas too): the share of seniors.';
+COMMENT ON COLUMN mart.v_gus_units.gmina_income_per_capita IS 'Budget income of the gmina per resident in PLN (from 2002; gminas incl. cities with powiat rights; at powiat level and above: all gminas of the area; NULL for Warsaw''s districts, which have no budget of their own). Use as a measure of local wealth.';
+COMMENT ON COLUMN mart.v_gus_units.census_population_13plus IS 'Residents aged 13+ in the national census (NSP): only in year 2011 (powiat level and above) and 2021 (gminas too); NULL in other years. Join the census year, not the election year.';
+COMMENT ON COLUMN mart.v_gus_units.census_higher_education IS 'Residents aged 13+ with higher education in the census (years 2011: powiats and above, 2021: gminas too).';
+COMMENT ON COLUMN mart.v_gus_units.higher_education_pct IS 'census_higher_education / census_population_13plus in percent (0-100); years 2011 (powiat level and above) and 2021 (gminas too) only.';
 CREATE INDEX ON mart.v_gus_units (teryt, year);
 CREATE INDEX ON mart.v_gus_units (year, level);
 """

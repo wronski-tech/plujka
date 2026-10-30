@@ -60,7 +60,9 @@ requests/s, 100 per 15 min, 1,000 per 12 h and 10,000 per 7 days; a free key (`B
 `X-ClientId`) raises this to 10 / 500 / 5,000 / 50,000. A full run is about 366 requests (about an
 hour without a key); pages are cached under `.tmp/gus_bdl` so an interrupted run resumes. GUS
 publishes BDL data under Creative Commons Attribution 4.0 (CC BY 4.0); cite "Źródło: GUS, Bank Danych
-Lokalnych". Data fetched on 2026-10-29; 2025 values are not included yet.
+Lokalnych". Data fetched on 2026-10-29 (age structure, gmina income and census education on
+2026-10-30, with `--indicators`, which fetches only the named indicators and keeps the rest); 2025
+values are not included yet.
 
 ## PKW data and attribution
 

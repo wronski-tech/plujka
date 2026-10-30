@@ -154,7 +154,9 @@ FAMILY_KEYWORDS: dict[str, tuple[str, ...]] = {
     r"hondt|sainte|lague|metod|podzial\w* mandat|gdyby": ("v_seat_", "sejm_district", "sejmik_district", "rada_district"),
     # GUS statistics, not an election. Not "mieszka" (candidates' residence), not "miejsk" alone ("rada miejska").
     r"\bgus\b|ludnosc|mieszkanc|bezrobo|wynagrodz|zarob|pensj|gestosc|zaludn|powierzchn|wiejsk|\bwsi\b"
-    r"|gmin\w* miejsk|miejsk\w* gmin|\bw miastach\b": ("gus_", "v_gus_"),
+    r"|gmin\w* miejsk|miejsk\w* gmin|\bw miastach\b"
+    r"|wyksztalc|studia wyzsz|emeryt|senior|starsz\w* (ludn|mieszk|spoleczen)|struktur\w* wieku|w wieku (przed|po)?produkc"
+    r"|dochod\w* (gmin|budzet|na mieszk)|bogat|zamozn": ("gus_", "v_gus_"),
     # The 1990s results use the old gmina codes; the key maps them to today's units.
     # Single polling stations: a plain view next to the election's own relations.
     r"obwod|lokal\w* wyborcz|komisj\w* obwodow": ("v_precinct_",),

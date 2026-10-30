@@ -4,6 +4,11 @@ Not an election: the ``gus`` family loads official statistics of Statistics Pola
 unit and year so that election results can be related to them (e.g. support for a party against the
 unemployment rate of the powiat). It writes no ``mart.elections`` rows.
 
+Indicators (``INDICATORS``): population (total, urban, rural), area, density, registered unemployment,
+salaries, age structure (shares of pre-working, working and post-working age), gmina budget income per
+resident, and census education (NSP 2021 by gmina, NSP 2011 by powiat: residents aged 13+ and with
+higher education; NSP 2002 is not published in BDL by territorial unit).
+
 Source: ``data/gus/bdl_values.parquet`` and ``data/gus/bdl_variables.csv``, fetched from the GUS Local
 Data Bank API (Bank Danych Lokalnych, https://bdl.stat.gov.pl/api/v1/) by ``scripts/fetch_gus_bdl.py``
 and committed. One row per BDL variable, year and territorial unit; ``teryt`` is derived from the BDL
@@ -22,8 +27,9 @@ WARSZAWY NIE USTALONO") are not loaded either, but count when gminas are added u
 Checks: one value per (year, level, unit, indicator); every TERYT appears in the loaded election
 tables (``mart`` geography) or in ``NOT_IN_ELECTIONS``; additive indicators of gminas add up to their
 powiat, powiats to their voivodeship and voivodeships to Poland, Warsaw's districts to the city;
-urban + rural population = population. GUS publishes no unemployment figures for Warsaw's districts and
-no district areas for 2006-2007 (``NOT_PUBLISHED_FOR_DISTRICTS``; BDL returns zeros), so the mart has none.
+urban + rural population = population; age shares sum to 100; census higher education <= residents 13+.
+GUS publishes no unemployment figures and no budget income for Warsaw's districts and no district areas
+for 2006-2007 (``NOT_PUBLISHED_FOR_DISTRICTS``; BDL returns zeros), so the mart has none.
 """
 
 from __future__ import annotations
@@ -60,7 +66,21 @@ INDICATORS = {
     "unemployed_share_working_age": (79214, "percent", False),
     "unemployment_rate": (60270, "percent", False),
     "avg_gross_salary": (64428, "PLN", False),
+    "age_preworking_pct": (60567, "percent", False),
+    "age_working_pct": (60566, "percent", False),
+    "age_postworking_pct": (60565, "percent", False),
+    "gmina_income_per_capita": (76973, "PLN", False),
+    # Census education (NSP): residents aged 13+ and those with higher education. BDL publishes NSP 2021
+    # down to gminas and NSP 2011 down to powiats; NSP 2002 is not in BDL by territorial unit.
+    "nsp2021_population_13plus": (1671256, "persons", True),
+    "nsp2021_higher_education": (1671257, "persons", True),
+    "nsp2011_population_13plus": (396081, "persons", True),
+    "nsp2011_higher_education": (396078, "persons", True),
 }
+# Additive indicators whose parts may differ from the total by at most this many persons: NSP 2011
+# education comes from the census sample survey, and GUS rounds each unit's estimate separately
+# (powiats differ from their voivodeship by up to 3 persons in 13 voivodeships).
+SAMPLE_ROUNDING = {"nsp2011_higher_education": 3}
 # BDL level -> mart level.
 LEVELS = {0: "country", 2: "wojewodztwo", 5: "powiat", 6: "gmina"}
 # TERYT type digit (last digit of a 7-digit TERYT) of the gmina-level units loaded -> gmina_type.
@@ -80,12 +100,13 @@ NOT_GMINAS = {
 }
 # Indicators GUS does not publish for Warsaw's districts -> years (None: every year). BDL returns them as
 # 0 with attribute 0, which would read as "no unemployed" or "no area". Unemployment: the labour office
-# covers the whole city; area: missing in 2006-2007 only. Dropped for districts; the build fails if any
+# covers the whole city; area: missing in 2006-2007 only; gmina budget income: the city's budget. Dropped for districts; the build fails if any
 # of them is non-zero, i.e. if GUS starts publishing them.
 NOT_PUBLISHED_FOR_DISTRICTS: dict[str, tuple[int, ...] | None] = {
     "unemployed_registered": None,
     "unemployed_share_working_age": None,
     "area_ha": (2006, 2007),
+    "gmina_income_per_capita": None,  # districts have no budgets of their own: the city's budget covers them
 }
 # TERYT codes in the GUS data that only some loaded elections use, with the reason; accepted even when
 # those elections are not loaded. Any other code missing from the election tables fails the build.
@@ -167,6 +188,8 @@ def build_gus(con: duckdb.DuckDBPyConnection, sources: YearSources) -> list[Elec
         raise BuildError(f"{VARIABLES_FILE.name} has no BDL variable for {missing}")
     con.execute("CREATE OR REPLACE TABLE gus_indicator_spec (indicator VARCHAR, bdl_variable_id INT, unit VARCHAR, additive BOOLEAN)")
     con.executemany("INSERT INTO gus_indicator_spec VALUES (?, ?, ?, ?)", [[k, *v] for k, v in INDICATORS.items()])
+    con.execute("CREATE OR REPLACE TABLE gus_sample_rounding (indicator VARCHAR, persons INT)")
+    con.executemany("INSERT INTO gus_sample_rounding VALUES (?, ?)", [list(r) for r in SAMPLE_ROUNDING.items()])
     con.execute(
         f"""CREATE OR REPLACE TABLE gus_src AS SELECT * FROM read_parquet({sql_literal(str(VALUES_FILE))})
             WHERE year = {year}"""
@@ -258,11 +281,12 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
     )
     child_sum = """
         SELECT count(*) FROM (
-            SELECT p.indicator, p.unit_key, p.value, sum(c.value) AS children
+            SELECT p.indicator, p.unit_key, p.value, coalesce(r.persons, 0) AS tolerance, sum(c.value) AS children
             FROM gus_indicators p
             JOIN gus_check_values c ON c.indicator = p.indicator AND c.level = '{child}' AND ({join})
+            LEFT JOIN gus_sample_rounding r ON r.indicator = p.indicator
             WHERE p.level = '{parent}' AND p.indicator IN (SELECT indicator FROM gus_indicator_spec WHERE additive)
-            GROUP BY ALL HAVING sum(c.value) <> p.value)"""
+            GROUP BY ALL HAVING abs(sum(c.value) - p.value) > coalesce(r.persons, 0))"""
     checks = {
         "duplicate (year, level, unit, indicator)": """
             SELECT count(*) FROM (SELECT 1 FROM gus_indicators GROUP BY level, unit_key, indicator HAVING count(*) > 1)""",
@@ -295,6 +319,15 @@ def _check(con: duckdb.DuckDBPyConnection, year: int) -> None:
             SELECT count(*) FROM gus_indicators
             WHERE (unit = 'percent' AND value NOT BETWEEN 0 AND 100)
                OR (indicator IN ('population', 'area_ha', 'avg_gross_salary') AND value <= 0)""",
+        "age shares (pre-working, working, post-working) do not sum to 100 (+-0.2)": """
+            SELECT count(*) FROM (
+                SELECT level, unit_key FROM gus_indicators WHERE indicator IN ('age_preworking_pct', 'age_working_pct', 'age_postworking_pct')
+                GROUP BY ALL HAVING count(*) <> 3 OR abs(sum(value) - 100) > 0.2)""",
+        "census residents with higher education exceed residents aged 13+": """
+            SELECT count(*) FROM gus_indicators h JOIN gus_indicators t USING (level, unit_key)
+            WHERE (h.indicator, t.indicator) IN (('nsp2021_higher_education', 'nsp2021_population_13plus'),
+                                                 ('nsp2011_higher_education', 'nsp2011_population_13plus'))
+              AND h.value > t.value""",
         "gmina-level unit without population": """
             SELECT count(*) FROM gus_units u WHERE level = 'gmina'
               AND NOT EXISTS (SELECT 1 FROM gus_indicators i WHERE i.level = 'gmina' AND i.unit_key = u.unit_key

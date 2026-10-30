@@ -4,7 +4,8 @@
 The mart family ``gus`` (``api/services/mart/build_gus.py``) relates election results to official
 statistics of Statistics Poland (GUS): population (total, urban, rural; 31 December), area, population
 density, registered unemployment (gmina counts and share of the working-age population; powiat
-unemployment rate) and the average gross monthly salary (powiat). The variables are listed in
+unemployment rate), the average gross monthly salary (powiat), age structure and gmina budget income per
+resident (gminas), and census education (NSP 2021 gminas, NSP 2011 powiats). The variables are listed in
 ``build_gus.INDICATORS``; this script downloads every published year in ``--first-year``..``--last-year``
 for Poland, voivodeships, powiats and (where BDL publishes them) gminas, and writes committed source data:
 
@@ -29,7 +30,10 @@ by GUS under CC BY 4.0 (source: GUS, Bank Danych Lokalnych).
 
 Usage:
   python3 scripts/fetch_gus_bdl.py [--first-year 1995] [--last-year 2024] [--out-dir data/gus]
-                                   [--cache-dir .tmp/gus_bdl] [--refresh]
+                                   [--cache-dir .tmp/gus_bdl] [--refresh] [--indicators a,b]
+
+``--indicators`` fetches only the named indicators (e.g. newly added ones) and keeps the other variables
+from the existing ``bdl_values.parquet`` and ``bdl_variables.csv``.
 """
 
 from __future__ import annotations
@@ -66,7 +70,7 @@ USER_AGENT = "plujka-gus-bdl/1.0 (+https://github.com/wronski-tech/plujka)"
 PAGE_SIZE = 100  # the API maximum
 # BDL levels fetched per variable: gmina-level variables also have powiat, voivodeship and country
 # aggregates; the unemployment rate and salaries are published down to powiats only.
-POWIAT_ONLY = {60270, 64428}
+POWIAT_ONLY = {60270, 64428, 396081, 396078}
 # Requests allowed per window (seconds), kept a little below the published limits.
 ANONYMOUS_LIMITS = {1: 4, 900: 95, 43200: 950}
 KEY_LIMITS = {1: 9, 900: 480, 43200: 4800}
@@ -204,11 +208,26 @@ def main() -> None:
     parser.add_argument("--out-dir", type=Path, default=ROOT / "data" / "gus")
     parser.add_argument("--cache-dir", type=Path, default=ROOT / ".tmp" / "gus_bdl")
     parser.add_argument("--refresh", action="store_true", help="Ignore cached pages and download again")
+    parser.add_argument("--indicators", help="Comma-separated indicators to fetch; the others are kept from the "
+                        "existing files in --out-dir (default: fetch all)")
     args = parser.parse_args()
 
     client = Client(args.cache_dir, args.refresh)
     infos, rows = [], []
+    chosen = set(args.indicators.split(",")) if args.indicators else set(INDICATORS)
+    if unknown := chosen - set(INDICATORS):
+        raise SystemExit(f"unknown indicators: {sorted(unknown)}")
+    if kept := [v for k, (v, _, _) in INDICATORS.items() if k not in chosen]:
+        with (args.out_dir / "bdl_variables.csv").open(encoding="utf-8") as fh:
+            infos = [r for r in csv.DictReader(fh) if int(r["bdl_variable_id"]) in kept]
+        if len(infos) != len(kept):
+            raise SystemExit("bdl_variables.csv lacks a kept indicator: fetch it too")
+        rows = duckdb.connect().execute(
+            f"SELECT * FROM read_parquet('{args.out_dir / 'bdl_values.parquet'}') WHERE bdl_variable_id IN ({', '.join(map(str, kept))})"
+        ).fetchall()
     for indicator, (variable_id, _, _) in INDICATORS.items():
+        if indicator not in chosen:
+            continue
         print(f"[gus] {indicator}: BDL variable {variable_id}", flush=True)
         info, variable_rows = fetch_variable(client, variable_id, args.first_year, args.last_year)
         infos.append(info)
@@ -230,6 +249,8 @@ def main() -> None:
     )
     tmp_csv.unlink()
     tmp.replace(values)
+    order = [v for v, _, _ in INDICATORS.values()]
+    infos.sort(key=lambda i: order.index(int(i["bdl_variable_id"])))
     with (args.out_dir / "bdl_variables.csv").open("w", newline="", encoding="utf-8") as fh:
         writer = csv.DictWriter(fh, fieldnames=list(infos[0]))
         writer.writeheader()

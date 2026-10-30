@@ -58,13 +58,16 @@ Bank (BDL) API into `data/gus/bdl_values.parquet` (committed, 1.7 MB) and `data/
 `gmina_type` from the 7th TERYT digit: miejska / wiejska / miejsko-wiejska / dzielnica Warszawy) and
 `mart.gus_indicators` (long format: population, urban/rural population, area in ha, density,
 registered unemployed and their share of the working-age population, the unemployment rate and the
-average gross salary at powiat level and above); `v_gus_units` is the wide form. Units join elections
+average gross salary at powiat level and above, shares of pre-working / working / post-working age,
+gmina budget income per resident, and census education: residents aged 13+ and with higher education
+from NSP 2021 by gmina and NSP 2011 by powiat, stored in the census year only; NSP 2002 is not in BDL by
+unit); `v_gus_units` is the wide form (`higher_education_pct`). Units join elections
 by TERYT or by `unit_key` (as in `v_party_results`); statistics refer to 31 December, so compare an
 election with the closest GUS year (October 2023 → 2023, June 2025 → 2024). The family writes no
 `mart.elections` rows and is built after the election families (its TERYT check reads their tables).
 Checks: unique keys; every TERYT appears in the election tables or `build_gus.NOT_IN_ELECTIONS`; gminas
 add up to their powiat, powiats to their voivodeship, voivodeships to Poland and Warsaw's districts to
-the city; urban + rural = population. GUS words in a question add the GUS relations to the prompt but
+the city; urban + rural = population; age shares sum to 100; census higher education ≤ residents 13+. GUS words in a question add the GUS relations to the prompt but
 do not narrow it (`dynamic_sql.ADD_ONLY_PREFIXES`), and such questions never fall back to the Sejm
 templates.
 
@@ -118,7 +121,7 @@ count only in `country`.
 | `v_party_change` | change against the previous election of the same kind, with a `comparable` flag |
 | `v_gmina_continuity` | which gmina TERYT codes appear in which elections |
 | `v_person_history` | every candidacy of a person (materialized, indexed by `person_id` and by `full_name` trigrams) |
-| `v_gus_units` | GUS statistics per unit and year in wide form: population, urban share, area, density, unemployment, salary |
+| `v_gus_units` | GUS statistics per unit and year in wide form: population, urban share, area, density, unemployment, salary, age structure, gmina income per resident, census higher education (2011, 2021) |
 | `v_seat_methods` | Sejm and sejmik seats per committee under D'Hondt, Sainte-Laguë and modified Sainte-Laguë, with the official thresholds |
 | `party_families` (table) | lead alias → party family, with a Polish note on the lineage |
 | `gmina_codes_pre1999` (table) | 1975–1998 gmina code → 1999 TERYT, today's voivodeship and powiat, current gmina codes (from `streamlit_app/geo/gminy_pre1999.json`) |
@@ -330,6 +333,9 @@ A family-year is not loaded if any check fails. The checks it passed are stored 
 
 These are properties of the official files, not build errors. Each check names its exception.
 
+- **GUS census education 2011.** NSP 2011 education comes from the census sample survey and GUS
+  rounds each unit's estimate separately: residents with higher education in the powiats of 13
+  voivodeships differ from the voivodeship total by up to 3 persons (`build_gus.SAMPLE_ROUNDING`).
 - **Sejm and Senate 1991–1997.** Sejm 1991: PKW announced 22,341 precinct commissions, KBW's files
   have 22,340 (all votes reconcile). Sejm and Senate 1993: KBW's files give 21,807 fewer eligible
   voters than PKW (district 21 Kraków −9,000, district 32 Piła −12,807), votes are equal, so turnout
