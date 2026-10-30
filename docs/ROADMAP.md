@@ -146,13 +146,13 @@ Cel: odtwarzalne wdrożenie na Hetznerze z backupem, monitoringiem i aktualną d
 gdy nowy serwer powstaje z Terraformu, przechodzi próbę odtworzenia i ma alerty.
 
 **Dokumentacja**
-- [ ] 1. Przegląd dokumentów: liczby, rozmiary, polecenia, ścieżki.
-- [ ] 2. Duplikaty: `Architecture.md` / `docs/ARCHITECTURE.md`, `AGENT_INSTRUCTIONS.md` / `AGENTS.md`.
-- [ ] 3. README: szybki start, zakres danych.
+- [x] 1. Przegląd dokumentów: liczby, rozmiary, polecenia, ścieżki.
+- [x] 2. Duplikaty: `Architecture.md` / `docs/ARCHITECTURE.md`, `AGENT_INSTRUCTIONS.md` / `AGENTS.md`.
+- [x] 3. README: szybki start, zakres danych.
 - [ ] 4. `docs/DEPLOYMENT.md`: Hetzner krok po kroku.
-- [ ] 5. Runbook incydentów.
+- [x] 5. Runbook incydentów.
 - [ ] 6. Odtwarzanie z backupu, przetestowane.
-- [ ] 7. Licencja kodu (decyzja właściciela) i atrybucja danych (NOTICE).
+- [ ] 7. Licencja kodu (decyzja właściciela) i atrybucja danych (NOTICE — zrobione; brak LICENSE).
 - [ ] 8. CHANGELOG i wydania z tagów.
 - [ ] 9. Dokumentacja API (OpenAPI) z przykładami.
 - [ ] 10. Sprawdzanie linków w dokumentacji w CI.

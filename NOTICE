@@ -1,0 +1,23 @@
+Plujka — third-party data and attribution
+
+The code licence is chosen by the repository owner (no LICENSE file yet). The data below keeps the
+terms of its publishers; redistribute it only under those terms.
+
+Election data (data/kbw_stage_parquet, data/pkw_stage_parquet, data/source_manifest.json)
+  Source: Państwowa Komisja Wyborcza / Krajowe Biuro Wyborcze — https://danewyborcze.kbw.gov.pl,
+  https://pkw.gov.pl. Official public information; cite "Źródło: PKW / KBW". The staged parquet is a
+  lossless conversion of the published files (scripts/kbw_stage_duckdb.py).
+
+GUS statistics (data/gus)
+  Source: Główny Urząd Statystyczny, Bank Danych Lokalnych — https://bdl.stat.gov.pl.
+  Licence: Creative Commons Attribution 4.0 (CC BY 4.0). Cite "Źródło: GUS, Bank Danych Lokalnych".
+
+PKW results pages for 2006 list blocs (data/pkw_html/list_groups_2006.csv)
+  Source: PKW, https://wybory2006.pkw.gov.pl. Official public information.
+
+Boundaries (streamlit_app/geo)
+  gminy.json, powiaty.json, wojewodztwa.json, wojewodztwa_1975.json: public domain, derived from the
+  GUGiK national register of boundaries (PRG) through jusuff/PolandGeoJson (Unlicense).
+  gminy_osm.json, powiaty_osm.json: © OpenStreetMap contributors, Open Database License 1.0
+  (https://opendatacommons.org/licenses/odbl/1-0/). Keep this attribution when redistributing.
+  Details: streamlit_app/geo/README.md.
