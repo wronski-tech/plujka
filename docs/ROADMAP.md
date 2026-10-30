@@ -61,9 +61,9 @@ funkcja ma stały SQL na roli tylko do odczytu, test i ekran w UI.
 - [x] 39. Gotowe zestawienia dla każdej rodziny wyborów, działające bez LLM.
 - [x] 40. Tryb ciemny i palety map przyjazne daltonistom. (Paleta viridis już jest.)
 - [x] 41. Dostępność: klawiatura, kontrast, opisy wykresów.
-- [ ] 42. Widok mobilny.
+- [x] 42. Widok mobilny.
 - [x] 43. Legenda map z wyborem przedziałów.
-- [ ] 44. Eksport mapy i wykresu do PNG/SVG.
+- [x] 44. Eksport mapy i wykresu do PNG/SVG.
 - [x] 45. Historia zapytań w sesji.
 - [ ] 46. Angielska wersja interfejsu (etykiety).
 

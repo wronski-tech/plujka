@@ -8,7 +8,7 @@ import math
 import os
 import re
 import unicodedata
-from typing import Any
+from typing import Any, Callable
 from datetime import date, timedelta
 from urllib.parse import urlencode
 
@@ -17,9 +17,10 @@ import pandas as pd
 import pydeck as pdk
 import requests
 import streamlit as st
+import vl_convert as vlc
 
 from chart_columns import line_series, numeric_columns, scatter_columns
-from map_units import boundaries, feature_key, is_osm, unit_values, visible_features, voivodeship_level
+from map_units import boundaries, feature_key, features_svg, is_osm, unit_values, visible_features, voivodeship_level
 
 API_URL = os.getenv("API_URL", "http://localhost:8000")
 # Sent as X-API-Key when the API requires keys (API_KEYS on the API side).
@@ -189,7 +190,7 @@ def _render_scatter(rows: list[dict], label: str, x: str, y: str) -> None:
         )
         .properties(height=420, description=f"Wykres punktowy: {x} i {y} dla {len(frame)} jednostek ({label}).")
     )
-    st.altair_chart(chart, use_container_width=True)
+    _altair(chart, f"wykres {x} {y}")
     st.caption(f"Każdy punkt to jedna jednostka ({len(frame)}): {x} (oś pozioma) i {y} (oś pionowa).")
 
 
@@ -207,7 +208,27 @@ def _render_line(rows: list[dict], series: str | None) -> None:
             f"Wykres liniowy: {value} w latach {frame['year'].min()}–{frame['year'].max()}"
             + (f", serie: {', '.join(map(str, frame[series].unique()))}." if series else ".")))
     )
+    _altair(chart, f"wykres {value} w czasie")
+
+
+def _image_export(svg: Callable[[], str], name: str, key: str) -> None:
+    """On request, download a chart or map as SVG and PNG (vl-convert renders the PNG from the SVG)."""
+    if not st.toggle("Pobierz jako obraz (PNG/SVG)", key=key):
+        return
+    data = svg()
+    file_name = _csv_file_name(name).removesuffix(".csv")
+    c1, c2, _ = st.columns([1, 1, 3])
+    c1.download_button("SVG", data=data, file_name=f"{file_name}.svg", mime="image/svg+xml", key=f"{key}_svg")
+    c2.download_button("PNG", data=vlc.svg_to_png(data, scale=2), file_name=f"{file_name}.png", mime="image/png",
+                       key=f"{key}_png")
+
+
+def _altair(chart: alt.Chart, name: str) -> None:
+    """An Altair chart with the PNG/SVG export toggle (keyed by the chart, so each chart has its own)."""
     st.altair_chart(chart, use_container_width=True)
+    spec = chart.to_json()
+    _image_export(lambda: vlc.vegalite_to_svg(spec), name,
+                  key=f"chart_export_{hashlib.sha1(spec.encode()).hexdigest()[:12]}")
 
 
 def _bar_description(frame: pd.DataFrame, label: str, value: str) -> str:
@@ -248,7 +269,7 @@ def _render_chart(rows: list[dict]) -> None:
         )
         .properties(height=max(120, 26 * len(frame)), description=_bar_description(frame, label, value))
     )
-    st.altair_chart(chart, use_container_width=True)
+    _altair(chart, f"wykres {value}")
 
 
 def _points(coordinates: list) -> list[list[float]]:
@@ -365,12 +386,14 @@ def _render_map(rows: list[dict], key: str = "answer") -> None:
     )
     if classes:
         bounds = [low, *breaks]
-        _map_legend([(_palette_color(stops, i / (MAP_CLASSES - 1)), f"{bounds[i]:g}–{bounds[i + 1]:g}")
-                     for i in range(MAP_CLASSES) if i == 0 or bounds[i + 1] > bounds[i]])
+        legend = [(_palette_color(stops, i / (MAP_CLASSES - 1)), f"{bounds[i]:g}–{bounds[i + 1]:g}")
+                  for i in range(MAP_CLASSES) if i == 0 or bounds[i + 1] > bounds[i]]
     else:
-        _map_legend([(_palette_color(stops, i / (MAP_CLASSES - 1)), f"{low + (high - low) * i / (MAP_CLASSES - 1):.4g}")
-                     for i in range(MAP_CLASSES)])
+        legend = [(_palette_color(stops, i / (MAP_CLASSES - 1)), f"{low + (high - low) * i / (MAP_CLASSES - 1):.4g}")
+                  for i in range(MAP_CLASSES)]
+    _map_legend(legend)
     st.caption(f"Kolor: {value}. Szare jednostki nie występują w wyniku.")
+    _image_export(lambda: features_svg(features, value, legend), f"mapa {value}", key=f"map_export_{key}")
     if level == "wojewodztwa_1975":
         st.caption("Granice 49 województw z lat 1975–1998 złożone z obecnych gmin (przybliżone).")
     elif column == "teryt_gmina_pre1999":
@@ -824,6 +847,12 @@ st.markdown(
                 --plujka-glow: rgba(0, 0, 0, 0.3);
             }
             .plujka-hero { background: linear-gradient(125deg, #1e1b4b 0%, #312e81 52%, #3b0764 100%); }
+        }
+        /* Phones: Streamlit stacks columns below 640px; use the width and keep the hero compact. */
+        @media (max-width: 640px) {
+            .main .block-container { padding: 1rem 0.75rem 2rem; }
+            .plujka-hero { padding: 0.9rem 1rem; border-radius: 14px; }
+            .plujka-hero h2 { font-size: 1.3rem; }
         }
         /* Visible keyboard focus on every control. */
         :focus-visible { outline: 2px solid #6366f1 !important; outline-offset: 2px; }

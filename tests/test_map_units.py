@@ -6,7 +6,7 @@ import json
 import unittest
 
 from streamlit_app.map_units import (
-    GEO_DIR, boundaries, feature_key, is_additive, is_osm, pre1999_codes, teryt_changes, unit_values,
+    GEO_DIR, boundaries, feature_key, features_svg, is_additive, is_osm, pre1999_codes, teryt_changes, unit_values,
     visible_features, voivodeship_level,
 )
 
@@ -340,6 +340,19 @@ class TestVoivodeshipExtents(unittest.TestCase):
         for year in (2003, None):
             self.assertTrue(contains(self.outline("MAŁOPOLSKIE", year)["geometry"], *self.SZERZYNY))
             self.assertNotIn("parts", self.outline("MAŁOPOLSKIE", year)["properties"])
+
+
+
+class TestFeaturesSvg(unittest.TestCase):
+    def test_square_degree_at_60n_is_half_as_wide_as_tall(self) -> None:
+        # cos(60°) = 0.5: one degree of longitude spans half the width of one degree of latitude.
+        square = {"type": "Polygon", "coordinates": [[[20, 59.5], [21, 59.5], [21, 60.5], [20, 60.5], [20, 59.5]]]}
+        feature = {"geometry": square, "properties": {"fill": [1, 2, 3, 255], "name": "A & B", "value": 7}}
+        svg = features_svg([feature], "Tytuł <x>", [([0, 0, 0], "0–1")], width=220)
+        xs, ys = zip(*(map(float, p.split(",")) for p in svg.split('d="M')[1].split("Z")[0].split(" L")))
+        self.assertAlmostEqual((max(ys) - min(ys)) / (max(xs) - min(xs)), 2.0, places=2)
+        self.assertIn("<title>A &amp; B: 7</title>", svg)
+        self.assertIn("Tytuł &lt;x&gt;", svg)
 
 
 if __name__ == "__main__":

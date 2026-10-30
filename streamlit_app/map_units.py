@@ -6,6 +6,7 @@ Kept free of Streamlit so the matching rules can be unit tested.
 from __future__ import annotations
 
 import json
+import math
 import unicodedata
 from collections import defaultdict
 from functools import lru_cache
@@ -176,3 +177,48 @@ def visible_features(
         f for f in features
         if id(f) in drawn or ("parts" not in f["properties"] and f["properties"]["teryt"] not in hidden)
     ]
+
+
+def _rings(geometry: dict) -> list[list[list[float]]]:
+    """Outer and inner rings of a Polygon or MultiPolygon."""
+    polygons = [geometry["coordinates"]] if geometry["type"] == "Polygon" else geometry["coordinates"]
+    return [ring for polygon in polygons for ring in polygon]
+
+
+def features_svg(features: list[dict], title: str, legend: list[tuple[list[int], str]], width: int = 800) -> str:
+    """Static SVG of a choropleth: features carry ``properties.fill`` [r, g, b, alpha] and ``name``/``value``.
+
+    Equirectangular projection scaled by the cosine of the mid latitude (fine at Poland's size); the title on
+    top and the legend swatches below the map.
+    """
+    from xml.sax.saxutils import escape
+
+    points = [p for f in features for ring in _rings(f["geometry"]) for p in ring]
+    lons, lats = [p[0] for p in points], [p[1] for p in points]
+    west, north = min(lons), max(lats)
+    k = math.cos(math.radians((min(lats) + north) / 2))
+    span_x, span_y = (max(lons) - west) * k, north - min(lats)
+    scale = (width - 20) / span_x
+    height = span_y * scale + 20
+    top, bottom = 40, 30 + 22 * ((len(legend) + 4) // 5)
+
+    def xy(p: list[float]) -> str:
+        return f"{10 + (p[0] - west) * k * scale:.1f},{top + 10 + (north - p[1]) * scale:.1f}"
+
+    paths = []
+    for f in features:
+        r, g, b, a = f["properties"]["fill"]
+        d = " ".join("M" + " L".join(xy(p) for p in ring) + "Z" for ring in _rings(f["geometry"]))
+        label = escape(f"{f['properties'].get('name', '')}: {f['properties'].get('value', '')}")
+        paths.append(f'<path d="{d}" fill="rgb({r},{g},{b})" fill-opacity="{a / 255:.2f}" fill-rule="evenodd" '
+                     f'stroke="#64748b" stroke-opacity="0.5" stroke-width="0.4"><title>{label}</title></path>')
+    swatches = "".join(
+        f'<rect x="{10 + 150 * (i % 5)}" y="{top + height + 12 + 22 * (i // 5)}" width="18" height="12" '
+        f'fill="rgb({c[0]},{c[1]},{c[2]})" stroke="#94a3b8"/><text x="{34 + 150 * (i % 5)}" '
+        f'y="{top + height + 22 + 22 * (i // 5)}" font-size="12">{escape(text)}</text>'
+        for i, (c, text) in enumerate(legend)
+    )
+    total = top + height + bottom
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{width}" height="{total:.0f}" viewBox="0 0 {width} {total:.0f}" '
+            f'font-family="sans-serif"><rect width="100%" height="100%" fill="white"/>'
+            f'<text x="10" y="26" font-size="16" font-weight="bold">{escape(title)}</text>{"".join(paths)}{swatches}</svg>')
