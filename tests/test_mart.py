@@ -1054,7 +1054,8 @@ class TestDynamicQueryFlow(unittest.TestCase):
         previous = {"question": "Frekwencja w Krakowie w 2023?", "sql": self.GOOD}
         with patch.object(dynamic_sql, "data_context", return_value=("Elections: ...", "load-1")), \
                 patch.object(dynamic_sql, "schema_description", return_value={"v_turnout": "mart.v_turnout ..."}), \
-                patch.object(dynamic_sql.examples, "similar_examples", return_value=[]):
+                patch.object(dynamic_sql.examples, "similar_examples", return_value=[]), \
+                patch.object(dynamic_sql, "loaded_years", return_value={"sejm": [2019, 2023]}):
             def context(question: str, prev: dict | None = previous) -> str:
                 return dynamic_sql.build_context(question, [], prev)[0]
 
