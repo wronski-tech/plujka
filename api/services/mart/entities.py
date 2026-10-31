@@ -145,7 +145,9 @@ def score_entry(kind: str, folded: str, stems: set[str], exact: set[str]) -> boo
     if not words:
         return False
     if kind == "committee":
-        return all(w in exact for w in words)
+        # Abbreviations must be written exactly ("PO" is not "pod"); longer words may be inflected
+        # ("Konfederacji", "Platformy").
+        return all(w in exact or (len(w) >= 5 and _word_matches(w, stems)) for w in words)
     return all(_word_matches(w, stems) for w in words)
 
 
@@ -353,7 +355,7 @@ def find_ambiguity(matches: list[EntityMatch]) -> dict | None:
     kinds that share a name (gmina Kraków, powiat Kraków, Sejm district Kraków) are not ambiguous:
     the SQL generator picks the level from the question.
     """
-    persons = [m for m in matches if m.kind == "person"]
+    persons = list({m.ref: m for m in matches if m.kind == "person"}.values())  # a colloquial name and its person
     if len(persons) > 1:
         return {
             "prompt": "Pytanie pasuje do kilku osób. O którą chodzi?",

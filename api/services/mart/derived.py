@@ -1314,6 +1314,45 @@ FROM (
 GROUP BY alias, committee_name;
 """
 
+ENTITY_ALIASES = Path(__file__).with_name("entity_aliases.csv")
+
+# Colloquial names from entity_aliases.csv: a committee alias stands for every committee with the
+# target alias; a person alias ('Olek KWAŚNIEWSKI', or a surname part such as 'KORWIN') for the
+# person of the target candidacy ('<full name>|<chamber> <year>').
+ENTITY_ALIASES_SQL = r"""
+INSERT INTO mart.entity_lexicon (kind, name, folded, ref, detail, years)
+SELECT 'committee', a.alias, mart.fold_name(a.alias), l.ref, 'colloquial name of ' || a.target, l.years
+FROM entity_alias a JOIN mart.entity_lexicon l ON l.kind = 'committee' AND l.name = a.target
+WHERE a.kind = 'committee'
+UNION ALL
+SELECT 'person', a.alias, mart.fold_name(split_part(a.alias, ' ', -1)), l.ref, 'colloquial name of ' || l.name || ' — ' || l.detail, l.years
+FROM entity_alias a
+JOIN (SELECT DISTINCT person_id, full_name, chamber, year FROM mart.v_person_history) h
+  ON h.full_name = split_part(a.target, '|', 1) AND h.chamber || ' ' || h.year = split_part(a.target, '|', 2)
+JOIN mart.entity_lexicon l ON l.kind = 'person' AND l.ref = h.person_id::text
+WHERE a.kind = 'person'
+RETURNING kind, name;
+"""
+
+
+def load_entity_aliases(pg: psycopg.Connection, path: Path = ENTITY_ALIASES) -> int:
+    """Add the colloquial names of ``path`` to the lexicon; return the rows added.
+
+    Raises ValueError when an alias matches no committee alias or candidacy (a typo would otherwise
+    be ignored silently).
+    """
+    with path.open(encoding="utf-8", newline="") as fh:
+        rows = [(r["kind"].strip(), r["alias"].strip(), r["target"].strip()) for r in csv.DictReader(fh)]
+    pg.execute("CREATE TEMP TABLE entity_alias (kind TEXT, alias TEXT, target TEXT) ON COMMIT DROP")
+    with pg.cursor() as cur:
+        cur.executemany("INSERT INTO entity_alias VALUES (%s, %s, %s)", rows)
+    added = pg.execute(ENTITY_ALIASES_SQL).fetchall()
+    missing = sorted({alias for _, alias, _ in rows} - {name for _, name in added})
+    if missing:
+        raise ValueError(f"{path.name}: aliases {missing} match nothing")
+    return len(added)
+
+
 ANALYZED = (
     "persons",
     "v_gus_units",
@@ -1849,7 +1888,9 @@ def rebuild(pg: psycopg.Connection) -> None:
         pg.execute("SELECT count(*) FROM mart.rada_candidates WHERE person_id IS NOT NULL").fetchone()[0],
     )
     pg.execute(LEXICON_SQL)
-    log.info("entity lexicon: %s names", pg.execute("SELECT count(*) FROM mart.entity_lexicon").fetchone()[0])
+    colloquial = load_entity_aliases(pg)
+    log.info("entity lexicon: %s names, %s colloquial", pg.execute("SELECT count(*) FROM mart.entity_lexicon").fetchone()[0],
+             colloquial)
     check_seat_allocation(pg)
     for relation in ANALYZED:
         pg.execute(f"ANALYZE mart.{relation}")

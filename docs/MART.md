@@ -213,6 +213,14 @@ Only elected mayors and sejmik councillors among local persons are in `entity_le
 thousands of council candidates would make every surname ambiguous); others are found by SQL on
 `full_name`.
 
+**Colloquial names** live in `api/services/mart/entity_aliases.csv` (`kind,alias,target,note`) and
+are added to `entity_lexicon` after every rebuild, so the lexicon stays the one place that turns
+names into keys. A committee alias ("Platforma", "Konfa", "ludowcy", "Koalicja Obywatelska") stands
+for every committee with the target alias; a person alias ("Olek KWAŚNIEWSKI", or a surname part
+used alone such as "KORWIN") points at the person of the target candidacy (`<full name>|<chamber>
+<year>`) and shares its `person_id`, so it never becomes a second clarification option. An alias
+that matches nothing fails the build; every row needs a `note`.
+
 **Manual corrections** live in `api/services/mart/person_overrides.csv`:
 
 ```csv
@@ -616,7 +624,8 @@ would answer it from Sejm data.
    names the surname (`entities.surname_mentioned`): not the word that matched a given name, and,
    without a given name in the question, a capitalized word closer to the surname than to any
    committee alias ("w gminach" is not GMIŃSKI, "turę" not TUR, "PiS" not PIŚ, "Lewicy" not
-   LEWICKI; "Kukiz" is both). A lower-case surname alone ("tusk") is left to SQL on `full_name`.
+   LEWICKI; "Kukiz" is both). Committee aliases of five or more letters may be inflected
+   ("Konfederacji", "Platformy"); shorter ones (PO, KO, PiS) must be written exactly. A lower-case surname alone ("tusk") is left to SQL on `full_name`.
    Persons whose given name appears in the question are kept first; then those elected more often.
    `narrow_matches` drops matches the question rules out: other given names; surnames that are
    matched places, except that a given name or a capitalized word inside the sentence beats a

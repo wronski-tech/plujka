@@ -661,6 +661,24 @@ class TestClarification(unittest.TestCase):
         stems, exact = entities.question_terms("Frekwencja w Białymstoku")
         self.assertFalse(entities.score_entry("gmina", "bialobrzegi", stems, exact))
 
+    def test_inflected_committee_names_and_colloquial_person_names(self) -> None:
+        def committee(question: str, alias: str) -> bool:
+            stems, exact = entities.question_terms(question)
+            return entities.score_entry("committee", entities.fold(alias), stems, exact)
+
+        self.assertTrue(committee("Poparcie Konfederacji w 2023", "Konfederacja"))
+        self.assertTrue(committee("Wynik Platformy w 2011", "Platforma"))
+        self.assertTrue(committee("Mandaty Koalicji Obywatelskiej", "Koalicja Obywatelska"))
+        self.assertFalse(committee("Wyniki pod Krakowem", "PO"), "abbreviations stay exact")
+        self.assertFalse(committee("Konfederacji Polski", "Konfederacja Polski Niepodległej"), "every word must be there")
+        # A colloquial name ('Olek KWAŚNIEWSKI', same person_id) keeps its person and is not a second option.
+        olek = entities.EntityMatch("person", "Olek KWAŚNIEWSKI", "1921", "colloquial name of Aleksander KWAŚNIEWSKI", [1995])
+        president = entities.EntityMatch("person", "Aleksander KWAŚNIEWSKI", "1921", "prezydent 1995", [1995])
+        namesake = entities.EntityMatch("person", "Aleksander KWAŚNIEWSKI", "77", "pe 2014", [2014])
+        narrowed = entities.narrow_matches("Ile głosów dostał Olek Kwaśniewski?", [olek, president, namesake])
+        self.assertEqual(narrowed, [olek])
+        self.assertIsNone(entities.find_ambiguity([olek, president]))
+
     def test_question_years_and_town_narrow_namesakes(self) -> None:
         older = entities.EntityMatch("person", "Jarosław KACZYŃSKI", "8", "sejm 2011", [2011])
         narrowed = entities.narrow_matches("Ile głosów dostał Jarosław Kaczyński w 2023?", [self.JAROSLAW, older])
