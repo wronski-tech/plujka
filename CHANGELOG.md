@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Comparative follow-ups: „A jak to wypada w porównaniu z 2019?” after an answer keeps the previous filters and asks for both sides in one result (a column per side and the difference) instead of replacing the year; the follow-up toggle defaults to on for short comparisons. The evaluation set has four follow-up items (`previous` turn), 310 questions in total.
 - Multi-part questions: when one question asks two or three separate things, the model may return one SELECT per part (`{"parts": [{"title", "sql"}]}`); each part passes the SQL guard (one unsafe part rejects the answer), runs read-only, and the combined rows carry their part title in `part`. The SQL panel shows the parts as `-- part:` blocks, and the UI draws one table, chart and map per part.
 - Clarifications with ready queries: an ambiguous question gets at most four options, each with a short description and a validated query written in one model call; the UI shows the description under the button, and a picked option runs its cached query without another model call.
 - Thumbs-down triage: `scripts/triage_feedback.py` groups the thumbs-down questions by likely problem with the LLM (`feedback_groups.md`) and proposes a corrected query per question through the usual SQL prompt and guard; proposals with rows wait in `example_proposals.jsonl` for `add_sql_example.py --review`.

@@ -2,7 +2,8 @@
 """Evaluate LLM-written SQL against the evaluation set (``tests/eval/questions.jsonl``).
 
 Each item is a question with either a reference ``sql`` (its rows are the expected result) or
-``"expect": "clarify"`` (the question must end in a clarification). A generated answer passes when
+``"expect": "clarify"`` (the question must end in a clarification); a follow-up item also has
+``previous`` (``{"question", "sql"}`` of the earlier turn, sent as the conversation's previous turn). A generated answer passes when
 every expected row is found in its own generated row: all numbers of the expected row appear in it
 (to 0.05, so a percentage rounded to one decimal still matches); rows without numbers compare their
 texts instead. Extra columns and extra rows do not fail an item.
@@ -105,7 +106,7 @@ def check(items: list[dict]) -> int:
     failed = warned = 0
     for item in items:
         problems = []
-        clarification = dynamic_sql.resolve_question_entities(item["question"], None, None)[1]
+        clarification = dynamic_sql.resolve_question_entities(item["question"], None, item.get("previous"))[1]
         if bool(clarification) != (item.get("expect") == "clarify"):
             warned += 1
             got = f"clarification about {clarification['kind']}" if clarification else "no clarification"
@@ -127,7 +128,7 @@ def check(items: list[dict]) -> int:
 def evaluate(item: dict) -> dict:
     """Ask the model for one item and grade the result."""
     started = time.monotonic()
-    rows, sql, error, meta = dynamic_sql.try_dynamic_query(item["question"])
+    rows, sql, error, meta = dynamic_sql.try_dynamic_query(item["question"], None, item.get("previous"))
     status = meta.get("status", "skipped")
     if item.get("expect") == "clarify":
         passed = status == "clarify"

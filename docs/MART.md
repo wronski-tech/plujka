@@ -643,7 +643,10 @@ would answer it from Sejm data.
    kinds the new question does not name are inherited from the previous question, and the previous
    question and SQL are added to the prompt with the instruction to keep their filters unless the
    new question changes them. The UI sends the accumulated questions of the conversation as
-   `previous.question`, so a chain of follow-ups keeps the original place or person.
+   `previous.question`, so a chain of follow-ups keeps the original place or person. A follow-up
+   that compares (`dynamic_sql.COMPARISON_RE`: „w porównaniu”, „względem”, „zmieniło”, „niż”, …)
+   asks for both sides in one result instead of a replaced filter: one row per unit with a column
+   per side and their difference. The UI turns the follow-up toggle on for short comparisons too.
 4. **Prompt.** Schema comments (cached per mart load) of the relevant relations only, loaded
    elections, matched entities, up to `SQL_EXAMPLES_K` similar verified examples and the SQL rules.
    `dynamic_sql.FAMILY_KEYWORDS` maps words naming an election kind ("prezydenckie", "sejmik",

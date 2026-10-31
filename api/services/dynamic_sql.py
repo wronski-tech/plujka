@@ -396,6 +396,17 @@ def resolve_question_entities(
     return matches, clarification
 
 
+# Folded words of a follow-up that compares with the previous result ("a w porównaniu z 2019?").
+COMPARISON_RE = re.compile(
+    r"\b(porown\w*|wzgledem|wobec|zmienil\w*|zmian\w*|roznic\w*|niz|vs|versus|przyros\w*|spad\w*|wzros\w*)\b"
+)
+
+
+def is_comparison(question: str) -> bool:
+    """Whether ``question`` asks to compare (with the previous turn, when it is a follow-up)."""
+    return COMPARISON_RE.search(entities.fold(question)) is not None
+
+
 def build_context(
     question: str, matches: list[entities.EntityMatch], previous: dict | None = None
 ) -> tuple[str, str, dict[str, Any]]:
@@ -419,6 +430,13 @@ def build_context(
             f"(election, year, place, person, party) unless the new question changes them.\n"
             f"Previous question: {previous['question']}\nPrevious SQL: {previous.get('sql') or '-'}"
         )
+        if is_comparison(question):
+            context += (
+                "\nThe new question compares with the previous result: return both sides in one result "
+                "instead of replacing the previous filter - one row per compared unit (or party, candidate) "
+                "with one column per side, named after it (e.g. turnout_2019, turnout_2023), and their "
+                "difference (diff_pp for percentages)."
+            )
     used = {
         "examples": [{"question": e["question"], "source": e.get("source")} for e in similar],
         "schema_relations": len(relations),

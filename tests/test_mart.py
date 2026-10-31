@@ -971,6 +971,22 @@ class TestDynamicQueryFlow(unittest.TestCase):
         # The same words after a different previous turn are a different question: no cache hit.
         self.assertEqual((first[3]["status"], other[3]["status"]), ("first_pass", "first_pass"))
 
+    def test_comparative_follow_up_asks_for_both_sides(self) -> None:
+        self.patches[0].stop()  # the real build_context, with the database parts stubbed
+        previous = {"question": "Frekwencja w Krakowie w 2023?", "sql": self.GOOD}
+        with patch.object(dynamic_sql, "data_context", return_value=("Elections: ...", "load-1")), \
+                patch.object(dynamic_sql, "schema_description", return_value={"v_turnout": "mart.v_turnout ..."}), \
+                patch.object(dynamic_sql.examples, "similar_examples", return_value=[]):
+            def context(question: str, prev: dict | None = previous) -> str:
+                return dynamic_sql.build_context(question, [], prev)[0]
+
+            for question in ("A w porównaniu z 2019?", "Jak to się zmieniło od 2019?", "Czy więcej niż w 2019?"):
+                self.assertIn("compares with the previous result", context(question), question)
+            # A plain follow-up keeps replacing the filter; a standalone question has no previous turn.
+            self.assertNotIn("compares", context("A w 2019?"))
+            self.assertNotIn("compares", context("Porównaj frekwencję w Krakowie i Gdańsku w 2023", None))
+        self.patches[0].start()
+
 
 class TestGusUnitTeryt(unittest.TestCase):
     def test_bdl_unit_ids_map_to_teryt(self) -> None:

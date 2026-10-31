@@ -88,7 +88,7 @@ Cel: lepsze rozumienie pytań i odpowiedzi bez faktów spoza SQL. Gotowe, gdy fu
 **Rozumienie pytań**
 - [x] 6. Doprecyzowania jako 2–4 interpretacje z gotowym SQL.
 - [x] 7. Pytania wieloczęściowe (kilka zapytań, połączony wynik).
-- [ ] 8. Pytania porównawcze z pamięcią rozmowy.
+- [x] 8. Pytania porównawcze z pamięcią rozmowy.
 - [ ] 9. Potoczne nazwy komitetów i osób, leksykon jako źródło prawdy.
 - [ ] 10. Literówki i brak polskich znaków.
 - [ ] 11. Pytania po angielsku.

@@ -135,10 +135,16 @@ def _ask(question: str, entity_refs: list[dict] | None = None, previous: dict | 
         return None
 
 
+# Short comparisons with the earlier answer ("Jak to wypada w porównaniu z 2019?").
+_COMPARE_BACK = re.compile(r"\b(w porównaniu|porównaj z|porównując z|względem|niż wtedy|niż wcześniej|poprzedni\w*|zmieniło się)")
+
+
 def _looks_like_follow_up(question: str) -> bool:
-    """Heuristic default for the follow-up toggle: "a w 2019?", "i w Gdańsku?", very short questions."""
+    """Heuristic default for the follow-up toggle: "a w 2019?", "i w Gdańsku?", very short questions,
+    short comparisons with the previous answer."""
     words = question.lower().split()
-    return bool(words) and (words[0] in ("a", "i", "oraz", "to", "tam", "tylko") or len(words) <= 3)
+    return bool(words) and (words[0] in ("a", "i", "oraz", "to", "tam", "tylko") or len(words) <= 3
+                            or (len(words) <= 8 and _COMPARE_BACK.search(question.lower()) is not None))
 
 
 HISTORY_SIZE = 20
