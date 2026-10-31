@@ -497,7 +497,7 @@ class AskResponse(BaseModel):
     )
     answer: dict[str, Any] | None = Field(
         default=None,
-        description="Polish answer text: {text, source: llm|fallback, verified, caveats}; LLM text only when its numbers match the rows; caveats are fixed notes about data gaps",
+        description="Answer text: {text, source: llm|fallback|docs, verified, caveats}; LLM text only when its numbers match the rows; docs: a definition from docs/DEFINITIONS.md with `sources`; caveats are fixed notes about data gaps",
     )
     clarification: dict[str, Any] | None = Field(
         default=None,
@@ -1471,7 +1471,7 @@ def ask(request: AskRequest, http_request: Request, api_key: str | None = Depend
     refs = [r.model_dump() for r in request.entity_refs] if request.entity_refs else None
     previous = request.previous.model_dump() if request.previous else None
     result = router.route_question(request.question, entity_refs=refs, previous=previous)
-    if not result.get("clarification"):
+    if not result.get("clarification") and not result.get("answer"):
         result["answer"] = answer.compose_answer(request.question, result.get("result") or [], result.get("sql") or "")
     result["result"] = [{k: _json_value(v) for k, v in row.items()} for row in result.get("result") or []]
     telemetry = _telemetry(result, started)

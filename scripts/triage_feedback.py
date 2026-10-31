@@ -106,6 +106,10 @@ def triage(feedback_path: Path, group=llm_groups) -> int:
         report += [f"## {g.get('problem', '?')} ({len(members)})", ""]
         for record in members:
             sql = None
+            if record["ask_response"].get("intent") == "definition":
+                # Answered from docs/DEFINITIONS.md: the text needs fixing, not a query.
+                report.append(f"- {record['question']} — definition, fix docs/DEFINITIONS.md")
+                continue
             if examples.example_id(record["question"]) not in done:
                 sql = propose(record, g.get("problem", ""))
             report.append(f"- {record['question']}" + (" — corrected query proposed" if sql else ""))

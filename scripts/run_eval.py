@@ -2,7 +2,8 @@
 """Evaluate LLM-written SQL against the evaluation set (``tests/eval/questions.jsonl``).
 
 Each item is a question with either a reference ``sql`` (its rows are the expected result) or
-``"expect": "clarify"`` (the question must end in a clarification); a follow-up item also has
+``"expect": "clarify"`` (the question must end in a clarification) or ``"definition": "<section title>"``
+(answered from ``docs/DEFINITIONS.md`` without the model); a follow-up item also has
 ``previous`` (``{"question", "sql"}`` of the earlier turn, sent as the conversation's previous turn). A generated answer passes when
 every expected row is found in its own generated row: all numbers of the expected row appear in it
 (to 0.05, so a percentage rounded to one decimal still matches); rows without numbers compare their
@@ -43,7 +44,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from api.services import dynamic_sql  # noqa: E402
+from api.services import definitions, dynamic_sql  # noqa: E402
 from api.services.mart.entities import fold  # noqa: E402
 from api.services.mart.safe_sql import run_readonly, validate_mart_sql  # noqa: E402
 
@@ -106,6 +107,15 @@ def check(items: list[dict]) -> int:
     failed = warned = 0
     for item in items:
         problems = []
+        # Definitions are deterministic: the expected section must be found, and no data question may be.
+        found = [d["title"] for d in definitions.find_definitions(item["question"])]
+        if item.get("definition") not in found if "definition" in item else found:
+            problems.append(f"definitions found: {found or 'none'}")
+        if "definition" in item:
+            failed += bool(problems)
+            if problems:
+                print(f"[FAIL] {item['id']} {item['question']}\n       {'; '.join(problems)}")
+            continue
         clarification = dynamic_sql.resolve_question_entities(item["question"], None, item.get("previous"))[1]
         if bool(clarification) != (item.get("expect") == "clarify"):
             warned += 1
@@ -128,9 +138,16 @@ def check(items: list[dict]) -> int:
 def evaluate(item: dict) -> dict:
     """Ask the model for one item and grade the result."""
     started = time.monotonic()
-    rows, sql, error, meta = dynamic_sql.try_dynamic_query(item["question"], None, item.get("previous"))
+    if "definition" in item:
+        rows, sql, error = [], None, None
+        found = [d["title"] for d in definitions.find_definitions(item["question"])]
+        meta = {"status": "definition" if found else "skipped"}
+    else:
+        rows, sql, error, meta = dynamic_sql.try_dynamic_query(item["question"], None, item.get("previous"))
     status = meta.get("status", "skipped")
-    if item.get("expect") == "clarify":
+    if "definition" in item:
+        passed = item["definition"] in found
+    elif item.get("expect") == "clarify":
         passed = status == "clarify"
     else:
         passed = status in ("first_pass", "repaired", "cached") and rows_match(run_readonly(item["sql"]), rows)

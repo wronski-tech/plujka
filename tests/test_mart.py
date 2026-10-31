@@ -20,7 +20,7 @@ from unittest.mock import MagicMock, patch
 import duckdb
 import psycopg
 
-from api.services import answer, dynamic_sql
+from api.services import answer, definitions, dynamic_sql
 from api.services.mart import entities, examples
 from api.services.mart.build_common import (
     create_committee_aliases,
@@ -828,8 +828,10 @@ class TestCuratedExamples(unittest.TestCase):
             feedback = Path(tmp) / "feedback.jsonl"
             lines = [{"rating": "thumbs_down", "question": q, "needs_fix": True, "ask_response": {"intent": "dynamic_sql", "sql": sql}}
                      for q, sql in (("Frekwencja w eurowyborach 2019", bad), ("Frekwencja PE 2014", fixed), ("Sondaż na 2027", None))]
+            # A definition answer gets no query proposal: its text in docs/DEFINITIONS.md needs the fix.
+            lines.append({"rating": "thumbs_down", "question": "Co to jest próg wyborczy?", "ask_response": {"intent": "definition", "sql": ""}})
             feedback.write_text("".join(json.dumps(r) + "\n" for r in [*lines, {"rating": "thumbs_up", "question": "x"}]), encoding="utf-8")
-            groups = [{"problem": "Election filter missing", "items": [0, 1]}, {"problem": "Not in the database", "items": [2, 7]}]
+            groups = [{"problem": "Election filter missing", "items": [0, 1]}, {"problem": "Not in the database", "items": [2, 3, 7]}]
             # The model returns the fix for the first question and the same rejected query for the second.
             with patch.object(dynamic_sql, "resolve_question_entities", return_value=([], None)), \
                     patch.object(dynamic_sql, "build_context", return_value=("ctx", "v", {})), \
@@ -840,7 +842,8 @@ class TestCuratedExamples(unittest.TestCase):
             proposals = [json.loads(line) for line in (Path(tmp) / "example_proposals.jsonl").read_text(encoding="utf-8").splitlines()]
             self.assertEqual(proposals, [{"question": "Frekwencja w eurowyborach 2019", "sql": validate_mart_sql(fixed), "note": "Election filter missing"}])
             report = (Path(tmp) / "feedback_groups.md").read_text(encoding="utf-8")
-            self.assertIn("## Not in the database (1)", report)
+            self.assertIn("## Not in the database (2)", report)
+            self.assertIn("- Co to jest próg wyborczy? — definition, fix docs/DEFINITIONS.md", report)
 
     def test_local_search_ranks_by_shared_words(self) -> None:
         hits = examples._local_similar("frekwencja w drugiej turze wyborów prezydenckich 2025", k=2)
@@ -858,6 +861,8 @@ class TestEvaluationSet(unittest.TestCase):
                 self.assertNotIn(entities.fold(item["question"]), curated, "the few-shot example would leak the answer")
                 if "sql" in item:
                     validate_mart_sql(item["sql"])
+                elif "definition" in item:
+                    self.assertIn(item["definition"], [d["title"] for d in definitions.find_definitions(item["question"])])
                 else:
                     self.assertEqual(item.get("expect"), "clarify")
 

@@ -336,3 +336,13 @@
 {"id": "english-010", "family": "english", "question": "What was the turnout in Lodz in the 2023 Sejm election?", "sql": "SELECT turnout_pct FROM mart.v_turnout WHERE election = 'sejm' AND year = 2023 AND level = 'gmina' AND teryt_gmina = '106101'"}
 {"id": "english-011", "family": "english", "question": "How many votes did Paweł Kukiz get in the first round of the 2015 presidential election?", "sql": "SELECT full_name, votes, pct FROM mart.prezydent_candidates WHERE year = 2015 AND round = 1 AND last_name = 'KUKIZ'"}
 {"id": "english-012", "family": "english", "question": "Which committee won the 2019 Sejm election in Podlaskie?", "sql": "SELECT committee_name, pct FROM mart.v_sejm_list_results WHERE year = 2019 AND level = 'wojewodztwo' AND wojewodztwo = 'podlaskie' ORDER BY votes DESC LIMIT 1"}
+{"id": "definition-001", "family": "definition", "question": "Co to jest frekwencja?", "definition": "Frekwencja"}
+{"id": "definition-002", "family": "definition", "question": "Jak liczona jest frekwencja?", "definition": "Frekwencja"}
+{"id": "definition-003", "family": "definition", "question": "Co to jest próg wyborczy?", "definition": "Próg wyborczy"}
+{"id": "definition-004", "family": "definition", "question": "Jak działa metoda D'Hondta?", "definition": "Metoda D'Hondta"}
+{"id": "definition-005", "family": "definition", "question": "Czym różni się metoda D'Hondta od Sainte-Laguë?", "definition": "Metoda Sainte-Laguë"}
+{"id": "definition-006", "family": "definition", "question": "Kiedy referendum jest ważne?", "definition": "Ważność referendum"}
+{"id": "definition-007", "family": "definition", "question": "Co to są głosy nieważne?", "definition": "Głosy ważne i nieważne"}
+{"id": "definition-008", "family": "definition", "question": "Co oznacza JOW?", "definition": "Okręgi jednomandatowe (JOW)"}
+{"id": "definition-009", "family": "definition", "question": "What is the electoral threshold?", "definition": "Próg wyborczy"}
+{"id": "definition-010", "family": "definition", "question": "What are party families?", "definition": "Rodziny partii"}

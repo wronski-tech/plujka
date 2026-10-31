@@ -92,7 +92,7 @@ Cel: lepsze rozumienie pytań i odpowiedzi bez faktów spoza SQL. Gotowe, gdy fu
 - [x] 9. Potoczne nazwy komitetów i osób, leksykon jako źródło prawdy.
 - [x] 10. Literówki i brak polskich znaków.
 - [x] 11. Pytania po angielsku.
-- [ ] 12. Definicje z dokumentacji repo, nie z wiedzy modelu.
+- [x] 12. Definicje z dokumentacji repo, nie z wiedzy modelu.
 - [ ] 13. Odmowa dla pytań spoza zakresu (sondaże, prognozy).
 - [ ] 14. Okresy („lata 90.”, „od 2005”) → lata obecne w bazie.
 - [ ] 15. Pytania geograficzne przez widoki atrybutów jednostek.

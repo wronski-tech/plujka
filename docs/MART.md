@@ -609,6 +609,13 @@ question (+ previous turn) ─▶ router ─▶ dynamic_sql ─▶ rows? ─▶ 
                                              └─ no rows, plain Sejm question ─▶ legacy SQL templates
 ```
 
+**Definitions** (`api/services/definitions.py`). A question that asks what a term means or how a
+rule works ("Co to jest próg wyborczy?", "Jak działa metoda D'Hondta?") and names no year is answered
+with the curated text of `docs/DEFINITIONS.md` (intent `definition`, answer source `docs`, no SQL and
+no model call), so definitions never come from the model's own knowledge. A definition question about
+a term the file does not cover goes on to SQL. Evaluation items with `"definition": "<section title>"`
+check that the right section is found and that no data question is caught.
+
 **Routing** (`router.route_question`). Every question goes to dynamic SQL over the mart first. The
 legacy Sejm templates run only when dynamic SQL returned no rows (no OpenAI key, mart unreachable,
 failed or empty query) and the request is none of: an answer to a clarification (`entity_refs`), a

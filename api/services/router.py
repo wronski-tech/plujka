@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 
 from api.services import db
+from api.services import definitions
 from api.services import kbw_analytics
 from api.services.dynamic_sql import try_dynamic_query
 from api.services.embeddings import embed_text
@@ -79,9 +80,24 @@ def route_question(question: str, entity_refs: list[dict] | None = None, previou
     The templates run only when dynamic SQL produced no rows (no OpenAI key, mart unreachable,
     failed or empty query) and the question is one they can answer: not an explicit entity choice
     (``entity_refs``, the answer to a clarification), not a follow-up (``previous`` turn), and not
-    about an election only the mart covers.
+    about an election only the mart covers. Definition questions get the curated text of
+    ``docs/DEFINITIONS.md`` (intent ``definition``, no SQL).
     """
     years = _extract_years(question)
+    # Definitions come from the repository docs, not from the model.
+    found = [] if entity_refs or previous else definitions.find_definitions(question)
+    if found:
+        return {
+            "question": question,
+            "intent": "definition",
+            "entity": None,
+            "year": None,
+            "years": years,
+            "sql": "",
+            "params": {"definitions": [d["title"] for d in found]},
+            "result": [],
+            "answer": definitions.definition_answer(question, found),
+        }
     dyn_rows, dyn_sql, dyn_err, dyn_meta = try_dynamic_query(question, entity_refs, previous)
     response = _dynamic_response(question, None, years, dyn_rows, dyn_sql, dyn_meta)
     if response:

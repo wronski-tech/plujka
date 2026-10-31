@@ -5,7 +5,7 @@ from __future__ import annotations
 import unittest
 from unittest.mock import patch
 
-from api.services import router
+from api.services import definitions, router
 from api.services.router import _gmina_ilike_from_question, _kbw_geo_pattern_from_question
 
 
@@ -50,6 +50,25 @@ class TestMartOnlyElections(unittest.TestCase):
             for question in ("Bezrobocie a wynik PiS w powiatach w 2023", "Who won the presidential election in 2015?"):
                 response = router.route_question(question)
                 self.assertEqual(response["intent"], "dynamic_sql")
+
+
+class TestDefinitions(unittest.TestCase):
+    def test_definition_questions_are_answered_from_the_docs(self) -> None:
+        with patch.object(router, "try_dynamic_query", side_effect=AssertionError("model asked")):
+            response = router.route_question("Czym różni się metoda D'Hondta od Sainte-Laguë?")
+            english = router.route_question("What is the electoral threshold?")
+        self.assertEqual(response["intent"], "definition")
+        self.assertEqual(response["answer"]["sources"],
+                         ["docs/DEFINITIONS.md#metoda-dhondta", "docs/DEFINITIONS.md#metoda-sainte-laguë"])
+        self.assertIn("1, 3, 5", response["answer"]["text"])
+        self.assertTrue(english["answer"]["text"].startswith("The electoral threshold"))
+
+    def test_data_questions_still_go_to_sql(self) -> None:
+        # A year, a place ("in Warsaw") or no request for a meaning: the rows answer it, not the docs.
+        for question in ("Jaka była frekwencja w 2023?", "What is the turnout in Warsaw?", "Jakie komitety przekroczyły próg?",
+                         "Co to jest frekwencja w wyborach 2019?", "Kto to jest wójt Gdowa?"):
+            with self.subTest(question=question):
+                self.assertEqual(definitions.find_definitions(question), [])
 
 
 class TestTemplateFallback(unittest.TestCase):

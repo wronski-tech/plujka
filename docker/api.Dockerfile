@@ -7,7 +7,7 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 COPY api /app/api
 COPY data /app/data
-COPY docs/MART.md /app/docs/MART.md
+COPY docs/MART.md docs/DEFINITIONS.md /app/docs/
 
 EXPOSE 8000
 

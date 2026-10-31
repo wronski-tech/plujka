@@ -463,6 +463,10 @@ def _render_answer(data: dict) -> None:
     answer = data.get("answer") or {}
     if not answer.get("text"):
         return
+    if answer.get("source") == "docs":
+        st.markdown(answer["text"])
+        st.caption("📖 Definicja z dokumentacji projektu (" + ", ".join(answer.get("sources") or []) + "), nie z wiedzy modelu.")
+        return
     st.markdown(f"**{answer['text']}**")
     if answer.get("source") == "llm":
         st.caption("✓ Każda liczba w tej odpowiedzi występuje w wyniku zapytania SQL.")
@@ -489,6 +493,49 @@ def _render_clarification(question: str, data: dict) -> None:
             if chosen is not None:
                 _remember(question, chosen, refs, previous)
                 st.rerun()
+
+
+def _render_feedback(q: str, data: dict, fp: str) -> None:
+    """Thumbs up / report buttons for the shown answer (saved through /feedback)."""
+    st.markdown("###### Oceń odpowiedź")
+    if st.session_state.get("_feedback_ack_fp") == fp:
+        st.caption("Dziękujemy — ocena została zapisana.")
+    else:
+        if st.button(_t("👍 Dobra odpowiedź"), key=f"fb_up_{fp}", use_container_width=True):
+            try:
+                fb = requests.post(
+                    f"{API_URL}/feedback",
+                    headers=API_HEADERS,
+                    json={"rating": "thumbs_up", "question": q, "ask_response": data},
+                    timeout=30,
+                )
+                fb.raise_for_status()
+                st.session_state["_feedback_ack_fp"] = fp
+                st.rerun()
+            except requests.RequestException as err:
+                st.warning(f"Nie udało się zapisać oceny: {err}")
+        st.caption(
+            "Jeśli wynik jest błędny, niepełny albo nie na temat, wyślij go do poprawy. "
+            "Zapiszemy pytanie, SQL i odpowiedź, żeby poprawić logikę systemu."
+        )
+        if st.button(_t("⚠️ Zgłoś odpowiedź do poprawy"), key=f"fb_down_{fp}", use_container_width=True):
+            try:
+                fb = requests.post(
+                    f"{API_URL}/feedback",
+                    headers=API_HEADERS,
+                    json={
+                        "rating": "thumbs_down",
+                        "question": q,
+                        "ask_response": data,
+                    },
+                    timeout=30,
+                )
+                fb.raise_for_status()
+                st.session_state["_feedback_ack_fp"] = fp
+                st.rerun()
+            except requests.RequestException as err:
+                st.warning(f"Nie udało się zapisać zgłoszenia: {err}")
+
 
 
 def _render_result_emotes(data: dict) -> None:
@@ -1827,6 +1874,9 @@ if last:
         _render_person_links(data, entity_refs, fp)
         st.stop()
     _render_answer(data)
+    if data.get("intent") == "definition":
+        _render_feedback(q, data, fp)
+        st.stop()
     _render_result_emotes(data)
     # A multi-part answer (rows tagged with "part") gets one table, chart and map per part.
     parts: dict = {}
@@ -1904,43 +1954,6 @@ if last:
             "Dane: KBW · Odpowiedzi mogą być przybliżone do poziomu okręgu sejmowego, nie do gminy."
         )
 
-    st.markdown("###### Oceń odpowiedź")
-    if st.session_state.get("_feedback_ack_fp") == fp:
-        st.caption("Dziękujemy — ocena została zapisana.")
-    else:
-        if st.button(_t("👍 Dobra odpowiedź"), key=f"fb_up_{fp}", use_container_width=True):
-            try:
-                fb = requests.post(
-                    f"{API_URL}/feedback",
-                    headers=API_HEADERS,
-                    json={"rating": "thumbs_up", "question": q, "ask_response": data},
-                    timeout=30,
-                )
-                fb.raise_for_status()
-                st.session_state["_feedback_ack_fp"] = fp
-                st.rerun()
-            except requests.RequestException as err:
-                st.warning(f"Nie udało się zapisać oceny: {err}")
-        st.caption(
-            "Jeśli wynik jest błędny, niepełny albo nie na temat, wyślij go do poprawy. "
-            "Zapiszemy pytanie, SQL i odpowiedź, żeby poprawić logikę systemu."
-        )
-        if st.button(_t("⚠️ Zgłoś odpowiedź do poprawy"), key=f"fb_down_{fp}", use_container_width=True):
-            try:
-                fb = requests.post(
-                    f"{API_URL}/feedback",
-                    headers=API_HEADERS,
-                    json={
-                        "rating": "thumbs_down",
-                        "question": q,
-                        "ask_response": data,
-                    },
-                    timeout=30,
-                )
-                fb.raise_for_status()
-                st.session_state["_feedback_ack_fp"] = fp
-                st.rerun()
-            except requests.RequestException as err:
-                st.warning(f"Nie udało się zapisać zgłoszenia: {err}")
+    _render_feedback(q, data, fp)
 
 st.divider()
