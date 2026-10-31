@@ -625,7 +625,13 @@ would answer it from Sejm data.
    without a given name in the question, a capitalized word closer to the surname than to any
    committee alias ("w gminach" is not GMIŃSKI, "turę" not TUR, "PiS" not PIŚ, "Lewicy" not
    LEWICKI; "Kukiz" is both). Committee aliases of five or more letters may be inflected
-   ("Konfederacji", "Platformy"); shorter ones (PO, KO, PiS) must be written exactly. A lower-case surname alone ("tusk") is left to SQL on `full_name`.
+   ("Konfederacji", "Platformy"); shorter ones (PO, KO, PiS) must be written exactly. Questions
+   without Polish letters match the same way (everything is folded), and a long name word may
+   carry one typo, a wrong or two swapped letters ("Platfromy", "Gdańksu"); a person found only
+   through such a near match yields to a place or person the same word names more closely
+   (KRASOWSKI is not "Krakowa", KAMYSZEK not "Kosiniak-Kamysz"). Before the per-kind cut, persons who
+   ran in a year the question names come first; afterwards the election it names („prezydenckich
+   2005”) narrows namesakes of that year. A lower-case surname alone ("tusk") is left to SQL on `full_name`.
    Persons whose given name appears in the question are kept first; then those elected more often.
    `narrow_matches` drops matches the question rules out: other given names; surnames that are
    matched places, except that a given name or a capitalized word inside the sentence beats a

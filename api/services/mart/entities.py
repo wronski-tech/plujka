@@ -102,7 +102,17 @@ def _match_rest(word: str, stems: set[str]) -> int | None:
         # The shared 4-letter prefix keeps "krakowie" away from "krapkowice".
         elif len(word) >= 6 and word[:4] == stem[:4] and SequenceMatcher(None, word, stem).ratio() >= 0.88:
             best = 3 if best is None else best
+        # One typo (a wrong letter or two swapped letters) in a long stem ("platfromy" -> "platforma").
+        elif len(stem) >= 6 and word[:2] == stem[:2] and len(word) - len(stem) <= 3 and _one_edit(word[: len(stem)], stem):
+            best = 3 if best is None else best
     return best
+
+
+def _one_edit(a: str, b: str) -> bool:
+    """Whether ``a`` and ``b`` (same length) differ by one substituted letter or two swapped neighbours."""
+    diff = [i for i, (x, y) in enumerate(zip(a, b)) if x != y]
+    return len(a) == len(b) and (len(diff) == 1 or (len(diff) == 2 and diff[1] == diff[0] + 1
+                                                   and a[diff[0]] == b[diff[1]] and a[diff[1]] == b[diff[0]]))
 
 
 def _word_matches(word: str, stems: set[str]) -> bool:
@@ -184,13 +194,15 @@ def resolve_entities(question: str, conn: psycopg.Connection | None = None) -> l
         if score_entry(kind, folded, stems, exact) and (kind != "person" or surname_mentioned(name, question, alias_words)):
             by_kind.setdefault(kind, []).append(EntityMatch(kind, name, ref, detail, list(years)))
     matches: list[EntityMatch] = []
+    years = {int(y) for y in re.findall(r"\b(?:19|20)\d{2}\b", question)}
     for kind in sorted(by_kind):
         if kind == "person":
-            # Before the cut: people whose given name is in the question, then those elected more
-            # often (a bare "Kaczyński" most likely means the long-serving MP), then recency.
+            # Before the cut: people whose given name is in the question, then those who ran in a
+            # year it names, then those elected more often (a bare "Kaczyński" most likely means the
+            # long-serving MP), then recency.
             def key(m: EntityMatch) -> tuple:
                 named = any(_word_matches(g, stems) for g in _given_names(m))
-                return (not named, -(m.detail or "").count("elected"), -max(m.years), m.name)
+                return (not named, not years & set(m.years), -(m.detail or "").count("elected"), -max(m.years), m.name)
         else:
             # Longer names first: every word of a match is in the question ("Jelenia Góra" before "Góra").
             def key(m: EntityMatch) -> tuple:
@@ -240,6 +252,13 @@ def _capitalized_inside(question: str, surname: str) -> bool:
     return any(raw[:1].isupper() and _word_matches(surname, _word_stems(fold(raw))) for raw in words)
 
 
+# Words naming an election -> the chamber label in person details ("prezydent 2005 (round 1)").
+_CHAMBER_WORDS = (
+    (r"prezydenck", "prezydent"), (r"\bsejm(?!ik)", "sejm"), (r"\bsenat", "senat"), (r"europ", "pe"),
+    (r"\bsejmik", "sejmik"), (r"\b(wojt|burmistrz|prezydent(em|a)? miasta)", "wbp"),
+)
+
+
 def narrow_matches(question: str, matches: list[EntityMatch]) -> list[EntityMatch]:
     """Drop matches the question rules out.
 
@@ -259,7 +278,8 @@ def narrow_matches(question: str, matches: list[EntityMatch]) -> list[EntityMatc
       ("Szczecin" is not Szczecinek, "Bielsko-Biała" not Biała, "Przemysław Czarnek" neither
       Przemyśl nor Czarne).
     - Persons without a candidacy in the years the question names, when another matched person has
-      one ("Jarosław Kaczyński w 2023" is the one who ran in 2023).
+      one ("Jarosław Kaczyński w 2023" is the one who ran in 2023), and then without a candidacy in
+      the election it names ("prezydenckich 2005").
     - Rural gminas named like a town gmina when the question says "miasto" ("w mieście Elbląg").
     """
     stems, _ = question_terms(question)
@@ -282,22 +302,31 @@ def narrow_matches(question: str, matches: list[EntityMatch]) -> list[EntityMatc
         for other in matches:
             theirs = covered.get(id(other))
             # Places compete with places of their kind; a person only when named with more words
-            # (the surname alone may be the place: KRAK in "w Krakowie").
-            if theirs is None or other is place or other.kind not in (place.kind, "person") or (
-                other.kind == place.kind and _PLACE_PREFIX.sub("", fold(other.name)) == name
+            # (the surname alone may be the place: KRAK in "w Krakowie"). Persons compete with other
+            # people ("Kosiniak-Kamysz" is not KAMYSZEK, a typo-close KOSIENIAK or KACZYŃSKA for "Kaczyński").
+            # A person also yields to a place its word names more closely (KRASOWSKI is not "Krakowa").
+            rivals = (*PLACE_KINDS, "person") if place.kind == "person" else (place.kind, "person")
+            if theirs is None or other is place or other.kind not in rivals or (
+                other.kind == place.kind and (_PLACE_PREFIX.sub("", fold(other.name)) == name or other.ref == place.ref)
             ):
                 continue
             if mine and all(i in theirs and theirs[i] <= r for i, r in mine.items()) and (
-                len(theirs) > len(mine) or (other.kind != "person" and any(theirs[i] < r for i, r in mine.items()))
+                len(theirs) > len(mine) or ((other.kind != "person" or place.kind == "person") and any(theirs[i] < r for i, r in mine.items()))
             ):
                 return True
         return False
 
     towns = {_PLACE_PREFIX.sub("", fold(m.name)): m.ref for m in matches if m.kind == "gmina" and m.name.startswith("m. ")}
     town_named = bool(towns) and re.search(r"\bmiast|\bmiesc", fold(question)) is not None
-    shadowed = {id(m) for m in matches if m.kind in PLACE_KINDS and dominated(m)}
+    shadowed = {id(m) for m in matches if (m.kind in PLACE_KINDS or m.kind == "person") and dominated(m)}
     years = {int(y) for y in re.findall(r"\b(?:19|20)\d{2}\b", question)}
     in_years = [m for m in matches if m.kind == "person" and years & set(m.years)]
+    # The election the question names narrows further ("Marek Borowski ... prezydenckich 2005").
+    chambers = [c for pattern, c in _CHAMBER_WORDS if re.search(pattern, fold(question))]
+    in_chamber = [m for m in in_years or [m for m in matches if m.kind == "person"]
+                  if any(f"{c} {y}" in (m.detail or "") for c in chambers for y in (years or {""}))]
+    if in_chamber:
+        in_years = in_chamber
     aliases = {fold(m.name) for m in matches if m.kind == "committee"}
     other_stems = {s for raw in re.findall(r"[^\W_]+", question) if fold(raw) not in aliases
                    for s in _word_stems(fold(raw))}

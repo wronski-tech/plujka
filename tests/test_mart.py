@@ -679,6 +679,32 @@ class TestClarification(unittest.TestCase):
         self.assertEqual(narrowed, [olek])
         self.assertIsNone(entities.find_ambiguity([olek, president]))
 
+    def test_typos_and_missing_diacritics(self) -> None:
+        def matches(kind: str, question: str, name: str) -> bool:
+            stems, exact = entities.question_terms(question)
+            return entities.score_entry(kind, entities.fold(name), stems, exact)
+
+        self.assertTrue(matches("committee", "Wynik Platfromy w 2011", "Platforma"))  # swapped letters
+        self.assertTrue(matches("gmina", "Frekwencja w Gdańksu", "Gdańsk"))
+        self.assertTrue(matches("gmina", "Frekwencja w Lodzi", "Łódź"))  # no Polish letters
+        self.assertFalse(matches("gmina", "Frekwencja w Gdyni", "Gdańsk"))
+        # A person found only through a typo yields to the place the word names exactly.
+        krasowski = entities.EntityMatch("person", "Edward KRASOWSKI", "5", "rada_gminy 2014", [2014])
+        city = entities.EntityMatch("gmina", "m. Kraków", "126101", "powiat Kraków", [2014])
+        self.assertEqual(entities.narrow_matches("Kto został prezydentem Krakowa w 2014?", [krasowski, city]), [city])
+        # A full double surname beats people matching one part or a look-alike.
+        full = entities.EntityMatch("person", "Władysław Marcin KOSINIAK-KAMYSZ", "1", "sejm 2023", [2023])
+        part = entities.EntityMatch("person", "Andrzej Roman KAMYSZEK", "2", "rada_gminy 2018", [2018])
+        near = entities.EntityMatch("person", "Romuald Piotr KOSIENIAK", "3", "rada_gminy 2018", [2018])
+        self.assertEqual(entities.narrow_matches("Ile glosow dostal Kosiniak-Kamysz", [full, part, near]), [full])
+
+    def test_named_election_narrows_namesakes_of_that_year(self) -> None:
+        president = entities.EntityMatch("person", "Marek Stefan BOROWSKI", "1", "prezydent 2005 (round 1); sejm 2007", [2005, 2007])
+        mp = entities.EntityMatch("person", "Marek Włodzimierz BOROWSKI", "2", "sejm 2005 (district 3)", [2005])
+        question = "Ile głosów zdobył Marek Borowski w wyborach prezydenckich 2005?"
+        self.assertEqual(entities.narrow_matches(question, [president, mp]), [president])
+        self.assertEqual(len(entities.narrow_matches("Ile głosów zdobył Marek Borowski w 2005?", [president, mp])), 2)
+
     def test_question_years_and_town_narrow_namesakes(self) -> None:
         older = entities.EntityMatch("person", "Jarosław KACZYŃSKI", "8", "sejm 2011", [2011])
         narrowed = entities.narrow_matches("Ile głosów dostał Jarosław Kaczyński w 2023?", [self.JAROSLAW, older])

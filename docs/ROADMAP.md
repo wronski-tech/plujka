@@ -90,7 +90,7 @@ Cel: lepsze rozumienie pytań i odpowiedzi bez faktów spoza SQL. Gotowe, gdy fu
 - [x] 7. Pytania wieloczęściowe (kilka zapytań, połączony wynik).
 - [x] 8. Pytania porównawcze z pamięcią rozmowy.
 - [x] 9. Potoczne nazwy komitetów i osób, leksykon jako źródło prawdy.
-- [ ] 10. Literówki i brak polskich znaków.
+- [x] 10. Literówki i brak polskich znaków.
 - [ ] 11. Pytania po angielsku.
 - [ ] 12. Definicje z dokumentacji repo, nie z wiedzy modelu.
 - [ ] 13. Odmowa dla pytań spoza zakresu (sondaże, prognozy).
