@@ -20,7 +20,7 @@ from unittest.mock import MagicMock, patch
 import duckdb
 import psycopg
 
-from api.services import answer, definitions, dynamic_sql
+from api.services import answer, definitions, dynamic_sql, scope
 from api.services.mart import entities, examples
 from api.services.mart.build_common import (
     create_committee_aliases,
@@ -863,6 +863,8 @@ class TestEvaluationSet(unittest.TestCase):
                     validate_mart_sql(item["sql"])
                 elif "definition" in item:
                     self.assertIn(item["definition"], [d["title"] for d in definitions.find_definitions(item["question"])])
+                elif item.get("expect") == "refuse":
+                    self.assertTrue(scope.is_out_of_scope(item["question"]))
                 else:
                     self.assertEqual(item.get("expect"), "clarify")
 

@@ -609,6 +609,13 @@ question (+ previous turn) ─▶ router ─▶ dynamic_sql ─▶ rows? ─▶ 
                                              └─ no rows, plain Sejm question ─▶ legacy SQL templates
 ```
 
+**Out of scope** (`api/services/scope.py`). Polls, exit polls, forecasts and future results ("Kto
+wygra wybory w 2027?", "Ile mandatów zdobędzie KO?", "Who will win the next election?") have no rows in
+the mart, so they get a fixed Polish or English refusal before any SQL or model call (intent
+`out_of_scope`, answer source `refusal`). The pattern matches future forms only: "wygrał", "dostał" and
+the seat simulator's conditional ("miałby", "gdyby") are answered. Evaluation items with
+`"expect": "refuse"` check it, and `run_eval.py --check` fails when an answerable item is refused.
+
 **Definitions** (`api/services/definitions.py`). A question that asks what a term means or how a
 rule works ("Co to jest próg wyborczy?", "Jak działa metoda D'Hondta?") and names no year is answered
 with the curated text of `docs/DEFINITIONS.md` (intent `definition`, answer source `docs`, no SQL and

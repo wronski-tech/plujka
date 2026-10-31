@@ -106,9 +106,11 @@ def triage(feedback_path: Path, group=llm_groups) -> int:
         report += [f"## {g.get('problem', '?')} ({len(members)})", ""]
         for record in members:
             sql = None
-            if record["ask_response"].get("intent") == "definition":
-                # Answered from docs/DEFINITIONS.md: the text needs fixing, not a query.
-                report.append(f"- {record['question']} — definition, fix docs/DEFINITIONS.md")
+            # Answered without SQL: the definition text or the refusal rule needs fixing, not a query.
+            fix = {"definition": "definition, fix docs/DEFINITIONS.md",
+                   "out_of_scope": "refused, check api/services/scope.py"}.get(record["ask_response"].get("intent"))
+            if fix:
+                report.append(f"- {record['question']} — {fix}")
                 continue
             if examples.example_id(record["question"]) not in done:
                 sql = propose(record, g.get("problem", ""))

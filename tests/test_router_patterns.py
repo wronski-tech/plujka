@@ -5,7 +5,7 @@ from __future__ import annotations
 import unittest
 from unittest.mock import patch
 
-from api.services import definitions, router
+from api.services import definitions, router, scope
 from api.services.router import _gmina_ilike_from_question, _kbw_geo_pattern_from_question
 
 
@@ -69,6 +69,23 @@ class TestDefinitions(unittest.TestCase):
                          "Co to jest frekwencja w wyborach 2019?", "Kto to jest wójt Gdowa?"):
             with self.subTest(question=question):
                 self.assertEqual(definitions.find_definitions(question), [])
+
+
+class TestOutOfScope(unittest.TestCase):
+    def test_polls_forecasts_and_future_results_are_refused_without_the_model(self) -> None:
+        with patch.object(router, "try_dynamic_query", side_effect=AssertionError("model asked")):
+            for question in ("Kto wygra wybory w 2027?", "Ile głosów dostanie PiS?", "Najnowsze sondaże", "Will Konfederacja enter the Sejm?"):
+                with self.subTest(question=question):
+                    response = router.route_question(question)
+                    self.assertEqual((response["intent"], response["answer"]["source"], response["sql"]), ("out_of_scope", "refusal", ""))
+        self.assertTrue(router.route_question("Who will win the next election?")["answer"]["text"].startswith("I can't answer"))
+
+    def test_past_results_and_seat_simulations_are_answered(self) -> None:
+        # Past tense ("wygrał", "dostał"), the seat simulator's conditional and look-alike place names.
+        for question in ("Kto wygrał wybory w 2023?", "Ile mandatów dostał PiS?", "Ile mandatów miałby PiS metodą Sainte-Laguë?",
+                         "Gdyby PiS i Konfederacja szły razem, ile mandatów by miały?", "Wyniki w gminie Wygoda"):
+            with self.subTest(question=question):
+                self.assertFalse(scope.is_out_of_scope(question))
 
 
 class TestTemplateFallback(unittest.TestCase):

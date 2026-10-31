@@ -15,6 +15,7 @@ SQL safety), `docs/DATA.md` (sources), `docs/DEPLOYMENT.md` (API keys, Redis lim
 | `api/services/router.py` | `route_question`: `dynamic_sql` first for every question; legacy templates only when it has no rows and the question is a plain Sejm one (no clarification answer, no follow-up, no mart-only election) |
 | `api/services/sql_templates.py` | Legacy SQL templates over `kbw_facts` (JSONB rows) |
 | `api/services/dynamic_sql.py` | LLM-written SQL over `mart`: entities/clarification, follow-ups (`previous`), relevant schema only (`FAMILY_KEYWORDS`), examples, sqlglot guard, read-only run, one repair, SQL cache |
+| `api/services/scope.py` | Polls, forecasts and future results: fixed refusal before any SQL or model call |
 | `api/services/definitions.py`, `docs/DEFINITIONS.md` | Definition questions (no year) answered with curated doc text, before any SQL or model call |
 | `api/services/answer.py` | Polish answer text; every number must appear in the SQL rows, else a deterministic summary; `CAVEATS` (fixed notes about data gaps) |
 | `api/services/rate_limit.py` | Limit for `POST /ask`: in-process sliding window, or shared through Redis (`REDIS_URL`) |

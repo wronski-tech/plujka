@@ -2,7 +2,8 @@
 """Evaluate LLM-written SQL against the evaluation set (``tests/eval/questions.jsonl``).
 
 Each item is a question with either a reference ``sql`` (its rows are the expected result) or
-``"expect": "clarify"`` (the question must end in a clarification) or ``"definition": "<section title>"``
+``"expect": "clarify"`` (the question must end in a clarification), ``"expect": "refuse"`` (a poll, forecast
+or future result, refused by ``api/services/scope.py``) or ``"definition": "<section title>"``
 (answered from ``docs/DEFINITIONS.md`` without the model); a follow-up item also has
 ``previous`` (``{"question", "sql"}`` of the earlier turn, sent as the conversation's previous turn). A generated answer passes when
 every expected row is found in its own generated row: all numbers of the expected row appear in it
@@ -44,7 +45,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from api.services import definitions, dynamic_sql  # noqa: E402
+from api.services import definitions, dynamic_sql, scope  # noqa: E402
 from api.services.mart.entities import fold  # noqa: E402
 from api.services.mart.safe_sql import run_readonly, validate_mart_sql  # noqa: E402
 
@@ -111,7 +112,10 @@ def check(items: list[dict]) -> int:
         found = [d["title"] for d in definitions.find_definitions(item["question"])]
         if item.get("definition") not in found if "definition" in item else found:
             problems.append(f"definitions found: {found or 'none'}")
-        if "definition" in item:
+        # Refusals too: the expected ones are refused, and no answerable question is.
+        if scope.is_out_of_scope(item["question"]) != (item.get("expect") == "refuse"):
+            problems.append("refused" if item.get("expect") != "refuse" else "not refused")
+        if "definition" in item or item.get("expect") == "refuse":
             failed += bool(problems)
             if problems:
                 print(f"[FAIL] {item['id']} {item['question']}\n       {'; '.join(problems)}")
@@ -138,14 +142,18 @@ def check(items: list[dict]) -> int:
 def evaluate(item: dict) -> dict:
     """Ask the model for one item and grade the result."""
     started = time.monotonic()
-    if "definition" in item:
+    if item.get("expect") == "refuse":
+        rows, sql, error, meta = [], None, None, {"status": "refused" if scope.is_out_of_scope(item["question"]) else "skipped"}
+    elif "definition" in item:
         rows, sql, error = [], None, None
         found = [d["title"] for d in definitions.find_definitions(item["question"])]
         meta = {"status": "definition" if found else "skipped"}
     else:
         rows, sql, error, meta = dynamic_sql.try_dynamic_query(item["question"], None, item.get("previous"))
     status = meta.get("status", "skipped")
-    if "definition" in item:
+    if item.get("expect") == "refuse":
+        passed = status == "refused"
+    elif "definition" in item:
         passed = item["definition"] in found
     elif item.get("expect") == "clarify":
         passed = status == "clarify"

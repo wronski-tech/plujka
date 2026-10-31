@@ -4,6 +4,7 @@ import re
 
 from api.services import db
 from api.services import definitions
+from api.services import scope
 from api.services import kbw_analytics
 from api.services.dynamic_sql import try_dynamic_query
 from api.services.embeddings import embed_text
@@ -81,9 +82,23 @@ def route_question(question: str, entity_refs: list[dict] | None = None, previou
     failed or empty query) and the question is one they can answer: not an explicit entity choice
     (``entity_refs``, the answer to a clarification), not a follow-up (``previous`` turn), and not
     about an election only the mart covers. Definition questions get the curated text of
-    ``docs/DEFINITIONS.md`` (intent ``definition``, no SQL).
+    ``docs/DEFINITIONS.md`` (intent ``definition``, no SQL); polls, forecasts and future results a fixed
+    refusal (intent ``out_of_scope``).
     """
     years = _extract_years(question)
+    # Polls, forecasts and future results are not in the data: refuse instead of letting the model answer.
+    if not entity_refs and scope.is_out_of_scope(question):
+        return {
+            "question": question,
+            "intent": "out_of_scope",
+            "entity": None,
+            "year": None,
+            "years": years,
+            "sql": "",
+            "params": {},
+            "result": [],
+            "answer": scope.refusal_answer(question),
+        }
     # Definitions come from the repository docs, not from the model.
     found = [] if entity_refs or previous else definitions.find_definitions(question)
     if found:

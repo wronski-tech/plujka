@@ -79,6 +79,7 @@ Central defaults and env vars are in `api/services/config.py` (`DATABASE_URL`, `
 | LLM SQL over `mart`  | `api/services/dynamic_sql.py`, `api/services/mart/safe_sql.py`, `api/services/mart/entities.py`, `api/services/mart/examples.py` |
 | Evaluation of LLM SQL | `scripts/run_eval.py`, `tests/eval/questions.jsonl`, `.github/workflows/eval.yml` (nightly, real model) |
 | Answer text          | `api/services/answer.py`          |
+| Out-of-scope refusal | `api/services/scope.py`           |
 | Definitions          | `api/services/definitions.py`, `docs/DEFINITIONS.md` |
 | `mart` schema / build| `api/services/mart/`, `scripts/build_mart.py` |
 | LLM prompts / parsing| `api/services/llm.py`             |

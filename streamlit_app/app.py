@@ -463,6 +463,9 @@ def _render_answer(data: dict) -> None:
     answer = data.get("answer") or {}
     if not answer.get("text"):
         return
+    if answer.get("source") == "refusal":
+        st.info(answer["text"], icon="🚫")
+        return
     if answer.get("source") == "docs":
         st.markdown(answer["text"])
         st.caption("📖 Definicja z dokumentacji projektu (" + ", ".join(answer.get("sources") or []) + "), nie z wiedzy modelu.")
@@ -1874,7 +1877,7 @@ if last:
         _render_person_links(data, entity_refs, fp)
         st.stop()
     _render_answer(data)
-    if data.get("intent") == "definition":
+    if data.get("intent") in ("definition", "out_of_scope"):
         _render_feedback(q, data, fp)
         st.stop()
     _render_result_emotes(data)
