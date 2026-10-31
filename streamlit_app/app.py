@@ -1822,15 +1822,25 @@ if last:
         st.stop()
     _render_answer(data)
     _render_result_emotes(data)
+    # A multi-part answer (rows tagged with "part") gets one table, chart and map per part.
+    parts: dict = {}
+    for row in data.get("result") or []:
+        parts.setdefault(row.get("part") if "part" in row else None, []).append(row)
     with st.container(border=True):
-        st.dataframe(
-            data["result"], use_container_width=True, hide_index=True, column_config=_code_columns(data["result"])
-        )
+        for title, part_rows in parts.items() or {None: []}.items():
+            if title is not None:
+                st.markdown(f"**{title}**")
+                part_rows = [{k: v for k, v in r.items() if k != "part"} for r in part_rows]
+                columns = [k for k in part_rows[0] if any(r.get(k) is not None for r in part_rows)]
+                part_rows = [{k: r.get(k) for k in columns} for r in part_rows]
+            st.dataframe(part_rows, use_container_width=True, hide_index=True, column_config=_code_columns(part_rows))
+            parts[title] = part_rows
         _csv_download(data["result"], q, key=f"csv_{fp}")
     _render_person_links(data, entity_refs, fp)
-    if data.get("result"):
-        _render_chart(data["result"])
-        _render_map(data["result"])
+    for i, part_rows in enumerate(parts.values()):
+        if part_rows:
+            _render_chart(part_rows)
+            _render_map(part_rows, key="answer" if i == 0 else f"answer_{i}")
 
     with st.expander(_t("Co zrozumiał system"), expanded=False):
         c1, c2 = st.columns(2)

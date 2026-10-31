@@ -7,9 +7,12 @@ Flow for one question:
    instead of a guess. Explicit choices (``entity_refs``) replace matches of their kind.
 2. The prompt carries the mart schema description (table/column ``COMMENT``s read from PostgreSQL),
    the loaded elections, the entity matches, similar verified examples (``examples.py``) and rules.
-3. The model returns one SELECT; ``safe_sql.validate_mart_sql`` checks it with sqlglot and caps LIMIT.
-4. ``safe_sql.run_readonly`` runs it as the read-only mart role. On a database error the model gets
-   one repair attempt with the failing SQL and the error message.
+3. The model returns one SELECT (or up to three for a question asking separate things, kept as one
+   text of "-- part: <title>" blocks); ``safe_sql.validate_mart_sql`` checks each with sqlglot and
+   caps LIMIT.
+4. ``safe_sql.run_readonly`` runs them as the read-only mart role; rows of a multi-part answer carry
+   their part title in ``part``. On a database error the model gets one repair attempt with the
+   failing SQL and the error message.
 
 A validated SQL that ran successfully is cached per (question, entity choices, mart load) so a
 repeated question skips the LLM. ``meta`` records status, timings and token usage for telemetry.
@@ -59,7 +62,49 @@ SQL_RULES = f"""Rules:
   'sainte_lague_modified') per district over the lists that pass the chosen threshold, then sum.
 - Percentages in the mart are already 0-100. Order results deterministically.
 - Include LIMIT {MART_MAX_ROWS} or less.
+- When the question asks two or three separate things that one SELECT cannot answer together
+  (e.g. turnout in one election and seats in another), return
+  {{"parts": [{{"title": "<short Polish title>", "sql": "..."}}]}} instead, one SELECT per part.
 Return JSON: {{"sql": "..."}}"""
+
+# A multi-part answer is kept as one text: "-- part: <title>" + SELECT, parts joined by PART_SEPARATOR.
+PART_SEPARATOR = "\n;\n"
+MAX_PARTS = 3
+
+
+def split_parts(sql: str) -> list[tuple[str | None, str]]:
+    """``[(title, select)]`` of a multi-part query text; ``[(None, sql)]`` for a single query."""
+    if PART_SEPARATOR not in sql:
+        return [(None, sql)]
+    parts = []
+    for chunk in sql.split(PART_SEPARATOR):
+        first, _, rest = chunk.strip().partition("\n")
+        title = first[len("-- part:"):].strip() if first.startswith("-- part:") else None
+        parts.append((title, rest if title is not None else chunk.strip()))
+    return parts
+
+
+def join_parts(parts: list[tuple[str | None, str]]) -> str:
+    """Inverse of ``split_parts``."""
+    if len(parts) == 1 and parts[0][0] is None:
+        return parts[0][1]
+    return PART_SEPARATOR.join(f"-- part: {title or '?'}\n{sql}" for title, sql in parts)
+
+
+def validate_parts(raw: str) -> str:
+    """Validate every part of ``raw`` with the SQL guard; return the normalized query text."""
+    parts = split_parts(raw)
+    if len(parts) > MAX_PARTS:
+        raise safe_sql.UnsafeSqlError(f"At most {MAX_PARTS} parts are allowed.")
+    return join_parts([(title, safe_sql.validate_mart_sql(sql)) for title, sql in parts])
+
+
+def run_parts(sql: str) -> list[dict]:
+    """Run a validated query text; rows of a multi-part one carry their part title in ``part``."""
+    parts = split_parts(sql)
+    if len(parts) == 1:
+        return safe_sql.run_readonly(parts[0][1])
+    return [{"part": title, **row} for title, select in parts for row in safe_sql.run_readonly(select)]
 
 
 class _SqlCache:
@@ -234,9 +279,14 @@ def _llm_sql(
     usage = response.usage
     tokens = {"prompt_tokens": usage.prompt_tokens, "completion_tokens": usage.completion_tokens} if usage else {}
     try:
-        sql = (json.loads(response.choices[0].message.content or "{}").get("sql") or "").strip()
+        payload = json.loads(response.choices[0].message.content or "{}")
     except json.JSONDecodeError as exc:
         raise ValueError("Model response was not valid JSON.") from exc
+    parts = [p for p in payload.get("parts") or [] if isinstance(p, dict) and p.get("sql")]
+    if len(parts) >= 2:
+        sql = join_parts([(" ".join(str(p.get("title") or "?").split()), str(p["sql"]).strip()) for p in parts])
+    else:
+        sql = str((parts[0]["sql"] if parts else payload.get("sql")) or "").strip()
     if not sql:
         raise ValueError("Model returned no SQL.")
     return sql, tokens
@@ -416,7 +466,7 @@ def try_dynamic_query(
     if cached:
         try:
             phase = time.monotonic()
-            rows = safe_sql.run_readonly(cached)
+            rows = run_parts(cached)
             timings["execute"] = _ms(phase)
             return rows, cached, None, {**meta, "status": "cached"}
         except psycopg.Error:
@@ -431,7 +481,7 @@ def try_dynamic_query(
             timings[f"llm_{attempt}"] = _ms(phase)
             for name, value in used.items():
                 tokens[name] = tokens.get(name, 0) + value
-            sql = safe_sql.validate_mart_sql(raw)
+            sql = validate_parts(raw)
         except safe_sql.UnsafeSqlError as exc:
             log.warning("dynamic SQL rejected: %s", exc)
             return [], None, str(exc), {**meta, "status": "rejected", "phase": attempt, "error": str(exc)}
@@ -439,7 +489,7 @@ def try_dynamic_query(
             return [], sql, str(exc), {**meta, "status": "skipped", "phase": attempt, "error": str(exc)}
         try:
             phase = time.monotonic()
-            rows = safe_sql.run_readonly(sql)
+            rows = run_parts(sql)
             timings[f"execute_{attempt}"] = _ms(phase)
             SQL_CACHE.put(cache_key, sql)
             return rows, sql, None, {**meta, "status": attempt}

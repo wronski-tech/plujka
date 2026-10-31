@@ -659,10 +659,13 @@ would answer it from Sejm data.
    bounded by the statement timeout and the row cap. `tests/test_mart.py` has a list of attacks and a
    seeded fuzzer that wraps safe queries in injection fragments and checks every accepted output
    independently (one SELECT, mart relations only, no system functions, capped LIMIT); a follow-up's
-   previous SQL is only shown to the model, never executed.
+   previous SQL is only shown to the model, never executed. A question asking two or three separate
+   things may get one SELECT per part (`{"parts": [{"title", "sql"}]}`, kept as one text of
+   `-- part: <title>` blocks, `dynamic_sql.split_parts`); every part is validated and one rejected
+   part rejects the whole answer.
 6. **Execution** as `plujka_mart_reader` (`MART_DATABASE_URL`): read-only transactions, `mart` only,
    statement timeout `MART_STATEMENT_TIMEOUT_MS`. On a database error the model gets one repair
-   attempt with the error message.
+   attempt with the error message. Rows of a multi-part answer carry their part title in `part`.
 7. **Cache.** A validated query that ran is cached per (folded question, entity choices, previous turn, mart load)
    for `SQL_CACHE_TTL_SECONDS`; a repeated question skips the LLM. A new build invalidates it.
 
