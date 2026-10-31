@@ -59,7 +59,10 @@ _MART_ONLY_ELECTION_RE = re.compile(
     r"prezydent|referend|sejmik|samorz[aą]d|w[oó]jt|burmistrz|europarlament|parlament\w* europejsk|"
     r"europos[lł]|senat|radn|rad[ayz]i? (gmin|powiat|miasta|dzielnic)|"
     # GUS statistics (population, unemployment, salaries): the Sejm templates cannot answer them either.
-    r"\bgus\b|ludno[sś][cć]|mieszka[nń]c|bezrob|wynagrodz|zarob|pensj|g[eę]sto[sś][cć]|zaludn|wiejsk",
+    r"\bgus\b|ludno[sś][cć]|mieszka[nń]c|bezrob|wynagrodz|zarob|pensj|g[eę]sto[sś][cć]|zaludn|wiejsk"
+    # The same in English.
+    r"|presiden|european parliament|\bmeps?\b|local (election|government)|mayor|council|regional assembl|recall"
+    r"|population|inhabitant|unemploy|salar|\bwages?\b|densit|rural",
     re.IGNORECASE,
 )
 

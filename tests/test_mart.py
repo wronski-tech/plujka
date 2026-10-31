@@ -521,6 +521,10 @@ class TestAnswerNumbers(unittest.TestCase):
         self.assertEqual(result["source"], "fallback")
         self.assertIn("7 640 854", result["text"])
         self.assertIn("year: 2023;", answer.fallback_answer([{"year": 2023, "district_no": 19, "votes": 202424}]))
+        # An English question gets the English summary.
+        with patch.object(answer, "OPENAI_API_KEY", ""):
+            self.assertTrue(answer.compose_answer("What was the result of PiS?", self.ROWS)["text"].startswith("Result: "))
+        self.assertFalse(answer.is_english("Ile głosów dostał PiS w Warszawie w 2023?"))
         with patch.object(answer, "OPENAI_API_KEY", "k"), patch.object(answer, "ANSWER_SUMMARY_ENABLED", True), \
                 patch.object(answer, "_llm_answer", return_value=("PiS miał 40% głosów.", {})):
             result = answer.compose_answer("Wynik PiS?", self.ROWS)
@@ -697,6 +701,25 @@ class TestClarification(unittest.TestCase):
         part = entities.EntityMatch("person", "Andrzej Roman KAMYSZEK", "2", "rada_gminy 2018", [2018])
         near = entities.EntityMatch("person", "Romuald Piotr KOSIENIAK", "3", "rada_gminy 2018", [2018])
         self.assertEqual(entities.narrow_matches("Ile glosow dostal Kosiniak-Kamysz", [full, part, near]), [full])
+
+    def test_english_questions(self) -> None:
+        stems, exact = entities.question_terms("How many votes did Warsaw's party get?")
+        self.assertTrue(entities.score_entry("powiat", "warsaw", stems, exact))  # possessive 's
+        self.assertFalse(entities.score_entry("person", "partyka", stems, exact))  # "party" is a stopword
+        # An English and a Polish name of one unit or committee count once; the committees of the
+        # question's years (here the latest) come before the cut, not five older ones with longer names.
+        coalition = "KOALICYJNY KOMITET WYBORCZY TRZECIA DROGA"
+        rows = [("committee", "Third Way", "third way", coalition, None, [2023, 2024]),
+                ("committee", "Polish People's Party", "polish people's party", coalition, None, [2023, 2024])]
+        rows += [("committee", "Polish People's Party", "polish people's party", f"PSL {y}", None, [y]) for y in range(2001, 2007)]
+        rows += [("powiat", "Warszawa", "warszawa", "1465", None, [2023]), ("powiat", "Warsaw", "warsaw", "1465", None, [2023])]
+        conn = MagicMock()
+        conn.execute.return_value.fetchall.return_value = rows
+        found = entities.resolve_entities("How many votes did the Third Way and the Polish People's Party get in Warsaw?", conn)
+        self.assertEqual([m.ref for m in found if m.kind == "committee"][:2], [coalition, "PSL 2006"])
+        self.assertEqual([m.name for m in found if m.kind == "powiat"], ["Warsaw"])
+        found = entities.resolve_entities("Ile głosów w Warszawie?", conn)
+        self.assertEqual([m.name for m in found if m.kind == "powiat"], ["Warszawa"])
 
     def test_named_election_narrows_namesakes_of_that_year(self) -> None:
         president = entities.EntityMatch("person", "Marek Stefan BOROWSKI", "1", "prezydent 2005 (round 1); sejm 2007", [2005, 2007])
@@ -1096,6 +1119,17 @@ class TestPromptRelations(unittest.TestCase):
         self.assertIn("sejm_lists", relations)
         self.assertNotIn("pe_lists", relations)
         self.assertNotIn("v_precinct_results", dynamic_sql.relevant_relations("Kto wygrał wybory prezydenckie w 2020?", self.AVAILABLE))
+
+    def test_english_questions_name_their_election(self) -> None:
+        relevant = lambda q: dynamic_sql.relevant_relations(q, self.AVAILABLE)  # noqa: E731
+        self.assertEqual(relevant("Who won the 2020 presidential election?"),
+                         ["elections", "persons", "v_turnout", "prezydent_results", "wbp_candidates"])
+        european = relevant("Turnout in the European Parliament election 2019")
+        self.assertIn("pe_lists", european)
+        self.assertNotIn("sejm_lists", european)
+        self.assertIn("sejm_lists", relevant("How many seats did PiS win in the 2023 parliamentary election?"))
+        self.assertIn("rada_candidates", relevant("How many councillors does the Zakopane council have?"))
+        self.assertIn("local_referenda", relevant("How many mayors were recalled in referendums?"))
 
     def test_recall_questions_get_the_local_referendums(self) -> None:
         for question in ("Ile było referendów w sprawie odwołania wójta?", "Kiedy odwołano burmistrza Chrzanowa?",

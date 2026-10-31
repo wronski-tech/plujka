@@ -26,12 +26,13 @@ MAX_ROWS_IN_PROMPT = 30
 _NUMBER_RE = re.compile(r"(?<![\w.,])\d{1,3}(?:[ \u00a0\u202f]\d{3})+(?:,\d+)?(?![\d])|(?<![\w])\d+(?:[.,]\d+)*")
 
 ANSWER_PROMPT = """You describe the result of a SQL query over official Polish election data.
-Write 1-3 short sentences in Polish that answer the question.
+Write 1-3 short sentences that answer the question, in the question's language (Polish unless it is
+asked in English).
 Rules:
 - Use only facts and numbers that appear in the rows. Do not compute new numbers (no differences,
   sums or ratios that are not in the rows) and do not add knowledge from outside the rows.
-- Copy numbers exactly; you may round percentages to one decimal. Write thousands with spaces
-  (7 640 854) and decimals with a comma (35,38%).
+- Copy numbers exactly; you may round percentages to one decimal. In Polish write thousands with
+  spaces (7 640 854) and decimals with a comma (35,38%); in English 7,640,854 and 35.38%.
 - If the rows do not answer the question, say so briefly.
 Return JSON: {"answer": "..."}"""
 
@@ -98,13 +99,27 @@ def format_number(value: Any, column: str = "") -> str:
     return str(value)
 
 
-def fallback_answer(rows: list[dict[str, Any]]) -> str:
-    """Deterministic summary taken directly from the rows."""
+# Words of English questions that Polish ones do not use.
+_ENGLISH_WORDS = frozenset(
+    "the what who which how many much did does were is are in of and won win get got votes turnout election "
+    "elections party results result".split()
+)
+
+
+def is_english(question: str) -> bool:
+    """Whether the question is asked in English (at least two common English words)."""
+    return len(_ENGLISH_WORDS.intersection(re.findall(r"[a-z]+", question.lower()))) >= 2
+
+
+def fallback_answer(rows: list[dict[str, Any]], english: bool = False) -> str:
+    """Deterministic summary taken directly from the rows (in English for English questions)."""
     if not rows:
-        return "Brak wyników w danych dla tego pytania."
+        return "No results in the data for this question." if english else "Brak wyników w danych dla tego pytania."
     first = "; ".join(f"{column}: {format_number(value, column)}" for column, value in rows[0].items() if value is not None)
     if len(rows) == 1:
-        return f"Wynik: {first}."
+        return f"Result: {first}." if english else f"Wynik: {first}."
+    if english:
+        return f"Found {format_number(len(rows))} rows. First: {first}."
     return f"Znaleziono {format_number(len(rows))} wierszy. Pierwszy: {first}."
 
 
@@ -222,7 +237,7 @@ def compose_answer(question: str, rows: list[dict[str, Any]], sql: str = "") -> 
     ``rejected_numbers`` lists the numbers that made an LLM text fail the check; ``caveats`` are fixed
     Polish notes about data gaps that apply to these rows (see ``CAVEATS``).
     """
-    result: dict[str, Any] = {"text": fallback_answer(rows), "source": "fallback", "verified": True, "caveats": caveats(rows, sql)}
+    result: dict[str, Any] = {"text": fallback_answer(rows, is_english(question)), "source": "fallback", "verified": True, "caveats": caveats(rows, sql)}
     if not rows or not ANSWER_SUMMARY_ENABLED or not OPENAI_API_KEY:
         return result
     try:

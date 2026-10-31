@@ -47,8 +47,9 @@ class TestMartOnlyElections(unittest.TestCase):
         empty = ([], "SELECT 1 WHERE false", None, {"status": "first_pass"})
         with patch.object(router, "try_dynamic_query", return_value=empty), \
                 patch.object(router, "_route_templates", side_effect=AssertionError("template routing used")):
-            response = router.route_question("Bezrobocie a wynik PiS w powiatach w 2023")
-        self.assertEqual(response["intent"], "dynamic_sql")
+            for question in ("Bezrobocie a wynik PiS w powiatach w 2023", "Who won the presidential election in 2015?"):
+                response = router.route_question(question)
+                self.assertEqual(response["intent"], "dynamic_sql")
 
 
 class TestTemplateFallback(unittest.TestCase):

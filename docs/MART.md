@@ -218,7 +218,9 @@ are added to `entity_lexicon` after every rebuild, so the lexicon stays the one 
 names into keys. A committee alias ("Platforma", "Konfa", "ludowcy", "Koalicja Obywatelska") stands
 for every committee with the target alias; a person alias ("Olek KWAŚNIEWSKI", or a surname part
 used alone such as "KORWIN") points at the person of the target candidacy (`<full name>|<chamber>
-<year>`) and shares its `person_id`, so it never becomes a second clarification option. An alias
+<year>`) and shares its `person_id`, so it never becomes a second clarification option. A place
+alias (English names: "Warsaw", "Masovian") stands for every place unit whose folded name is the
+target's ("Warszawa" covers the powiat, "m. st. Warszawa" and the Sejm districts). An alias
 that matches nothing fails the build; every row needs a `note`.
 
 **Manual corrections** live in `api/services/mart/person_overrides.csv`:

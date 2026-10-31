@@ -42,6 +42,11 @@ _STOPWORDS = frozenset(
     kandydatow partia partii komitet komitetu lista listy roku rok wynik wyniki mandat mandaty mandatow
     posel poslow posla senator senatora miasto miescie wies wsi oraz czy jak dla przez jest byl byla bylo
     tura ture turze tury turach mieli mial miala mialo
+    the who what which how many much did does was were get got and for from with won win votes vote
+    election elections turnout party parties seats seat result results district districts county counties
+    municipality municipalities voivodeship voivodeships province president presidential parliament
+    parliamentary european local mayor round first second percent share most highest lowest city town
+    candidate candidates committee year compare between support
     """.split()
 )
 
@@ -82,7 +87,8 @@ def _word_stems(word: str) -> set[str]:
 
 def question_terms(question: str) -> tuple[set[str], set[str]]:
     """Return (stems for name matching, exact folded words for alias matching)."""
-    words = [w for w in re.findall(r"[a-z0-9']+", fold(question).replace("-", " "))]
+    # English possessives: "Warsaw's" is "Warsaw".
+    words = [w for w in re.findall(r"[a-z0-9']+", re.sub(r"'s\b", "", fold(question)).replace("-", " "))]
     return {s for word in words for s in _word_stems(word)}, set(words)
 
 
@@ -193,6 +199,22 @@ def resolve_entities(question: str, conn: psycopg.Connection | None = None) -> l
     for kind, name, folded, ref, detail, years in rows:
         if score_entry(kind, folded, stems, exact) and (kind != "person" or surname_mentioned(name, question, alias_words)):
             by_kind.setdefault(kind, []).append(EntityMatch(kind, name, ref, detail, list(years)))
+
+    def uncovered(m: EntityMatch) -> int:
+        """Letters the question leaves uncovered in the name (exact alias words leave none)."""
+        words = [w for w in re.split(r"[\s\-]+", _PLACE_PREFIX.sub("", fold(m.name))) if w]
+        return sum(0 if w in exact else (_match_rest(w, stems) or 0) for w in words)
+
+    # A place or committee named twice (an English or colloquial name and its own: "Warsaw" also
+    # matches "Warszawie") keeps the closer name, so duplicates do not fill the cut below.
+    for kind, found in by_kind.items():
+        if kind != "person":
+            best: dict[tuple, EntityMatch] = {}
+            for m in found:
+                key = (m.ref, tuple(m.years))
+                if key not in best or uncovered(m) < uncovered(best[key]):
+                    best[key] = m
+            by_kind[kind] = list(best.values())
     matches: list[EntityMatch] = []
     years = {int(y) for y in re.findall(r"\b(?:19|20)\d{2}\b", question)}
     for kind in sorted(by_kind):
@@ -203,6 +225,11 @@ def resolve_entities(question: str, conn: psycopg.Connection | None = None) -> l
             def key(m: EntityMatch) -> tuple:
                 named = any(_word_matches(g, stems) for g in _given_names(m))
                 return (not named, not years & set(m.years), -(m.detail or "").count("elected"), -max(m.years), m.name)
+        elif kind == "committee":
+            # Committees of the years the question names, then the latest ("Third Way and Polish People's
+            # Party" keeps the 2023 coalition, not five older PSL committees with a longer name).
+            def key(m: EntityMatch) -> tuple:
+                return (bool(years) and not years & set(m.years), -max(m.years), m.name)
         else:
             # Longer names first: every word of a match is in the question ("Jelenia Góra" before "Góra").
             def key(m: EntityMatch) -> tuple:

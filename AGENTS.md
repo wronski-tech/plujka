@@ -20,7 +20,7 @@ SQL safety), `docs/DATA.md` (sources), `docs/DEPLOYMENT.md` (API keys, Redis lim
 | `api/services/mart/schema.py` | `mart` DDL with English `COMMENT`s, read-only role, list of queryable relations |
 | `api/services/mart/build_common.py`, `build_precincts.py` | Shared DuckDB macros, header matching, loading; precinct geography/protocol columns |
 | `api/services/mart/build_<family>.py` | DuckDB build per family and year (`sejm`+`senat`, `prezydent`, `pe`, `referendum`, `samorzad`) with consistency checks; `build_rady.py` builds councils inside `samorzad` |
-| `api/services/mart/derived.py`, `person_overrides.csv`, `entity_aliases.csv` | Persons (name rules, birth-year check for local candidacies, manual overrides), result and cross-election views, party families (`party_families`), turnout basis, seat views and the seat-allocation check (`mart.allocate_seats`), entity lexicon (rebuilt after every load, with colloquial names of committees and persons) |
+| `api/services/mart/derived.py`, `person_overrides.csv`, `entity_aliases.csv` | Persons (name rules, birth-year check for local candidacies, manual overrides), result and cross-election views, party families (`party_families`), turnout basis, seat views and the seat-allocation check (`mart.allocate_seats`), entity lexicon (rebuilt after every load, with colloquial and English names of committees, persons and places) |
 | `api/services/mart/examples.py`, `sql_examples.jsonl` | Verified question → SQL few-shot examples (curated file, OpenSearch; thumbs-up answers join after `add_sql_example.py --review`) |
 | `api/services/mart/safe_sql.py` | `validate_mart_sql` (sqlglot) and `run_readonly` |
 | `api/services/mart/entities.py` | Question → lexicon matches (inflected Polish names → TERYT / person_id / committee), narrowing, ambiguity |
@@ -70,7 +70,7 @@ SQL safety), `docs/DATA.md` (sources), `docs/DEPLOYMENT.md` (API keys, Redis lim
   `scripts/add_sql_example.py --check`; fix or remove examples that fail.
 - **Staging must not lose rows.** No `ignore_errors`, no guessed delimiters. Layout fallbacks (title lines,
   list rows, `="…"` wrappers, unquoted 2010 files) are explicit and each has a test in `TestStrictStaging`.
-- **Colloquial names go to `entity_aliases.csv`,** not into prompts or code: the lexicon is the
+- **Colloquial and English names go to `entity_aliases.csv`,** not into prompts or code: the lexicon is the
   source of truth for names; every row needs a `note`, and an alias that matches nothing fails the build.
 - **Person corrections go to `person_overrides.csv`,** never into SQL special cases; every row needs a
   `note`, and a row that matches nothing fails the build.

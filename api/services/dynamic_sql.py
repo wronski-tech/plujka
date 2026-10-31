@@ -187,27 +187,33 @@ def schema_description(version: str = "", compact: bool = False) -> dict[str, st
 # A question naming at least one kind gets only those relations plus SHARED_RELATIONS in the
 # prompt; a question naming none gets the whole schema.
 FAMILY_KEYWORDS: dict[str, tuple[str, ...]] = {
-    r"\bsejm(?!ik)|posel|posl|poslank|parlament(?!\w*\s+europ)": ("sejm_", "v_sejm_", "precincts", "v_candidate_"),
-    r"senat|senac|parlament(?!\w*\s+europ)": ("senat_", "precincts", "v_candidate_"),
-    r"prezyden": ("prezydent_", "v_prezydent_", "wbp_"),
-    r"europ|\bpe\b": ("pe_", "v_pe_", "v_candidate_"),
+    # English words follow the Polish ones: questions may be asked in English.
+    r"\bsejm(?!ik)|posel|posl|poslank|parlament(?!\w*\s+europ)|(?<!european )parliament(?!\w*\s+europ)|\bmps?\b":
+        ("sejm_", "v_sejm_", "precincts", "v_candidate_"),
+    r"senat|senac|parlament(?!\w*\s+europ)|(?<!european )parliament(?!\w*\s+europ)": ("senat_", "precincts", "v_candidate_"),
+    r"prezyden|presiden": ("prezydent_", "v_prezydent_", "wbp_"),
+    r"europ|\bpe\b|\bmeps?\b": ("pe_", "v_pe_", "v_candidate_"),
     r"referend": ("referendum_", "v_referendum_", "local_referenda"),
     # Recall referendums (odwołanie wójta, burmistrza, rady) are local referendums too.
-    r"odwola|odwoln": ("local_referenda",),
-    r"sejmik|wojewodzk": ("sejmik_", "v_sejmik_"),
-    r"samorzad": ("sejmik_", "v_sejmik_", "wbp_", "rada_", "v_rada_"),
+    r"odwola|odwoln|recall": ("local_referenda",),
+    r"sejmik|wojewodzk|(regional|provincial|voivodeship) (assembl|council)": ("sejmik_", "v_sejmik_"),
+    r"samorzad|local (election|government)|self.government|municipal election": ("sejmik_", "v_sejmik_", "wbp_", "rada_", "v_rada_"),
     r"wojt|burmistrz|mayor": ("wbp_",),
-    r"\brad(a|y|e|zie|ach|ami)\b|radn": ("rada_", "v_rada_"),
-    r"hondt|sainte|lague|metod|podzial\w* mandat|gdyby": ("v_seat_", "sejm_district", "sejmik_district", "rada_district"),
+    r"\brad(a|y|e|zie|ach|ami)\b|radn|council": ("rada_", "v_rada_"),
+    r"hondt|sainte|lague|metod|podzial\w* mandat|gdyby|seat (allocation|distribution)|allocat\w* (of )?seats|what if":
+        ("v_seat_", "sejm_district", "sejmik_district", "rada_district"),
     # GUS statistics, not an election. Not "mieszka" (candidates' residence), not "miejsk" alone ("rada miejska").
     r"\bgus\b|ludnosc|mieszkanc|bezrobo|wynagrodz|zarob|pensj|gestosc|zaludn|powierzchn|wiejsk|\bwsi\b"
     r"|gmin\w* miejsk|miejsk\w* gmin|\bw miastach\b"
     r"|wyksztalc|studia wyzsz|emeryt|senior|starsz\w* (ludn|mieszk|spoleczen)|struktur\w* wieku|w wieku (przed|po)?produkc"
-    r"|dochod\w* (gmin|budzet|na mieszk)|bogat|zamozn": ("gus_", "v_gus_"),
+    r"|dochod\w* (gmin|budzet|na mieszk)|bogat|zamozn"
+    r"|population|inhabitant|unemploy|salar|\bwages?\b|income|densit|rural|urban|pension|elderly|education|wealth":
+        ("gus_", "v_gus_"),
     # The 1990s results use the old gmina codes; the key maps them to today's units.
     # Single polling stations: a plain view next to the election's own relations.
-    r"obwod|lokal\w* wyborcz|komisj\w* obwodow": ("v_precinct_",),
-    r"\b199[0-7]\b|sprzed 1999|dawn\w* (wojewodz|gmin)|star\w* wojewodz|49 wojewodz": ("gmina_codes_pre1999",),
+    r"obwod|lokal\w* wyborcz|komisj\w* obwodow|precinct|polling (station|place)": ("v_precinct_",),
+    r"\b199[0-7]\b|sprzed 1999|dawn\w* (wojewodz|gmin)|star\w* wojewodz|49 wojewodz|(old|former) voivodeship|49 voivodeship":
+        ("gmina_codes_pre1999",),
 }
 # Groups that only add relations: GUS statistics and the pre-1999 gmina key are used with some election, so a question
 # naming no election kind besides them ("Nawrocki w gminach wiejskich") still gets the whole schema.

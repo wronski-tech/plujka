@@ -1318,7 +1318,8 @@ ENTITY_ALIASES = Path(__file__).with_name("entity_aliases.csv")
 
 # Colloquial names from entity_aliases.csv: a committee alias stands for every committee with the
 # target alias; a person alias ('Olek KWAŚNIEWSKI', or a surname part such as 'KORWIN') for the
-# person of the target candidacy ('<full name>|<chamber> <year>').
+# person of the target candidacy ('<full name>|<chamber> <year>'); a place alias (English names such as
+# 'Warsaw') for every place unit whose folded name is the target's.
 ENTITY_ALIASES_SQL = r"""
 INSERT INTO mart.entity_lexicon (kind, name, folded, ref, detail, years)
 SELECT 'committee', a.alias, mart.fold_name(a.alias), l.ref, 'colloquial name of ' || a.target, l.years
@@ -1331,6 +1332,11 @@ JOIN (SELECT DISTINCT person_id, full_name, chamber, year FROM mart.v_person_his
   ON h.full_name = split_part(a.target, '|', 1) AND h.chamber || ' ' || h.year = split_part(a.target, '|', 2)
 JOIN mart.entity_lexicon l ON l.kind = 'person' AND l.ref = h.person_id::text
 WHERE a.kind = 'person'
+UNION ALL
+-- Places (English names): every place unit whose folded name is the target's ("Warszawa" is also "m. st. Warszawa").
+SELECT l.kind, a.alias, mart.fold_name(a.alias), l.ref, 'other name of ' || l.name || coalesce(' — ' || l.detail, ''), l.years
+FROM entity_alias a JOIN mart.entity_lexicon l ON l.kind NOT IN ('committee', 'person') AND l.folded = mart.fold_name(a.target)
+WHERE a.kind = 'place'
 RETURNING kind, name;
 """
 
@@ -1338,7 +1344,7 @@ RETURNING kind, name;
 def load_entity_aliases(pg: psycopg.Connection, path: Path = ENTITY_ALIASES) -> int:
     """Add the colloquial names of ``path`` to the lexicon; return the rows added.
 
-    Raises ValueError when an alias matches no committee alias or candidacy (a typo would otherwise
+    Raises ValueError when an alias matches no committee alias, candidacy or place (a typo would otherwise
     be ignored silently).
     """
     with path.open(encoding="utf-8", newline="") as fh:
