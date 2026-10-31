@@ -372,6 +372,9 @@ def narrow_matches(question: str, matches: list[EntityMatch]) -> list[EntityMatc
 
     person_wins, beaten = set(), set()
     for m in persons:
+        # A person the place names more closely cannot beat it ("Podlaskie" is not PODLASKA).
+        if id(m) in shadowed:
+            continue
         clash = clashing_places(m)
         if clash and all(p.kind in ADJECTIVE_PLACE_KINDS for p in clash) and (
             m in named or _capitalized_inside(question, fold(m.name.split()[-1]))

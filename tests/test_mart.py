@@ -696,6 +696,10 @@ class TestClarification(unittest.TestCase):
         krasowski = entities.EntityMatch("person", "Edward KRASOWSKI", "5", "rada_gminy 2014", [2014])
         city = entities.EntityMatch("gmina", "m. Kraków", "126101", "powiat Kraków", [2014])
         self.assertEqual(entities.narrow_matches("Kto został prezydentem Krakowa w 2014?", [krasowski, city]), [city])
+        # ... also when the place word is capitalized: a near-match surname cannot beat the voivodeship.
+        podlaska = entities.EntityMatch("person", "Wioletta Małgorzata PODLASKA", "6", "rada_gminy 2018", [2018])
+        podlaskie = entities.EntityMatch("wojewodztwo", "podlaskie", "20", None, [2019])
+        self.assertEqual(entities.narrow_matches("Wynik PiS w województwie Podlaskie w 2019", [podlaska, podlaskie]), [podlaskie])
         # A full double surname beats people matching one part or a look-alike.
         full = entities.EntityMatch("person", "Władysław Marcin KOSINIAK-KAMYSZ", "1", "sejm 2023", [2023])
         part = entities.EntityMatch("person", "Andrzej Roman KAMYSZEK", "2", "rada_gminy 2018", [2018])
