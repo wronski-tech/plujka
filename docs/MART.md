@@ -609,6 +609,13 @@ question (+ previous turn) ─▶ router ─▶ dynamic_sql ─▶ rows? ─▶ 
                                              └─ no rows, plain Sejm question ─▶ legacy SQL templates
 ```
 
+**Periods** (`dynamic_sql.period_ranges`). Decades ("lata 90.", "latach dwutysięcznych", "1990s"),
+ranges ("2001-2011", "między 2005 a 2015"), open ranges ("od 2005" inclusive, "po 2015" and "przed
+2005" exclusive, "do 2011") and relative periods ("w ostatniej dekadzie", "ostatnie trzy wybory",
+"ostatnie wybory") are turned into explicit years before the model writes SQL: the prompt lists the
+`year BETWEEN` bounds and the loaded years of the elections the question is about (`mart.elections`),
+so the model never guesses which years exist. Two named years ("2019 i 2023") are not a period.
+
 **Out of scope** (`api/services/scope.py`). Polls, exit polls, forecasts and future results ("Kto
 wygra wybory w 2027?", "Ile mandatów zdobędzie KO?", "Who will win the next election?") have no rows in
 the mart, so they get a fixed Polish or English refusal before any SQL or model call (intent

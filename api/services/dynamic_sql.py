@@ -413,6 +413,83 @@ def is_comparison(question: str) -> bool:
     return COMPARISON_RE.search(entities.fold(question)) is not None
 
 
+_Y = r"((?:19|20)\d{2})"
+_NUMBER_WORDS = {"dwa": 2, "dwoje": 2, "dwoch": 2, "trzy": 3, "trzech": 3, "cztery": 4, "czterech": 4, "piec": 5, "pieciu": 5,
+                 "two": 2, "three": 3, "four": 4, "five": 5}
+_N = r"(\d+|" + "|".join(_NUMBER_WORDS) + ")"
+# Folded period phrases, longest first; each returns (start, end) or ("last", n). Open ends are clipped
+# to 1989 and the current year.
+_PERIODS: list[tuple[re.Pattern, Any]] = [
+    (re.compile(rf"\b(?:w latach |latach |lata )?{_Y}\s*[-–—]\s*{_Y}\b"), lambda m, now: (int(m[1]), int(m[2]))),
+    (re.compile(rf"\b(?:od|from) (?:roku )?{_Y} (?:do|to|until) (?:roku )?{_Y}\b"), lambda m, now: (int(m[1]), int(m[2]))),
+    (re.compile(rf"\b(?:miedzy|between) (?:rokiem )?{_Y} (?:a|and) (?:rokiem )?{_Y}\b"), lambda m, now: (int(m[1]), int(m[2]))),
+    # Decades: "lata 90.", "latach 2000", "90s", "1990s", "latach dziewięćdziesiątych".
+    (re.compile(r"\blat(?:a|ach)? ((?:19|20)?\d0)(?:\.|\b)(?:-?tych|-?te)?"), lambda m, now: _decade(m[1])),
+    (re.compile(r"\b((?:19|20)?\d0)'?s\b"), lambda m, now: _decade(m[1])),
+    (re.compile(r"\blat(?:a|ach)? (dziewiecdziesiat|dwutysieczn)\w*"),
+     lambda m, now: _decade("90" if m[1] == "dziewiecdziesiat" else "2000")),
+    (re.compile(rf"\b(?:od|since|starting|starting from|from) (?:roku )?{_Y}\b"), lambda m, now: (int(m[1]), now)),
+    (re.compile(rf"\b(?:po|after) (?:roku )?{_Y}\b"), lambda m, now: (int(m[1]) + 1, now)),
+    (re.compile(rf"\b(?:przed|before) (?:rokiem )?{_Y}\b"), lambda m, now: (1989, int(m[1]) - 1)),
+    (re.compile(rf"\b(?:do|until|till|up to) (?:roku )?{_Y}\b"), lambda m, now: (1989, int(m[1]))),
+    (re.compile(rf"\b(?:ostatni\w* {_N}|{_N} ostatni\w*) lat\w*|\b(?:last|past) {_N} years\b"), lambda m, now: (now - _count(m), now)),
+    (re.compile(r"\bostatni\w* dekad\w*|\b(?:last|past) decade\b"), lambda m, now: (now - 10, now)),
+    (re.compile(rf"\b(?:ostatni\w* {_N}|{_N} ostatni\w*) wybor\w*|\b(?:last|past) {_N} elections\b"), lambda m, now: ("last", _count(m))),
+    (re.compile(r"\bostatni\w* wybor\w*|\b(?:last|latest|most recent) elections?\b"), lambda m, now: ("last", 1)),
+]
+
+
+def _decade(digits: str) -> tuple[int, int]:
+    """First and last year of a decade written as "90", "1990", "2000" or "10" (two digits: 1990s for 30-90)."""
+    start = int(digits) if len(digits) == 4 else (1900 if int(digits) >= 30 else 2000) + int(digits)
+    return start, start + 9
+
+
+def _count(m: re.Match) -> int:
+    """The number of a "last N" phrase (digits or a number word, whichever group matched)."""
+    word = next(g for g in m.groups() if g)
+    return int(word) if word.isdigit() else _NUMBER_WORDS[word]
+
+
+def period_ranges(question: str, now: int | None = None) -> list[tuple[str, Any, int]]:
+    """Periods named in the question: ``(phrase, start, end)`` year ranges or ``(phrase, "last", n)``."""
+    folded, now = entities.fold(question), now or time.localtime().tm_year
+    out = []
+    for pattern, years in _PERIODS:
+        for m in pattern.finditer(folded):
+            out.append((m[0].strip(), *years(m, now)))
+            folded = folded[: m.start()] + " " * len(m[0]) + folded[m.end():]  # a span counts once
+    return out
+
+
+def loaded_years() -> dict[str, list[int]]:
+    """Years of every loaded election (``mart.elections``)."""
+    with psycopg.connect(MART_DATABASE_URL) as conn:
+        rows = conn.execute("SELECT DISTINCT election, year FROM mart.elections ORDER BY 1, 2").fetchall()
+    out: dict[str, list[int]] = {}
+    for election, year in rows:
+        out.setdefault(election, []).append(year)
+    return out
+
+
+def period_hint(periods: list[tuple[str, Any, int]], loaded: dict[str, list[int]], relations: list[str]) -> str:
+    """Prompt lines turning the question's periods into the loaded years of the relevant elections."""
+    relevant = {e: y for e, y in loaded.items() if any(r.startswith((f"{e}_", f"v_{e}_")) for r in relations)} or loaded
+    lines = []
+    for phrase, start, end in periods:
+        if start == "last":
+            years = {e: y[-end:] for e, y in relevant.items()}
+            meaning = "the latest loaded election" if end == 1 else f"the last {end} loaded elections"
+            meaning += " of the kind asked about"
+        else:
+            years = {e: [x for x in y if start <= x <= end] for e, y in relevant.items()}
+            meaning = f"years {start}-{end} (year BETWEEN {start} AND {end})"
+        loaded_in = "; ".join(f"{e} {', '.join(map(str, y))}" for e, y in years.items() if y) or "none"
+        lines.append(f"- \"{phrase}\" means {meaning}; loaded years: {loaded_in}")
+    return ("Periods in the question (use exactly these years, one row per year when the question asks "
+            "about a trend):\n" + "\n".join(lines))
+
+
 def build_context(
     question: str, matches: list[entities.EntityMatch], previous: dict | None = None
 ) -> tuple[str, str, dict[str, Any]]:
@@ -425,9 +502,12 @@ def build_context(
     if len(relations) == len(described):  # no election kind named: whole schema, base tables compact
         described = schema_description(version, compact=True)
     similar = examples.similar_examples(question)
+    # Periods ("lata 90.", "od 2005") become the loaded years, so the model does not guess them.
+    periods = period_ranges(question)
+    period = f"\n\n{period_hint(periods, loaded_years(), relations)}" if periods else ""
     context = (
         "Schema:\n" + "\n\n".join(described[r] for r in relations)
-        + f"\n\n{elections}\n\nEntities matched in the question:\n{hints}"
+        + f"\n\n{elections}{period}\n\nEntities matched in the question:\n{hints}"
         + (f"\n\n{examples.format_examples(similar)}" if similar else "")
     )
     if previous:

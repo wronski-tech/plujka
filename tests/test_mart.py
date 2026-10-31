@@ -1131,6 +1131,29 @@ class TestPromptRelations(unittest.TestCase):
         self.assertNotIn("pe_lists", relations)
         self.assertNotIn("v_precinct_results", dynamic_sql.relevant_relations("Kto wygrał wybory prezydenckie w 2020?", self.AVAILABLE))
 
+    def test_periods_become_loaded_years(self) -> None:
+        ranges = lambda q: [p[1:] for p in dynamic_sql.period_ranges(q, now=2026)]  # noqa: E731
+        self.assertEqual(ranges("Frekwencja w latach 90."), [(1990, 1999)])
+        self.assertEqual(ranges("Turnout in the 2000s"), [(2000, 2009)])
+        self.assertEqual(ranges("Wyniki w latach 20."), [(2020, 2029)])
+        # "od" includes the year, "po" and "przed" do not.
+        self.assertEqual(ranges("Wyniki PiS od 2015"), [(2015, 2026)])
+        self.assertEqual(ranges("Wyniki PiS po 2015 roku"), [(2016, 2026)])
+        self.assertEqual(ranges("Wyniki SLD przed 2005"), [(1989, 2004)])
+        self.assertEqual(ranges("Frekwencja w latach 2001-2011"), [(2001, 2011)])
+        self.assertEqual(ranges("Frekwencja w ostatnich trzech wyborach"), [("last", 3)])
+        self.assertEqual(ranges("Frekwencja w trzech ostatnich wyborach"), [("last", 3)])
+        self.assertEqual(ranges("Kto wygrał ostatnie wybory?"), [("last", 1)])
+        # Two named years, an election name with "do" and a plain year are not periods.
+        for question in ("Frekwencja 2019 i 2023", "Ile mandatów do Sejmu 2023?", "Wyniki 2015"):
+            self.assertEqual(ranges(question), [], question)
+        loaded = {"sejm": [1991, 1993, 1997, 2001], "prezydent": [1990, 1995, 2000]}
+        hint = dynamic_sql.period_hint(dynamic_sql.period_ranges("Sejm w latach 90.", now=2026), loaded, ["sejm_lists", "v_turnout"])
+        self.assertIn("year BETWEEN 1990 AND 1999); loaded years: sejm 1991, 1993, 1997", hint)
+        self.assertNotIn("prezydent", hint, "only the elections the question is about")
+        hint = dynamic_sql.period_hint(dynamic_sql.period_ranges("ostatnie dwa wybory", now=2026), loaded, ["v_turnout"])
+        self.assertIn("sejm 1997, 2001; prezydent 1995, 2000", hint)
+
     def test_english_questions_name_their_election(self) -> None:
         relevant = lambda q: dynamic_sql.relevant_relations(q, self.AVAILABLE)  # noqa: E731
         self.assertEqual(relevant("Who won the 2020 presidential election?"),

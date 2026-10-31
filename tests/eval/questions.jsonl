@@ -354,3 +354,9 @@
 {"id": "refuse-006", "family": "refuse", "question": "Czy Mentzen będzie prezydentem?", "expect": "refuse"}
 {"id": "refuse-007", "family": "refuse", "question": "Who will win the next presidential election?", "expect": "refuse"}
 {"id": "refuse-008", "family": "refuse", "question": "What do the latest polls say about PiS?", "expect": "refuse"}
+{"id": "period-001", "family": "period", "question": "Jaka była frekwencja w wyborach do Sejmu w latach 90.?", "sql": "SELECT year, turnout_pct FROM mart.v_sejm_turnout WHERE year BETWEEN 1990 AND 1999 AND level = 'country' ORDER BY year"}
+{"id": "period-002", "family": "period", "question": "Kto wygrywał pierwsze tury wyborów prezydenckich od 2005?", "sql": "SELECT DISTINCT ON (year) year, full_name, pct FROM mart.v_prezydent_results WHERE year >= 2005 AND round = 1 AND level = 'country' ORDER BY year, votes DESC"}
+{"id": "period-003", "family": "period", "question": "Ile mandatów zdobywało PiS w wyborach do Sejmu po 2010 roku?", "sql": "SELECT year, seats FROM mart.v_sejm_national_results WHERE year > 2010 AND 'PiS' = ANY(aliases) ORDER BY year"}
+{"id": "period-004", "family": "period", "question": "Frekwencja w trzech ostatnich wyborach do Parlamentu Europejskiego", "sql": "SELECT year, turnout_pct FROM mart.v_turnout WHERE election = 'pe' AND level = 'country' AND year IN (2014, 2019, 2024) ORDER BY year"}
+{"id": "period-005", "family": "period", "question": "Turnout in Sejm elections in the 2000s", "sql": "SELECT year, turnout_pct FROM mart.v_sejm_turnout WHERE year BETWEEN 2000 AND 2009 AND level = 'country' ORDER BY year"}
+{"id": "period-006", "family": "period", "question": "Jaki procent głosów zdobywało SLD w wyborach do Sejmu przed 2005?", "sql": "SELECT year, pct FROM mart.v_sejm_national_results WHERE year < 2005 AND 'SLD' = ANY(aliases) ORDER BY year"}
